@@ -1,8 +1,10 @@
-﻿using System;
+﻿using newAlgorithm.Model;
+using newAlgorithm.Service;
+using System;
 using System.Collections.Generic;
+using System.Data.Common;
+using System.Diagnostics.PerformanceData;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace newAlgorithm
 {
@@ -16,6 +18,7 @@ namespace newAlgorithm
         private List<List<List<int>>> _startProcessing;
         private List<List<List<int>>> _endProcessing;
         private List<SheduleElement> _rWithTime;
+        public static Visualizer viz;
 
         /// <summary>
         /// 
@@ -26,6 +29,7 @@ namespace newAlgorithm
         {
             this._r = r;
             L = l;
+            viz = new Visualizer(l, r[0].Count);
         }
 
         /// <summary>
@@ -154,6 +158,86 @@ namespace newAlgorithm
             }
         }
 
+        private void CalculateSheduleWithBufer(int b, int deviceCount, int countType)
+        {
+            Matrix timeProcessing = new Matrix(Treatment);
+
+            RMatrix rMatrix = new RMatrix(countType);
+
+            for (int column = 0; column < _r.Count; column++)
+            {
+                for (int row = 0; row < _r[column].Count; row++)
+                {
+                    var val = _r[column][row];
+                    if(val != 0)
+                    {
+                        rMatrix.AddNode(row + 1, val);
+                        break;
+                    }
+                }
+            }
+
+            List<List<int>> pMatr = new List<List<int>>();
+            for (int row = 0; row < _r[0].Count; row++)
+            {
+                List<int> tmp = new List<int>();
+                for (int column = 0; column < _r.Count; column++)
+                {
+                    tmp.Add(0);
+                }
+                pMatr.Add(tmp);
+            }
+            for (int column = 0; column < _r.Count; column++)
+            {
+                for (int row = 0; row < _r[column].Count; row++)
+                {
+                    if (_r[column][row] != 0)
+                    {
+                        pMatr[row][column] = 1;
+                    }
+                }
+            }
+
+            Matrix pMatrix = new Matrix(pMatr);
+
+            TreeDimMatrix timeChangeover = new TreeDimMatrix(deviceCount);
+            for (int device = 0; device < Switching.Count; device++)
+            {
+                for (int fromType = 0; fromType < Switching[device].Count; fromType++)
+                {
+                    for (int toType = 0; toType < Switching[device][fromType].Count; toType++)
+                    {
+                        var val = Switching[device][fromType][toType];
+                        if (val != 0)
+                        {
+                            timeChangeover.AddNode(device + 1, fromType + 1, toType + 1, Switching[device][fromType][toType]);
+                        }
+                    }
+                }
+            }
+
+            TreeDimMatrix tnMatrix = CalculationService.CalculateTnMatrix(rMatrix, pMatrix, timeProcessing, timeChangeover, b);
+
+            //if (viz == null)
+            //{
+            //    viz = new Visualizer(deviceCount, countType);
+            //}
+            //else
+            //{
+            //    viz.CreateExcelAppList(deviceCount, countType);
+            //}
+
+            //viz.Visualize(tnMatrix, timeProcessing, rMatrix);
+
+            TreeDimMatrixNode lastNode = tnMatrix.treeDimMatrix.Last();
+            int count = lastNode.Count;
+            int type = rMatrix.Find(lastNode.Type).Type;
+
+            int value = timeProcessing.GetItem(lastNode.DeviceNumber, type);
+
+            _timeConstructShedule = count + value;
+        }
+
         /// <summary>
         /// 
         /// </summary>
@@ -245,6 +329,30 @@ namespace newAlgorithm
         /// <summary>
         /// 
         /// </summary>
+        /// <returns></returns>
+        public List<List<int>> ConstructSheduleWithBuffer(int b, int countType)
+        {
+            var tempTime = 9999999;
+            CalculateSheduleWithBufer(b, L, countType);
+            var tempR = CopyMatrix(_r);
+            tempTime = _timeConstructShedule;
+            for (var i = 0; i < _r.Count - 1; i++)
+            {
+                for (var j = i + 1; j < _r.Count; j++)
+                {
+                    ChangeColum(i, j);
+                }
+                CalculateSheduleWithBufer(b, L, countType);
+                if (tempTime >= _timeConstructShedule) continue;
+                _r = tempR;
+                _timeConstructShedule = tempTime;
+            }
+            return _r;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
         /// <param name="tz"></param>
         /// <param name="crit"></param>
         /// <returns></returns>
@@ -276,7 +384,7 @@ namespace newAlgorithm
         /// <returns></returns>
         public int GetTime()
         {
-            ConstructShedule();
+            //ConstructShedule();
             return _timeConstructShedule;
         }
     }

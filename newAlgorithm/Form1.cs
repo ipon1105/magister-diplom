@@ -16,6 +16,7 @@ namespace newAlgorithm
         int _selectionType = 2;
         int _l, _maxS, _maxT;
         int _countType, _countBatches;
+        public static int buff;
         List<List<List<int>>> _temptS = new List<List<List<int>>>();
         List<List<int>> _temptT = new List<List<int>>();
 
@@ -157,6 +158,7 @@ namespace newAlgorithm
 
         private void button1_Click(object sender, EventArgs e)
         {
+            buff = Convert.ToInt32(buffer.Value);
              _countType = (int)numericUpDown1.Value; // количество типов
             _countBatches = Convert.ToInt32(countBatchesTB.Text); // количество пакетов
             var listCountButches = new List<int>(); // количество пакетов каждого типа
@@ -689,7 +691,7 @@ namespace newAlgorithm
             int countType = (int)numericUpDown1.Value;
             int countDevices = Convert.ToInt32(LTB.Text);
 
-            for (int rowIndex = countType * 2; rowIndex < countType * countDevices; rowIndex++)
+            for (int rowIndex = countType; rowIndex < countType * countDevices; rowIndex++)
             {
                 var row = dataGridView2.Rows[rowIndex];
                 for (int columnIndex = 0; columnIndex < row.Cells.Count; columnIndex++)

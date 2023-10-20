@@ -37,6 +37,10 @@
     <StartupObject>newAlgorithm.Program</StartupObject>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Microsoft.Office.Interop.Excel, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Office.Interop.Excel.15.0.4795.1001\lib\net20\Microsoft.Office.Interop.Excel.dll</HintPath>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -50,6 +54,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BatchTypeClaims.cs" />
+    <Compile Include="CalculationService.cs" />
     <Compile Include="FirstLevel.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
@@ -60,6 +65,15 @@
     <Compile Include="GAA.cs" />
     <Compile Include="GaaSecondLevel.cs" />
     <Compile Include="Groups.cs" />
+    <Compile Include="Model\Job\Job.cs" />
+    <Compile Include="Model\Job\JobContainer.cs" />
+    <Compile Include="Model\Matrix.cs" />
+    <Compile Include="Model\RMatrix\RMatrix.cs" />
+    <Compile Include="Model\RMatrix\RMatrixNode.cs" />
+    <Compile Include="Model\TimeChangeoverMatrix\TreeDimMatrix.cs" />
+    <Compile Include="Model\TimeChangeoverMatrix\TreeDimMatrixNode.cs" />
+    <Compile Include="Model\TreeDimMatrix\TreeDimMatrix.cs" />
+    <Compile Include="Model\TreeDimMatrix\TreeDimMatrixNode.cs" />
     <Compile Include="OldFirstLevel.cs" />
     <Compile Include="OldSecondLevel.cs" />
     <Compile Include="Kit.cs" />
@@ -68,6 +82,7 @@
     <Compile Include="Sets.cs" />
     <Compile Include="Shedule.cs" />
     <Compile Include="SheduleElement.cs" />
+    <Compile Include="Visualizer.cs" />
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
     </EmbeddedResource>
@@ -81,6 +96,7 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
+    <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -94,6 +110,7 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

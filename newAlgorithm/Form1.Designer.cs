@@ -63,23 +63,26 @@
             this.label8 = new System.Windows.Forms.Label();
             this.checkBox1 = new System.Windows.Forms.CheckBox();
             this.tabPage2 = new System.Windows.Forms.TabPage();
+            this.valueRandomize = new System.Windows.Forms.NumericUpDown();
+            this.copyPreprocessingTime = new System.Windows.Forms.Button();
+            this.randomizePreprocessingTime = new System.Windows.Forms.Button();
+            this.randomizeProcessingTime = new System.Windows.Forms.Button();
             this.label6 = new System.Windows.Forms.Label();
             this.dataGridView2 = new System.Windows.Forms.DataGridView();
             this.label7 = new System.Windows.Forms.Label();
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
-            this.randomizeProcessingTime = new System.Windows.Forms.Button();
-            this.randomizePreprocessingTime = new System.Windows.Forms.Button();
-            this.copyPreprocessingTime = new System.Windows.Forms.Button();
-            this.valueRandomize = new System.Windows.Forms.NumericUpDown();
+            this.buffer = new System.Windows.Forms.NumericUpDown();
+            this.label11 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).BeginInit();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.GenerationCounter)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown2)).BeginInit();
             this.tabPage2.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.valueRandomize)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.valueRandomize)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.buffer)).BeginInit();
             this.SuspendLayout();
             // 
             // numericUpDown1
@@ -115,7 +118,7 @@
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(15, 188);
+            this.button1.Location = new System.Drawing.Point(15, 238);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(136, 23);
             this.button1.TabIndex = 2;
@@ -218,6 +221,8 @@
             // 
             // tabPage1
             // 
+            this.tabPage1.Controls.Add(this.label11);
+            this.tabPage1.Controls.Add(this.buffer);
             this.tabPage1.Controls.Add(this.GenerationCounter);
             this.tabPage1.Controls.Add(this.textBox2);
             this.tabPage1.Controls.Add(this.OptimizationSecondLevel);
@@ -253,7 +258,7 @@
             this.tabPage1.Location = new System.Drawing.Point(4, 22);
             this.tabPage1.Name = "tabPage1";
             this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(648, 347);
+            this.tabPage1.Size = new System.Drawing.Size(656, 370);
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "Установка параметров";
             this.tabPage1.UseVisualStyleBackColor = true;
@@ -449,7 +454,7 @@
             // 
             // button3
             // 
-            this.button3.Location = new System.Drawing.Point(15, 227);
+            this.button3.Location = new System.Drawing.Point(15, 267);
             this.button3.Name = "button3";
             this.button3.Size = new System.Drawing.Size(136, 23);
             this.button3.TabIndex = 14;
@@ -495,6 +500,43 @@
             this.tabPage2.Text = "Установка времени";
             this.tabPage2.UseVisualStyleBackColor = true;
             // 
+            // valueRandomize
+            // 
+            this.valueRandomize.Location = new System.Drawing.Point(4, 337);
+            this.valueRandomize.Name = "valueRandomize";
+            this.valueRandomize.Size = new System.Drawing.Size(62, 20);
+            this.valueRandomize.TabIndex = 22;
+            // 
+            // copyPreprocessingTime
+            // 
+            this.copyPreprocessingTime.Location = new System.Drawing.Point(466, 337);
+            this.copyPreprocessingTime.Name = "copyPreprocessingTime";
+            this.copyPreprocessingTime.Size = new System.Drawing.Size(139, 20);
+            this.copyPreprocessingTime.TabIndex = 21;
+            this.copyPreprocessingTime.Text = "Копировать с первого";
+            this.copyPreprocessingTime.UseVisualStyleBackColor = true;
+            this.copyPreprocessingTime.Click += new System.EventHandler(this.copyPreprocessingTime_Click);
+            // 
+            // randomizePreprocessingTime
+            // 
+            this.randomizePreprocessingTime.Location = new System.Drawing.Point(321, 337);
+            this.randomizePreprocessingTime.Name = "randomizePreprocessingTime";
+            this.randomizePreprocessingTime.Size = new System.Drawing.Size(139, 20);
+            this.randomizePreprocessingTime.TabIndex = 21;
+            this.randomizePreprocessingTime.Text = "Рандом времени";
+            this.randomizePreprocessingTime.UseVisualStyleBackColor = true;
+            this.randomizePreprocessingTime.Click += new System.EventHandler(this.randomizePreprocessingTime_Click);
+            // 
+            // randomizeProcessingTime
+            // 
+            this.randomizeProcessingTime.Location = new System.Drawing.Point(72, 337);
+            this.randomizeProcessingTime.Name = "randomizeProcessingTime";
+            this.randomizeProcessingTime.Size = new System.Drawing.Size(212, 20);
+            this.randomizeProcessingTime.TabIndex = 13;
+            this.randomizeProcessingTime.Text = "Рандом времени обработки";
+            this.randomizeProcessingTime.UseVisualStyleBackColor = true;
+            this.randomizeProcessingTime.Click += new System.EventHandler(this.randomizeProcessingTime_Click);
+            // 
             // label6
             // 
             this.label6.AutoSize = true;
@@ -516,7 +558,6 @@
             this.dataGridView2.Name = "dataGridView2";
             this.dataGridView2.Size = new System.Drawing.Size(283, 288);
             this.dataGridView2.TabIndex = 19;
-            this.dataGridView2.Click += new System.EventHandler(this.LTB_TextChanged);
             // 
             // label7
             // 
@@ -536,42 +577,36 @@
             this.dataGridView1.Size = new System.Drawing.Size(280, 288);
             this.dataGridView1.TabIndex = 17;
             // 
-            // randomizeProcessingTime
+            // buffer
             // 
-            this.randomizeProcessingTime.Location = new System.Drawing.Point(72, 337);
-            this.randomizeProcessingTime.Name = "randomizeProcessingTime";
-            this.randomizeProcessingTime.Size = new System.Drawing.Size(212, 20);
-            this.randomizeProcessingTime.TabIndex = 13;
-            this.randomizeProcessingTime.Text = "Рандом времени обработки";
-            this.randomizeProcessingTime.UseVisualStyleBackColor = true;
-            this.randomizeProcessingTime.Click += new System.EventHandler(this.randomizeProcessingTime_Click);
+            this.buffer.Location = new System.Drawing.Point(15, 212);
+            this.buffer.Maximum = new decimal(new int[] {
+            15,
+            0,
+            0,
+            0});
+            this.buffer.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            this.buffer.Name = "buffer";
+            this.buffer.Size = new System.Drawing.Size(120, 20);
+            this.buffer.TabIndex = 34;
+            this.buffer.Value = new decimal(new int[] {
+            3,
+            0,
+            0,
+            0});
             // 
-            // randomizePreprocessingTime
+            // label11
             // 
-            this.randomizePreprocessingTime.Location = new System.Drawing.Point(321, 337);
-            this.randomizePreprocessingTime.Name = "randomizePreprocessingTime";
-            this.randomizePreprocessingTime.Size = new System.Drawing.Size(139, 20);
-            this.randomizePreprocessingTime.TabIndex = 21;
-            this.randomizePreprocessingTime.Text = "Рандом времени";
-            this.randomizePreprocessingTime.UseVisualStyleBackColor = true;
-            this.randomizePreprocessingTime.Click += new System.EventHandler(this.randomizePreprocessingTime_Click);
-            // 
-            // copyPreprocessingTime
-            // 
-            this.copyPreprocessingTime.Location = new System.Drawing.Point(466, 337);
-            this.copyPreprocessingTime.Name = "copyPreprocessingTime";
-            this.copyPreprocessingTime.Size = new System.Drawing.Size(139, 20);
-            this.copyPreprocessingTime.TabIndex = 21;
-            this.copyPreprocessingTime.Text = "Копировать с первого";
-            this.copyPreprocessingTime.UseVisualStyleBackColor = true;
-            this.copyPreprocessingTime.Click += new System.EventHandler(this.copyPreprocessingTime_Click);
-            // 
-            // valueRandomize
-            // 
-            this.valueRandomize.Location = new System.Drawing.Point(4, 337);
-            this.valueRandomize.Name = "valueRandomize";
-            this.valueRandomize.Size = new System.Drawing.Size(62, 20);
-            this.valueRandomize.TabIndex = 22;
+            this.label11.AutoSize = true;
+            this.label11.Location = new System.Drawing.Point(12, 196);
+            this.label11.Name = "label11";
+            this.label11.Size = new System.Drawing.Size(39, 13);
+            this.label11.TabIndex = 35;
+            this.label11.Text = "Буфер";
             // 
             // Form1
             // 
@@ -589,9 +624,10 @@
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown2)).EndInit();
             this.tabPage2.ResumeLayout(false);
             this.tabPage2.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.valueRandomize)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView2)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.valueRandomize)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.buffer)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -641,6 +677,8 @@
         private System.Windows.Forms.Button randomizePreprocessingTime;
         private System.Windows.Forms.Button randomizeProcessingTime;
         private System.Windows.Forms.NumericUpDown valueRandomize;
+        private System.Windows.Forms.Label label11;
+        private System.Windows.Forms.NumericUpDown buffer;
     }
 }
 

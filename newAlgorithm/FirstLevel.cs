@@ -4,6 +4,7 @@ using System.Windows.Forms;
 using System.IO;
 using System.Security.Cryptography.X509Certificates;
 using System.Reflection;
+using System;
 
 namespace newAlgorithm
 {
@@ -317,7 +318,8 @@ namespace newAlgorithm
                 {
                     tempA[type] = CopyVector(SetTempAFromA2(type, variantOfSplitIndex)[type]);
                     var shedule = new Shedule(tempA);
-                    shedule.ConstructShedule();
+                    //shedule.ConstructShedule();
+                    shedule.ConstructSheduleWithBuffer(Form1.buff, _countType);
                     var fBuf = shedule.GetTime();
                     string s;
                     s = PrintA(tempA);
@@ -353,6 +355,7 @@ namespace newAlgorithm
                 GenerateStartSolution();
                 var shedule = new Shedule(_a);
                 shedule.ConstructShedule();
+                //shedule.ConstructSheduleWithBuffer(3, _countType);
                 _f1 = shedule.GetTime();
                 MessageBox.Show(PrintA(_a) + " Время обработки " + _f1);
                 _f1Buf = _f1;
@@ -396,6 +399,7 @@ namespace newAlgorithm
                                 tempA = SetTempAFromA2(i, j);
                                 shedule = new Shedule(tempA);
                                 shedule.ConstructShedule();
+                                //shedule.ConstructSheduleWithBuffer(Form1.buff, _countType);
                                 var fBuf = shedule.GetTime();
                                 s = PrintA(tempA);
                                 file.Write(s + " " + fBuf);
@@ -479,7 +483,8 @@ namespace newAlgorithm
                 }
             }
             var shedule = new Shedule(tempA);
-            shedule.ConstructShedule();
+            //shedule.ConstructShedule();
+            shedule.ConstructSheduleWithBuffer(3, _countType);
             var r = shedule.RetyrnR();
             var sets = new Sets(Form1.compositionSets, Form1.timeSets);
             sets.GetSolution(r);
