@@ -42,6 +42,8 @@
             this.button2 = new System.Windows.Forms.Button();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.label11 = new System.Windows.Forms.Label();
+            this.buffer = new System.Windows.Forms.NumericUpDown();
             this.GenerationCounter = new System.Windows.Forms.NumericUpDown();
             this.textBox2 = new System.Windows.Forms.TextBox();
             this.OptimizationSecondLevel = new System.Windows.Forms.CheckBox();
@@ -55,10 +57,10 @@
             this.button5 = new System.Windows.Forms.Button();
             this.numericUpDown2 = new System.Windows.Forms.NumericUpDown();
             this.button4 = new System.Windows.Forms.Button();
-            this.radioButton4 = new System.Windows.Forms.RadioButton();
-            this.radioButton3 = new System.Windows.Forms.RadioButton();
-            this.radioButton2 = new System.Windows.Forms.RadioButton();
-            this.radioButton1 = new System.Windows.Forms.RadioButton();
+            this.radioButton_UniformRanking = new System.Windows.Forms.RadioButton();
+            this.radioButton_SigmaClipping = new System.Windows.Forms.RadioButton();
+            this.radioButton_RouletteMethod = new System.Windows.Forms.RadioButton();
+            this.radioButton_TournamentSelection = new System.Windows.Forms.RadioButton();
             this.button3 = new System.Windows.Forms.Button();
             this.label8 = new System.Windows.Forms.Label();
             this.checkBox1 = new System.Windows.Forms.CheckBox();
@@ -71,18 +73,16 @@
             this.dataGridView2 = new System.Windows.Forms.DataGridView();
             this.label7 = new System.Windows.Forms.Label();
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
-            this.buffer = new System.Windows.Forms.NumericUpDown();
-            this.label11 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).BeginInit();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.buffer)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.GenerationCounter)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown2)).BeginInit();
             this.tabPage2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.valueRandomize)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.buffer)).BeginInit();
             this.SuspendLayout();
             // 
             // numericUpDown1
@@ -236,10 +236,10 @@
             this.tabPage1.Controls.Add(this.button5);
             this.tabPage1.Controls.Add(this.numericUpDown2);
             this.tabPage1.Controls.Add(this.button4);
-            this.tabPage1.Controls.Add(this.radioButton4);
-            this.tabPage1.Controls.Add(this.radioButton3);
-            this.tabPage1.Controls.Add(this.radioButton2);
-            this.tabPage1.Controls.Add(this.radioButton1);
+            this.tabPage1.Controls.Add(this.radioButton_UniformRanking);
+            this.tabPage1.Controls.Add(this.radioButton_SigmaClipping);
+            this.tabPage1.Controls.Add(this.radioButton_RouletteMethod);
+            this.tabPage1.Controls.Add(this.radioButton_TournamentSelection);
             this.tabPage1.Controls.Add(this.button3);
             this.tabPage1.Controls.Add(this.label8);
             this.tabPage1.Controls.Add(this.checkBox1);
@@ -263,6 +263,37 @@
             this.tabPage1.Text = "Установка параметров";
             this.tabPage1.UseVisualStyleBackColor = true;
             this.tabPage1.Click += new System.EventHandler(this.tabPage1_Click);
+            // 
+            // label11
+            // 
+            this.label11.AutoSize = true;
+            this.label11.Location = new System.Drawing.Point(12, 196);
+            this.label11.Name = "label11";
+            this.label11.Size = new System.Drawing.Size(39, 13);
+            this.label11.TabIndex = 35;
+            this.label11.Text = "Буфер";
+            // 
+            // buffer
+            // 
+            this.buffer.Location = new System.Drawing.Point(15, 212);
+            this.buffer.Maximum = new decimal(new int[] {
+            15,
+            0,
+            0,
+            0});
+            this.buffer.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            this.buffer.Name = "buffer";
+            this.buffer.Size = new System.Drawing.Size(120, 20);
+            this.buffer.TabIndex = 34;
+            this.buffer.Value = new decimal(new int[] {
+            3,
+            0,
+            0,
+            0});
             // 
             // GenerationCounter
             // 
@@ -404,53 +435,53 @@
             this.button4.UseVisualStyleBackColor = true;
             this.button4.Click += new System.EventHandler(this.button4_Click);
             // 
-            // radioButton4
+            // radioButton_UniformRanking
             // 
-            this.radioButton4.AutoSize = true;
-            this.radioButton4.Location = new System.Drawing.Point(163, 273);
-            this.radioButton4.Name = "radioButton4";
-            this.radioButton4.Size = new System.Drawing.Size(171, 17);
-            this.radioButton4.TabIndex = 18;
-            this.radioButton4.TabStop = true;
-            this.radioButton4.Text = "Равномерное ранжирование";
-            this.radioButton4.UseVisualStyleBackColor = true;
-            this.radioButton4.CheckedChanged += new System.EventHandler(this.radioButton4_CheckedChanged);
+            this.radioButton_UniformRanking.AutoSize = true;
+            this.radioButton_UniformRanking.Location = new System.Drawing.Point(163, 273);
+            this.radioButton_UniformRanking.Name = "radioButton_UniformRanking";
+            this.radioButton_UniformRanking.Size = new System.Drawing.Size(171, 17);
+            this.radioButton_UniformRanking.TabIndex = 18;
+            this.radioButton_UniformRanking.TabStop = true;
+            this.radioButton_UniformRanking.Text = "Равномерное ранжирование";
+            this.radioButton_UniformRanking.UseVisualStyleBackColor = true;
+            this.radioButton_UniformRanking.CheckedChanged += new System.EventHandler(this.radioButton4_CheckedChanged);
             // 
-            // radioButton3
+            // radioButton_SigmaClipping
             // 
-            this.radioButton3.AutoSize = true;
-            this.radioButton3.Location = new System.Drawing.Point(163, 296);
-            this.radioButton3.Name = "radioButton3";
-            this.radioButton3.Size = new System.Drawing.Size(234, 17);
-            this.radioButton3.TabIndex = 17;
-            this.radioButton3.TabStop = true;
-            this.radioButton3.Text = "Сигма отсечение(Пока не реализованно)";
-            this.radioButton3.UseVisualStyleBackColor = true;
-            this.radioButton3.CheckedChanged += new System.EventHandler(this.radioButton3_CheckedChanged);
+            this.radioButton_SigmaClipping.AutoSize = true;
+            this.radioButton_SigmaClipping.Location = new System.Drawing.Point(163, 296);
+            this.radioButton_SigmaClipping.Name = "radioButton_SigmaClipping";
+            this.radioButton_SigmaClipping.Size = new System.Drawing.Size(234, 17);
+            this.radioButton_SigmaClipping.TabIndex = 17;
+            this.radioButton_SigmaClipping.TabStop = true;
+            this.radioButton_SigmaClipping.Text = "Сигма отсечение(Пока не реализованно)";
+            this.radioButton_SigmaClipping.UseVisualStyleBackColor = true;
+            this.radioButton_SigmaClipping.CheckedChanged += new System.EventHandler(this.radioButton3_CheckedChanged);
             // 
-            // radioButton2
+            // radioButton_RouletteMethod
             // 
-            this.radioButton2.AutoSize = true;
-            this.radioButton2.Location = new System.Drawing.Point(163, 250);
-            this.radioButton2.Name = "radioButton2";
-            this.radioButton2.Size = new System.Drawing.Size(100, 17);
-            this.radioButton2.TabIndex = 16;
-            this.radioButton2.TabStop = true;
-            this.radioButton2.Text = "Метод рулетки";
-            this.radioButton2.UseVisualStyleBackColor = true;
-            this.radioButton2.CheckedChanged += new System.EventHandler(this.radioButton2_CheckedChanged);
+            this.radioButton_RouletteMethod.AutoSize = true;
+            this.radioButton_RouletteMethod.Location = new System.Drawing.Point(163, 250);
+            this.radioButton_RouletteMethod.Name = "radioButton_RouletteMethod";
+            this.radioButton_RouletteMethod.Size = new System.Drawing.Size(100, 17);
+            this.radioButton_RouletteMethod.TabIndex = 16;
+            this.radioButton_RouletteMethod.TabStop = true;
+            this.radioButton_RouletteMethod.Text = "Метод рулетки";
+            this.radioButton_RouletteMethod.UseVisualStyleBackColor = true;
+            this.radioButton_RouletteMethod.CheckedChanged += new System.EventHandler(this.radioButton2_CheckedChanged);
             // 
-            // radioButton1
+            // radioButton_TournamentSelection
             // 
-            this.radioButton1.AutoSize = true;
-            this.radioButton1.Location = new System.Drawing.Point(163, 227);
-            this.radioButton1.Name = "radioButton1";
-            this.radioButton1.Size = new System.Drawing.Size(133, 17);
-            this.radioButton1.TabIndex = 15;
-            this.radioButton1.TabStop = true;
-            this.radioButton1.Text = "Турнирная селекция ";
-            this.radioButton1.UseVisualStyleBackColor = true;
-            this.radioButton1.CheckedChanged += new System.EventHandler(this.radioButton1_CheckedChanged);
+            this.radioButton_TournamentSelection.AutoSize = true;
+            this.radioButton_TournamentSelection.Location = new System.Drawing.Point(163, 227);
+            this.radioButton_TournamentSelection.Name = "radioButton_TournamentSelection";
+            this.radioButton_TournamentSelection.Size = new System.Drawing.Size(133, 17);
+            this.radioButton_TournamentSelection.TabIndex = 15;
+            this.radioButton_TournamentSelection.TabStop = true;
+            this.radioButton_TournamentSelection.Text = "Турнирная селекция ";
+            this.radioButton_TournamentSelection.UseVisualStyleBackColor = true;
+            this.radioButton_TournamentSelection.CheckedChanged += new System.EventHandler(this.radioButton1_CheckedChanged);
             // 
             // button3
             // 
@@ -577,37 +608,6 @@
             this.dataGridView1.Size = new System.Drawing.Size(280, 288);
             this.dataGridView1.TabIndex = 17;
             // 
-            // buffer
-            // 
-            this.buffer.Location = new System.Drawing.Point(15, 212);
-            this.buffer.Maximum = new decimal(new int[] {
-            15,
-            0,
-            0,
-            0});
-            this.buffer.Minimum = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
-            this.buffer.Name = "buffer";
-            this.buffer.Size = new System.Drawing.Size(120, 20);
-            this.buffer.TabIndex = 34;
-            this.buffer.Value = new decimal(new int[] {
-            3,
-            0,
-            0,
-            0});
-            // 
-            // label11
-            // 
-            this.label11.AutoSize = true;
-            this.label11.Location = new System.Drawing.Point(12, 196);
-            this.label11.Name = "label11";
-            this.label11.Size = new System.Drawing.Size(39, 13);
-            this.label11.TabIndex = 35;
-            this.label11.Text = "Буфер";
-            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -620,6 +620,7 @@
             this.tabControl1.ResumeLayout(false);
             this.tabPage1.ResumeLayout(false);
             this.tabPage1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.buffer)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.GenerationCounter)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown2)).EndInit();
             this.tabPage2.ResumeLayout(false);
@@ -627,7 +628,6 @@
             ((System.ComponentModel.ISupportInitialize)(this.valueRandomize)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView2)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.buffer)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -655,10 +655,10 @@
         private System.Windows.Forms.Label label8;
         private System.Windows.Forms.CheckBox checkBox1;
         private System.Windows.Forms.Button button3;
-        private System.Windows.Forms.RadioButton radioButton4;
-        private System.Windows.Forms.RadioButton radioButton3;
-        private System.Windows.Forms.RadioButton radioButton2;
-        private System.Windows.Forms.RadioButton radioButton1;
+        private System.Windows.Forms.RadioButton radioButton_UniformRanking;
+        private System.Windows.Forms.RadioButton radioButton_SigmaClipping;
+        private System.Windows.Forms.RadioButton radioButton_RouletteMethod;
+        private System.Windows.Forms.RadioButton radioButton_TournamentSelection;
         private System.Windows.Forms.Button button4;
         private System.Windows.Forms.NumericUpDown numericUpDown2;
         private System.Windows.Forms.Button button5;
