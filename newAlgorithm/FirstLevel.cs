@@ -60,6 +60,19 @@ namespace newAlgorithm
             return inMatrix.ToList();
         }
 
+        /// <summary>
+        /// Алгоритм формирования фиксированных партий
+        /// </summary>
+        public void GenerateFixSolution()
+        {
+            _a = new List<List<int>>();
+            for (var i = 0; i < _countType; i++)
+            {
+                _i.Add(1);
+                _a.Add(new List<int>());
+                _a[i].Add(_countClaims[i]);
+            }
+        }
 
         /// <summary>
         /// Алгоритм формирования начальных решений по составам партий всех типов
@@ -309,38 +322,42 @@ namespace newAlgorithm
         /// <param name="file"></param>
         /// <param name="tempA"></param>
         /// <param name="type"></param>
-        public void CombinationType(StreamWriter file, List<List<int>> tempA, int type, ref bool solutionFlag )
+        public void CombinationType(StreamWriter file, List<List<List<int>>> tempMatrix, int type, List<List<int>> tempM, ref bool solutionFlag )
         {
             if (type < _countType)
             {
-                var tempB = CopyMatrix(tempA);
                 for (var variantOfSplitIndex = 0; variantOfSplitIndex < _a2[type].Count; variantOfSplitIndex++)
                 {
-                    tempA[type] = CopyVector(SetTempAFromA2(type, variantOfSplitIndex)[type]);
-                    var shedule = new Shedule(tempA);
-                    //shedule.ConstructShedule();
-                    shedule.ConstructSheduleWithBuffer(Form1.buff, _countType);
-                    var fBuf = shedule.GetTime();
-                    string s;
-                    s = PrintA(tempA);
-                    file.Write(s + " " + fBuf);
-                    MessageBox.Show(s + " Время обработки " + fBuf);
-                    if (fBuf < _f1Buf)
+                    List<List<int>> tempB;
+                    if (tempM != null)
                     {
-                        _abuf = CopyMatrix(tempA);
-                        solutionFlag = true;
-                        _f1Buf = fBuf;
-                        file.Write(" +");
-                        return;
+                        tempB = CopyMatrix(tempM);
+                    } else
+                    {
+                        tempB = new List<List<int>>();
                     }
-                    file.WriteLine();
-                    CombinationType(file, tempA, type + 1, ref solutionFlag);
+                    tempB.Add(tempMatrix[type][variantOfSplitIndex]);
+                    CombinationType(file, tempMatrix, type + 1, tempB, ref solutionFlag);
                 }
-
-                for (int index = type + 1; index < _countType; index++)
+            } else
+            {
+                var shedule = new Shedule(tempM);
+                //shedule.ConstructShedule();
+                shedule.ConstructSheduleWithBuffer(Form1.buff, _countType);
+                var fBuf = shedule.GetTime();
+                string s;
+                s = PrintA(tempM);
+                file.Write(s + " " + fBuf);
+                MessageBox.Show(s + " Время обработки " + fBuf);
+                if (fBuf < _f1Buf)
                 {
-                    CombinationType(file, tempB, index, ref solutionFlag);
+                    _abuf = CopyMatrix(tempM);
+                    solutionFlag = true;
+                    _f1Buf = fBuf;
+                    file.Write(" +");
+                    return;
                 }
+                file.WriteLine();
             }
         }
 
@@ -352,16 +369,33 @@ namespace newAlgorithm
         {
             using (var file = new StreamWriter(fileName))
             {
-                GenerateStartSolution();
+                GenerateFixSolution();
                 var shedule = new Shedule(_a);
-                shedule.ConstructShedule();
-                //shedule.ConstructSheduleWithBuffer(3, _countType);
+                //shedule.ConstructShedule();
+                shedule.ConstructSheduleWithBuffer(Form1.buff, _countType);
                 _f1 = shedule.GetTime();
                 MessageBox.Show(PrintA(_a) + " Время обработки " + _f1);
                 _f1Buf = _f1;
                 file.WriteLine(_f1Buf);
                 var maxA = CopyMatrix(_a);
                 _typeSolutionFlag = true;
+
+                _i.Clear();
+                _a.Clear();
+
+                GenerateStartSolution();
+                shedule = new Shedule(_a);
+                //shedule.ConstructShedule();
+                shedule.ConstructSheduleWithBuffer(Form1.buff, _countType);
+                _f1 = shedule.GetTime();
+                MessageBox.Show(PrintA(_a) + " Время обработки " + _f1);
+                if (_f1 < _f1Buf)
+                {
+                    _abuf = CopyMatrix(_a);
+                    _typeSolutionFlag = true;
+                    _f1Buf = _f1;
+                    file.Write(" +");
+                }
                 if (!_staticSolution)
                 {
                     while (CheckType(_i))
@@ -398,8 +432,8 @@ namespace newAlgorithm
                             {
                                 tempA = SetTempAFromA2(i, j);
                                 shedule = new Shedule(tempA);
-                                shedule.ConstructShedule();
-                                //shedule.ConstructSheduleWithBuffer(Form1.buff, _countType);
+                                //shedule.ConstructShedule();
+                                shedule.ConstructSheduleWithBuffer(Form1.buff, _countType);
                                 var fBuf = shedule.GetTime();
                                 s = PrintA(tempA);
                                 file.Write(s + " " + fBuf);
@@ -417,8 +451,7 @@ namespace newAlgorithm
                         if (!_typeSolutionFlag)
                         {
                             file.WriteLine("комбинации типов");
-                            tempA = CopyMatrix(_a);
-                            CombinationType(file, tempA, 0, ref _typeSolutionFlag);
+                            CombinationType(file, _a2, 0, null, ref _typeSolutionFlag);
                         }
 
                         if (_typeSolutionFlag)
