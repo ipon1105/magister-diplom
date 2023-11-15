@@ -79,6 +79,7 @@
     <Compile Include="Kit.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SelectionType.cs" />
     <Compile Include="Sets.cs" />
     <Compile Include="Shedule.cs" />
     <Compile Include="SheduleElement.cs" />

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using magisterDiplom;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -13,7 +14,9 @@ namespace newAlgorithm
 {
     public partial class Form1 : Form
     {
-        int _selectionType = 2;
+        /// Данная переменная отвечает за выбор способа обработки данных
+        private SelectoinType selectoinType;
+
         int _l, _maxS, _maxT;
         int _countType, _countBatches;
         public static int buff;
@@ -29,6 +32,9 @@ namespace newAlgorithm
         {
             InitializeComponent();
             InitializeForm();
+
+            // Инициализируем способ обработки данных
+            selectoinType = SelectoinType.Undefined;
 
             var test = new List<List<int>>();
             test.Add(new List<int>());
@@ -350,24 +356,24 @@ namespace newAlgorithm
             firstLevel.GenetateSolutionForAllTypesSecondAlgorithm();
         }
 
-        private void radioButton4_CheckedChanged(object sender, EventArgs e)
-        {
-            _selectionType = 2;
-        }
-
         private void radioButton1_CheckedChanged(object sender, EventArgs e)
         {
-            _selectionType = 0;
+            selectoinType = SelectoinType.TournamentSelection;
         }
 
         private void radioButton2_CheckedChanged(object sender, EventArgs e)
         {
-            _selectionType = 1;
+            selectoinType = SelectoinType.RouletteMethod;
+        }
+
+        private void radioButton4_CheckedChanged(object sender, EventArgs e)
+        {
+            selectoinType = SelectoinType.UniformRanking;
         }
 
         private void radioButton3_CheckedChanged(object sender, EventArgs e)
         {
-            _selectionType = 3;
+            selectoinType = SelectoinType.SigmaClipping;
         }
 
         private void button6_Click(object sender, EventArgs e)
@@ -754,7 +760,7 @@ namespace newAlgorithm
                                 gaa.SetXrom((int)numericUpDown2.Value);
                                 var countSourceKit = gaa.calcFitnessList();
                                 int s;
-                                var result = gaa.getSelectionPopulation(_selectionType, out s);
+                                var result = gaa.getSelectionPopulation(selectoinType, out s);
 
                                 using (var file = new StreamWriter("outputGAA.txt", true))
                                 {

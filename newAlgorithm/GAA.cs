@@ -1,4 +1,5 @@
-﻿using System;
+﻿using magisterDiplom;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -213,7 +214,7 @@ namespace newAlgorithm
 
             return nabor;
         }
-        public int getSelectionPopulation(int selection, out int s)
+        public int getSelectionPopulation(SelectoinType selection, out int s)
         {
             List<int> SortFitnessList = new List<int>(_fitnesslist);
             SortFitnessList.Sort();
