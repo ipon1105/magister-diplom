@@ -356,25 +356,29 @@ namespace newAlgorithm
             firstLevel.GenetateSolutionForAllTypesSecondAlgorithm();
         }
 
-        private void radioButton1_CheckedChanged(object sender, EventArgs e)
+        #region Выбор способа обработки данных
+
+        private void radioButton_TournamentSelection_change(object sender, EventArgs e)
         {
             selectoinType = SelectoinType.TournamentSelection;
         }
 
-        private void radioButton2_CheckedChanged(object sender, EventArgs e)
+        private void radioButton_RouletteMethod_change(object sender, EventArgs e)
         {
             selectoinType = SelectoinType.RouletteMethod;
         }
 
-        private void radioButton4_CheckedChanged(object sender, EventArgs e)
+        private void radioButton_UniformRanking_change(object sender, EventArgs e)
         {
             selectoinType = SelectoinType.UniformRanking;
         }
 
-        private void radioButton3_CheckedChanged(object sender, EventArgs e)
+        private void radioButton_SigmaClipping_change(object sender, EventArgs e)
         {
             selectoinType = SelectoinType.SigmaClipping;
         }
+
+        #endregion
 
         private void button6_Click(object sender, EventArgs e)
         {

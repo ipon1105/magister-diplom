@@ -445,7 +445,7 @@
             this.radioButton_UniformRanking.TabStop = true;
             this.radioButton_UniformRanking.Text = "Равномерное ранжирование";
             this.radioButton_UniformRanking.UseVisualStyleBackColor = true;
-            this.radioButton_UniformRanking.CheckedChanged += new System.EventHandler(this.radioButton4_CheckedChanged);
+            this.radioButton_UniformRanking.CheckedChanged += new System.EventHandler(this.radioButton_UniformRanking_change);
             // 
             // radioButton_SigmaClipping
             // 
@@ -457,7 +457,7 @@
             this.radioButton_SigmaClipping.TabStop = true;
             this.radioButton_SigmaClipping.Text = "Сигма отсечение(Пока не реализованно)";
             this.radioButton_SigmaClipping.UseVisualStyleBackColor = true;
-            this.radioButton_SigmaClipping.CheckedChanged += new System.EventHandler(this.radioButton3_CheckedChanged);
+            this.radioButton_SigmaClipping.CheckedChanged += new System.EventHandler(this.radioButton_SigmaClipping_change);
             // 
             // radioButton_RouletteMethod
             // 
@@ -469,7 +469,7 @@
             this.radioButton_RouletteMethod.TabStop = true;
             this.radioButton_RouletteMethod.Text = "Метод рулетки";
             this.radioButton_RouletteMethod.UseVisualStyleBackColor = true;
-            this.radioButton_RouletteMethod.CheckedChanged += new System.EventHandler(this.radioButton2_CheckedChanged);
+            this.radioButton_RouletteMethod.CheckedChanged += new System.EventHandler(this.radioButton_RouletteMethod_change);
             // 
             // radioButton_TournamentSelection
             // 
@@ -481,7 +481,7 @@
             this.radioButton_TournamentSelection.TabStop = true;
             this.radioButton_TournamentSelection.Text = "Турнирная селекция ";
             this.radioButton_TournamentSelection.UseVisualStyleBackColor = true;
-            this.radioButton_TournamentSelection.CheckedChanged += new System.EventHandler(this.radioButton1_CheckedChanged);
+            this.radioButton_TournamentSelection.CheckedChanged += new System.EventHandler(this.radioButton_TournamentSelection_change);
             // 
             // button3
             // 
