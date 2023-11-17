@@ -93,9 +93,9 @@ namespace newAlgorithm
         }
         
         /// <summary>
-        /// 
+        /// Данный конструктор вовзращает экземпляр данного класса на основе переданного параметра r
         /// </summary>
-        /// <param name="r"></param>
+        /// <param name="r">Матрица количества данных</param>
         public Shedule(List<List<int>> r)
         {
             _r = GenerateR(r);

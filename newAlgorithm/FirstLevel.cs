@@ -10,17 +10,26 @@ namespace newAlgorithm
 {
     class FirstLevel
     {
+
+        /// <summary>
+        /// Данная переменная определяет фиксированные ли партии
+        /// </summary>
+        private readonly bool isFixedBatches;
+
+        /// <summary>
+        /// Данная переменная определяет количество типов данных
+        /// </summary>
+        private readonly int dataTypesCount;
+
         private readonly List<int> _i;                  // Вектор интерпритируемых типов данных
         private List<List<int>> _ai;                    // Буферизированная матрица составов партий требований на k+1 шаге 
         private List<List<int>> _abuf;                  // Буферизированная матрица составов партий требований на k+1 шаге
         private List<List<List<int>>> _a1;              // Матрица составов партий требований на k+1 шаге 
         private List<List<List<int>>> _a2;              // Матрица составов партий требований фиксированного типа
         public List<List<int>> _a { get; private set; }                     // Матрица составов партий требований на k шаге
-        private readonly int _countType;                // Количество типов
-        private readonly List<int> _countClaims;        // Начальное количество требований для каждого типа данных
+        private readonly List<int> batchCountList;        // Начальное количество требований для каждого типа данных
         private int _f1;                                // Критерий текущего решения для всех типов
         private int _f1Buf;                             // Критерий текущего решения для всех типов
-        private readonly bool _staticSolution;          // Признак фиксированных партий
         private List<int> _nTemp;
         private bool _typeSolutionFlag;
 
@@ -28,14 +37,15 @@ namespace newAlgorithm
         /// <summary>
         /// Конструктор с параметрами
         /// </summary>
-        /// <param name="countType">количество типов рассматриваемых данных</param>
-        /// <param name="count_claims">количество требований всех типов данных</param>
-        public FirstLevel(int countType, List<int> countClaims, bool stat)
+        /// <param name="dataTypesCount">Количество типов данных</param>
+        /// <param name="batchCountList">Вектор длиной dataTypesCount, каждый элемент это количество элементов в партии</param>
+        /// <param name="isFixedBatches">Являются ли партии фиксированными</param>
+        public FirstLevel(int dataTypesCount, List<int> batchCountList, bool isFixedBatches)
         {
-            _countType = countType;
-            _countClaims = countClaims;
-            _staticSolution = stat;
-            _i = new List<int>(_countType);
+            this.dataTypesCount = dataTypesCount;
+            this.batchCountList = batchCountList;
+            this.isFixedBatches = isFixedBatches;
+            _i = new List<int>(this.dataTypesCount);
         }
 
 
@@ -66,11 +76,11 @@ namespace newAlgorithm
         public void GenerateFixSolution()
         {
             _a = new List<List<int>>();
-            for (var i = 0; i < _countType; i++)
+            for (var dataType = 0; dataType < dataTypesCount; dataType++)
             {
                 _i.Add(1);
                 _a.Add(new List<int>());
-                _a[i].Add(_countClaims[i]);
+                _a[dataType].Add(batchCountList[dataType]);
             }
         }
 
@@ -81,20 +91,20 @@ namespace newAlgorithm
         {
             const int claim = 2;
             _a = new List<List<int>>();
-            for (var i = 0; i < _countType; i++)
+            for (var dataType = 0; dataType < dataTypesCount; dataType++)
             {
                 _i.Add(1);
                 _a.Add(new List<int>());
-                _a[i].Add(_countClaims[i] - claim);
-                _a[i].Add(claim);
+                _a[dataType].Add(batchCountList[dataType] - claim);
+                _a[dataType].Add(claim);
             }
-            for (var i = 0; i < _countType; i++)
+            for (var dataType = 0; dataType < dataTypesCount; dataType++)
             {
-                if (_a[i][0] < 2 || _a[i][0] < _a[i][1])
+                if (_a[dataType][0] < 2 || _a[dataType][0] < _a[dataType][1])
                 {
-                    _a[i].Clear();
-                    _a[i].Add(_countClaims[i]);
-                    _i[i] = 0;
+                    _a[dataType].Clear();
+                    _a[dataType].Add(batchCountList[dataType]);
+                    _i[dataType] = 0;
                 }
             }
         }
@@ -119,9 +129,9 @@ namespace newAlgorithm
         private bool CheckType(IReadOnlyList<int> type)
         {
             var count = 0;
-            for (var j = 0; j < _countType; j++)
+            for (var dataType = 0; dataType < dataTypesCount; dataType++)
             {
-                if (type[j] > 0)
+                if (type[dataType] > 0)
                     count++;
             }
             return count != 0;
@@ -276,7 +286,7 @@ namespace newAlgorithm
 
         
         /// <summary>
-        /// НУжна для отладки вывода массива 
+        /// Нужна для отладки вывода массива 
         /// </summary>
         /// <param name="m">входной лист</param>
         /// <returns>лист в виде строки</returns>
@@ -324,7 +334,7 @@ namespace newAlgorithm
         /// <param name="type"></param>
         public void CombinationType(StreamWriter file, List<List<List<int>>> tempMatrix, int type, List<List<int>> tempM, ref bool solutionFlag )
         {
-            if (type < _countType)
+            if (type < dataTypesCount)
             {
                 for (var variantOfSplitIndex = 0; variantOfSplitIndex < _a2[type].Count; variantOfSplitIndex++)
                 {
@@ -343,7 +353,7 @@ namespace newAlgorithm
             {
                 var shedule = new Shedule(tempM);
                 //shedule.ConstructShedule();
-                shedule.ConstructSheduleWithBuffer(Form1.buff, _countType);
+                shedule.ConstructSheduleWithBuffer(Form1.buff, dataTypesCount);
                 var fBuf = shedule.GetTime();
                 string s;
                 s = PrintA(tempM);
@@ -372,7 +382,7 @@ namespace newAlgorithm
                 GenerateFixSolution();
                 var shedule = new Shedule(_a);
                 //shedule.ConstructShedule();
-                shedule.ConstructSheduleWithBuffer(Form1.buff, _countType);
+                shedule.ConstructSheduleWithBuffer(Form1.buff, dataTypesCount);
                 _f1 = shedule.GetTime();
                 MessageBox.Show(PrintA(_a) + " Время обработки " + _f1);
                 _f1Buf = _f1;
@@ -386,7 +396,7 @@ namespace newAlgorithm
                 GenerateStartSolution();
                 shedule = new Shedule(_a);
                 //shedule.ConstructShedule();
-                shedule.ConstructSheduleWithBuffer(Form1.buff, _countType);
+                shedule.ConstructSheduleWithBuffer(Form1.buff, dataTypesCount);
                 _f1 = shedule.GetTime();
                 MessageBox.Show(PrintA(_a) + " Время обработки " + _f1);
                 if (_f1 < _f1Buf)
@@ -396,7 +406,7 @@ namespace newAlgorithm
                     _f1Buf = _f1;
                     file.Write(" +");
                 }
-                if (!_staticSolution)
+                if (!isFixedBatches)
                 {
                     while (CheckType(_i))
                     {
@@ -405,11 +415,11 @@ namespace newAlgorithm
                         if (_typeSolutionFlag)
                         {
                             _a1 = new List<List<List<int>>>();
-                            for (var i = 0; i < _countType; i++)
+                            for (var dataType = 0; dataType < dataTypesCount; dataType++)
                             {
                                 _a1.Add(new List<List<int>>());
-                                _a1[i].Add(new List<int>());
-                                _a1[i][0] = CopyVector(_a[i]);
+                                _a1[dataType].Add(new List<int>());
+                                _a1[dataType][0] = CopyVector(_a[dataType]);
                             }
                             _typeSolutionFlag = false;
                         }
@@ -423,17 +433,17 @@ namespace newAlgorithm
                         _a2 = new List<List<List<int>>>();
                         string s;
                         file.WriteLine("окрестность 1 вида");
-                        for (var i = 0; i < _countType; i++)
+                        for (var dataType = 0; dataType < dataTypesCount; dataType++)
                         {
                             _a2.Add(new List<List<int>>());
-                            if (_i[i] <= 0) continue;
-                            _a2[i] = NewData(i);
-                            for (var j = 0; j < _a2[i].Count; j++)
+                            if (_i[dataType] <= 0) continue;
+                            _a2[dataType] = NewData(dataType);
+                            for (var j = 0; j < _a2[dataType].Count; j++)
                             {
-                                tempA = SetTempAFromA2(i, j);
+                                tempA = SetTempAFromA2(dataType, j);
                                 shedule = new Shedule(tempA);
                                 //shedule.ConstructShedule();
-                                shedule.ConstructSheduleWithBuffer(Form1.buff, _countType);
+                                shedule.ConstructSheduleWithBuffer(Form1.buff, dataTypesCount);
                                 var fBuf = shedule.GetTime();
                                 s = PrintA(tempA);
                                 file.Write(s + " " + fBuf);
@@ -462,12 +472,12 @@ namespace newAlgorithm
                         }
                         else
                         {
-                            for (int i = 0; i < _countType; i++)
+                            for (int dataType = 0; dataType < dataTypesCount; dataType++)
                             {
-                                _a1[i] = CopyMatrix(_a2[i]);
-                                if (!_a1[i].Any() || !_a1[i][0].Any())
+                                _a1[dataType] = CopyMatrix(_a2[dataType]);
+                                if (!_a1[dataType].Any() || !_a1[dataType][0].Any())
                                 {
-                                    _i[i] = 0;
+                                    _i[dataType] = 0;
                                 }
                             }
                         }
@@ -489,11 +499,11 @@ namespace newAlgorithm
         ///Менят здесь для _\*РУСЛАН*/_
         private void GenerateCombination(int ind, List<int> _n)
         {
-            for (int i = _countType - 1; i >= 0; i--)
+            for (int dataType = dataTypesCount - 1; dataType >= 0; dataType--)
             {
-                for (int j = 0;j <_a2[i].Count; j++)
+                for (int j = 0;j <_a2[dataType].Count; j++)
                 {
-                    _n[i]=j;
+                    _n[dataType]=j;
                     //f.WriteLine(PrintList(_n));
                         GetSolution(_n);
                 }        
@@ -508,16 +518,16 @@ namespace newAlgorithm
         private void GetSolution(List<int> _n)
         {
             var tempA = CopyMatrix(_a);
-            for (var j = 0; j < _countType; j++)
+            for (var dataType = 0; dataType < dataTypesCount; dataType++)
             {
-                if (_n[j] >= 0)
+                if (_n[dataType] >= 0)
                 {
-                    tempA[j] = CopyVector(SetTempAFromA2(j, _n[j])[j]);
+                    tempA[dataType] = CopyVector(SetTempAFromA2(dataType, _n[dataType])[dataType]);
                 }
             }
             var shedule = new Shedule(tempA);
             //shedule.ConstructShedule();
-            shedule.ConstructSheduleWithBuffer(3, _countType);
+            shedule.ConstructSheduleWithBuffer(3, dataTypesCount);
             var r = shedule.RetyrnR();
             var sets = new Sets(Form1.compositionSets, Form1.timeSets);
             sets.GetSolution(r);
@@ -556,7 +566,7 @@ namespace newAlgorithm
                 result[0] = _f1Buf;
                 var maxA = CopyMatrix(_a);
                 _typeSolutionFlag = true;
-                if (!_staticSolution)
+                if (!isFixedBatches)
                 {
                     while (CheckType(_i))
                     {
@@ -565,11 +575,11 @@ namespace newAlgorithm
                         if (_typeSolutionFlag)
                         {
                             _a1 = new List<List<List<int>>>();
-                            for (var i = 0; i < _countType; i++)
+                            for (var dataType = 0; dataType < dataTypesCount; dataType++)
                             {
                                 _a1.Add(new List<List<int>>());
-                                _a1[i].Add(new List<int>());
-                                _a1[i][0] = CopyVector(_a[i]);
+                                _a1[dataType].Add(new List<int>());
+                                _a1[dataType][0] = CopyVector(_a[dataType]);
                             }
                             _typeSolutionFlag = false;
                         }
@@ -581,14 +591,14 @@ namespace newAlgorithm
                         // Для каждого типа и каждого решения в типе строим новое решение и проверяем его на критерий
                         _a2 = new List<List<List<int>>>();
                         string s;
-                        for (var i = 0; i < _countType; i++)
+                        for (var dataType = 0; dataType < dataTypesCount; dataType++)
                         {
                             _a2.Add(new List<List<int>>());
-                            if (_i[i] <= 0) continue;
-                            _a2[i] = NewData(i);
-                            for (var j = 0; j < _a2[i].Count; j++)
+                            if (_i[dataType] <= 0) continue;
+                            _a2[dataType] = NewData(dataType);
+                            for (var j = 0; j < _a2[dataType].Count; j++)
                             {
-                                tempA = SetTempAFromA2(i, j);
+                                tempA = SetTempAFromA2(dataType, j);
                                 shedule = new Shedule(tempA);
                                 shedule.ConstructShedule();
                                 r = shedule.RetyrnR();
@@ -610,11 +620,11 @@ namespace newAlgorithm
                         {
                             List<int> _n = new List<int>();
                             _nTemp = new List<int>();
-                            for (int i = 0; i < _countType; i++)
+                            for (int dataType = 0; dataType < dataTypesCount; dataType++)
                             {
                                 _nTemp.Add(0);
-                                _n.Add(_a2[i].Count);
-                                if (_n[i] == 0) _n[i] = -1;
+                                _n.Add(_a2[dataType].Count);
+                                if (_n[dataType] == 0) _n[dataType] = -1;
                             }
                             GenerateCombination(0, _nTemp);
                         }
@@ -625,12 +635,12 @@ namespace newAlgorithm
                         }
                         else
                         {
-                            for (int i = 0; i < _countType; i++)
+                            for (int dataType = 0; dataType < dataTypesCount; dataType++)
                             {
-                                _a1[i] = CopyMatrix(_a2[i]);
-                                if (!_a1[i].Any() || !_a1[i][0].Any())
+                                _a1[dataType] = CopyMatrix(_a2[dataType]);
+                                if (!_a1[dataType].Any() || !_a1[dataType][0].Any())
                                 {
-                                    _i[i] = 0;
+                                    _i[dataType] = 0;
                                 }
                             }
                         }

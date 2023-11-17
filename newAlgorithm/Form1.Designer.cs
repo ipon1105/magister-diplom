@@ -28,99 +28,100 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.numericUpDown1 = new System.Windows.Forms.NumericUpDown();
-            this.countBatchesTB = new System.Windows.Forms.TextBox();
+            this.numeric_data_types_count = new System.Windows.Forms.NumericUpDown();
             this.button1 = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
-            this.timeSwitchingTB = new System.Windows.Forms.TextBox();
-            this.timeTreatmentingTB = new System.Windows.Forms.TextBox();
-            this.LTB = new System.Windows.Forms.TextBox();
             this.label3 = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
             this.label5 = new System.Windows.Forms.Label();
             this.button2 = new System.Windows.Forms.Button();
-            this.tabControl1 = new System.Windows.Forms.TabControl();
+            this.tabControl = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
-            this.label11 = new System.Windows.Forms.Label();
-            this.buffer = new System.Windows.Forms.NumericUpDown();
-            this.GenerationCounter = new System.Windows.Forms.NumericUpDown();
+            this.groupBox_system_setup = new System.Windows.Forms.GroupBox();
             this.textBox2 = new System.Windows.Forms.TextBox();
-            this.OptimizationSecondLevel = new System.Windows.Forms.CheckBox();
+            this.numeric_generation_count = new System.Windows.Forms.NumericUpDown();
             this.label10 = new System.Windows.Forms.Label();
+            this.group_box_data_proccessing = new System.Windows.Forms.GroupBox();
+            this.radioButton_TournamentSelection = new System.Windows.Forms.RadioButton();
+            this.radioButton_RouletteMethod = new System.Windows.Forms.RadioButton();
+            this.radioButton_SigmaClipping = new System.Windows.Forms.RadioButton();
+            this.radioButton_UniformRanking = new System.Windows.Forms.RadioButton();
             this.textBox1 = new System.Windows.Forms.TextBox();
+            this.numeric_device_count = new System.Windows.Forms.NumericUpDown();
             this.label9 = new System.Windows.Forms.Label();
             this.checkBox2 = new System.Windows.Forms.CheckBox();
+            this.numeric_max_proccessing_time = new System.Windows.Forms.NumericUpDown();
+            this.checkBox_optimization = new System.Windows.Forms.CheckBox();
+            this.numeric_batch_count = new System.Windows.Forms.NumericUpDown();
             this.OldSecondLevelAll = new System.Windows.Forms.Button();
             this.OldSecondLevelButton = new System.Windows.Forms.Button();
-            this.setsBtn = new System.Windows.Forms.Button();
+            this.numeric_max_changeover_time = new System.Windows.Forms.NumericUpDown();
             this.button5 = new System.Windows.Forms.Button();
             this.numericUpDown2 = new System.Windows.Forms.NumericUpDown();
+            this.label11 = new System.Windows.Forms.Label();
+            this.numeric_buffer = new System.Windows.Forms.NumericUpDown();
+            this.checkBox_fixed_batches = new System.Windows.Forms.CheckBox();
+            this.setsBtn = new System.Windows.Forms.Button();
             this.button4 = new System.Windows.Forms.Button();
-            this.radioButton_UniformRanking = new System.Windows.Forms.RadioButton();
-            this.radioButton_SigmaClipping = new System.Windows.Forms.RadioButton();
-            this.radioButton_RouletteMethod = new System.Windows.Forms.RadioButton();
-            this.radioButton_TournamentSelection = new System.Windows.Forms.RadioButton();
             this.button3 = new System.Windows.Forms.Button();
-            this.label8 = new System.Windows.Forms.Label();
-            this.checkBox1 = new System.Windows.Forms.CheckBox();
             this.tabPage2 = new System.Windows.Forms.TabPage();
-            this.valueRandomize = new System.Windows.Forms.NumericUpDown();
+            this.tableLayoutPanel = new System.Windows.Forms.TableLayoutPanel();
+            this.label6 = new System.Windows.Forms.Label();
+            this.dataGridView_changeover_time = new System.Windows.Forms.DataGridView();
+            this.label7 = new System.Windows.Forms.Label();
+            this.dataGridView_proccessing_time = new System.Windows.Forms.DataGridView();
+            this.randomizeProcessingTime = new System.Windows.Forms.Button();
+            this.numeric_random = new System.Windows.Forms.NumericUpDown();
             this.copyPreprocessingTime = new System.Windows.Forms.Button();
             this.randomizePreprocessingTime = new System.Windows.Forms.Button();
-            this.randomizeProcessingTime = new System.Windows.Forms.Button();
-            this.label6 = new System.Windows.Forms.Label();
-            this.dataGridView2 = new System.Windows.Forms.DataGridView();
-            this.label7 = new System.Windows.Forms.Label();
-            this.dataGridView1 = new System.Windows.Forms.DataGridView();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).BeginInit();
-            this.tabControl1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.numeric_data_types_count)).BeginInit();
+            this.tabControl.SuspendLayout();
             this.tabPage1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.buffer)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.GenerationCounter)).BeginInit();
+            this.groupBox_system_setup.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.numeric_generation_count)).BeginInit();
+            this.group_box_data_proccessing.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.numeric_device_count)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numeric_max_proccessing_time)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numeric_batch_count)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numeric_max_changeover_time)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown2)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numeric_buffer)).BeginInit();
             this.tabPage2.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.valueRandomize)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.dataGridView2)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
+            this.tableLayoutPanel.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dataGridView_changeover_time)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dataGridView_proccessing_time)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numeric_random)).BeginInit();
             this.SuspendLayout();
             // 
-            // numericUpDown1
+            // numeric_data_types_count
             // 
-            this.numericUpDown1.Location = new System.Drawing.Point(15, 33);
-            this.numericUpDown1.Maximum = new decimal(new int[] {
+            this.numeric_data_types_count.Location = new System.Drawing.Point(197, 57);
+            this.numeric_data_types_count.Maximum = new decimal(new int[] {
             15,
             0,
             0,
             0});
-            this.numericUpDown1.Minimum = new decimal(new int[] {
+            this.numeric_data_types_count.Minimum = new decimal(new int[] {
             1,
             0,
             0,
             0});
-            this.numericUpDown1.Name = "numericUpDown1";
-            this.numericUpDown1.Size = new System.Drawing.Size(120, 20);
-            this.numericUpDown1.TabIndex = 0;
-            this.numericUpDown1.Value = new decimal(new int[] {
+            this.numeric_data_types_count.Name = "numeric_data_types_count";
+            this.numeric_data_types_count.Size = new System.Drawing.Size(45, 20);
+            this.numeric_data_types_count.TabIndex = 0;
+            this.numeric_data_types_count.Value = new decimal(new int[] {
             3,
             0,
             0,
             0});
-            this.numericUpDown1.ValueChanged += new System.EventHandler(this.numericUpDown1_ValueChanged);
-            // 
-            // countBatchesTB
-            // 
-            this.countBatchesTB.Location = new System.Drawing.Point(15, 78);
-            this.countBatchesTB.Name = "countBatchesTB";
-            this.countBatchesTB.Size = new System.Drawing.Size(100, 20);
-            this.countBatchesTB.TabIndex = 1;
-            this.countBatchesTB.Text = "12";
+            this.numeric_data_types_count.ValueChanged += new System.EventHandler(this.numeric_data_types_count_ValueChanged);
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(15, 238);
+            this.button1.Location = new System.Drawing.Point(542, 348);
             this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(136, 23);
+            this.button1.Size = new System.Drawing.Size(90, 38);
             this.button1.TabIndex = 2;
             this.button1.Text = "Получить решение";
             this.button1.UseVisualStyleBackColor = true;
@@ -129,7 +130,7 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(16, 14);
+            this.label1.Location = new System.Drawing.Point(53, 59);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(138, 13);
             this.label1.TabIndex = 3;
@@ -138,69 +139,42 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(16, 54);
+            this.label2.Location = new System.Drawing.Point(13, 34);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(178, 13);
             this.label2.TabIndex = 4;
             this.label2.Text = "Количество данных каждого типа";
             // 
-            // timeSwitchingTB
-            // 
-            this.timeSwitchingTB.Location = new System.Drawing.Point(15, 119);
-            this.timeSwitchingTB.Name = "timeSwitchingTB";
-            this.timeSwitchingTB.Size = new System.Drawing.Size(100, 20);
-            this.timeSwitchingTB.TabIndex = 5;
-            this.timeSwitchingTB.Text = "2";
-            this.timeSwitchingTB.TextChanged += new System.EventHandler(this.timeSwitchingTB_TextChanged);
-            // 
-            // timeTreatmentingTB
-            // 
-            this.timeTreatmentingTB.Location = new System.Drawing.Point(15, 162);
-            this.timeTreatmentingTB.Name = "timeTreatmentingTB";
-            this.timeTreatmentingTB.Size = new System.Drawing.Size(100, 20);
-            this.timeTreatmentingTB.TabIndex = 6;
-            this.timeTreatmentingTB.Text = "2";
-            this.timeTreatmentingTB.TextChanged += new System.EventHandler(this.timeTreatmentingTB_TextChanged);
-            // 
-            // LTB
-            // 
-            this.LTB.Location = new System.Drawing.Point(159, 111);
-            this.LTB.Name = "LTB";
-            this.LTB.Size = new System.Drawing.Size(119, 20);
-            this.LTB.TabIndex = 7;
-            this.LTB.Text = "4";
-            this.LTB.TextChanged += new System.EventHandler(this.LTB_TextChanged);
-            // 
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(15, 100);
+            this.label3.Location = new System.Drawing.Point(3, 85);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(138, 13);
+            this.label3.Size = new System.Drawing.Size(188, 13);
             this.label3.TabIndex = 8;
-            this.label3.Text = "Макс время переналадки";
+            this.label3.Text = "Максимальное время переналадки";
             // 
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(16, 146);
+            this.label4.Location = new System.Drawing.Point(16, 110);
             this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(125, 13);
+            this.label4.Size = new System.Drawing.Size(175, 13);
             this.label4.TabIndex = 9;
-            this.label4.Text = "Макс время обработки";
+            this.label4.Text = "Максимальное время обработки";
             // 
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(166, 95);
+            this.label5.Location = new System.Drawing.Point(3, 162);
             this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(97, 13);
+            this.label5.Size = new System.Drawing.Size(189, 13);
             this.label5.TabIndex = 10;
-            this.label5.Text = "Длина конвейера";
+            this.label5.Text = "Количество приборов на конвейере";
             // 
             // button2
             // 
-            this.button2.Location = new System.Drawing.Point(161, 162);
+            this.button2.Location = new System.Drawing.Point(268, 155);
             this.button2.Name = "button2";
             this.button2.Size = new System.Drawing.Size(118, 23);
             this.button2.TabIndex = 11;
@@ -210,141 +184,192 @@
             // 
             // tabControl1
             // 
-            this.tabControl1.Controls.Add(this.tabPage1);
-            this.tabControl1.Controls.Add(this.tabPage2);
-            this.tabControl1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tabControl1.Location = new System.Drawing.Point(0, 0);
-            this.tabControl1.Name = "tabControl1";
-            this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(664, 396);
-            this.tabControl1.TabIndex = 12;
+            this.tabControl.Controls.Add(this.tabPage1);
+            this.tabControl.Controls.Add(this.tabPage2);
+            this.tabControl.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tabControl.Location = new System.Drawing.Point(0, 0);
+            this.tabControl.Name = "tabControl1";
+            this.tabControl.SelectedIndex = 0;
+            this.tabControl.Size = new System.Drawing.Size(771, 500);
+            this.tabControl.TabIndex = 12;
+            this.tabControl.Selecting += new System.Windows.Forms.TabControlCancelEventHandler(this.tabControl_time_setup_Selecting);
             // 
             // tabPage1
             // 
-            this.tabPage1.Controls.Add(this.label11);
-            this.tabPage1.Controls.Add(this.buffer);
-            this.tabPage1.Controls.Add(this.GenerationCounter);
-            this.tabPage1.Controls.Add(this.textBox2);
-            this.tabPage1.Controls.Add(this.OptimizationSecondLevel);
-            this.tabPage1.Controls.Add(this.label10);
-            this.tabPage1.Controls.Add(this.textBox1);
-            this.tabPage1.Controls.Add(this.label9);
-            this.tabPage1.Controls.Add(this.checkBox2);
-            this.tabPage1.Controls.Add(this.OldSecondLevelAll);
-            this.tabPage1.Controls.Add(this.OldSecondLevelButton);
+            this.tabPage1.Controls.Add(this.groupBox_system_setup);
             this.tabPage1.Controls.Add(this.setsBtn);
-            this.tabPage1.Controls.Add(this.button5);
-            this.tabPage1.Controls.Add(this.numericUpDown2);
             this.tabPage1.Controls.Add(this.button4);
-            this.tabPage1.Controls.Add(this.radioButton_UniformRanking);
-            this.tabPage1.Controls.Add(this.radioButton_SigmaClipping);
-            this.tabPage1.Controls.Add(this.radioButton_RouletteMethod);
-            this.tabPage1.Controls.Add(this.radioButton_TournamentSelection);
             this.tabPage1.Controls.Add(this.button3);
-            this.tabPage1.Controls.Add(this.label8);
-            this.tabPage1.Controls.Add(this.checkBox1);
-            this.tabPage1.Controls.Add(this.label1);
-            this.tabPage1.Controls.Add(this.button2);
-            this.tabPage1.Controls.Add(this.numericUpDown1);
-            this.tabPage1.Controls.Add(this.label5);
-            this.tabPage1.Controls.Add(this.countBatchesTB);
-            this.tabPage1.Controls.Add(this.label4);
             this.tabPage1.Controls.Add(this.button1);
-            this.tabPage1.Controls.Add(this.label3);
-            this.tabPage1.Controls.Add(this.label2);
-            this.tabPage1.Controls.Add(this.LTB);
-            this.tabPage1.Controls.Add(this.timeSwitchingTB);
-            this.tabPage1.Controls.Add(this.timeTreatmentingTB);
             this.tabPage1.Location = new System.Drawing.Point(4, 22);
             this.tabPage1.Name = "tabPage1";
             this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(656, 370);
+            this.tabPage1.Size = new System.Drawing.Size(763, 474);
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "Установка параметров";
             this.tabPage1.UseVisualStyleBackColor = true;
             this.tabPage1.Click += new System.EventHandler(this.tabPage1_Click);
             // 
-            // label11
+            // groupBox_system_setup
             // 
-            this.label11.AutoSize = true;
-            this.label11.Location = new System.Drawing.Point(12, 196);
-            this.label11.Name = "label11";
-            this.label11.Size = new System.Drawing.Size(39, 13);
-            this.label11.TabIndex = 35;
-            this.label11.Text = "Буфер";
-            // 
-            // buffer
-            // 
-            this.buffer.Location = new System.Drawing.Point(15, 212);
-            this.buffer.Maximum = new decimal(new int[] {
-            15,
-            0,
-            0,
-            0});
-            this.buffer.Minimum = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
-            this.buffer.Name = "buffer";
-            this.buffer.Size = new System.Drawing.Size(120, 20);
-            this.buffer.TabIndex = 34;
-            this.buffer.Value = new decimal(new int[] {
-            3,
-            0,
-            0,
-            0});
-            // 
-            // GenerationCounter
-            // 
-            this.GenerationCounter.Location = new System.Drawing.Point(287, 188);
-            this.GenerationCounter.Name = "GenerationCounter";
-            this.GenerationCounter.Size = new System.Drawing.Size(103, 20);
-            this.GenerationCounter.TabIndex = 33;
-            this.GenerationCounter.Value = new decimal(new int[] {
-            5,
-            0,
-            0,
-            0});
+            this.groupBox_system_setup.Controls.Add(this.numeric_data_types_count);
+            this.groupBox_system_setup.Controls.Add(this.textBox2);
+            this.groupBox_system_setup.Controls.Add(this.numeric_generation_count);
+            this.groupBox_system_setup.Controls.Add(this.label10);
+            this.groupBox_system_setup.Controls.Add(this.group_box_data_proccessing);
+            this.groupBox_system_setup.Controls.Add(this.textBox1);
+            this.groupBox_system_setup.Controls.Add(this.numeric_device_count);
+            this.groupBox_system_setup.Controls.Add(this.label9);
+            this.groupBox_system_setup.Controls.Add(this.checkBox2);
+            this.groupBox_system_setup.Controls.Add(this.label1);
+            this.groupBox_system_setup.Controls.Add(this.numeric_max_proccessing_time);
+            this.groupBox_system_setup.Controls.Add(this.checkBox_optimization);
+            this.groupBox_system_setup.Controls.Add(this.numeric_batch_count);
+            this.groupBox_system_setup.Controls.Add(this.OldSecondLevelAll);
+            this.groupBox_system_setup.Controls.Add(this.OldSecondLevelButton);
+            this.groupBox_system_setup.Controls.Add(this.numeric_max_changeover_time);
+            this.groupBox_system_setup.Controls.Add(this.label2);
+            this.groupBox_system_setup.Controls.Add(this.button5);
+            this.groupBox_system_setup.Controls.Add(this.label3);
+            this.groupBox_system_setup.Controls.Add(this.numericUpDown2);
+            this.groupBox_system_setup.Controls.Add(this.label4);
+            this.groupBox_system_setup.Controls.Add(this.label11);
+            this.groupBox_system_setup.Controls.Add(this.numeric_buffer);
+            this.groupBox_system_setup.Controls.Add(this.button2);
+            this.groupBox_system_setup.Controls.Add(this.label5);
+            this.groupBox_system_setup.Controls.Add(this.checkBox_fixed_batches);
+            this.groupBox_system_setup.Location = new System.Drawing.Point(8, 24);
+            this.groupBox_system_setup.Name = "groupBox_system_setup";
+            this.groupBox_system_setup.Size = new System.Drawing.Size(506, 401);
+            this.groupBox_system_setup.TabIndex = 41;
+            this.groupBox_system_setup.TabStop = false;
+            this.groupBox_system_setup.Text = "Настройки системы";
             // 
             // textBox2
             // 
-            this.textBox2.Location = new System.Drawing.Point(317, 105);
+            this.textBox2.Location = new System.Drawing.Point(364, 104);
             this.textBox2.Name = "textBox2";
             this.textBox2.Size = new System.Drawing.Size(100, 20);
             this.textBox2.TabIndex = 32;
             // 
-            // OptimizationSecondLevel
+            // numeric_generation_count
             // 
-            this.OptimizationSecondLevel.AutoSize = true;
-            this.OptimizationSecondLevel.Location = new System.Drawing.Point(487, 194);
-            this.OptimizationSecondLevel.Margin = new System.Windows.Forms.Padding(2);
-            this.OptimizationSecondLevel.Name = "OptimizationSecondLevel";
-            this.OptimizationSecondLevel.Size = new System.Drawing.Size(95, 17);
-            this.OptimizationSecondLevel.TabIndex = 31;
-            this.OptimizationSecondLevel.Text = "Оптимизация";
-            this.OptimizationSecondLevel.UseVisualStyleBackColor = true;
+            this.numeric_generation_count.Location = new System.Drawing.Point(394, 181);
+            this.numeric_generation_count.Name = "numeric_generation_count";
+            this.numeric_generation_count.Size = new System.Drawing.Size(103, 20);
+            this.numeric_generation_count.TabIndex = 33;
+            this.numeric_generation_count.Value = new decimal(new int[] {
+            5,
+            0,
+            0,
+            0});
+            this.numeric_generation_count.ValueChanged += new System.EventHandler(this.numeric_generation_count_ValueChanged);
             // 
             // label10
             // 
             this.label10.AutoSize = true;
-            this.label10.Location = new System.Drawing.Point(314, 56);
+            this.label10.Location = new System.Drawing.Point(361, 55);
             this.label10.Name = "label10";
             this.label10.Size = new System.Drawing.Size(137, 13);
             this.label10.TabIndex = 30;
             this.label10.Text = "Кол-во типов комплектов";
             // 
+            // group_box_data_proccessing
+            // 
+            this.group_box_data_proccessing.Controls.Add(this.radioButton_TournamentSelection);
+            this.group_box_data_proccessing.Controls.Add(this.radioButton_RouletteMethod);
+            this.group_box_data_proccessing.Controls.Add(this.radioButton_SigmaClipping);
+            this.group_box_data_proccessing.Controls.Add(this.radioButton_UniformRanking);
+            this.group_box_data_proccessing.Location = new System.Drawing.Point(6, 210);
+            this.group_box_data_proccessing.Name = "group_box_data_proccessing";
+            this.group_box_data_proccessing.Size = new System.Drawing.Size(246, 108);
+            this.group_box_data_proccessing.TabIndex = 36;
+            this.group_box_data_proccessing.TabStop = false;
+            this.group_box_data_proccessing.Text = "Способ обработки данных";
+            this.group_box_data_proccessing.Enter += new System.EventHandler(this.group_box_data_proccessing_Enter);
+            // 
+            // radioButton_TournamentSelection
+            // 
+            this.radioButton_TournamentSelection.AutoSize = true;
+            this.radioButton_TournamentSelection.Location = new System.Drawing.Point(6, 19);
+            this.radioButton_TournamentSelection.Name = "radioButton_TournamentSelection";
+            this.radioButton_TournamentSelection.Size = new System.Drawing.Size(133, 17);
+            this.radioButton_TournamentSelection.TabIndex = 15;
+            this.radioButton_TournamentSelection.TabStop = true;
+            this.radioButton_TournamentSelection.Text = "Турнирная селекция ";
+            this.radioButton_TournamentSelection.UseVisualStyleBackColor = true;
+            this.radioButton_TournamentSelection.CheckedChanged += new System.EventHandler(this.radioButton_TournamentSelection_change);
+            // 
+            // radioButton_RouletteMethod
+            // 
+            this.radioButton_RouletteMethod.AutoSize = true;
+            this.radioButton_RouletteMethod.Location = new System.Drawing.Point(6, 42);
+            this.radioButton_RouletteMethod.Name = "radioButton_RouletteMethod";
+            this.radioButton_RouletteMethod.Size = new System.Drawing.Size(100, 17);
+            this.radioButton_RouletteMethod.TabIndex = 16;
+            this.radioButton_RouletteMethod.TabStop = true;
+            this.radioButton_RouletteMethod.Text = "Метод рулетки";
+            this.radioButton_RouletteMethod.UseVisualStyleBackColor = true;
+            this.radioButton_RouletteMethod.CheckedChanged += new System.EventHandler(this.radioButton_RouletteMethod_change);
+            // 
+            // radioButton_SigmaClipping
+            // 
+            this.radioButton_SigmaClipping.AutoSize = true;
+            this.radioButton_SigmaClipping.Location = new System.Drawing.Point(6, 88);
+            this.radioButton_SigmaClipping.Name = "radioButton_SigmaClipping";
+            this.radioButton_SigmaClipping.Size = new System.Drawing.Size(234, 17);
+            this.radioButton_SigmaClipping.TabIndex = 17;
+            this.radioButton_SigmaClipping.TabStop = true;
+            this.radioButton_SigmaClipping.Text = "Сигма отсечение(Пока не реализованно)";
+            this.radioButton_SigmaClipping.UseVisualStyleBackColor = true;
+            this.radioButton_SigmaClipping.CheckedChanged += new System.EventHandler(this.radioButton_SigmaClipping_change);
+            // 
+            // radioButton_UniformRanking
+            // 
+            this.radioButton_UniformRanking.AutoSize = true;
+            this.radioButton_UniformRanking.Location = new System.Drawing.Point(6, 65);
+            this.radioButton_UniformRanking.Name = "radioButton_UniformRanking";
+            this.radioButton_UniformRanking.Size = new System.Drawing.Size(171, 17);
+            this.radioButton_UniformRanking.TabIndex = 18;
+            this.radioButton_UniformRanking.TabStop = true;
+            this.radioButton_UniformRanking.Text = "Равномерное ранжирование";
+            this.radioButton_UniformRanking.UseVisualStyleBackColor = true;
+            this.radioButton_UniformRanking.CheckedChanged += new System.EventHandler(this.radioButton_UniformRanking_change);
+            // 
             // textBox1
             // 
-            this.textBox1.Location = new System.Drawing.Point(317, 78);
+            this.textBox1.Location = new System.Drawing.Point(364, 77);
             this.textBox1.Name = "textBox1";
             this.textBox1.Size = new System.Drawing.Size(100, 20);
             this.textBox1.TabIndex = 29;
             // 
+            // numeric_device_count
+            // 
+            this.numeric_device_count.Location = new System.Drawing.Point(197, 160);
+            this.numeric_device_count.Maximum = new decimal(new int[] {
+            15,
+            0,
+            0,
+            0});
+            this.numeric_device_count.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            this.numeric_device_count.Name = "numeric_device_count";
+            this.numeric_device_count.Size = new System.Drawing.Size(45, 20);
+            this.numeric_device_count.TabIndex = 40;
+            this.numeric_device_count.Value = new decimal(new int[] {
+            3,
+            0,
+            0,
+            0});
+            this.numeric_device_count.ValueChanged += new System.EventHandler(this.numeric_device_count_ValueChanged);
+            // 
             // label9
             // 
             this.label9.AutoSize = true;
-            this.label9.Location = new System.Drawing.Point(314, 17);
+            this.label9.Location = new System.Drawing.Point(361, 16);
             this.label9.Name = "label9";
             this.label9.Size = new System.Drawing.Size(116, 13);
             this.label9.TabIndex = 28;
@@ -353,7 +378,7 @@
             // checkBox2
             // 
             this.checkBox2.AutoSize = true;
-            this.checkBox2.Location = new System.Drawing.Point(317, 36);
+            this.checkBox2.Location = new System.Drawing.Point(364, 35);
             this.checkBox2.Name = "checkBox2";
             this.checkBox2.Size = new System.Drawing.Size(122, 17);
             this.checkBox2.TabIndex = 27;
@@ -361,9 +386,47 @@
             this.checkBox2.UseVisualStyleBackColor = true;
             this.checkBox2.CheckedChanged += new System.EventHandler(this.checkBox2_CheckedChanged_1);
             // 
+            // numeric_max_proccessing_time
+            // 
+            this.numeric_max_proccessing_time.Location = new System.Drawing.Point(197, 108);
+            this.numeric_max_proccessing_time.Name = "numeric_max_proccessing_time";
+            this.numeric_max_proccessing_time.Size = new System.Drawing.Size(45, 20);
+            this.numeric_max_proccessing_time.TabIndex = 39;
+            this.numeric_max_proccessing_time.Value = new decimal(new int[] {
+            4,
+            0,
+            0,
+            0});
+            this.numeric_max_proccessing_time.ValueChanged += new System.EventHandler(this.numeric_max_proccessing_time_ValueChanged);
+            // 
+            // checkBox_optimization
+            // 
+            this.checkBox_optimization.AutoSize = true;
+            this.checkBox_optimization.Location = new System.Drawing.Point(6, 371);
+            this.checkBox_optimization.Margin = new System.Windows.Forms.Padding(2);
+            this.checkBox_optimization.Name = "checkBox_optimization";
+            this.checkBox_optimization.Size = new System.Drawing.Size(95, 17);
+            this.checkBox_optimization.TabIndex = 31;
+            this.checkBox_optimization.Text = "Оптимизация";
+            this.checkBox_optimization.UseVisualStyleBackColor = true;
+            this.checkBox_optimization.CheckedChanged += new System.EventHandler(this.checkBox_optimization_CheckedChanged);
+            // 
+            // numeric_batch_count
+            // 
+            this.numeric_batch_count.Location = new System.Drawing.Point(197, 32);
+            this.numeric_batch_count.Name = "numeric_batch_count";
+            this.numeric_batch_count.Size = new System.Drawing.Size(45, 20);
+            this.numeric_batch_count.TabIndex = 37;
+            this.numeric_batch_count.Value = new decimal(new int[] {
+            3,
+            0,
+            0,
+            0});
+            this.numeric_batch_count.ValueChanged += new System.EventHandler(this.numeric_batch_count_ValueChanged);
+            // 
             // OldSecondLevelAll
             // 
-            this.OldSecondLevelAll.Location = new System.Drawing.Point(285, 138);
+            this.OldSecondLevelAll.Location = new System.Drawing.Point(392, 131);
             this.OldSecondLevelAll.Margin = new System.Windows.Forms.Padding(2);
             this.OldSecondLevelAll.Name = "OldSecondLevelAll";
             this.OldSecondLevelAll.Size = new System.Drawing.Size(105, 22);
@@ -374,7 +437,7 @@
             // 
             // OldSecondLevelButton
             // 
-            this.OldSecondLevelButton.Location = new System.Drawing.Point(284, 162);
+            this.OldSecondLevelButton.Location = new System.Drawing.Point(391, 155);
             this.OldSecondLevelButton.Margin = new System.Windows.Forms.Padding(2);
             this.OldSecondLevelButton.Name = "OldSecondLevelButton";
             this.OldSecondLevelButton.Size = new System.Drawing.Size(106, 23);
@@ -383,19 +446,22 @@
             this.OldSecondLevelButton.UseVisualStyleBackColor = true;
             this.OldSecondLevelButton.Click += new System.EventHandler(this.OldSecondLevelButton_Click);
             // 
-            // setsBtn
+            // numeric_max_changeover_time
             // 
-            this.setsBtn.Location = new System.Drawing.Point(441, 250);
-            this.setsBtn.Name = "setsBtn";
-            this.setsBtn.Size = new System.Drawing.Size(81, 49);
-            this.setsBtn.TabIndex = 22;
-            this.setsBtn.Text = "Тест комплектов";
-            this.setsBtn.UseVisualStyleBackColor = true;
-            this.setsBtn.Click += new System.EventHandler(this.setsBtn_Click);
+            this.numeric_max_changeover_time.Location = new System.Drawing.Point(197, 83);
+            this.numeric_max_changeover_time.Name = "numeric_max_changeover_time";
+            this.numeric_max_changeover_time.Size = new System.Drawing.Size(45, 20);
+            this.numeric_max_changeover_time.TabIndex = 38;
+            this.numeric_max_changeover_time.Value = new decimal(new int[] {
+            4,
+            0,
+            0,
+            0});
+            this.numeric_max_changeover_time.ValueChanged += new System.EventHandler(this.numeric_max_changeover_time_ValueChanged);
             // 
             // button5
             // 
-            this.button5.Location = new System.Drawing.Point(160, 137);
+            this.button5.Location = new System.Drawing.Point(267, 130);
             this.button5.Name = "button5";
             this.button5.Size = new System.Drawing.Size(118, 23);
             this.button5.TabIndex = 21;
@@ -405,7 +471,7 @@
             // 
             // numericUpDown2
             // 
-            this.numericUpDown2.Location = new System.Drawing.Point(161, 188);
+            this.numericUpDown2.Location = new System.Drawing.Point(268, 181);
             this.numericUpDown2.Maximum = new decimal(new int[] {
             150,
             0,
@@ -424,125 +490,201 @@
             0,
             0,
             0});
+            this.numericUpDown2.ValueChanged += new System.EventHandler(this.numericUpDown2_ValueChanged);
+            // 
+            // label11
+            // 
+            this.label11.AutoSize = true;
+            this.label11.Location = new System.Drawing.Point(24, 136);
+            this.label11.Name = "label11";
+            this.label11.Size = new System.Drawing.Size(167, 13);
+            this.label11.TabIndex = 35;
+            this.label11.Text = "Максимальный размер буфера";
+            // 
+            // numeric_buffer
+            // 
+            this.numeric_buffer.Location = new System.Drawing.Point(197, 134);
+            this.numeric_buffer.Maximum = new decimal(new int[] {
+            15,
+            0,
+            0,
+            0});
+            this.numeric_buffer.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            this.numeric_buffer.Name = "numeric_buffer";
+            this.numeric_buffer.Size = new System.Drawing.Size(45, 20);
+            this.numeric_buffer.TabIndex = 34;
+            this.numeric_buffer.Value = new decimal(new int[] {
+            2,
+            0,
+            0,
+            0});
+            this.numeric_buffer.ValueChanged += new System.EventHandler(this.numeric_buffer_ValueChanged);
+            // 
+            // checkBox_fixed_batches
+            // 
+            this.checkBox_fixed_batches.AutoSize = true;
+            this.checkBox_fixed_batches.Location = new System.Drawing.Point(6, 349);
+            this.checkBox_fixed_batches.Name = "checkBox_fixed_batches";
+            this.checkBox_fixed_batches.Size = new System.Drawing.Size(149, 17);
+            this.checkBox_fixed_batches.TabIndex = 12;
+            this.checkBox_fixed_batches.Text = "Фиксированные партии";
+            this.checkBox_fixed_batches.UseVisualStyleBackColor = true;
+            this.checkBox_fixed_batches.CheckedChanged += new System.EventHandler(this.checkBox_fixed_batches_CheckedChanged);
+            // 
+            // setsBtn
+            // 
+            this.setsBtn.Location = new System.Drawing.Point(638, 348);
+            this.setsBtn.Name = "setsBtn";
+            this.setsBtn.Size = new System.Drawing.Size(90, 38);
+            this.setsBtn.TabIndex = 22;
+            this.setsBtn.Text = "Тест комплектов";
+            this.setsBtn.UseVisualStyleBackColor = true;
+            this.setsBtn.Click += new System.EventHandler(this.setsBtn_Click);
             // 
             // button4
             // 
-            this.button4.Location = new System.Drawing.Point(505, 14);
+            this.button4.Location = new System.Drawing.Point(638, 304);
             this.button4.Name = "button4";
-            this.button4.Size = new System.Drawing.Size(98, 50);
+            this.button4.Size = new System.Drawing.Size(90, 38);
             this.button4.TabIndex = 19;
             this.button4.Text = "Тестовый прогон";
             this.button4.UseVisualStyleBackColor = true;
             this.button4.Click += new System.EventHandler(this.button4_Click);
             // 
-            // radioButton_UniformRanking
-            // 
-            this.radioButton_UniformRanking.AutoSize = true;
-            this.radioButton_UniformRanking.Location = new System.Drawing.Point(163, 273);
-            this.radioButton_UniformRanking.Name = "radioButton_UniformRanking";
-            this.radioButton_UniformRanking.Size = new System.Drawing.Size(171, 17);
-            this.radioButton_UniformRanking.TabIndex = 18;
-            this.radioButton_UniformRanking.TabStop = true;
-            this.radioButton_UniformRanking.Text = "Равномерное ранжирование";
-            this.radioButton_UniformRanking.UseVisualStyleBackColor = true;
-            this.radioButton_UniformRanking.CheckedChanged += new System.EventHandler(this.radioButton_UniformRanking_change);
-            // 
-            // radioButton_SigmaClipping
-            // 
-            this.radioButton_SigmaClipping.AutoSize = true;
-            this.radioButton_SigmaClipping.Location = new System.Drawing.Point(163, 296);
-            this.radioButton_SigmaClipping.Name = "radioButton_SigmaClipping";
-            this.radioButton_SigmaClipping.Size = new System.Drawing.Size(234, 17);
-            this.radioButton_SigmaClipping.TabIndex = 17;
-            this.radioButton_SigmaClipping.TabStop = true;
-            this.radioButton_SigmaClipping.Text = "Сигма отсечение(Пока не реализованно)";
-            this.radioButton_SigmaClipping.UseVisualStyleBackColor = true;
-            this.radioButton_SigmaClipping.CheckedChanged += new System.EventHandler(this.radioButton_SigmaClipping_change);
-            // 
-            // radioButton_RouletteMethod
-            // 
-            this.radioButton_RouletteMethod.AutoSize = true;
-            this.radioButton_RouletteMethod.Location = new System.Drawing.Point(163, 250);
-            this.radioButton_RouletteMethod.Name = "radioButton_RouletteMethod";
-            this.radioButton_RouletteMethod.Size = new System.Drawing.Size(100, 17);
-            this.radioButton_RouletteMethod.TabIndex = 16;
-            this.radioButton_RouletteMethod.TabStop = true;
-            this.radioButton_RouletteMethod.Text = "Метод рулетки";
-            this.radioButton_RouletteMethod.UseVisualStyleBackColor = true;
-            this.radioButton_RouletteMethod.CheckedChanged += new System.EventHandler(this.radioButton_RouletteMethod_change);
-            // 
-            // radioButton_TournamentSelection
-            // 
-            this.radioButton_TournamentSelection.AutoSize = true;
-            this.radioButton_TournamentSelection.Location = new System.Drawing.Point(163, 227);
-            this.radioButton_TournamentSelection.Name = "radioButton_TournamentSelection";
-            this.radioButton_TournamentSelection.Size = new System.Drawing.Size(133, 17);
-            this.radioButton_TournamentSelection.TabIndex = 15;
-            this.radioButton_TournamentSelection.TabStop = true;
-            this.radioButton_TournamentSelection.Text = "Турнирная селекция ";
-            this.radioButton_TournamentSelection.UseVisualStyleBackColor = true;
-            this.radioButton_TournamentSelection.CheckedChanged += new System.EventHandler(this.radioButton_TournamentSelection_change);
-            // 
             // button3
             // 
-            this.button3.Location = new System.Drawing.Point(15, 267);
+            this.button3.Location = new System.Drawing.Point(638, 275);
             this.button3.Name = "button3";
-            this.button3.Size = new System.Drawing.Size(136, 23);
+            this.button3.Size = new System.Drawing.Size(90, 23);
             this.button3.TabIndex = 14;
             this.button3.Text = "Второй метод";
             this.button3.UseVisualStyleBackColor = true;
             this.button3.Click += new System.EventHandler(this.button3_Click);
             // 
-            // label8
-            // 
-            this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(158, 17);
-            this.label8.Name = "label8";
-            this.label8.Size = new System.Drawing.Size(130, 13);
-            this.label8.TabIndex = 13;
-            this.label8.Text = "Фиксированные партии";
-            // 
-            // checkBox1
-            // 
-            this.checkBox1.AutoSize = true;
-            this.checkBox1.Location = new System.Drawing.Point(161, 33);
-            this.checkBox1.Name = "checkBox1";
-            this.checkBox1.Size = new System.Drawing.Size(41, 17);
-            this.checkBox1.TabIndex = 12;
-            this.checkBox1.Text = "Да";
-            this.checkBox1.UseVisualStyleBackColor = true;
-            this.checkBox1.CheckedChanged += new System.EventHandler(this.checkBox1_CheckedChanged);
-            // 
             // tabPage2
             // 
-            this.tabPage2.Controls.Add(this.valueRandomize);
-            this.tabPage2.Controls.Add(this.copyPreprocessingTime);
-            this.tabPage2.Controls.Add(this.randomizePreprocessingTime);
-            this.tabPage2.Controls.Add(this.randomizeProcessingTime);
-            this.tabPage2.Controls.Add(this.label6);
-            this.tabPage2.Controls.Add(this.dataGridView2);
-            this.tabPage2.Controls.Add(this.label7);
-            this.tabPage2.Controls.Add(this.dataGridView1);
+            this.tabPage2.Controls.Add(this.tableLayoutPanel);
             this.tabPage2.Location = new System.Drawing.Point(4, 22);
             this.tabPage2.Name = "tabPage2";
             this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(656, 370);
+            this.tabPage2.Size = new System.Drawing.Size(763, 474);
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "Установка времени";
             this.tabPage2.UseVisualStyleBackColor = true;
             // 
-            // valueRandomize
+            // tableLayoutPanel
             // 
-            this.valueRandomize.Location = new System.Drawing.Point(4, 337);
-            this.valueRandomize.Name = "valueRandomize";
-            this.valueRandomize.Size = new System.Drawing.Size(62, 20);
-            this.valueRandomize.TabIndex = 22;
+            this.tableLayoutPanel.AutoSize = true;
+            this.tableLayoutPanel.ColumnCount = 4;
+            this.tableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.tableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.tableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.tableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.tableLayoutPanel.Controls.Add(this.randomizeProcessingTime, 1, 2);
+            this.tableLayoutPanel.Controls.Add(this.numeric_random, 0, 2);
+            this.tableLayoutPanel.Controls.Add(this.dataGridView_proccessing_time, 0, 1);
+            this.tableLayoutPanel.Controls.Add(this.copyPreprocessingTime, 3, 2);
+            this.tableLayoutPanel.Controls.Add(this.label7, 0, 0);
+            this.tableLayoutPanel.Controls.Add(this.dataGridView_changeover_time, 2, 1);
+            this.tableLayoutPanel.Controls.Add(this.randomizePreprocessingTime, 2, 2);
+            this.tableLayoutPanel.Controls.Add(this.label6, 2, 0);
+            this.tableLayoutPanel.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tableLayoutPanel.Location = new System.Drawing.Point(3, 3);
+            this.tableLayoutPanel.Name = "tableLayoutPanel";
+            this.tableLayoutPanel.RowCount = 3;
+            this.tableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 8.277405F));
+            this.tableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 91.7226F));
+            this.tableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 54F));
+            this.tableLayoutPanel.Size = new System.Drawing.Size(757, 468);
+            this.tableLayoutPanel.TabIndex = 23;
+            // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.tableLayoutPanel.SetColumnSpan(this.label6, 2);
+            this.label6.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.label6.Font = new System.Drawing.Font("Microsoft Sans Serif", 14F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.label6.Location = new System.Drawing.Point(381, 0);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(373, 34);
+            this.label6.TabIndex = 20;
+            this.label6.Text = "Время переналадки приборов";
+            this.label6.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // dataGridView_changeover_time
+            // 
+            this.dataGridView_changeover_time.AllowDrop = true;
+            this.dataGridView_changeover_time.AllowUserToAddRows = false;
+            this.dataGridView_changeover_time.AllowUserToDeleteRows = false;
+            this.dataGridView_changeover_time.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.AllCells;
+            this.dataGridView_changeover_time.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.tableLayoutPanel.SetColumnSpan(this.dataGridView_changeover_time, 2);
+            this.dataGridView_changeover_time.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.dataGridView_changeover_time.Location = new System.Drawing.Point(381, 37);
+            this.dataGridView_changeover_time.Name = "dataGridView_changeover_time";
+            this.dataGridView_changeover_time.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.AutoSizeToAllHeaders;
+            this.dataGridView_changeover_time.Size = new System.Drawing.Size(373, 373);
+            this.dataGridView_changeover_time.TabIndex = 19;
+            // 
+            // label7
+            // 
+            this.tableLayoutPanel.SetColumnSpan(this.label7, 2);
+            this.label7.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.label7.Font = new System.Drawing.Font("Microsoft Sans Serif", 14F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.label7.Location = new System.Drawing.Point(3, 0);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(372, 34);
+            this.label7.TabIndex = 18;
+            this.label7.Text = "Время обработки требований";
+            this.label7.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // dataGridView_proccessing_time
+            // 
+            this.dataGridView_proccessing_time.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.AllCells;
+            this.dataGridView_proccessing_time.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.tableLayoutPanel.SetColumnSpan(this.dataGridView_proccessing_time, 2);
+            this.dataGridView_proccessing_time.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.dataGridView_proccessing_time.Location = new System.Drawing.Point(3, 37);
+            this.dataGridView_proccessing_time.Name = "dataGridView_proccessing_time";
+            this.dataGridView_proccessing_time.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.AutoSizeToAllHeaders;
+            this.dataGridView_proccessing_time.Size = new System.Drawing.Size(372, 373);
+            this.dataGridView_proccessing_time.TabIndex = 17;
+            // 
+            // randomizeProcessingTime
+            // 
+            this.randomizeProcessingTime.Dock = System.Windows.Forms.DockStyle.Top;
+            this.randomizeProcessingTime.Location = new System.Drawing.Point(192, 416);
+            this.randomizeProcessingTime.Name = "randomizeProcessingTime";
+            this.randomizeProcessingTime.Size = new System.Drawing.Size(183, 20);
+            this.randomizeProcessingTime.TabIndex = 13;
+            this.randomizeProcessingTime.Text = "Рандом времени обработки";
+            this.randomizeProcessingTime.UseVisualStyleBackColor = true;
+            this.randomizeProcessingTime.Click += new System.EventHandler(this.randomizeProcessingTime_Click);
+            // 
+            // numeric_random
+            // 
+            this.numeric_random.Dock = System.Windows.Forms.DockStyle.Top;
+            this.numeric_random.Location = new System.Drawing.Point(3, 416);
+            this.numeric_random.Name = "numeric_random";
+            this.numeric_random.Size = new System.Drawing.Size(183, 20);
+            this.numeric_random.TabIndex = 22;
+            this.numeric_random.Value = new decimal(new int[] {
+            6,
+            0,
+            0,
+            0});
+            this.numeric_random.ValueChanged += new System.EventHandler(this.numeric_random_ValueChanged);
             // 
             // copyPreprocessingTime
             // 
-            this.copyPreprocessingTime.Location = new System.Drawing.Point(466, 337);
+            this.copyPreprocessingTime.Dock = System.Windows.Forms.DockStyle.Top;
+            this.copyPreprocessingTime.Location = new System.Drawing.Point(570, 416);
             this.copyPreprocessingTime.Name = "copyPreprocessingTime";
-            this.copyPreprocessingTime.Size = new System.Drawing.Size(139, 20);
+            this.copyPreprocessingTime.Size = new System.Drawing.Size(184, 20);
             this.copyPreprocessingTime.TabIndex = 21;
             this.copyPreprocessingTime.Text = "Копировать с первого";
             this.copyPreprocessingTime.UseVisualStyleBackColor = true;
@@ -550,110 +692,65 @@
             // 
             // randomizePreprocessingTime
             // 
-            this.randomizePreprocessingTime.Location = new System.Drawing.Point(321, 337);
+            this.randomizePreprocessingTime.Dock = System.Windows.Forms.DockStyle.Top;
+            this.randomizePreprocessingTime.Location = new System.Drawing.Point(381, 416);
             this.randomizePreprocessingTime.Name = "randomizePreprocessingTime";
-            this.randomizePreprocessingTime.Size = new System.Drawing.Size(139, 20);
+            this.randomizePreprocessingTime.Size = new System.Drawing.Size(183, 20);
             this.randomizePreprocessingTime.TabIndex = 21;
             this.randomizePreprocessingTime.Text = "Рандом времени";
             this.randomizePreprocessingTime.UseVisualStyleBackColor = true;
-            this.randomizePreprocessingTime.Click += new System.EventHandler(this.randomizePreprocessingTime_Click);
-            // 
-            // randomizeProcessingTime
-            // 
-            this.randomizeProcessingTime.Location = new System.Drawing.Point(72, 337);
-            this.randomizeProcessingTime.Name = "randomizeProcessingTime";
-            this.randomizeProcessingTime.Size = new System.Drawing.Size(212, 20);
-            this.randomizeProcessingTime.TabIndex = 13;
-            this.randomizeProcessingTime.Text = "Рандом времени обработки";
-            this.randomizeProcessingTime.UseVisualStyleBackColor = true;
-            this.randomizeProcessingTime.Click += new System.EventHandler(this.randomizeProcessingTime_Click);
-            // 
-            // label6
-            // 
-            this.label6.AutoSize = true;
-            this.label6.Font = new System.Drawing.Font("Microsoft Sans Serif", 14F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.label6.Location = new System.Drawing.Point(317, 16);
-            this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(282, 24);
-            this.label6.TabIndex = 20;
-            this.label6.Text = "Время переналадки приборов";
-            // 
-            // dataGridView2
-            // 
-            this.dataGridView2.AllowDrop = true;
-            this.dataGridView2.AllowUserToAddRows = false;
-            this.dataGridView2.AllowUserToDeleteRows = false;
-            this.dataGridView2.ClipboardCopyMode = System.Windows.Forms.DataGridViewClipboardCopyMode.EnableWithoutHeaderText;
-            this.dataGridView2.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dataGridView2.Location = new System.Drawing.Point(321, 43);
-            this.dataGridView2.Name = "dataGridView2";
-            this.dataGridView2.Size = new System.Drawing.Size(283, 288);
-            this.dataGridView2.TabIndex = 19;
-            // 
-            // label7
-            // 
-            this.label7.AutoSize = true;
-            this.label7.Font = new System.Drawing.Font("Microsoft Sans Serif", 14F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.label7.Location = new System.Drawing.Point(4, 16);
-            this.label7.Name = "label7";
-            this.label7.Size = new System.Drawing.Size(280, 24);
-            this.label7.TabIndex = 18;
-            this.label7.Text = "Время обработки требований";
-            // 
-            // dataGridView1
-            // 
-            this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dataGridView1.Location = new System.Drawing.Point(4, 43);
-            this.dataGridView1.Name = "dataGridView1";
-            this.dataGridView1.Size = new System.Drawing.Size(280, 288);
-            this.dataGridView1.TabIndex = 17;
+            this.randomizePreprocessingTime.Click += new System.EventHandler(this.randomizeChangeoverTime_Click);
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(664, 396);
-            this.Controls.Add(this.tabControl1);
+            this.ClientSize = new System.Drawing.Size(771, 500);
+            this.Controls.Add(this.tabControl);
             this.Name = "Form1";
             this.Text = "Form1";
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).EndInit();
-            this.tabControl1.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.numeric_data_types_count)).EndInit();
+            this.tabControl.ResumeLayout(false);
             this.tabPage1.ResumeLayout(false);
-            this.tabPage1.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.buffer)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.GenerationCounter)).EndInit();
+            this.groupBox_system_setup.ResumeLayout(false);
+            this.groupBox_system_setup.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.numeric_generation_count)).EndInit();
+            this.group_box_data_proccessing.ResumeLayout(false);
+            this.group_box_data_proccessing.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.numeric_device_count)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numeric_max_proccessing_time)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numeric_batch_count)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numeric_max_changeover_time)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown2)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numeric_buffer)).EndInit();
             this.tabPage2.ResumeLayout(false);
             this.tabPage2.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.valueRandomize)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.dataGridView2)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
+            this.tableLayoutPanel.ResumeLayout(false);
+            this.tableLayoutPanel.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dataGridView_changeover_time)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dataGridView_proccessing_time)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numeric_random)).EndInit();
             this.ResumeLayout(false);
 
         }
 
         #endregion
 
-        private System.Windows.Forms.NumericUpDown numericUpDown1;
-        private System.Windows.Forms.TextBox countBatchesTB;
+        private System.Windows.Forms.NumericUpDown numeric_data_types_count;
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.TextBox timeSwitchingTB;
-        private System.Windows.Forms.TextBox timeTreatmentingTB;
-        private System.Windows.Forms.TextBox LTB;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.Button button2;
-        private System.Windows.Forms.TabControl tabControl1;
+        private System.Windows.Forms.TabControl tabControl;
         private System.Windows.Forms.TabPage tabPage1;
         private System.Windows.Forms.TabPage tabPage2;
         private System.Windows.Forms.Label label6;
         private System.Windows.Forms.Label label7;
-        private System.Windows.Forms.DataGridView dataGridView1;
-        private System.Windows.Forms.Label label8;
-        private System.Windows.Forms.CheckBox checkBox1;
+        private System.Windows.Forms.DataGridView dataGridView_proccessing_time;
+        private System.Windows.Forms.CheckBox checkBox_fixed_batches;
         private System.Windows.Forms.Button button3;
         private System.Windows.Forms.RadioButton radioButton_UniformRanking;
         private System.Windows.Forms.RadioButton radioButton_SigmaClipping;
@@ -669,16 +766,23 @@
         private System.Windows.Forms.CheckBox checkBox2;
         private System.Windows.Forms.Label label10;
         private System.Windows.Forms.TextBox textBox1;
-        private System.Windows.Forms.CheckBox OptimizationSecondLevel;
+        private System.Windows.Forms.CheckBox checkBox_optimization;
         private System.Windows.Forms.TextBox textBox2;
-        private System.Windows.Forms.NumericUpDown GenerationCounter;
-        public System.Windows.Forms.DataGridView dataGridView2;
+        private System.Windows.Forms.NumericUpDown numeric_generation_count;
+        public System.Windows.Forms.DataGridView dataGridView_changeover_time;
         private System.Windows.Forms.Button copyPreprocessingTime;
         private System.Windows.Forms.Button randomizePreprocessingTime;
         private System.Windows.Forms.Button randomizeProcessingTime;
-        private System.Windows.Forms.NumericUpDown valueRandomize;
+        private System.Windows.Forms.NumericUpDown numeric_random;
         private System.Windows.Forms.Label label11;
-        private System.Windows.Forms.NumericUpDown buffer;
+        private System.Windows.Forms.NumericUpDown numeric_buffer;
+        private System.Windows.Forms.GroupBox group_box_data_proccessing;
+        private System.Windows.Forms.NumericUpDown numeric_max_proccessing_time;
+        private System.Windows.Forms.NumericUpDown numeric_max_changeover_time;
+        private System.Windows.Forms.NumericUpDown numeric_batch_count;
+        private System.Windows.Forms.NumericUpDown numeric_device_count;
+        private System.Windows.Forms.GroupBox groupBox_system_setup;
+        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel;
     }
 }
 

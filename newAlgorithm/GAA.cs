@@ -10,33 +10,47 @@ namespace newAlgorithm
 {
     public class GAA
     {
-        private readonly List<int> _i;                  // Вектор интерпритируемых типов данных
-        private List<List<int>> _ai;                    // Буферизированная матрица составов партий требований на k+1 шаге 
-        private List<List<List<int>>> _a1;              // Матрица составов партий требований на k+1 шаге 
-        private List<List<List<int>>> _a2;              //false global fvg// Матрица составов партий требований фиксированного типа
-        private List<List<int>> _a;                     // Матрица составов партий требований на k шаге
-        protected readonly int _countType;              // Количество типов
-        private readonly List<int> _countClaims;        // Начальное количество требований для каждого типа данных
-        private int _f1;                                // Критерий текущего решения для всех типов
-        private int _f1Buf;                             // Критерий текущего решения для всех типов
-        private readonly bool _staticSolution;          // Признак фиксированных партий
-        private List<List<List<int>>> Array;            // Состав пратий в виде массива
-        Random rand = new Random();
-        int _n = 10;
-        public List<int> _fitnesslist = new List<int>();
+        /// <summary>
+        /// Данная переменная содержит информацию о количестве типов данных
+        /// </summary>
+        protected readonly int dataTypesCount;
+
+        /// <summary>
+        /// Данная переменная определяем фиксированные ли партии
+        /// </summary>
+        private readonly bool isFixedBatches;
+
+        /// <summary>
+        /// Данная переменная представляет из себя список хромосом
+        /// </summary>
         public List<Xromossomi> nabor = new List<Xromossomi>();
 
-        public GAA(int countType, List<int> countClaims, bool stat, int countWorck)
+        /// <summary>
+        /// Данная переменная определяет количество данных каждого типа
+        /// </summary>
+        int batchCount = 10;
+
+        private readonly List<int> batchCountList;        // Начальное количество требований для каждого типа данных
+        Random rand = new Random();
+        public List<int> _fitnesslist = new List<int>();
+
+
+        /// <summary>
+        /// Данный конструктор создаёт экземпляр класса GAA
+        /// </summary>
+        /// <param name="dataTypesCount">Количество типов данных</param>
+        /// <param name="batchCountList">Вектор длиной dataTypesCount, каждый элемент которого будет равен batchCount</param>
+        /// <param name="isFixedBatches">Являются ли партии фиксированными</param>
+        /// <param name="batchCount">Количество данных каждого типа</param>
+        public GAA(int dataTypesCount, List<int> batchCountList, bool isFixedBatches, int batchCount)
         {
-            _countType = countType;
-            _countClaims = countClaims;
-            _staticSolution = stat;
-            _n = countWorck;
-            _i = new List<int>(_countType);
+            this.dataTypesCount = dataTypesCount;
+            this.batchCountList = batchCountList;
+            this.isFixedBatches = isFixedBatches;
+            this.batchCount = batchCount;
         }
 
-        public GAA() { }
-
+        // Данный класс описывает хромосому
         public class Xromossomi
         {
             Random rand = new Random();
@@ -59,143 +73,6 @@ namespace newAlgorithm
             public Xromossomi() { }
         }
 
-
-
-        public Xromossomi nachlist()
-        {
-            Xromossomi xrom = new Xromossomi();
-
-            for (int i = 0; i < _countType; i++)
-            {
-                xrom.GenList.Add(new List<int>());
-            }
-            xrom.GenListOst.AddRange(_countClaims);
-
-            for (int j = 0; j < xrom.GenList.Count; j++)
-            {
-                int buff = 0;
-                for (int i = 0; i < _n / 2 - 1; i++)
-                {
-                    if (xrom.GenListOst[j] == 2)
-                    {
-                        buff = 2;
-                        xrom.GenListOst[j] = 0;
-                    }
-                    else
-                        if (xrom.GenListOst[j] == 1)
-                    {
-                        xrom.GenList[j][xrom.GenList[j].Count - 1]++;
-                        xrom.GenListOst[j] = 0;
-                        buff = 0;
-                    }
-                    else
-                            if (xrom.GenListOst[j] == 0)
-                        buff = 0;
-                    else
-                        xrom.GenListOst[j] -= buff = rand.Next(2, xrom.GenListOst[j]);
-                    xrom.GenList[j].Add(buff);
-                }
-                xrom.GenList[j].Add(xrom.GenListOst[j]);
-            }
-            return xrom;
-        }
-
-        Xromossomi nach()
-        {
-
-
-            Xromossomi xrom = new Xromossomi();
-            int buff = 0;
-
-            for (int i = 0; i < _n / 2 - 1; i++)
-            {
-                if (xrom.ostA == 2)
-                {
-                    buff = 2;
-                    xrom.ostA = 0;
-                }
-                else
-                    if (xrom.ostA == 1)
-                {
-                    xrom.GenA[xrom.GenA.Count - 1]++;
-                    xrom.ostA = 0;
-                    buff = 0;
-                }
-                else
-                        if (xrom.ostA == 0)
-                    buff = 0;
-                else
-                    xrom.ostA -= buff = rand.Next(2, xrom.ostA);
-                xrom.GenA.Add(buff);
-            }
-            xrom.GenA.Add(xrom.ostA);
-            //
-            int s = _n % 3 == 2 ? _n / 3 + 1 : _n / 3;
-            int t = _n % 3 == 1 || _n % 3 == 2 ? _n / 3 + 1 : _n / 3;
-            buff = 0;
-            for (int i = 0; i < _n / 2 - 1; i++)
-            {
-                if (xrom.ostB == 0 && 10 == xrom.GenA.Sum() && xrom.GenA[2] != 0)
-                {
-
-                }
-
-                if (xrom.ostB == 2)
-                {
-                    buff = 2;
-                    xrom.ostB = 0;
-                }
-                else
-                    if (xrom.ostB == 1)
-                {
-                    if (xrom.GenB.Count == 0)
-                        xrom.GenA[(_n / 3) - 1]++;
-                    else
-                        xrom.GenB[xrom.GenB.Count - 1]++;
-                    xrom.ostB = 0;
-                }
-                else
-                        if (xrom.ostB == 0)
-                    buff = 0;
-                else
-                    xrom.ostB -= buff = rand.Next(2, xrom.ostB);
-                xrom.GenB.Add(buff);
-            }
-            xrom.GenB.Add(xrom.ostB);
-
-            ///
-            for (int i = 0; i < _n / 2 - 1; i++)
-            {
-                if (xrom.ostC == 2)
-                {
-                    buff = 2;
-                    xrom.ostC = 0;
-                }
-                else
-                    if (xrom.ostC == 1)
-                {
-                    xrom.GenC[xrom.GenC.Count - 1]++;
-                    xrom.ostC = 0;
-                }
-                else
-                        if (xrom.ostC == 0)
-                    buff = 0;
-                else
-                    xrom.ostC -= buff = rand.Next(2, xrom.ostC);
-                xrom.GenC.Add(buff);
-            }
-
-            if (xrom.ostC == 1)
-            {
-                xrom.GenC[xrom.GenC.Count - 1]++;
-                xrom.ostC = 0;
-            }
-            else
-                xrom.GenC.Add(xrom.ostC);
-
-            return xrom;
-        }
-
         public List<Xromossomi> SetXrom(int size)
         {
             for (int i = 0; i < size; i++)
@@ -214,17 +91,76 @@ namespace newAlgorithm
 
             return nabor;
         }
+
         public int getSelectionPopulation(SelectoinType selection, out int s)
         {
+            // TODO: Данная функция не будет работать без вызова, прежде, calcGAFitnessList
+
             List<int> SortFitnessList = new List<int>(_fitnesslist);
             SortFitnessList.Sort();
             s = _fitnesslist.IndexOf(SortFitnessList[0]);
             return SortFitnessList[0];
         }
 
+        public int calcSetsFitnessList(bool directedTime , decimal GenerationCount,int countHromos = 50)
+        {
+            var flagmanHromosom = new List<List<int>>();
+
+            
+            for (var i = 0; i < dataTypesCount; i++)
+            {
+                flagmanHromosom.Add( new List<int> {batchCount - 2 ,  2});
+            }
+                
+
+            var r = ToArrayList();
+            var test = new Sets(Form1.compositionSets, Form1.timeSets);
+            var FitnessList = new List<int>();
+            List<int> CountTime = new List<int>();
+
+            for (int i = 0; i < GenerationCount + 1; i++)
+            {
+                this.SetXrom(countHromos);
+                r = ToArrayList();
+                r.Add(flagmanHromosom);
+                foreach (var elem in r)
+                {
+                    var shedule = new Shedule(elem);
+                    shedule.ConstructShedule();
+                    test.GetSolution(shedule.RetyrnR());
+                    CountTime.Add(test.GetNewCriterion(directedTime));
+                }
+            }
+           
+            return CountTime.ToArray().Min();
+        }
+
+        public List<List<int>> calcFitnessList()
+        {
+            var r = ToArrayList();
+            var FitnessList = new List<int>();
+            var tuple = new Dictionary<int, List<List<int>>>();
+            var listint = new List<int>();
+            foreach (var elem in r)
+            {
+                // Создаём расписание на основе каждого элемента матрица r
+                Shedule shedule = new Shedule(elem);
+               
+                var time = shedule.GetTime();
+                
+                if(tuple.ContainsKey(time))
+                    continue;
+                tuple.Add(time, elem);
+                listint.Add(time);
 
 
-        void xor(int size, List<Xromossomi> nabr = null)
+
+            }
+
+            return tuple[listint.Min()];
+        }
+
+        private void xor(int size, List<Xromossomi> nabr = null)
         {
             List<Xromossomi> naborInternal = new List<Xromossomi>(nabor);
             if (nabr != null)
@@ -276,7 +212,7 @@ namespace newAlgorithm
             naborInternal = nabor1;
         }
 
-        public List<List<int>> TestArray()
+        private List<List<int>> TestArray()
         {
             List<List<int>> a1 = new List<List<int>>();
             List<int> a = new List<int>();
@@ -295,16 +231,16 @@ namespace newAlgorithm
             return a1;
         }
 
-        public List<List<int>> GenerateR(IReadOnlyList<List<int>> m)
+        private List<List<int>> GenerateR(IReadOnlyList<List<int>> m)
         {
             var result = new List<List<int>>();
             var summ = m.Sum(t => t.Count);
-            for (var i = 0; i < _countType; i++)
+            for (int dataType = 0; dataType < dataTypesCount; dataType++)
             {
                 result.Add(new List<int>());
                 for (var j = 0; j < summ; j++)
                 {
-                    result[i].Add(0);
+                    result[dataType].Add(0);
                 }
             }
             var ind = 0;
@@ -319,40 +255,7 @@ namespace newAlgorithm
             return result;
         }
 
-        public int calcSetsFitnessList(bool directedTime , decimal GenerationCount,int countHromos = 50)
-        {
-            var flagmanHromosom = new List<List<int>>();
-
-            
-            for (var i = 0; i < _countType; i++)
-            {
-                flagmanHromosom.Add( new List<int> {_n - 2 ,  2});
-            }
-                
-
-            var r = ToArrayList();
-            var test = new Sets(Form1.compositionSets, Form1.timeSets);
-            var FitnessList = new List<int>();
-            List<int> CountTime = new List<int>();
-
-            for (int i = 0; i < GenerationCount + 1; i++)
-            {
-                this.SetXrom(countHromos);
-                r = ToArrayList();
-                r.Add(flagmanHromosom);
-                foreach (var elem in r)
-                {
-                    var shedule = new Shedule(elem);
-                    shedule.ConstructShedule();
-                    test.GetSolution(shedule.RetyrnR());
-                    CountTime.Add(test.GetNewCriterion(directedTime));
-                }
-            }
-           
-            return CountTime.ToArray().Min();
-        }
-
-        public int[] calcGAFitnessList()
+        private int[] calcGAFitnessList()
         {
             var r = ToArrayList();
             List<int> CountTime = new List<int>();
@@ -370,40 +273,14 @@ namespace newAlgorithm
                 }
                 var timelist = listint.Select(list => list.GetTime());
                 FitnessList.Add(timelist.Min());
-               
+
 
             }
             _fitnesslist = FitnessList;
             return CountTime.ToArray();
         }
 
-
-        public List<List<int>> calcFitnessList()
-        {
-            var r = ToArrayList();
-            var FitnessList = new List<int>();
-            var tuple = new Dictionary<int, List<List<int>>>();
-            var listint = new List<int>();
-            foreach (var elem in r)
-            {
-               
-                var shedule = new Shedule(elem);
-               
-                var time = shedule.GetTime();
-                
-                if(tuple.ContainsKey(time))
-                    continue;
-                tuple.Add(time, elem);
-                listint.Add(time);
-
-
-
-            }
-
-            return tuple[listint.Min()];
-        }
-
-        public List<List<List<int>>> ToArrayList()
+        private List<List<List<int>>> ToArrayList()
         {
             List<List<List<int>>> r = new List<List<List<int>>>();
             foreach (var elem in nabor)
@@ -419,7 +296,8 @@ namespace newAlgorithm
             }
             return r;
         }
-        public List<List<List<int>>> ToArray()
+
+        private List<List<List<int>>> ToArray()
         {
             List<List<List<int>>> arrResult = new List<List<List<int>>>();
             foreach (var hromosoma in nabor)
@@ -460,7 +338,8 @@ namespace newAlgorithm
             return arrResult;
 
         }
-        void mutation()
+
+        private void mutation()
         {
             Random rand = new Random();
 
@@ -488,6 +367,142 @@ namespace newAlgorithm
                 }
             };
 
+        }
+
+        private Xromossomi nachlist()
+        {
+            // Инициализируем хромосому 
+            Xromossomi xrom = new Xromossomi();
+
+            // Инициализируем в xrom список GenList, как наполненный типами данных от 0 до n, где n - dataTypesCount
+            for (int dataType = 0; dataType < dataTypesCount; dataType++)
+                xrom.GenList.Add(new List<int>());
+
+            xrom.GenListOst.AddRange(batchCountList);
+
+            for (int j = 0; j < xrom.GenList.Count; j++)
+            {
+                int buff = 0;
+                for (int i = 0; i < batchCount / 2 - 1; i++)
+                {
+                    if (xrom.GenListOst[j] == 2)
+                    {
+                        buff = 2;
+                        xrom.GenListOst[j] = 0;
+                    }
+                    else
+                        if (xrom.GenListOst[j] == 1)
+                    {
+                        xrom.GenList[j][xrom.GenList[j].Count - 1]++;
+                        xrom.GenListOst[j] = 0;
+                        buff = 0;
+                    }
+                    else
+                            if (xrom.GenListOst[j] == 0)
+                        buff = 0;
+                    else
+                        xrom.GenListOst[j] -= buff = rand.Next(2, xrom.GenListOst[j]);
+                    xrom.GenList[j].Add(buff);
+                }
+                xrom.GenList[j].Add(xrom.GenListOst[j]);
+            }
+            return xrom;
+        }
+
+        private Xromossomi nach()
+        {
+
+
+            Xromossomi xrom = new Xromossomi();
+            int buff = 0;
+
+            for (int i = 0; i < batchCount / 2 - 1; i++)
+            {
+                if (xrom.ostA == 2)
+                {
+                    buff = 2;
+                    xrom.ostA = 0;
+                }
+                else
+                    if (xrom.ostA == 1)
+                {
+                    xrom.GenA[xrom.GenA.Count - 1]++;
+                    xrom.ostA = 0;
+                    buff = 0;
+                }
+                else
+                        if (xrom.ostA == 0)
+                    buff = 0;
+                else
+                    xrom.ostA -= buff = rand.Next(2, xrom.ostA);
+                xrom.GenA.Add(buff);
+            }
+            xrom.GenA.Add(xrom.ostA);
+            //
+            int s = batchCount % 3 == 2 ? batchCount / 3 + 1 : batchCount / 3;
+            int t = batchCount % 3 == 1 || batchCount % 3 == 2 ? batchCount / 3 + 1 : batchCount / 3;
+            buff = 0;
+            for (int i = 0; i < batchCount / 2 - 1; i++)
+            {
+                if (xrom.ostB == 0 && 10 == xrom.GenA.Sum() && xrom.GenA[2] != 0)
+                {
+
+                }
+
+                if (xrom.ostB == 2)
+                {
+                    buff = 2;
+                    xrom.ostB = 0;
+                }
+                else
+                    if (xrom.ostB == 1)
+                {
+                    if (xrom.GenB.Count == 0)
+                        xrom.GenA[(batchCount / 3) - 1]++;
+                    else
+                        xrom.GenB[xrom.GenB.Count - 1]++;
+                    xrom.ostB = 0;
+                }
+                else
+                        if (xrom.ostB == 0)
+                    buff = 0;
+                else
+                    xrom.ostB -= buff = rand.Next(2, xrom.ostB);
+                xrom.GenB.Add(buff);
+            }
+            xrom.GenB.Add(xrom.ostB);
+
+            ///
+            for (int i = 0; i < batchCount / 2 - 1; i++)
+            {
+                if (xrom.ostC == 2)
+                {
+                    buff = 2;
+                    xrom.ostC = 0;
+                }
+                else
+                    if (xrom.ostC == 1)
+                {
+                    xrom.GenC[xrom.GenC.Count - 1]++;
+                    xrom.ostC = 0;
+                }
+                else
+                        if (xrom.ostC == 0)
+                    buff = 0;
+                else
+                    xrom.ostC -= buff = rand.Next(2, xrom.ostC);
+                xrom.GenC.Add(buff);
+            }
+
+            if (xrom.ostC == 1)
+            {
+                xrom.GenC[xrom.GenC.Count - 1]++;
+                xrom.ostC = 0;
+            }
+            else
+                xrom.GenC.Add(xrom.ostC);
+
+            return xrom;
         }
     }
 }

@@ -9,33 +9,92 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Globalization;
 
 namespace newAlgorithm
 {
     public partial class Form1 : Form
     {
-        /// Данная переменная отвечает за выбор способа обработки данных
+
+        #region Поля данных
+
+        /// <summary>
+        /// Данная переменная отвечает за выбор способа обработки данных и определено перечислением SelectionType
+        /// </summary>
         private SelectoinType selectoinType;
 
-        int _l, _maxS, _maxT;
-        int _countType, _countBatches;
+        /// <summary>
+        /// Данная переменная представляет из себя максимальное время переналадки приборов
+        /// </summary>
+        int maxChangeoverTime;
+
+        /// <summary>
+        /// Данная переменная представляет из себя максимальное время выполнения задания
+        /// </summary>
+        int maxProccessingTime;
+
+        /// <summary>
+        /// Данная переменная определяет количество данных каждого типа
+        /// </summary>
+        int batchCount;
+
+        /// <summary>
+        /// Данная переменная определяет количество типов данных
+        /// </summary>
+        int dataTypesCount;
+
+        /// <summary>
+        /// Данная переменная определяет размер буфера перед приборами
+        /// </summary>
+        int buffer;
+
+        /// <summary>
+        /// Данная переменная определяет длину конвейера, как количество приборов
+        /// </summary>
+        int deviceCount;
+
+        /// <summary>
+        /// Данная переменная определяет значения для генерации рандомных данных
+        /// </summary>
+        int randomValue;
+
+        /// <summary>
+        /// Данная переменная определяет фиксированные ли партии
+        /// </summary>
+        bool isFixedBatches;
+
+        /// <summary>
+        /// Данная переменная определяет использование оптимизации
+        /// </summary>
+        bool isOptimization;
+
+        /// <summary>
+        /// Данная переменная определяет необходимость обновления данных при переходах на вкладку "Установка времени"
+        /// </summary>
+        private bool isValueChagedToUpdate;
+
+        /// <summary>
+        /// TODO: Написать описание
+        /// </summary>
+        int generation_count;
+
         public static int buff;
-        List<List<List<int>>> _temptS = new List<List<List<int>>>();
-        List<List<int>> _temptT = new List<List<int>>();
+        List<List<List<int>>> changeoverTime = new List<List<List<int>>>();
+        List<List<int>> proccessingTime = new List<List<int>>();
 
         public static bool direct;
 
         public static List<List<int>> compositionSets;//майкрософт кодстайл говорит юзать верблюжий стиль https://msdn.microsoft.com/en-us/library/ms229043%28v=vs.100%29.aspx
         public static List<List<int>> timeSets;
 
+        #endregion
+
         public Form1()
         {
             InitializeComponent();
             InitializeForm();
 
-            // Инициализируем способ обработки данных
-            selectoinType = SelectoinType.Undefined;
-
+            /*
             var test = new List<List<int>>();
             test.Add(new List<int>());
             test.Add(new List<int>(){2});
@@ -45,25 +104,46 @@ namespace newAlgorithm
             //t.GetTime();
             //var a = t.ReturnRIndex(0);
             //var b = t.ReturnRIndex(1);
+             */
+
         }
 
+        /// <summary>
+        /// Данная функция инициализирует все необходимые, для работы приложения, переменные
+        /// </summary>
         private void InitializeForm()
         {
-            _countType = (int)numericUpDown1.Value;
-            _countBatches = Convert.ToInt32(countBatchesTB.Text);
-            var listCountButches = new List<int>();
-            for (var ii = 0; ii < _countType; ii++)
-            {
-                listCountButches.Add(_countBatches);
-            }
+            // Инициализируем переменные с внешних компонентов
+            maxChangeoverTime = Convert.ToInt32(numeric_max_changeover_time.Value);
+            maxProccessingTime = Convert.ToInt32(numeric_max_proccessing_time.Value);
+            dataTypesCount = Convert.ToInt32(numeric_data_types_count.Value);
+            deviceCount = Convert.ToInt32(numeric_device_count.Value);
+            batchCount = Convert.ToInt32(numeric_batch_count.Value);
+            randomValue = Convert.ToInt32(numeric_random.Value);
+            buffer = Convert.ToInt32(numeric_buffer.Value);
+            isFixedBatches = checkBox_fixed_batches.Checked;
+            isOptimization = checkBox_optimization.Checked;
+            selectoinType = SelectoinType.Undefined;
+            isValueChagedToUpdate = false;
 
-            _l = Convert.ToInt32(LTB.Text);
-            _maxS = Convert.ToInt32(timeSwitchingTB.Text);
-            _maxT = Convert.ToInt32(timeTreatmentingTB.Text);
-            _temptS = new List<List<List<int>>>();
-            _temptT = new List<List<int>>();
-            RandomTime();
-            PrintTime();
+            // Инициализируем перменные для данных таблиц
+            changeoverTime = new List<List<List<int>>>();
+            proccessingTime = new List<List<int>>();
+
+            // Выполняем инициализацию графических таблиц
+            InitDataGridView();
+
+            // Выполняем инициализацию внутренних таблиц
+            InitTables();
+
+            // Выполяем рандомизацию для таблицы времени обработки
+            randomizeProcessingTime_Click();
+
+            // Выполняем рандомизацию для таблицы времени переналадки приборов
+            randomizeChangeoverTime_Click();
+
+            // Выполняем считывание данных во внутренние таблицы
+            GetTime();
         }
 
         private List<int> Copy(IEnumerable<int> _in)
@@ -96,91 +176,92 @@ namespace newAlgorithm
             return a;
         }
 
-        private void RandomTime()
+        /// <summary>
+        /// Данная функция выполняет инициализацию внутренних таблиц
+        /// </summary>
+        private void InitTables()
         {
-            var count = 0;
-            for (var i = 0; i < _l; i++)
+            // Для каждого прибора выполняем обработку
+            for (var device = 0; device < deviceCount; device++)
             {
-                _temptT.Add(new List<int>());
-                _temptS.Add(new List<List<int>>());
-                for (var j = 0; j < _countType; j++)
+                
+                // Инициализируем новые элементы в таблицы
+                proccessingTime.Add(new List<int>());
+                changeoverTime.Add(new List<List<int>>());
+
+                // Для каждого типа данных выполняем обработку
+                for (var row_dataType = 0; row_dataType < dataTypesCount; row_dataType++)
                 {
-                    var temp = (count % 2 == 0) ? 2 : _maxT;
-                    _temptT[i].Add(temp);
-                    _temptS[i].Add(new List<int>());
-                    for (var k = 0; k < _countType; k++)
-                    {
-                        temp = (count % 2 == 0) ? 2 : _maxS;
-                        _temptS[i][j].Add(temp);
-                    }
-                    count++;
+
+                    // Инициализируем новые элементы в таблицы
+                    proccessingTime[device].Add(0);
+                    changeoverTime[device].Add(new List<int>());
+
+                    // Для каждого типа данных выполняем обработку
+                    for (var col_dataType = 0; col_dataType < dataTypesCount; col_dataType++)
+                        changeoverTime[device][row_dataType].Add(0);
                 }
             }
         }
 
-        private void PrintTime()
+        /// <summary>
+        /// Данная функция переопределяет графические таблицы в зависимости от структуры сети
+        /// </summary>
+        private void InitDataGridView()
         {
-            dataGridView1.Rows.Clear();
-            dataGridView1.Columns.Clear();
-            dataGridView1.RowCount = _temptT.Count;
-            dataGridView1.ColumnCount = _temptT[0].Count;
-            for (var i = 0; i < _temptT.Count; i++)
-            {
-                for (var j = 0; j < _countType; j++)
-                {
-                    dataGridView1[j, i].Value = _temptT[i][j];
-                }
-            }
-            dataGridView2.Rows.Clear();
-            dataGridView2.Columns.Clear();
-            dataGridView2.RowCount = _temptS.Count * _temptS[0].Count;
-            dataGridView2.ColumnCount = _temptS[0].Count;
-            for (var k = 0; k < _temptS.Count; k++)
-                for (var i = 0; i < _countType; i++)
-                    for (var j = 0; j < _countType; j++)
-                    {
-                        var str = k * _temptS[0].Count + i;
-                        dataGridView2[j, str].Value = _temptS[k][i][j];
-                    }
+
+            // Удаляем структуру таблиц
+            dataGridView_proccessing_time.Rows.Clear();
+            dataGridView_proccessing_time.Columns.Clear();
+            dataGridView_changeover_time.Rows.Clear();
+            dataGridView_changeover_time.Columns.Clear();
+
+            // Определяем новую структуру
+            dataGridView_proccessing_time.RowCount = deviceCount;
+            dataGridView_proccessing_time.ColumnCount = dataTypesCount;
+            dataGridView_changeover_time.RowCount = deviceCount * dataTypesCount;
+            dataGridView_changeover_time.ColumnCount = dataTypesCount;
+
         }
 
+        /// <summary>
+        /// Данная функция выполняет считывание данных и графических таблиц во внутреннии
+        /// </summary>
         private void GetTime()
         {
-            for (var i = 0; i < _temptT.Count; i++)
-            {
-                for (var j = 0; j < _countType; j++)
-                {
-                    _temptT[i][j] = Convert.ToInt32(dataGridView1[j, i].Value);
+
+            // Для каждого прибора выполняем считывание
+            for (int device = 0; device < deviceCount; device++)
+
+                // Для каждого типа данных выполняем считывание
+                for (int row_dataType = 0; row_dataType < dataTypesCount; row_dataType++) { 
+
+                    // Считываем данные во внутрнние таблицы
+                    proccessingTime[device][row_dataType] = Convert.ToInt32(dataGridView_proccessing_time.Rows[device].Cells[row_dataType].Value);
+
+                    // Для каждого типа данных выполняем считывание
+                    for (var col_dataType = 0; col_dataType < dataTypesCount; col_dataType++)
+
+                        // Считываем данные во внутрнние таблицы
+                        changeoverTime[device][row_dataType][col_dataType] = Convert.ToInt32(dataGridView_changeover_time.Rows[row_dataType + device * dataTypesCount].Cells[0].Value);
                 }
-            }
-            for (var k = 0; k < _temptS.Count; k++)
-                for (var i = 0; i < _countType; i++)
-                    for (var j = 0; j < _countType; j++)
-                    {
-                        var str = k * _temptS[0].Count + i;
-                        _temptS[k][i][j] = Convert.ToInt32(dataGridView2[j, str].Value);
-                    }
         }
 
+        /// <summary>
+        /// Получить решение
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void button1_Click(object sender, EventArgs e)
         {
-            buff = Convert.ToInt32(buffer.Value);
-             _countType = (int)numericUpDown1.Value; // количество типов
-            _countBatches = Convert.ToInt32(countBatchesTB.Text); // количество пакетов
-            var listCountButches = new List<int>(); // количество пакетов каждого типа
-            for (var ii = 0; ii < _countType; ii++)
-            {
-                listCountButches.Add(_countBatches);
-            }
+            // Инициализируем вектор длиной dataTypesCount, каждый элемент которого будет равен batchCount
+            List<int> batchCountList = CreateBatchCountList();
 
-            _l = Convert.ToInt32(LTB.Text); // количество сегментов
-            _maxS = Convert.ToInt32(timeSwitchingTB.Text); // максимальное время преналадки
-            _maxT = Convert.ToInt32(timeTreatmentingTB.Text); // максимальное время выполнения
             GetTime();
-            Shedule.L = _l;
-            Shedule.Switching = _temptS;
-            Shedule.Treatment = _temptT;
-            var firstLevel = new FirstLevel(_countType, listCountButches, checkBox1.Checked);
+            Shedule.conveyorLenght = deviceCount;
+            Shedule.Switching = changeoverTime;
+            Shedule.Treatment = proccessingTime;
+            var firstLevel = new FirstLevel(dataTypesCount, batchCountList, isFixedBatches);
             firstLevel.GenetateSolutionForAllTypes("outputFirstAlgorithm.txt");
         }
 
@@ -223,10 +304,10 @@ namespace newAlgorithm
                         {
                             foreach (var t in n)
                             {
-                                _countType = t;
+                                dataTypesCount = t;
                                 for (int i = 0; i < n_kom; i++)
                                 {
-                                    for (var ind = 0; ind < _countType; ind++)
+                                    for (var ind = 0; ind < dataTypesCount; ind++)
                                     {
                                         var rand = new Random();
                                         var temp = rand.Next(10);
@@ -251,38 +332,38 @@ namespace newAlgorithm
                                     {
                                         foreach (var t3 in time)
                                         {
-                                            _temptS = new List<List<List<int>>>();
-                                            _temptT = new List<List<int>>();
-                                            _l = _countLine;
-                                            _maxS = t3;
-                                            _maxT = t2;
-                                            RandomTime();
-                                            PrintTime();
+                                            changeoverTime = new List<List<List<int>>>();
+                                            proccessingTime = new List<List<int>>();
+                                            deviceCount = _countLine;
+                                            maxChangeoverTime = t3;
+                                            maxProccessingTime = t2;
+                                            InitTables();
+                                            InitDataGridView();
                                             GetTime();
-                                            Shedule.L = _countLine;
-                                            Shedule.Switching = _temptS;
-                                            Shedule.Treatment = _temptT;
-                                            var listCountButches = new List<int>();
-                                            for (var ii = 0; ii < _countType; ii++)
-                                            {
-                                                listCountButches.Add(0);
-                                            }
+                                            Shedule.conveyorLenght = _countLine;
+                                            Shedule.Switching = changeoverTime;
+                                            Shedule.Treatment = proccessingTime;
 
-                                            for (var ii = 0; ii < _countType; ii++)
+                                            // Создаём вектор длиной dataTypesCount из 0
+                                            var batchCountList = new List<int>();
+                                            for (var dataType = 0; dataType < dataTypesCount; dataType++)
+                                                batchCountList.Add(0);
+                                            
+                                            for (var dataType = 0; dataType < dataTypesCount; dataType++)
                                             {
-                                                _countBatches = 0;
+                                                batchCount = 0;
                                                 for (int i = 0; i < n_kom; i++)
                                                 {
-                                                    _countBatches += compositionSets[i][ii] * n_kom_q;
+                                                    batchCount += compositionSets[i][dataType] * n_kom_q;
                                                 }
 
-                                                listCountButches[ii] = _countBatches;
+                                                batchCountList[dataType] = batchCount;
                                             }
 
-                                            var gaa = new GAA(_countType, listCountButches, checkBox1.Checked, _countBatches);
+                                            var gaa = new GAA(dataTypesCount, batchCountList, isFixedBatches, batchCount);
 
                                             
-                                            var result = gaa.calcSetsFitnessList(checkBox2.Checked, GenerationCounter.Value, (int)numericUpDown2.Value);
+                                            var result = gaa.calcSetsFitnessList(checkBox2.Checked, numeric_generation_count.Value, (int)numericUpDown2.Value);
 
                                             file.WriteLine(result);
                                         }
@@ -302,14 +383,14 @@ namespace newAlgorithm
         {
             try
             {
-                _countType = (int)numericUpDown1.Value;
-                _l = Convert.ToInt32(LTB.Text);
-                _maxS = Convert.ToInt32(timeSwitchingTB.Text);
-                _maxT = Convert.ToInt32(timeTreatmentingTB.Text);
-                _temptS = new List<List<List<int>>>();
-                _temptT = new List<List<int>>();
-                RandomTime();
-                PrintTime();
+                dataTypesCount = (int)numeric_data_types_count.Value;
+                deviceCount = Convert.ToInt32(numeric_device_count.Value);
+                maxChangeoverTime = Convert.ToInt32(numeric_max_changeover_time.Value);
+                maxProccessingTime = Convert.ToInt32(numeric_max_proccessing_time.Value);
+                changeoverTime = new List<List<List<int>>>();
+                proccessingTime = new List<List<int>>();
+                InitTables();
+                InitDataGridView();
             }
             catch 
             {
@@ -317,62 +398,89 @@ namespace newAlgorithm
             }
         }
 
-        private void numericUpDown1_ValueChanged(object sender, EventArgs e)
-        {
-            Change();
-        }
-
-        private void LTB_TextChanged(object sender, EventArgs e)
-        {
-            Change();
-        }
-
-        private void timeSwitchingTB_TextChanged(object sender, EventArgs e)
-        {
-            Change();
-        }
-
-        private void timeTreatmentingTB_TextChanged(object sender, EventArgs e)
-        {
-            Change();
-        }
-
+        /// <summary>
+        /// Второй метод
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void button3_Click(object sender, EventArgs e)
         {
-            _countType = (int)numericUpDown1.Value;
-            _countBatches = Convert.ToInt32(countBatchesTB.Text);
-            var listCountButches = new List<int>();
-            for (var ii = 0; ii < _countType; ii++)
-            {
-                listCountButches.Add(_countBatches);
-            }
+            // Инициализируем вектор длиной dataTypesCount, каждый элемент которого будет равен batchCount
+            List<int> batchCountList = CreateBatchCountList();
 
-            _l = Convert.ToInt32(LTB.Text);
+            deviceCount = Convert.ToInt32(numeric_device_count.Value);
             GetTime();
-            Shedule.L = _l;
-            Shedule.Switching = _temptS;
-            Shedule.Treatment = _temptT;
-            var firstLevel = new FirstLevel(_countType, listCountButches, checkBox1.Checked);
+            Shedule.conveyorLenght = deviceCount;
+            Shedule.Switching = changeoverTime;
+            Shedule.Treatment = proccessingTime;
+            var firstLevel = new FirstLevel(dataTypesCount, batchCountList, isFixedBatches);
             firstLevel.GenetateSolutionForAllTypesSecondAlgorithm();
+        }
+        
+        private void tabControl_time_setup_Selecting(object sender = null, TabControlCancelEventArgs e = null)
+        {
+
+            // Определяем необходимость переопределения данных таблиц
+            if (!isValueChagedToUpdate)
+                return;
+
+            // Отчищаем внутреннии таблицы
+            changeoverTime.Clear();
+            proccessingTime.Clear();
+
+            // Выполняем инициализацию графических таблиц
+            InitDataGridView();
+
+            // Выполняем инициализацию внутренних таблиц
+            InitTables();
+
+            // Выполяем рандомизацию для таблицы времени обработки
+            randomizeProcessingTime_Click();
+
+            // Выполняем рандомизацию для таблицы времени переналадки приборов
+            randomizeChangeoverTime_Click();
+
+            // Выполняем считывание данных во внутренние таблицы
+            GetTime();
         }
 
         #region Выбор способа обработки данных
 
+        /// <summary>
+        /// Данная функция обрабатывает выбор обработки данных и отмечает выбора, как SelectoinType.TournamentSelection (Турнирная селекция)
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void radioButton_TournamentSelection_change(object sender, EventArgs e)
         {
             selectoinType = SelectoinType.TournamentSelection;
         }
 
+        /// <summary>
+        /// Данная функция обрабатывает выбор обработки данных и отмечает выбора, как SelectoinType.RouletteMethod (Метод рулетки)
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void radioButton_RouletteMethod_change(object sender, EventArgs e)
         {
             selectoinType = SelectoinType.RouletteMethod;
         }
 
+        /// <summary>
+        /// Данная функция обрабатывает выбор обработки данных и отмечает выбора, как SelectoinType.UniformRanking (Равномерное ранжирование)
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void radioButton_UniformRanking_change(object sender, EventArgs e)
         {
             selectoinType = SelectoinType.UniformRanking;
         }
 
+        /// <summary>
+        /// Данная функция обрабатывает выбор обработки данных и отмечает выбора, как SelectoinType.SigmaClipping (Сигма отсечение)
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void radioButton_SigmaClipping_change(object sender, EventArgs e)
         {
             selectoinType = SelectoinType.SigmaClipping;
@@ -380,19 +488,120 @@ namespace newAlgorithm
 
         #endregion
 
-        private void button6_Click(object sender, EventArgs e)
-        {
+        #region Определяем входные параметры
 
+        /// <summary>
+        /// Данная функция определяет входные параметры с графического компонента numeric_batch_count и записывает их в batchCount
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void numeric_batch_count_ValueChanged(object sender, EventArgs e)
+        {
+            batchCount = Convert.ToInt32(numeric_batch_count.Value);
         }
+
+        /// <summary>
+        /// Данная функция определяет входные параметры с графического компонента numeric_max_changeover_time и записывает их в maxChangeoverTime
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void numeric_max_changeover_time_ValueChanged(object sender, EventArgs e)
+        {
+            maxChangeoverTime = Convert.ToInt32(numeric_max_changeover_time.Value);
+        }
+
+        /// <summary>
+        /// Данная функция определяет входные параметры с графического компонента numeric_max_proccessing_time и записывает их в maxProccessingTime
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void numeric_max_proccessing_time_ValueChanged(object sender, EventArgs e)
+        {
+            maxProccessingTime = Convert.ToInt32(numeric_max_proccessing_time.Value);
+        }
+
+        /// <summary>
+        /// Данная функция определяет входные параметры с графического компонента numeric_data_types_count и записывает их в dataTypesCount
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void numeric_data_types_count_ValueChanged(object sender, EventArgs e)
+        {
+            dataTypesCount = Convert.ToInt32(numeric_data_types_count.Value);
+            isValueChagedToUpdate = true;
+        }
+
+        /// <summary>
+        /// Данная функция определяет входные параметры с графического компонента numeric_buffer и записывает их в buffer
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void numeric_buffer_ValueChanged(object sender, EventArgs e)
+        {
+            buffer = Convert.ToInt32(numeric_buffer.Value);
+        }
+
+        /// <summary>
+        /// Данная функция определяет входные параметры с графического компонента numeric_device_count и записывает их в deviceCount
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void numeric_device_count_ValueChanged(object sender, EventArgs e)
+        {
+            deviceCount = Convert.ToInt32(numeric_device_count.Value);
+            isValueChagedToUpdate = true;
+        }
+
+        /// <summary>
+        /// Данная функция определяет входные параметры с графического компонента checkBox_fixed_batches и записывает их в isFixedBatches
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void checkBox_fixed_batches_CheckedChanged(object sender, EventArgs e)
+        {
+            isFixedBatches = checkBox_fixed_batches.Checked;
+        }
+
+        /// <summary>
+        /// Данная функция определяет входные параметры с графического компонента checkBox_optimization и записывает их в isOptimization
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void checkBox_optimization_CheckedChanged(object sender, EventArgs e)
+        {
+            isOptimization = checkBox_optimization.Checked;
+        }
+
+        /// <summary>
+        /// Данная функция определяет входные параметры с графического компонента numeric_random и записывает их в randomValue
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void numeric_random_ValueChanged(object sender, EventArgs e)
+        {
+            randomValue = Convert.ToInt32(numeric_random.Value);
+        }
+
+        /// <summary>
+        /// Данная функция определяет входные параметры с графического компонента numeric_generation_count и записывает их в generation_count
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void numeric_generation_count_ValueChanged(object sender, EventArgs e)
+        {
+            generation_count = Convert.ToInt32(numeric_generation_count.Value);
+        }
+        #endregion
+
 
         private void OldSecondLevelButton_Click(object sender, EventArgs e)
         {
             var massi = new[] { 2, 4, 8, 16, 32 };
-            using (var file = new StreamWriter("Фиксированные партии - " +checkBox1.Checked +", оптимизации групп " + OptimizationSecondLevel.Checked + " N=" + numericUpDown1.Value + " L=" + LTB.Text + ".txt", false))
+            using (var file = new StreamWriter("Фиксированные партии - " + isFixedBatches + ", оптимизации групп " + isOptimization + " N=" + numeric_data_types_count.Value.ToString() + " L=" + numeric_device_count.Value.ToString() + ".txt", false))
             {
                 foreach (var intt in massi)
                 {
-                    timeSwitchingTB.Text = intt.ToString();
+                    numeric_max_changeover_time.Value = intt;
                     foreach (var item in massi)
                     {
                         for (var tz = 50; tz <= 200; tz = tz + 50)
@@ -401,29 +610,25 @@ namespace newAlgorithm
                             {
 
 
-                                timeTreatmentingTB.Text = item.ToString();
-                                _countType = (int) numericUpDown1.Value;
-                                _countBatches = Convert.ToInt32(countBatchesTB.Text);
-                                var listCountButches = new List<int>();
-                                for (var ii = 0; ii < _countType; ii++)
-                                {
-                                    listCountButches.Add(_countBatches);
-                                }
+                                numeric_max_proccessing_time.Value = item;
 
-                                _l = Convert.ToInt32(LTB.Text);
-                                _maxS = Convert.ToInt32(timeSwitchingTB.Text);
-                                _maxT = Convert.ToInt32(timeTreatmentingTB.Text);
+                                // Инициализируем вектор длиной dataTypesCount, каждый элемент которого будет равен batchCount
+                                List<int> batchCountList = CreateBatchCountList();
+
+                                deviceCount = Convert.ToInt32(numeric_device_count.Value);
+                                maxChangeoverTime = Convert.ToInt32(numeric_max_changeover_time.Value);
+                                maxProccessingTime = Convert.ToInt32(numeric_max_proccessing_time.Value);
                                 GetTime();
-                                Shedule.L = _l;
-                                Shedule.Switching = _temptS;
-                                Shedule.Treatment = _temptT;
-                                var firstLevel = new FirstLevel(_countType, listCountButches, checkBox1.Checked);
+                                Shedule.conveyorLenght = deviceCount;
+                                Shedule.Switching = changeoverTime;
+                                Shedule.Treatment = proccessingTime;
+                                var firstLevel = new FirstLevel(dataTypesCount, batchCountList, isFixedBatches);
                                 firstLevel.GenetateSolutionForAllTypes("outputFirstAlgorithm.txt");
-                                var oldSecondLevel = new OldSecondLevel(tz, countGroup, _l);
+                                var oldSecondLevel = new OldSecondLevel(tz, countGroup, deviceCount);
 
                                 int criteria;
                                 int flCrit;
-                                var listInt = !OptimizationSecondLevel.Checked
+                                var listInt = !isOptimization
                                     ? oldSecondLevel.CalcFitnessList(firstLevel._a, out criteria, out flCrit)
                                     : oldSecondLevel.CalcOptimalFitnessList(firstLevel._a, out criteria, out flCrit);
                                 var stringTime = listInt.Select(i => i.ToString());
@@ -443,10 +648,6 @@ namespace newAlgorithm
             MessageBox.Show(@"Решения найдены");
         }
 
-        private void checkBox1_CheckedChanged(object sender, EventArgs e)
-        {
-
-        }
 
         private void checkBox2_CheckedChanged(object sender, EventArgs e)
         {
@@ -461,11 +662,11 @@ namespace newAlgorithm
         private void OldSecondLevelAll_Click(object sender, EventArgs e)
         {
             var massi = new[] { 2, 4, 8, 16, 32 };
-            using (var file = new StreamWriter("Га, оптимизации групп " +OptimizationSecondLevel.Checked +" N=" + numericUpDown1.Value + "L=" + LTB.Text + ".txt", false))
+            using (var file = new StreamWriter("Га, оптимизации групп " + isOptimization + " N=" + numeric_data_types_count.Value + "L=" + numeric_device_count.Value.ToString() + ".txt", false))
             {
                 foreach (var intt in massi)
                 {
-                    timeSwitchingTB.Text = intt.ToString();
+                    numeric_max_changeover_time.Value = intt;
                     foreach (var item in massi)
                     {
                         for (var tz = 50; tz <= 200; tz = tz + 50)
@@ -474,34 +675,30 @@ namespace newAlgorithm
                             {
 
 
-                                timeTreatmentingTB.Text = item.ToString();
-                                _countType = (int)numericUpDown1.Value;
-                                _countBatches = Convert.ToInt32(countBatchesTB.Text);
-                                var listCountButches = new List<int>();
-                                for (var ii = 0; ii < _countType; ii++)
-                                {
-                                    listCountButches.Add(_countBatches);
-                                }
+                                numeric_max_proccessing_time.Value = item;
 
-                                _l = Convert.ToInt32(LTB.Text);
-                                _maxS = Convert.ToInt32(timeSwitchingTB.Text);
-                                _maxT = Convert.ToInt32(timeTreatmentingTB.Text);
+                                // Инициализируем вектор длиной dataTypesCount, каждый элемент которого будет равен batchCount
+                                List<int> batchCountList = CreateBatchCountList();
+
+                                deviceCount = Convert.ToInt32(numeric_device_count.Value);
+                                maxChangeoverTime = Convert.ToInt32(numeric_max_changeover_time.Value);
+                                maxProccessingTime = Convert.ToInt32(numeric_max_proccessing_time.Value);
                                 GetTime();
-                                Shedule.L = _l;
-                                Shedule.Switching = _temptS;
-                                Shedule.Treatment = _temptT;
+                                Shedule.conveyorLenght = deviceCount;
+                                Shedule.Switching = changeoverTime;
+                                Shedule.Treatment = proccessingTime;
 
-                                var gaa = new GAA(_countType, listCountButches, checkBox1.Checked, _countBatches);
+                                var gaa = new GAA(dataTypesCount, batchCountList, isFixedBatches, batchCount);
                                 gaa.SetXrom((int)numericUpDown2.Value);
                                 var sostav = gaa.calcFitnessList();
 
-                                //var firstLevel = new FirstLevel(_countType, listCountButches, checkBox1.Checked);
+                                //var firstLevel = new FirstLevel(_countType, batchCountList, checkBox1.Checked);
                                 //firstLevel.GenetateSolutionForAllTypes("outputFirstAlgorithm.txt");
-                                var oldSecondLevel = new OldSecondLevel(tz, countGroup, _l);
+                                var oldSecondLevel = new OldSecondLevel(tz, countGroup, deviceCount);
 
                                 int criteria;
                                 int flCrit;
-                                var listInt = !OptimizationSecondLevel.Checked
+                                var listInt = !isOptimization
                                     ? oldSecondLevel.CalcFitnessList(sostav, out criteria, out flCrit)
                                     : oldSecondLevel.CalcOptimalFitnessList(sostav, out criteria, out flCrit);
                                 var stringTime = listInt.Select(i => i.ToString());
@@ -526,6 +723,11 @@ namespace newAlgorithm
 
         }
 
+        /// <summary>
+        /// Тестовый прогон
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void button4_Click(object sender, EventArgs e)
         {
             Form1.direct = checkBox2.Checked;
@@ -563,12 +765,12 @@ namespace newAlgorithm
                 {
                     foreach (var t in n)
                     {
-                        _countType = t;
+                        dataTypesCount = t;
                         compositionSets = new List<List<int>>();
                         for (int i = 0; i < n_kom; i++)
                         {
                             compositionSets.Add(new List<int>());
-                            for (var ind = 0; ind < _countType; ind++)
+                            for (var ind = 0; ind < dataTypesCount; ind++)
                             {
                                 temp = rand.Next(10);
                                 if (temp > 5)
@@ -595,37 +797,38 @@ namespace newAlgorithm
                             {
                                 foreach (var t3 in time)
                                 {
-                                    _temptS = new List<List<List<int>>>(); // переналадка
-                                    _temptT = new List<List<int>>(); // время обработки данных i-го типа
-                                    _l = _countLine; // количество сегментов
-                                    _maxS = t3;
-                                    _maxT = t2;
-                                    RandomTime();
-                                    PrintTime();
+                                    changeoverTime = new List<List<List<int>>>(); // переналадка
+                                    proccessingTime = new List<List<int>>(); // время обработки данных i-го типа
+                                    deviceCount = _countLine; // количество сегментов
+                                    maxChangeoverTime = t3;
+                                    maxProccessingTime = t2;
+                                    InitTables();
+                                    InitDataGridView();
                                     GetTime();
-                                    Shedule.L = _countLine;
-                                    Shedule.Switching = _temptS;
-                                    Shedule.Treatment = _temptT;
-                                    var listCountButches = new List<int>(); // Количество пакетов
-                                    for (var ii = 0; ii < _countType; ii++)
+                                    Shedule.conveyorLenght = _countLine;
+                                    Shedule.Switching = changeoverTime;
+                                    Shedule.Treatment = proccessingTime;
+
+                                    var _batchCountList = new List<int>(); // Количество пакетов
+                                    for (var ii = 0; ii < dataTypesCount; ii++)
                                     {
-                                        listCountButches.Add(0);
+                                        _batchCountList.Add(0);
                                     }
-                                    for (var ii = 0; ii < _countType; ii++)
+                                    for (var ii = 0; ii < dataTypesCount; ii++)
                                     {
-                                        _countBatches = 0;
+                                        batchCount = 0;
                                         for (int i = 0; i < n_kom; i++)
                                         {
-                                            _countBatches += compositionSets[i][ii];
+                                            batchCount += compositionSets[i][ii];
                                         }
-                                        listCountButches[ii] = _countBatches * n_kom_q;
+                                        _batchCountList[ii] = batchCount * n_kom_q;
                                     }
-                                    var firstLevel = new FirstLevel(_countType, listCountButches, checkBox1.Checked);
+                                    var firstLevel = new FirstLevel(dataTypesCount, _batchCountList, isFixedBatches);
                                     var result = firstLevel.GenetateSolutionForAllTypesSecondAlgorithm();
 
-                                    //var gaa = new GAA(_countType, listCountButches, checkBox1.Checked, _countBatches);
+                                    //var gaa = new GAA(_countType, listCountButches, checkBox1.Checked, batchCount);
                                     //var resultGaa = gaa.calcSetsFitnessList(checkBox2.Checked, GenerationCounter.Value, (int)numericUpDown2.Value);
-                                        
+
                                     var first = result[0];
                                     var top = result[1];
                                     //fileOut.WriteLine(first + "\t" + top + "\t" + resultGaa);
@@ -641,72 +844,119 @@ namespace newAlgorithm
             MessageBox.Show("Тестовый прогон завершен");
         }
 
-        private void randomizeProcessingTime_Click(object sender, EventArgs e)
+        /// <summary>
+        /// Данная функция выполняет рандомизацию таблицы слева (таблица времени обработки)
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void randomizeProcessingTime_Click(object sender = null, EventArgs e = null)
         {
-            int valueRandomize = (int) this.valueRandomize.Value;
-            var tmpValue = valueRandomize / 2;
+            // Формируем рандомайзер на основе введённого значение
+            // Random rand = new Random(randomValue);
 
-            for (int rowIndex = 0; rowIndex < dataGridView1.RowCount; rowIndex++)
+            // Формируем второе рандомное значение, как половина от введённого
+            int _randomValue = randomValue / 2;
+
+            // Для каждого прибора (проходимся по всем строкам таблицы dataGridView_proccessing_time)
+            for (int device = 0; device < dataGridView_proccessing_time.RowCount; device++)
             {
-                var value = 0;
-                if (rowIndex % 2 == 0)
+
+                // Выполняем наименование строки
+                dataGridView_proccessing_time.Rows[device].HeaderCell.Value = string.Format("Device {0}", device);
+
+                // Чередуем два рандомных значения _randomValue и randomValue с каждой новой строкой
+                int value = (device % 2 == 0) ? _randomValue : randomValue;
+
+                // Для каждого типа данных (проходися по всем столбцам таблица dataGridView_proccessing_time)
+                for (int dataType = 0; dataType < dataGridView_proccessing_time.ColumnCount; dataType++)
                 {
-                    value = tmpValue;
-                } else
-                {
-                    value = valueRandomize;
-                }
-                var row = dataGridView1.Rows[rowIndex];
-                for (int columnIndex = 0; columnIndex < row.Cells.Count; columnIndex++)
-                {
-                    value = value == tmpValue ? valueRandomize : tmpValue;
-                    dataGridView1.Rows[rowIndex].Cells[columnIndex].Value = value;
+
+                    // Выполняем наименование строки
+                    dataGridView_proccessing_time.Columns[dataType].HeaderCell.Value = string.Format("Type {0}", dataType);
+
+
+                    // Чередуем два рандомных значения _randomValue и randomValue с каждой новой колонкой
+                    value = (value == _randomValue) ? randomValue : _randomValue;
+
+                    // Присваиваем новое рандомное значение в таблице dataGridView_proccessing_time
+                    dataGridView_proccessing_time.Rows[device].Cells[dataType].Value = value;
                 }
             }
+
+            // Сохраняем сгенерированные данные
+            GetTime();
         }
 
-        private void randomizePreprocessingTime_Click(object sender, EventArgs e)
+        /// <summary>
+        /// Данная функция выполняет рандомизацию таблицы справа (таблица времени переналадки)
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void randomizeChangeoverTime_Click(object sender = null, EventArgs e = null)
         {
-            int countType = (int)numericUpDown1.Value;
-            int valueRandomize = (int)this.valueRandomize.Value;
-            var tmpValue = valueRandomize / 2;
+            // Формируем рандомайзер на основе введённого значение
+            // Random rand = new Random(randomValue);
 
-            for (int rowIndex = 0; rowIndex < countType; rowIndex++)
+            // Формируем второе рандомное значение, как половина от введённого
+            int _randomValue = randomValue / 2;
+
+            // Для каждого устройства
+            for (int device = 0; device < deviceCount; device++)
             {
-                var value = 0;
-                if (rowIndex % 2 == 0)
+                
+                // Для каждого типа данных (проходимся по всем строкам таблицы dataGridView_changeover_time)
+                for (int row_dataType = 0; row_dataType < dataTypesCount; row_dataType++)
                 {
-                    value = tmpValue;
-                }
-                else
-                {
-                    value = valueRandomize;
-                }
-                var row = dataGridView2.Rows[rowIndex];
-                for (int columnIndex = 0; columnIndex < row.Cells.Count; columnIndex++)
-                {
-                    if (rowIndex == columnIndex)
+
+                    // Выполняем наименование строки
+                    dataGridView_changeover_time.Rows[row_dataType + device * dataTypesCount].HeaderCell.Value = string.Format("Type {0}", row_dataType);
+
+                    // Чередуем два рандомных значения _randomValue и randomValue с каждой новой строкой
+                    int value = (row_dataType % 2 == 0) ? _randomValue : randomValue;
+
+                    // Для каждого типа данных (проходися по всем столбцам таблица dataGridView_changeover_time)
+                    for (int col_dataType = 0; col_dataType < dataTypesCount; col_dataType++)
                     {
-                        dataGridView2.Rows[rowIndex].Cells[columnIndex].Value = 0;
-                        continue;
+
+                        // Выполняем наименование столбцов
+                        if (device == 0)
+                            dataGridView_changeover_time.Columns[col_dataType].HeaderCell.Value = string.Format("Type {0}", row_dataType % deviceCount);
+
+                        // Когда индекс по строке равен индексу по столбцу
+                        if (row_dataType == col_dataType)
+                        {
+
+                            // Присваиваем значение 0 таблице dataGridView_changeover_time
+                            dataGridView_changeover_time.Rows[row_dataType + device * dataTypesCount].Cells[col_dataType].Value = 0;
+
+                            // Продолжаем обработку
+                            continue;
+                        }
+
+                        // Чередуем два рандомных значения _randomValue и randomValue с каждой новой колонкой
+                        value = (value == _randomValue) ? randomValue : _randomValue;
+
+                        // Присваиваем новое рандомное значение в таблице dataGridView_changeover_time
+                        dataGridView_changeover_time.Rows[row_dataType + device * dataTypesCount].Cells[col_dataType].Value = value;
                     }
-                    value = value == tmpValue ? valueRandomize : tmpValue;
-                    dataGridView2.Rows[rowIndex].Cells[columnIndex].Value = value;
                 }
             }
+
+            // Сохраняем сгенерированные данные
+            GetTime();
         }
 
         private void copyPreprocessingTime_Click(object sender, EventArgs e)
         {
-            int countType = (int)numericUpDown1.Value;
-            int countDevices = Convert.ToInt32(LTB.Text);
+            int countType = (int)numeric_data_types_count.Value;
+            int countDevices = Convert.ToInt32(numeric_device_count.Value);
 
             for (int rowIndex = countType; rowIndex < countType * countDevices; rowIndex++)
             {
-                var row = dataGridView2.Rows[rowIndex];
+                var row = dataGridView_changeover_time.Rows[rowIndex];
                 for (int columnIndex = 0; columnIndex < row.Cells.Count; columnIndex++)
                 {
-                    dataGridView2.Rows[rowIndex].Cells[columnIndex].Value = dataGridView2.Rows[rowIndex % countType].Cells[columnIndex].Value;
+                    dataGridView_changeover_time.Rows[rowIndex].Cells[columnIndex].Value = dataGridView_changeover_time.Rows[rowIndex % countType].Cells[columnIndex].Value;
                 }
             }
         }
@@ -725,50 +975,67 @@ namespace newAlgorithm
             return str;
         }
 
+        /// <summary>
+        /// Прогон
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void button5_Click(object sender, EventArgs e)
         {
-            var massi = new[] { 8, 12, 16, 24, 32 };
-            foreach (var intt in massi)
-            {
-                countBatchesTB.Text = intt.ToString();
-                for (int z = 5; z <= 10; z += 5)
-                {
-                    numericUpDown1.Text = z.ToString();
-                    for (int z1 = 5; z1 <= 10; z1 += 5)
-                    {
-                        LTB.Text = z1.ToString();
-                        using (var file = new StreamWriter("outputGAASimpleResult.txt", true))
-                        {
-                            file.WriteLine("________________(CB = " + intt + ")");
-                            file.WriteLine();
-                            file.WriteLine("________________(L = " + LTB.Text + ")(N=" + numericUpDown1.Value + ")_____");
-                        }
-                        for (int p = 2; p <= 32; p *= 2)
-                        {
-                            timeTreatmentingTB.Text = Convert.ToString(p);
-                            for (int i = 2; i <= 32; i *= 2)
-                            {
-                                timeSwitchingTB.Text = Convert.ToString(i);
+            // Инициализируем выходной файл на добавление
+            StreamWriter file_output_method_GAA = new StreamWriter("outputGAASimpleResult.txt", true);
 
-                                Shedule.L = _l;
-                                Shedule.Switching = _temptS;
-                                Shedule.Treatment = _temptT;
-                                _countType = (int)numericUpDown1.Value;
-                                _countBatches = Convert.ToInt32(countBatchesTB.Text);
-                                var listCountButches = new List<int>();
-                                for (var ii = 0; ii < _countType; ii++)
-                                {
-                                    listCountButches.Add(_countBatches);
-                                }
-                                var gaa = new GAA(_countType, listCountButches, checkBox1.Checked, _countBatches);
+            // Фиксируем начало обработки
+            file_output_method_GAA.WriteLine($"Дата и время запуска: {DateTime.Now.ToString("O")}\n{{");
+
+            // Формируем массив данных [8, 12, 16, 24, 32]
+            int[] array = { 8, 12, 16, 24, 32 };
+
+            // Для каждого элемента из массива array выполняем обработку
+            foreach (int _batchCount in array)
+            {
+
+                // Для следующих количеств типов данных выполняем обработку
+                for (int _dataTypesCount = 5; _dataTypesCount <= 10; _dataTypesCount += 5)
+                {
+
+                    // Для следующих количеств приборов (сегментов) выполняем обработку
+                    for (int _conveyorLenght = 5; _conveyorLenght <= 10; _conveyorLenght += 5)
+                    {
+                        
+                        // Выводим информацию в выходной файл
+                        file_output_method_GAA.WriteLine("\tbatchCount(CB)   \t= {0}", _batchCount);
+                        file_output_method_GAA.WriteLine("\tconveyorLength(L)\t= {0}", _conveyorLenght);
+                        file_output_method_GAA.WriteLine("\tdataTypesCount(N)\t= {0}", _dataTypesCount);
+                        
+                        // Для следующих максимальных времён выполнения обработки выполняем обработку
+                        for (int _maxProccessingTime = 2; _maxProccessingTime <= 32; _maxProccessingTime *= 2)
+                        {
+                            // Выводим информацию в выходной файл
+                            file_output_method_GAA.WriteLine($"\t{{\n\t\tmaxProccessingTime\t= {_maxProccessingTime}");
+
+                            // Для следующих максимальных времён переналадки приборов выполняем обработку
+                            for (int _maxChangeoverTime = 2; _maxChangeoverTime <= 32; _maxChangeoverTime *= 2)
+                            {
+                                // Выводим информацию в выходной файл
+                                file_output_method_GAA.WriteLine($"\t\t{{\n\t\t\tmaxChangeoverTime\t= {_maxChangeoverTime}");
+
+                                // Формируем расписание
+                                Shedule.conveyorLenght = _conveyorLenght;
+                                Shedule.Switching = changeoverTime;
+                                Shedule.Treatment = proccessingTime;
+
+                                // Инициализируем вектор длиной _dataTypesCount, каждый элемент которого будет равен _batchCount
+                                List<int> batchCountList = CreateBatchCountList(_batchCount, _dataTypesCount);
+
+                                var gaa = new GAA(_dataTypesCount, batchCountList, isFixedBatches, _batchCount);
                                 gaa.SetXrom((int)numericUpDown2.Value);
                                 var countSourceKit = gaa.calcFitnessList();
                                 int s;
                                 var result = gaa.getSelectionPopulation(selectoinType, out s);
 
-                                using (var file = new StreamWriter("outputGAA.txt", true))
+                                using (var file_outputGAA = new StreamWriter("outputGAA.txt", true))
                                 {
-                                    int k = 0;
                                     foreach (var elem in gaa.nabor)
                                     {
 
@@ -776,38 +1043,42 @@ namespace newAlgorithm
                                         {
                                             foreach (var elem3 in elem2)
                                             {
-                                                file.Write(elem3 + " ");
+                                                file_outputGAA.Write(elem3 + " ");
                                             }
-                                            file.WriteLine();
+                                            file_outputGAA.WriteLine();
                                         }
-                                        file.WriteLine("_________________________");
-                                        file.WriteLine(gaa._fitnesslist[i]);
-                                        file.WriteLine("+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=");
-                                        file.WriteLine("Kit" + countSourceKit[i]);
-                                        file.WriteLine("+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=");
-                                        file.WriteLine("_________________________");
-                                        k++;
+                                        file_outputGAA.WriteLine("_________________________");
+                                        file_outputGAA.WriteLine(gaa._fitnesslist[_maxChangeoverTime]);
+                                        file_outputGAA.WriteLine("+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=");
+                                        file_outputGAA.WriteLine("Kit" + countSourceKit[_maxChangeoverTime]);
+                                        file_outputGAA.WriteLine("+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=");
+                                        file_outputGAA.WriteLine("_________________________");
+
                                     }
 
-                                    file.WriteLine("***************************");
-                                    file.WriteLine(result);
-                                    file.WriteLine("***************************");
+                                    file_outputGAA.WriteLine("***************************");
+                                    file_outputGAA.WriteLine(result);
+                                    file_outputGAA.WriteLine("***************************");
 
                                 }
-                                using (var file = new StreamWriter("outputGAASimpleResult.txt", true))
-                                {
-                                    file.WriteLine(result);
-                                }
+
+                                // Выводим информацию в выходной файл
+                                file_output_method_GAA.WriteLine("\t\t\tresult\t= {0}", result);
+                                file_output_method_GAA.WriteLine($"\t\t}}");
                             }
-                            using (var file = new StreamWriter("outputGAASimpleResult.txt", true))
-                            {
-                                file.WriteLine("_____________________");   
-                            }
+
+                            // Выводим информацию в выходной файл
+                            file_output_method_GAA.WriteLine($"\t}}");
                         }
                     }
                 }
             }
-            MessageBox.Show("Данные успешно записаны", "Учпешное завершение", MessageBoxButtons.OK);
+
+            // Фиксируем конец обработки
+            file_output_method_GAA.WriteLine($"}}\nДата и время завершения: {DateTime.Now.ToString("O")}");
+            file_output_method_GAA.Close();
+
+            MessageBox.Show("Данные успешно записаны", "Успешное завершение", MessageBoxButtons.OK);
         }
 
         private void setsBtn_Click(object sender, EventArgs e)
@@ -827,5 +1098,42 @@ namespace newAlgorithm
             testType.Add(firstType);
             testType.Add(secondType);
         }
+
+        private void group_box_data_proccessing_Enter(object sender, EventArgs e)
+        {
+
+        }
+
+        private void numericUpDown2_ValueChanged(object sender, EventArgs e)
+        {
+
+        }
+
+
+        /// <summary>
+        /// Данная функция возвращает вектор длиной в количество типов данных состоящий из максимального размера каждого типа данных.
+        /// Например для _dataTypesCount = 3 и _batchCount = 2 вернёт [2,2,2].
+        /// Если вызвать функцию с аргументами по умолчанию, то в качестве значений _batchCount и _dataTypesCount будут 
+        /// взяты локальные значения batchCount и dataTypesCount.
+        /// </summary>
+        /// <param name="_batchCount">Максимальное количество элементов для любого типа данных</param>
+        /// <param name="_dataTypesCount">Максимальное количество типов данных</param>
+        /// <returns>Вектор длиной _dataTypesCount, каждый элемент которого равен _batchCount</returns>
+        private List<int> CreateBatchCountList(int _batchCount = 0, int _dataTypesCount = 0)
+        {
+            // Проверяем аргументы на корректные параметры
+            _batchCount = _batchCount == 0 ? batchCount : _batchCount;
+            _dataTypesCount = _dataTypesCount == 0 ? dataTypesCount : _dataTypesCount;
+
+            // Объявляем переменную списка содержащую количество элементов каждого типа
+            List<int> batchCountList = new List<int>();
+            for (int dataType = 0; dataType < _dataTypesCount; dataType++)
+                batchCountList.Add(_batchCount);
+
+            // Возвращаем список количества элементов каждого типа
+            return batchCountList;
+        }
+
     }
+
 }
