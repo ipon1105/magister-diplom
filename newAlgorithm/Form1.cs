@@ -920,7 +920,7 @@ namespace newAlgorithm
 
                         // Выполняем наименование столбцов
                         if (device == 0)
-                            dataGridView_changeover_time.Columns[col_dataType].HeaderCell.Value = string.Format("Type {0}", row_dataType % deviceCount);
+                            dataGridView_changeover_time.Columns[col_dataType].HeaderCell.Value = string.Format("Type {0}", col_dataType);
 
                         // Когда индекс по строке равен индексу по столбцу
                         if (row_dataType == col_dataType)
