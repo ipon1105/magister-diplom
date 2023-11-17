@@ -10,15 +10,20 @@ namespace newAlgorithm
 {
     class Shedule
     {
+        /// <summary>
+        /// Данная статическая переменная определяет длину конвейерной ленты по сути количество приборов
+        /// </summary>
+        public static int conveyorLenght;
+
+        public static Visualizer viz;
+
         private List<List<int>> _r;
         public static List<List<int>> Treatment;
         public static List<List<List<int>>> Switching;
         private int _timeConstructShedule;
-        public static int L;
         private List<List<List<int>>> _startProcessing;
         private List<List<List<int>>> _endProcessing;
         private List<SheduleElement> _rWithTime;
-        public static Visualizer viz;
 
         /// <summary>
         /// 
@@ -28,7 +33,7 @@ namespace newAlgorithm
         public Shedule(List<List<int>> r, int l)
         {
             this._r = r;
-            L = l;
+            conveyorLenght = l;
             viz = new Visualizer(l, r[0].Count);
         }
 
@@ -103,7 +108,7 @@ namespace newAlgorithm
         {
             _startProcessing = new List<List<List<int>>>();
             _endProcessing = new List<List<List<int>>>();
-            for (var i = 0; i < L; i++)//количество приборов
+            for (var i = 0; i < conveyorLenght; i++)//количество приборов
             {
                 _startProcessing.Add(new List<List<int>>());
                 _endProcessing.Add(new List<List<int>>());
@@ -127,7 +132,7 @@ namespace newAlgorithm
             var yy = 0;
             var zz = 0;
             var xx = 0;
-            for (var i = 0; i < L; i++)
+            for (var i = 0; i < conveyorLenght; i++)
             {
                 for (var j = 0; j < _r.Count; j++)
                 {
@@ -333,7 +338,7 @@ namespace newAlgorithm
         public List<List<int>> ConstructSheduleWithBuffer(int b, int countType)
         {
             var tempTime = 9999999;
-            CalculateSheduleWithBufer(b, L, countType);
+            CalculateSheduleWithBufer(b, conveyorLenght, countType);
             var tempR = CopyMatrix(_r);
             tempTime = _timeConstructShedule;
             for (var i = 0; i < _r.Count - 1; i++)
@@ -342,7 +347,7 @@ namespace newAlgorithm
                 {
                     ChangeColum(i, j);
                 }
-                CalculateSheduleWithBufer(b, L, countType);
+                CalculateSheduleWithBufer(b, conveyorLenght, countType);
                 if (tempTime >= _timeConstructShedule) continue;
                 _r = tempR;
                 _timeConstructShedule = tempTime;
@@ -361,7 +366,7 @@ namespace newAlgorithm
             var criterier = 0;
             ConstructShedule();
 
-            for (int numberPocess = 0; numberPocess < L; numberPocess++)
+            for (int numberPocess = 0; numberPocess < conveyorLenght; numberPocess++)
             {
                 for (int numberBatch = 0; numberBatch < _startProcessing[numberPocess].Count; numberBatch++)
                 {
@@ -374,7 +379,7 @@ namespace newAlgorithm
                 criterier -= _startProcessing[numberPocess][0][0];
             }
 
-            crit = (tz * L) - criterier;
+            crit = (tz * conveyorLenght) - criterier;
             return _timeConstructShedule;
         }
 
