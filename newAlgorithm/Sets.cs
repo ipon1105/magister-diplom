@@ -8,13 +8,16 @@ namespace newAlgorithm
 {
     class Sets
     {
+        /// <summary>
+        /// Данная переменная определяем типы данных
+        /// </summary>
         private readonly int _types;
-        private readonly List<List<int>> _composition;
+        private readonly List<List<int>> _composition; // состав
         private readonly List<List<int>> _time;
         private List<List<Kit>> _readySets;
 
         /// <summary>
-        /// 
+        /// Данный конструктур создаёт и возвращает экземпляр класса 
         /// </summary>
         /// <param name="countType"></param>
         /// <param name="composition"></param>
@@ -25,11 +28,18 @@ namespace newAlgorithm
             _composition = composition;
             _time = time;
             _readySets = new List<List<Kit>>();
+
+            // Для каджого из типов данных
             for (int i = 0; i < _types; i++)
             {
+
+                // Создаём набор и добавляем их в переменную _readySets
                 _readySets.Add(new List<Kit>());
+
+                // Для каждого из списка 
                 for (int j = 0; j < time[i].Count; j++)
                 {
+
                     _readySets[i].Add(new Kit(composition[i], time[i][j]));
                 }
             }
