@@ -55,10 +55,16 @@ namespace newAlgorithm
             var timeList = new List<int>();
             var timeListResult = new List<int>();
             var time = 0;
+
+            // Пробегаемся по всем типам в матрице R
             foreach (var type in r)
             {
+                
+                // Если количество частей будет больше количества групп, то прекращаем цикл
                 if (countParty >= countGroup)
                     break;
+
+                // Пробегаемся по всем частям в векторе Type метрицы R
                 foreach (var party in type)
                 {
                     PartyList[countParty][r.IndexOf(type)].Add(party);
@@ -78,6 +84,7 @@ namespace newAlgorithm
                         PartyList[countParty][r.IndexOf(type)].Remove(PartyList[countParty][r.IndexOf(type)].Last());
                         countParty++;
 
+                        // Если количество частей будет больше количества групп, то прекращаем цикл
                         if (countParty >= countGroup)
                             break;
                         while (PartyList[countParty].Count <= r.IndexOf(type))
@@ -191,6 +198,11 @@ namespace newAlgorithm
             return timeListResult.Take(countGroup).ToList();
         }
 
+        /// <summary>
+        /// Выполяем генерацию матрицы R
+        /// </summary>
+        /// <param name="N"></param>
+        /// <returns></returns>
         private List<List<int>> BuildR(List<List<int>> N)
         {
             List<List<int>> Res=new List<List<int>>();

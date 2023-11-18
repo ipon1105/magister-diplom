@@ -73,6 +73,11 @@ namespace newAlgorithm
             public Xromossomi() { }
         }
 
+        /// <summary>
+        /// Данная функция создаём список из хромосом размеров переданного в аргументе
+        /// </summary>
+        /// <param name="size">Размер списка из хромосом</param>
+        /// <returns></returns>
         public List<Xromossomi> SetXrom(int size)
         {
             for (int i = 0; i < size; i++)
@@ -374,37 +379,36 @@ namespace newAlgorithm
             // Инициализируем хромосому 
             Xromossomi xrom = new Xromossomi();
 
-            // Инициализируем в xrom список GenList, как наполненный типами данных от 0 до n, где n - dataTypesCount
+            // Инициализируем в xrom вектор GenList длиной dataTypesCount, как наполненный списками. 
             for (int dataType = 0; dataType < dataTypesCount; dataType++)
                 xrom.GenList.Add(new List<int>());
 
+            // Добавляем в вектор GenListOst все элементы из списка batchCountList
             xrom.GenListOst.AddRange(batchCountList);
 
-            for (int j = 0; j < xrom.GenList.Count; j++)
+            for (int GenElement = 0; GenElement < xrom.GenList.Count; GenElement++)
             {
                 int buff = 0;
-                for (int i = 0; i < batchCount / 2 - 1; i++)
+                for (int _batchCount = 0; _batchCount < batchCount / 2 - 1; _batchCount++)
                 {
-                    if (xrom.GenListOst[j] == 2)
+                    if (xrom.GenListOst[GenElement] == 2)
                     {
                         buff = 2;
-                        xrom.GenListOst[j] = 0;
+                        xrom.GenListOst[GenElement] = 0;
                     }
-                    else
-                        if (xrom.GenListOst[j] == 1)
+                    else if (xrom.GenListOst[GenElement] == 1)
                     {
-                        xrom.GenList[j][xrom.GenList[j].Count - 1]++;
-                        xrom.GenListOst[j] = 0;
+                        xrom.GenList[GenElement][xrom.GenList[GenElement].Count - 1]++;
+                        xrom.GenListOst[GenElement] = 0;
                         buff = 0;
                     }
-                    else
-                            if (xrom.GenListOst[j] == 0)
+                    else if (xrom.GenListOst[GenElement] == 0)
                         buff = 0;
                     else
-                        xrom.GenListOst[j] -= buff = rand.Next(2, xrom.GenListOst[j]);
-                    xrom.GenList[j].Add(buff);
+                        xrom.GenListOst[GenElement] -= buff = rand.Next(2, xrom.GenListOst[GenElement]);
+                    xrom.GenList[GenElement].Add(buff);
                 }
-                xrom.GenList[j].Add(xrom.GenListOst[j]);
+                xrom.GenList[GenElement].Add(xrom.GenListOst[GenElement]);
             }
             return xrom;
         }

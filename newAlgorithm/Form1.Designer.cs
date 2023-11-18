@@ -58,7 +58,7 @@
             this.OldSecondLevelButton = new System.Windows.Forms.Button();
             this.numeric_max_changeover_time = new System.Windows.Forms.NumericUpDown();
             this.button5 = new System.Windows.Forms.Button();
-            this.numericUpDown2 = new System.Windows.Forms.NumericUpDown();
+            this.numeric_xromossomi_size = new System.Windows.Forms.NumericUpDown();
             this.label11 = new System.Windows.Forms.Label();
             this.numeric_buffer = new System.Windows.Forms.NumericUpDown();
             this.checkBox_fixed_batches = new System.Windows.Forms.CheckBox();
@@ -67,14 +67,14 @@
             this.button3 = new System.Windows.Forms.Button();
             this.tabPage2 = new System.Windows.Forms.TabPage();
             this.tableLayoutPanel = new System.Windows.Forms.TableLayoutPanel();
-            this.label6 = new System.Windows.Forms.Label();
-            this.dataGridView_changeover_time = new System.Windows.Forms.DataGridView();
-            this.label7 = new System.Windows.Forms.Label();
-            this.dataGridView_proccessing_time = new System.Windows.Forms.DataGridView();
             this.randomizeProcessingTime = new System.Windows.Forms.Button();
             this.numeric_random = new System.Windows.Forms.NumericUpDown();
+            this.dataGridView_proccessing_time = new System.Windows.Forms.DataGridView();
             this.copyPreprocessingTime = new System.Windows.Forms.Button();
+            this.label7 = new System.Windows.Forms.Label();
+            this.dataGridView_changeover_time = new System.Windows.Forms.DataGridView();
             this.randomizePreprocessingTime = new System.Windows.Forms.Button();
+            this.label6 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.numeric_data_types_count)).BeginInit();
             this.tabControl.SuspendLayout();
             this.tabPage1.SuspendLayout();
@@ -85,13 +85,13 @@
             ((System.ComponentModel.ISupportInitialize)(this.numeric_max_proccessing_time)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numeric_batch_count)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numeric_max_changeover_time)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown2)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numeric_xromossomi_size)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numeric_buffer)).BeginInit();
             this.tabPage2.SuspendLayout();
             this.tableLayoutPanel.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.dataGridView_changeover_time)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.dataGridView_proccessing_time)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numeric_random)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dataGridView_proccessing_time)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dataGridView_changeover_time)).BeginInit();
             this.SuspendLayout();
             // 
             // numeric_data_types_count
@@ -182,13 +182,13 @@
             this.button2.UseVisualStyleBackColor = true;
             this.button2.Click += new System.EventHandler(this.button2_Click);
             // 
-            // tabControl1
+            // tabControl
             // 
             this.tabControl.Controls.Add(this.tabPage1);
             this.tabControl.Controls.Add(this.tabPage2);
             this.tabControl.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tabControl.Location = new System.Drawing.Point(0, 0);
-            this.tabControl.Name = "tabControl1";
+            this.tabControl.Name = "tabControl";
             this.tabControl.SelectedIndex = 0;
             this.tabControl.Size = new System.Drawing.Size(771, 500);
             this.tabControl.TabIndex = 12;
@@ -231,7 +231,7 @@
             this.groupBox_system_setup.Controls.Add(this.label2);
             this.groupBox_system_setup.Controls.Add(this.button5);
             this.groupBox_system_setup.Controls.Add(this.label3);
-            this.groupBox_system_setup.Controls.Add(this.numericUpDown2);
+            this.groupBox_system_setup.Controls.Add(this.numeric_xromossomi_size);
             this.groupBox_system_setup.Controls.Add(this.label4);
             this.groupBox_system_setup.Controls.Add(this.label11);
             this.groupBox_system_setup.Controls.Add(this.numeric_buffer);
@@ -469,28 +469,28 @@
             this.button5.UseVisualStyleBackColor = true;
             this.button5.Click += new System.EventHandler(this.button5_Click);
             // 
-            // numericUpDown2
+            // numeric_xromossomi_size
             // 
-            this.numericUpDown2.Location = new System.Drawing.Point(268, 181);
-            this.numericUpDown2.Maximum = new decimal(new int[] {
+            this.numeric_xromossomi_size.Location = new System.Drawing.Point(268, 181);
+            this.numeric_xromossomi_size.Maximum = new decimal(new int[] {
             150,
             0,
             0,
             0});
-            this.numericUpDown2.Minimum = new decimal(new int[] {
+            this.numeric_xromossomi_size.Minimum = new decimal(new int[] {
             1,
             0,
             0,
             0});
-            this.numericUpDown2.Name = "numericUpDown2";
-            this.numericUpDown2.Size = new System.Drawing.Size(120, 20);
-            this.numericUpDown2.TabIndex = 20;
-            this.numericUpDown2.Value = new decimal(new int[] {
+            this.numeric_xromossomi_size.Name = "numeric_xromossomi_size";
+            this.numeric_xromossomi_size.Size = new System.Drawing.Size(120, 20);
+            this.numeric_xromossomi_size.TabIndex = 20;
+            this.numeric_xromossomi_size.Value = new decimal(new int[] {
             50,
             0,
             0,
             0});
-            this.numericUpDown2.ValueChanged += new System.EventHandler(this.numericUpDown2_ValueChanged);
+            this.numeric_xromossomi_size.ValueChanged += new System.EventHandler(this.numericUpDown2_ValueChanged);
             // 
             // label11
             // 
@@ -602,58 +602,6 @@
             this.tableLayoutPanel.Size = new System.Drawing.Size(757, 468);
             this.tableLayoutPanel.TabIndex = 23;
             // 
-            // label6
-            // 
-            this.label6.AutoSize = true;
-            this.tableLayoutPanel.SetColumnSpan(this.label6, 2);
-            this.label6.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.label6.Font = new System.Drawing.Font("Microsoft Sans Serif", 14F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.label6.Location = new System.Drawing.Point(381, 0);
-            this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(373, 34);
-            this.label6.TabIndex = 20;
-            this.label6.Text = "Время переналадки приборов";
-            this.label6.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            // 
-            // dataGridView_changeover_time
-            // 
-            this.dataGridView_changeover_time.AllowDrop = true;
-            this.dataGridView_changeover_time.AllowUserToAddRows = false;
-            this.dataGridView_changeover_time.AllowUserToDeleteRows = false;
-            this.dataGridView_changeover_time.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.AllCells;
-            this.dataGridView_changeover_time.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.tableLayoutPanel.SetColumnSpan(this.dataGridView_changeover_time, 2);
-            this.dataGridView_changeover_time.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.dataGridView_changeover_time.Location = new System.Drawing.Point(381, 37);
-            this.dataGridView_changeover_time.Name = "dataGridView_changeover_time";
-            this.dataGridView_changeover_time.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.AutoSizeToAllHeaders;
-            this.dataGridView_changeover_time.Size = new System.Drawing.Size(373, 373);
-            this.dataGridView_changeover_time.TabIndex = 19;
-            // 
-            // label7
-            // 
-            this.tableLayoutPanel.SetColumnSpan(this.label7, 2);
-            this.label7.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.label7.Font = new System.Drawing.Font("Microsoft Sans Serif", 14F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.label7.Location = new System.Drawing.Point(3, 0);
-            this.label7.Name = "label7";
-            this.label7.Size = new System.Drawing.Size(372, 34);
-            this.label7.TabIndex = 18;
-            this.label7.Text = "Время обработки требований";
-            this.label7.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            // 
-            // dataGridView_proccessing_time
-            // 
-            this.dataGridView_proccessing_time.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.AllCells;
-            this.dataGridView_proccessing_time.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.tableLayoutPanel.SetColumnSpan(this.dataGridView_proccessing_time, 2);
-            this.dataGridView_proccessing_time.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.dataGridView_proccessing_time.Location = new System.Drawing.Point(3, 37);
-            this.dataGridView_proccessing_time.Name = "dataGridView_proccessing_time";
-            this.dataGridView_proccessing_time.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.AutoSizeToAllHeaders;
-            this.dataGridView_proccessing_time.Size = new System.Drawing.Size(372, 373);
-            this.dataGridView_proccessing_time.TabIndex = 17;
-            // 
             // randomizeProcessingTime
             // 
             this.randomizeProcessingTime.Dock = System.Windows.Forms.DockStyle.Top;
@@ -679,6 +627,18 @@
             0});
             this.numeric_random.ValueChanged += new System.EventHandler(this.numeric_random_ValueChanged);
             // 
+            // dataGridView_proccessing_time
+            // 
+            this.dataGridView_proccessing_time.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.AllCells;
+            this.dataGridView_proccessing_time.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.tableLayoutPanel.SetColumnSpan(this.dataGridView_proccessing_time, 2);
+            this.dataGridView_proccessing_time.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.dataGridView_proccessing_time.Location = new System.Drawing.Point(3, 37);
+            this.dataGridView_proccessing_time.Name = "dataGridView_proccessing_time";
+            this.dataGridView_proccessing_time.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.AutoSizeToAllHeaders;
+            this.dataGridView_proccessing_time.Size = new System.Drawing.Size(372, 373);
+            this.dataGridView_proccessing_time.TabIndex = 17;
+            // 
             // copyPreprocessingTime
             // 
             this.copyPreprocessingTime.Dock = System.Windows.Forms.DockStyle.Top;
@@ -690,6 +650,33 @@
             this.copyPreprocessingTime.UseVisualStyleBackColor = true;
             this.copyPreprocessingTime.Click += new System.EventHandler(this.copyPreprocessingTime_Click);
             // 
+            // label7
+            // 
+            this.tableLayoutPanel.SetColumnSpan(this.label7, 2);
+            this.label7.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.label7.Font = new System.Drawing.Font("Microsoft Sans Serif", 14F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.label7.Location = new System.Drawing.Point(3, 0);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(372, 34);
+            this.label7.TabIndex = 18;
+            this.label7.Text = "Время обработки требований";
+            this.label7.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // dataGridView_changeover_time
+            // 
+            this.dataGridView_changeover_time.AllowDrop = true;
+            this.dataGridView_changeover_time.AllowUserToAddRows = false;
+            this.dataGridView_changeover_time.AllowUserToDeleteRows = false;
+            this.dataGridView_changeover_time.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.AllCells;
+            this.dataGridView_changeover_time.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.tableLayoutPanel.SetColumnSpan(this.dataGridView_changeover_time, 2);
+            this.dataGridView_changeover_time.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.dataGridView_changeover_time.Location = new System.Drawing.Point(381, 37);
+            this.dataGridView_changeover_time.Name = "dataGridView_changeover_time";
+            this.dataGridView_changeover_time.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.AutoSizeToAllHeaders;
+            this.dataGridView_changeover_time.Size = new System.Drawing.Size(373, 373);
+            this.dataGridView_changeover_time.TabIndex = 19;
+            // 
             // randomizePreprocessingTime
             // 
             this.randomizePreprocessingTime.Dock = System.Windows.Forms.DockStyle.Top;
@@ -700,6 +687,19 @@
             this.randomizePreprocessingTime.Text = "Рандом времени";
             this.randomizePreprocessingTime.UseVisualStyleBackColor = true;
             this.randomizePreprocessingTime.Click += new System.EventHandler(this.randomizeChangeoverTime_Click);
+            // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.tableLayoutPanel.SetColumnSpan(this.label6, 2);
+            this.label6.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.label6.Font = new System.Drawing.Font("Microsoft Sans Serif", 14F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.label6.Location = new System.Drawing.Point(381, 0);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(373, 34);
+            this.label6.TabIndex = 20;
+            this.label6.Text = "Время переналадки приборов";
+            this.label6.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // Form1
             // 
@@ -721,15 +721,15 @@
             ((System.ComponentModel.ISupportInitialize)(this.numeric_max_proccessing_time)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numeric_batch_count)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numeric_max_changeover_time)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown2)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numeric_xromossomi_size)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numeric_buffer)).EndInit();
             this.tabPage2.ResumeLayout(false);
             this.tabPage2.PerformLayout();
             this.tableLayoutPanel.ResumeLayout(false);
             this.tableLayoutPanel.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.dataGridView_changeover_time)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.dataGridView_proccessing_time)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numeric_random)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dataGridView_proccessing_time)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dataGridView_changeover_time)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -757,7 +757,7 @@
         private System.Windows.Forms.RadioButton radioButton_RouletteMethod;
         private System.Windows.Forms.RadioButton radioButton_TournamentSelection;
         private System.Windows.Forms.Button button4;
-        private System.Windows.Forms.NumericUpDown numericUpDown2;
+        private System.Windows.Forms.NumericUpDown numeric_xromossomi_size;
         private System.Windows.Forms.Button button5;
         private System.Windows.Forms.Button setsBtn;
         private System.Windows.Forms.Button OldSecondLevelButton;
