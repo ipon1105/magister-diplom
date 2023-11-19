@@ -19,7 +19,6 @@ namespace newAlgorithm
         /// <summary>
         /// Данный конструктур создаёт и возвращает экземпляр класса 
         /// </summary>
-        /// <param name="countType"></param>
         /// <param name="composition"></param>
         /// <param name="time"></param>
         public Sets(List<List<int>> composition, List<List<int>> time)
@@ -46,14 +45,18 @@ namespace newAlgorithm
         }
 
         /// <summary>
-        /// Новый критерий
+        /// Данная функция формирует новый критерий на основе переданного в аргументе значения диррективных строков
         /// </summary>
         /// <returns></returns>
-        public int GetNewCriterion(bool direct)
+        public int GetNewCriterion(bool deadline)
         {
-            if (direct)
+            
+            // Инициализируем результирующую переменную
+            int res = 0;
+
+            // Если диррективные сроки были установлены
+            if (deadline)
             {
-                int res = 0;
                 foreach (var row in _readySets)
                 {
                     foreach (var elem in row)
@@ -64,12 +67,11 @@ namespace newAlgorithm
                         }
                     }
                 }
-                return res;
             }
             else
             {
-                int res = 0;
                 var count = 0;
+
                 foreach (var row in _readySets)
                 {
                     count += row.Count;
@@ -82,8 +84,12 @@ namespace newAlgorithm
                         }
                     }
                 }
-                return (int)(res / count);
+
+                res /= count;
             }
+
+            // Возвращаем результат
+            return res;
         }
 
         /// <summary>

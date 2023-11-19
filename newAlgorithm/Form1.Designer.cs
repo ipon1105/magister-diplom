@@ -50,7 +50,7 @@
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.numeric_device_count = new System.Windows.Forms.NumericUpDown();
             this.label9 = new System.Windows.Forms.Label();
-            this.checkBox2 = new System.Windows.Forms.CheckBox();
+            this.checkBox_deadline_on = new System.Windows.Forms.CheckBox();
             this.numeric_max_proccessing_time = new System.Windows.Forms.NumericUpDown();
             this.checkBox_optimization = new System.Windows.Forms.CheckBox();
             this.numeric_batch_count = new System.Windows.Forms.NumericUpDown();
@@ -208,7 +208,6 @@
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "Установка параметров";
             this.tabPage1.UseVisualStyleBackColor = true;
-            this.tabPage1.Click += new System.EventHandler(this.tabPage1_Click);
             // 
             // groupBox_system_setup
             // 
@@ -220,7 +219,7 @@
             this.groupBox_system_setup.Controls.Add(this.textBox1);
             this.groupBox_system_setup.Controls.Add(this.numeric_device_count);
             this.groupBox_system_setup.Controls.Add(this.label9);
-            this.groupBox_system_setup.Controls.Add(this.checkBox2);
+            this.groupBox_system_setup.Controls.Add(this.checkBox_deadline_on);
             this.groupBox_system_setup.Controls.Add(this.label1);
             this.groupBox_system_setup.Controls.Add(this.numeric_max_proccessing_time);
             this.groupBox_system_setup.Controls.Add(this.checkBox_optimization);
@@ -286,7 +285,6 @@
             this.group_box_data_proccessing.TabIndex = 36;
             this.group_box_data_proccessing.TabStop = false;
             this.group_box_data_proccessing.Text = "Способ обработки данных";
-            this.group_box_data_proccessing.Enter += new System.EventHandler(this.group_box_data_proccessing_Enter);
             // 
             // radioButton_TournamentSelection
             // 
@@ -375,16 +373,15 @@
             this.label9.TabIndex = 28;
             this.label9.Text = "Диррективные сроки";
             // 
-            // checkBox2
+            // checkBox_deadline_on
             // 
-            this.checkBox2.AutoSize = true;
-            this.checkBox2.Location = new System.Drawing.Point(364, 35);
-            this.checkBox2.Name = "checkBox2";
-            this.checkBox2.Size = new System.Drawing.Size(122, 17);
-            this.checkBox2.TabIndex = 27;
-            this.checkBox2.Text = "Да/Первая задача";
-            this.checkBox2.UseVisualStyleBackColor = true;
-            this.checkBox2.CheckedChanged += new System.EventHandler(this.checkBox2_CheckedChanged_1);
+            this.checkBox_deadline_on.AutoSize = true;
+            this.checkBox_deadline_on.Location = new System.Drawing.Point(364, 35);
+            this.checkBox_deadline_on.Name = "checkBox_deadline_on";
+            this.checkBox_deadline_on.Size = new System.Drawing.Size(122, 17);
+            this.checkBox_deadline_on.TabIndex = 27;
+            this.checkBox_deadline_on.Text = "Да/Первая задача";
+            this.checkBox_deadline_on.UseVisualStyleBackColor = true;
             // 
             // numeric_max_proccessing_time
             // 
@@ -763,7 +760,7 @@
         private System.Windows.Forms.Button OldSecondLevelButton;
         private System.Windows.Forms.Button OldSecondLevelAll;
         private System.Windows.Forms.Label label9;
-        private System.Windows.Forms.CheckBox checkBox2;
+        private System.Windows.Forms.CheckBox checkBox_deadline_on;
         private System.Windows.Forms.Label label10;
         private System.Windows.Forms.TextBox textBox1;
         private System.Windows.Forms.CheckBox checkBox_optimization;

@@ -22,11 +22,7 @@ namespace newAlgorithm
         {
             _value = value;
             _type = type;
-            _time = new List<int>();
-            foreach(var elem in time)
-            {
-                _time.Add(elem);
-            }
+            _time = new List<int>(time);
         }
 
         /// <summary>
@@ -39,18 +35,18 @@ namespace newAlgorithm
         }
 
         /// <summary>
-        /// 
+        /// Данная функция вовзращает тип
         /// </summary>
-        /// <returns></returns>
+        /// <returns>Тип</returns>
         public int getType()
         {
             return _type;
         }
 
         /// <summary>
-        /// 
+        /// Данная функция вовзращает список временной список
         /// </summary>
-        /// <returns></returns>
+        /// <returns>Список из элементов времени</returns>
         public List<int> getTime()
         {
             return _time;
