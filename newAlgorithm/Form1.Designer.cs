@@ -358,7 +358,7 @@
             this.numeric_device_count.Size = new System.Drawing.Size(45, 20);
             this.numeric_device_count.TabIndex = 40;
             this.numeric_device_count.Value = new decimal(new int[] {
-            3,
+            4,
             0,
             0,
             0});
@@ -515,7 +515,7 @@
             this.numeric_buffer.Size = new System.Drawing.Size(45, 20);
             this.numeric_buffer.TabIndex = 34;
             this.numeric_buffer.Value = new decimal(new int[] {
-            2,
+            3,
             0,
             0,
             0});
