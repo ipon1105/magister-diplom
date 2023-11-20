@@ -21,12 +21,20 @@ namespace newAlgorithm
         /// </summary>
         private readonly int dataTypesCount;
 
+        /// <summary>
+        /// Данная переменная определяет вектор данных для интерпритации типов данных
+        /// </summary>
         private readonly List<int> _i;                  // Вектор интерпритируемых типов данных
+        
         private List<List<int>> _ai;                    // Буферизированная матрица составов партий требований на k+1 шаге 
         private List<List<int>> _abuf;                  // Буферизированная матрица составов партий требований на k+1 шаге
         private List<List<List<int>>> _a1;              // Матрица составов партий требований на k+1 шаге 
         private List<List<List<int>>> _a2;              // Матрица составов партий требований фиксированного типа
         public List<List<int>> _a { get; private set; }                     // Матрица составов партий требований на k шаге
+        
+        /// <summary>
+        /// Данная переменная определяет вектор количества требований для каждого типа данных
+        /// </summary>
         private readonly List<int> batchCountList;        // Начальное количество требований для каждого типа данных
         private int _f1;                                // Критерий текущего решения для всех типов
         private int _f1Buf;                             // Критерий текущего решения для всех типов
@@ -72,14 +80,26 @@ namespace newAlgorithm
 
         /// <summary>
         /// Алгоритм формирования фиксированных партий
+        /// Данная функция выполняет инициализацию матрицы _a и вектора _i.
+        /// Вектор _i инициализируется, как вектор из 1 длиной dataTypesCount.
+        /// Матрица _a инициализируется, как матрица [dataTypesCount x 1].
         /// </summary>
         public void GenerateFixSolution()
         {
+            // Инициализируем строки матрицы A
             _a = new List<List<int>>();
+
+            // Для каждого типа данных выполняем обработку
             for (var dataType = 0; dataType < dataTypesCount; dataType++)
             {
+
+                // Добавляем в вектор _i элемент 1 в конец списка
                 _i.Add(1);
+
+                // Инициализируем столбцы матрицы A
                 _a.Add(new List<int>());
+
+                // Для каждой строки матрицы A добавляем вектор количеств элементов в партии
                 _a[dataType].Add(batchCountList[dataType]);
             }
         }
@@ -108,18 +128,6 @@ namespace newAlgorithm
                 }
             }
         }
-
-
-        /// <summary>
-        /// Функция вычисления f1 критерия
-        /// </summary>
-        /// <param name="inMatrix">Матрица А на текущем шаге</param>
-        /// <returns>Значение критериия</returns>
-        public int GetCriterion(List<List<int>> inMatrix)
-        {
-            return inMatrix.SelectMany(t => t).Sum();
-        }
-
 
         /// <summary>
         /// Функция проверки наличия оставшихся в рассмотрении типов
@@ -284,47 +292,6 @@ namespace newAlgorithm
             return result;
         }
 
-        
-        /// <summary>
-        /// Нужна для отладки вывода массива 
-        /// </summary>
-        /// <param name="m">входной лист</param>
-        /// <returns>лист в виде строки</returns>
-        private static string PrintList(List<int> m)
-        {
-            var result = "";
-            foreach (var t in m)
-            {
-                result += t + ", ";
-            }
-            return result;
-        }
-
-
-        /// <summary>
-        /// Проверка на достижение максимально возможного решения по составам типов
-        /// </summary>
-        /// <param name="inMatrix">Матрица текущих составов</param>
-        private void CheckSolution(IReadOnlyList<List<int>> inMatrix)
-        {
-            for (var i = 0; i < inMatrix.Count; i++)
-            {
-                var elem = inMatrix[i][0];
-                if (elem != 2) continue;
-                var count = 1;
-                for (var j = 1; j < inMatrix[i].Count; j++)
-                {
-                    if (inMatrix[i][j] == elem)
-                    {
-                        count++;
-                    }
-                }
-                if (count == inMatrix[i].Count)
-                {
-                    _i[i] = 0;
-                }
-            }
-        }
 
         /// <summary>
         /// Рекурсивная комбинация всех типов _a2 с фиксированным решением _a
@@ -344,6 +311,7 @@ namespace newAlgorithm
                         tempB = CopyMatrix(tempM);
                     } else
                     {
+
                         tempB = new List<List<int>>();
                     }
                     tempB.Add(tempMatrix[type][variantOfSplitIndex]);
@@ -371,7 +339,6 @@ namespace newAlgorithm
             }
         }
 
-
         /// <summary>
         /// Алгоритм формирования решения по составам паритй всех типов данных
         /// </summary>
@@ -390,6 +357,7 @@ namespace newAlgorithm
                 var maxA = CopyMatrix(_a);
                 _typeSolutionFlag = true;
 
+                // Выполяем отчистку вектора _i и матрицы _a
                 _i.Clear();
                 _a.Clear();
 
@@ -489,7 +457,6 @@ namespace newAlgorithm
             }
         }
 
-
         /// <summary>
         /// Формирование перебора для всех возможных решений из А2
         /// </summary>
@@ -544,7 +511,6 @@ namespace newAlgorithm
             }
             //f.WriteLine();
         }
-
 
         /// <summary>
         /// Алгоритм формирования решения по составам паритй всех типов данных
@@ -652,5 +618,64 @@ namespace newAlgorithm
             }
             return result;
         }
+
+
+        #region Неиспользуемые функции
+
+        /// <summary>
+        /// Нужна для отладки вывода массива 
+        /// </summary>
+        /// <param name="m">входной лист</param>
+        /// <returns>лист в виде строки</returns>
+        private static string PrintList(List<int> m)
+        {
+            var result = "";
+            foreach (var t in m)
+            {
+                result += t + ", ";
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// Проверка на достижение максимально возможного решения по составам типов
+        /// </summary>
+        /// <param name="inMatrix">Матрица текущих составов</param>
+        private void CheckSolution(IReadOnlyList<List<int>> inMatrix)
+        {
+            for (var i = 0; i < inMatrix.Count; i++)
+            {
+                var elem = inMatrix[i][0];
+
+
+                if (elem != 2)
+                    continue;
+
+                var count = 1;
+                for (var j = 1; j < inMatrix[i].Count; j++)
+                {
+                    if (inMatrix[i][j] == elem)
+                    {
+                        count++;
+                    }
+                }
+                if (count == inMatrix[i].Count)
+                {
+                    _i[i] = 0;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Функция вычисления f1 критерия
+        /// </summary>
+        /// <param name="inMatrix">Матрица А на текущем шаге</param>
+        /// <returns>Значение критериия</returns>
+        public int GetCriterion(List<List<int>> inMatrix)
+        {
+            return inMatrix.SelectMany(t => t).Sum();
+        }
+
+        #endregion
     }
 }

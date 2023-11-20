@@ -142,9 +142,9 @@ namespace newAlgorithm
             List<int> batchCountList = CreateBatchCountList();
 
             // Инициализируем расписание
-            Shedule.conveyorLenght = deviceCount;
-            Shedule.Switching = changeoverTime;
-            Shedule.Treatment = proccessingTime;
+            Shedule.deviceCount = deviceCount;
+            Shedule.changeoverTime = changeoverTime;
+            Shedule.proccessingTime = proccessingTime;
 
             // Создаём экземпляр класса первого уровня
             var firstLevel = new FirstLevel(dataTypesCount, batchCountList, isFixedBatches);
@@ -164,9 +164,9 @@ namespace newAlgorithm
             List<int> batchCountList = CreateBatchCountList();
 
             // Инициализируем расписание
-            Shedule.conveyorLenght = deviceCount;
-            Shedule.Switching = changeoverTime;
-            Shedule.Treatment = proccessingTime;
+            Shedule.deviceCount = deviceCount;
+            Shedule.changeoverTime = changeoverTime;
+            Shedule.proccessingTime = proccessingTime;
 
             // Формируем первый уровень
             var firstLevel = new FirstLevel(dataTypesCount, batchCountList, isFixedBatches);
@@ -204,9 +204,9 @@ namespace newAlgorithm
                                 List<int> batchCountList = CreateBatchCountList();
 
                                 // Выполняем настройку расписания
-                                Shedule.conveyorLenght = deviceCount;
-                                Shedule.Switching = OldChangeoverTimeGenerator(_maxChangeoverTime, deviceCount, dataTypesCount);
-                                Shedule.Treatment = OldProccessingTimeGenerator(_maxProccessingTime, deviceCount, dataTypesCount);
+                                Shedule.deviceCount = deviceCount;
+                                Shedule.changeoverTime = OldChangeoverTimeGenerator(_maxChangeoverTime, deviceCount, dataTypesCount);
+                                Shedule.proccessingTime = OldProccessingTimeGenerator(_maxProccessingTime, deviceCount, dataTypesCount);
 
                                 // Создаём экземпляр класса GAA
                                 var gaa = new GAA(dataTypesCount, batchCountList, isFixedBatches, batchCount);
@@ -270,9 +270,9 @@ namespace newAlgorithm
                                 List<int> batchCountList = CreateBatchCountList();
 
                                 // Формируем расписание
-                                Shedule.conveyorLenght = deviceCount;
-                                Shedule.Switching = OldChangeoverTimeGenerator(_maxChangeoverTime, deviceCount, dataTypesCount);
-                                Shedule.Treatment = OldProccessingTimeGenerator(_maxProccessingTime, deviceCount, dataTypesCount);
+                                Shedule.deviceCount = deviceCount;
+                                Shedule.changeoverTime = OldChangeoverTimeGenerator(_maxChangeoverTime, deviceCount, dataTypesCount);
+                                Shedule.proccessingTime = OldProccessingTimeGenerator(_maxProccessingTime, deviceCount, dataTypesCount);
 
 
                                 var firstLevel = new FirstLevel(dataTypesCount, batchCountList, isFixedBatches);
@@ -378,16 +378,19 @@ namespace newAlgorithm
                             fileOut.WriteLine(printArray(timeSets));
                             fileOut.WriteLine($"Compositions");
                             fileOut.WriteLine(printArray(compositionSets));
+
+                            // Перебираем каждой элемент вектора, как время выполнения задания
                             foreach (var _maxProccessingTime in time)
                             {
 
+                                // Перебираем каждой элемент вектора, как время переналадки приборов
                                 foreach (var _maxChangeoverTime in time)
                                 {
 
                                     // Формируем расписание
-                                    Shedule.conveyorLenght = _deviceCount;
-                                    Shedule.Switching = OldChangeoverTimeGenerator(_maxChangeoverTime, _deviceCount, _dataTypesCount);
-                                    Shedule.Treatment = OldProccessingTimeGenerator(_maxProccessingTime, _deviceCount, _dataTypesCount);
+                                    Shedule.deviceCount = _deviceCount;
+                                    Shedule.changeoverTime = OldChangeoverTimeGenerator(_maxChangeoverTime, _deviceCount, _dataTypesCount);
+                                    Shedule.proccessingTime = OldProccessingTimeGenerator(_maxProccessingTime, _deviceCount, _dataTypesCount);
 
                                     // Создаём вектор длиной в количество типов данных наполненный нулями
                                     List<int> _batchCountList = CreateBatchCountList(0, _dataTypesCount);
@@ -466,9 +469,9 @@ namespace newAlgorithm
                                 file_output_method_GAA.WriteLine($"\t\t{{\n\t\t\tmaxChangeoverTime\t= {_maxChangeoverTime}");
 
                                 // Формируем расписание
-                                Shedule.conveyorLenght = _deviceCount;
-                                Shedule.Switching = OldChangeoverTimeGenerator(_maxChangeoverTime, _deviceCount, _dataTypesCount);
-                                Shedule.Treatment = OldProccessingTimeGenerator(_maxProccessingTime, _deviceCount, _dataTypesCount);
+                                Shedule.deviceCount = _deviceCount;
+                                Shedule.changeoverTime = OldChangeoverTimeGenerator(_maxChangeoverTime, _deviceCount, _dataTypesCount);
+                                Shedule.proccessingTime = OldProccessingTimeGenerator(_maxProccessingTime, _deviceCount, _dataTypesCount);
 
                                 // Инициализируем вектор длиной _dataTypesCount, каждый элемент которого будет равен _batchCount
                                 List<int> batchCountList = CreateBatchCountList(_batchCount, _dataTypesCount);
@@ -536,9 +539,16 @@ namespace newAlgorithm
             int[] N_komplect_type = { 2 };
             int[] N_komplect_for_type = { 2, 4 };
             int[] N_komplect_sostav = { 2, 4 };
-            int[] n = { 5, 10 };
-            int[] l = { 5, 10 };
+
+            // Формируем вектор из возможных количеств типов данных
+            int[] _dataTypesCountArray = { 5, 10 };
+
+            // Формируем вектор из возможных количеств приборов в конвейерной системе
+            int[] _deviceCountArray = { 5, 10 };
+
+            // Формируем вектор из значений { 2, 4, 8, 16, 32 }, для генерации матриц выполнения и переналадки
             int[] time = { 2, 4, 8, 16, 32 };
+
             using (var file = new StreamWriter("11 - " + checkBox_deadline_on.Checked + ".txt", false))
             {
                 foreach (var n_kom in N_komplect_type)
@@ -551,14 +561,8 @@ namespace newAlgorithm
                         {
                             var rand = new Random();
                             var temp = rand.Next(10);
-                            if (temp > 5)
-                            {
-                                temp = 150;
-                            }
-                            else
-                            {
-                                temp = 100;
-                            }
+                            temp = (temp > 5) ? 150 : 100;
+
                             compositionSets.Add(new List<int>());
                             timeSets.Add(new List<int>());
                             for (int j = 0; j < n_kom_q; j++)
@@ -568,12 +572,11 @@ namespace newAlgorithm
                         }
                         foreach (var n_kom_s in N_komplect_sostav)
                         {
-                            foreach (var t in n)
+                            foreach (var _dataTypesCount in _dataTypesCountArray)
                             {
-                                dataTypesCount = t;
                                 for (int i = 0; i < n_kom; i++)
                                 {
-                                    for (var ind = 0; ind < dataTypesCount; ind++)
+                                    for (var dataType = 0; dataType < _dataTypesCount; dataType++)
                                     {
                                         var rand = new Random();
                                         var temp = rand.Next(10);
@@ -588,46 +591,42 @@ namespace newAlgorithm
                                     }
                                 }
 
-                                foreach (var _countLine in l)
+                                foreach (var _deviceCount in _deviceCountArray)
                                 {
-                                    file.WriteLine("Kn=" + n_kom);
-                                    file.WriteLine("Kq=" + n_kom_q);
-                                    file.WriteLine("Kqs=" + n_kom_s);
-                                    file.WriteLine("N=" + t + "L=" + _countLine);
+                                    file.WriteLine($"Kn =\t{n_kom}");
+                                    file.WriteLine($"Kq =\t{n_kom_q}");
+                                    file.WriteLine($"Kqs=\t{n_kom_s}");
+                                    file.WriteLine($"N  =\t{_dataTypesCount};\tL = {_deviceCount}");
+
+                                    // Перебираем каждой элемент вектора, как время выполнения задания
                                     foreach (var _maxProccessingTime in time)
                                     {
+
+                                        // Перебираем каждой элемент вектора, как время переналадки приборов
                                         foreach (var _maxChangeoverTime in time)
                                         {
-                                            changeoverTime = new List<List<List<int>>>();
-                                            proccessingTime = new List<List<int>>();
-                                            deviceCount = _countLine;
-                                            maxChangeoverTime = _maxChangeoverTime;
-                                            maxProccessingTime = _maxProccessingTime;
-                                            InitTables();
-                                            InitDataGridView();
-                                            GetTime();
-                                            Shedule.conveyorLenght = _countLine;
-                                            Shedule.Switching = changeoverTime;
-                                            Shedule.Treatment = proccessingTime;
+
+                                            // Формируем расписание
+                                            Shedule.deviceCount = _deviceCount;
+                                            Shedule.changeoverTime = OldChangeoverTimeGenerator(_maxChangeoverTime, _deviceCount, _dataTypesCount);
+                                            Shedule.proccessingTime = OldProccessingTimeGenerator(_maxProccessingTime, _deviceCount, _dataTypesCount);
 
                                             // Создаём вектор длиной dataTypesCount из 0
-                                            var batchCountList = CreateBatchCountList(0, dataTypesCount);
+                                            var batchCountList = CreateBatchCountList(0, _dataTypesCount);
 
-                                            for (var dataType = 0; dataType < dataTypesCount; dataType++)
+                                            for (var dataType = 0; dataType < _dataTypesCount; dataType++)
                                             {
                                                 batchCount = 0;
                                                 for (int i = 0; i < n_kom; i++)
-                                                {
                                                     batchCount += compositionSets[i][dataType] * n_kom_q;
-                                                }
 
                                                 batchCountList[dataType] = batchCount;
                                             }
 
-                                            var gaa = new GAA(dataTypesCount, batchCountList, isFixedBatches, batchCount);
+                                            var gaa = new GAA(_dataTypesCount, batchCountList, isFixedBatches, batchCount);
 
 
-                                            var result = gaa.calcSetsFitnessList(checkBox_deadline_on.Checked, numeric_generation_count.Value, (int)numeric_xromossomi_size.Value);
+                                            var result = gaa.calcSetsFitnessList(checkBox_deadline_on.Checked, generationCount, xromossomiSize);
 
                                             file.WriteLine(result);
                                         }
@@ -666,7 +665,7 @@ namespace newAlgorithm
             testType.Add(secondType);
         }
 
-        #endregion
+            #endregion
 
             #region Выбор способа обработки данных
 
@@ -710,7 +709,7 @@ namespace newAlgorithm
             selectoinType = SelectoinType.SigmaClipping;
         }
 
-        #endregion
+            #endregion
 
             #region Обработка рандомизаций и выбора вкладки
 

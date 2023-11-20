@@ -44,7 +44,7 @@ namespace newAlgorithm
         }
 
         /// <summary>
-        /// Данная функция вовзращает список временной список
+        /// Данная функция вовзращает временной список
         /// </summary>
         /// <returns>Список из элементов времени</returns>
         public List<int> getTime()

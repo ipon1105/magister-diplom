@@ -20,7 +20,7 @@
         /// <summary>
         ///  Данная переменная содержит в себе количество пакетов в текущей позиции текущего типа данного узла
         /// </summary>
-        public int Count { get; }
+        public int Count { get; private set; }
 
         /// <summary>
         /// Данный конструктор принимает 3 параметра и возвращает экземпляр класса узла матрицы R
@@ -33,6 +33,15 @@
             Type = type;
             Position = position;
             Count = count;
+        }
+
+        /// <summary>
+        /// Данная функция выполняет установку данных количества пакетов
+        /// </summary>
+        /// <param name="value">Количество пакетов</param>
+        public void setCount(int value)
+        {
+            Count = value;
         }
     }
 }

@@ -9,7 +9,7 @@ namespace newAlgorithm
     static class Program
     {
         /// <summary>
-        /// Главная точка входа для приложения.
+        /// Точка входа для приложения.
         /// </summary>
         [STAThread]
         static void Main()

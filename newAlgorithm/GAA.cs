@@ -112,7 +112,7 @@ namespace newAlgorithm
             var flagmanHromosom = new List<List<int>>();
 
             
-            for (var i = 0; i < dataTypesCount; i++)
+            for (var dataType = 0; dataType < dataTypesCount; dataType++)
             {
                 flagmanHromosom.Add( new List<int> {batchCount - 2 ,  2});
             }
@@ -140,6 +140,23 @@ namespace newAlgorithm
             return CountTime.ToArray().Min();
         }
 
+        private List<List<List<int>>> ToArrayList()
+        {
+            List<List<List<int>>> r = new List<List<List<int>>>();
+            foreach (var elem in nabor)
+            {
+                foreach (var elem2 in elem.GenList)
+                {
+                    elem2.Sort();
+                    elem2.Reverse();
+                    elem2.RemoveAll(e => e == 0);
+                }
+
+                r.Add(elem.GenList);
+            }
+            return r;
+        }
+
         public List<List<int>> calcFitnessList()
         {
             var r = ToArrayList();
@@ -164,6 +181,47 @@ namespace newAlgorithm
 
             return tuple[listint.Min()];
         }
+
+        private Xromossomi nachlist()
+        {
+            // Инициализируем хромосому 
+            Xromossomi xrom = new Xromossomi();
+
+            // Инициализируем в xrom вектор GenList длиной dataTypesCount, как наполненный списками. 
+            for (int dataType = 0; dataType < dataTypesCount; dataType++)
+                xrom.GenList.Add(new List<int>());
+
+            // Добавляем в вектор GenListOst все элементы из списка batchCountList
+            xrom.GenListOst.AddRange(batchCountList);
+
+            for (int GenElement = 0; GenElement < xrom.GenList.Count; GenElement++)
+            {
+                int buff = 0;
+                for (int _batchCount = 0; _batchCount < batchCount / 2 - 1; _batchCount++)
+                {
+                    if (xrom.GenListOst[GenElement] == 2)
+                    {
+                        buff = 2;
+                        xrom.GenListOst[GenElement] = 0;
+                    }
+                    else if (xrom.GenListOst[GenElement] == 1)
+                    {
+                        xrom.GenList[GenElement][xrom.GenList[GenElement].Count - 1]++;
+                        xrom.GenListOst[GenElement] = 0;
+                        buff = 0;
+                    }
+                    else if (xrom.GenListOst[GenElement] == 0)
+                        buff = 0;
+                    else
+                        xrom.GenListOst[GenElement] -= buff = rand.Next(2, xrom.GenListOst[GenElement]);
+                    xrom.GenList[GenElement].Add(buff);
+                }
+                xrom.GenList[GenElement].Add(xrom.GenListOst[GenElement]);
+            }
+            return xrom;
+        }
+
+        #region Функции которые страшно удалять, хоть они и не используются
 
         private void xor(int size, List<Xromossomi> nabr = null)
         {
@@ -285,23 +343,6 @@ namespace newAlgorithm
             return CountTime.ToArray();
         }
 
-        private List<List<List<int>>> ToArrayList()
-        {
-            List<List<List<int>>> r = new List<List<List<int>>>();
-            foreach (var elem in nabor)
-            {
-                foreach (var elem2 in elem.GenList)
-                {
-                    elem2.Sort();
-                    elem2.Reverse();
-                    elem2.RemoveAll(e => e == 0);
-                }
-
-                r.Add(elem.GenList);
-            }
-            return r;
-        }
-
         private List<List<List<int>>> ToArray()
         {
             List<List<List<int>>> arrResult = new List<List<List<int>>>();
@@ -372,45 +413,6 @@ namespace newAlgorithm
                 }
             };
 
-        }
-
-        private Xromossomi nachlist()
-        {
-            // Инициализируем хромосому 
-            Xromossomi xrom = new Xromossomi();
-
-            // Инициализируем в xrom вектор GenList длиной dataTypesCount, как наполненный списками. 
-            for (int dataType = 0; dataType < dataTypesCount; dataType++)
-                xrom.GenList.Add(new List<int>());
-
-            // Добавляем в вектор GenListOst все элементы из списка batchCountList
-            xrom.GenListOst.AddRange(batchCountList);
-
-            for (int GenElement = 0; GenElement < xrom.GenList.Count; GenElement++)
-            {
-                int buff = 0;
-                for (int _batchCount = 0; _batchCount < batchCount / 2 - 1; _batchCount++)
-                {
-                    if (xrom.GenListOst[GenElement] == 2)
-                    {
-                        buff = 2;
-                        xrom.GenListOst[GenElement] = 0;
-                    }
-                    else if (xrom.GenListOst[GenElement] == 1)
-                    {
-                        xrom.GenList[GenElement][xrom.GenList[GenElement].Count - 1]++;
-                        xrom.GenListOst[GenElement] = 0;
-                        buff = 0;
-                    }
-                    else if (xrom.GenListOst[GenElement] == 0)
-                        buff = 0;
-                    else
-                        xrom.GenListOst[GenElement] -= buff = rand.Next(2, xrom.GenListOst[GenElement]);
-                    xrom.GenList[GenElement].Add(buff);
-                }
-                xrom.GenList[GenElement].Add(xrom.GenListOst[GenElement]);
-            }
-            return xrom;
         }
 
         private Xromossomi nach()
@@ -508,5 +510,7 @@ namespace newAlgorithm
 
             return xrom;
         }
+        
+        #endregion
     }
 }

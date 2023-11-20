@@ -5,6 +5,16 @@ namespace newAlgorithm.Service
 {
     public class CalculationService
     {
+
+        /// <summary>
+        /// Ультралютая фукнция на 500 строк непотно чего
+        /// </summary>
+        /// <param name="rMatrix"></param>
+        /// <param name="pMatrix"></param>
+        /// <param name="timeProcessing"></param>
+        /// <param name="timeChangeover"></param>
+        /// <param name="b"></param>
+        /// <returns></returns>
         public static TreeDimMatrix CalculateTnMatrix(
             RMatrix rMatrix,
             Matrix pMatrix,
@@ -15,7 +25,7 @@ namespace newAlgorithm.Service
         {
             TreeDimMatrix tnMatrix = new TreeDimMatrix(timeChangeover.deviceCount);
 
-            int nP = pMatrix.matrix[0].Count;
+            int nP = pMatrix.columnCount;
 
             int deviceCount = timeChangeover.deviceCount;
 
@@ -23,7 +33,7 @@ namespace newAlgorithm.Service
             int nJPrevious = 0;
             for (int j = 1; j <= nP; j++)
             {
-                RMatrixNode currentNode = rMatrix.Find(j);
+                RMatrixNode currentNode = rMatrix[j];
                 int nJ = currentNode.Count;
                 int currentType = currentNode.Type;
                 for (int q = 1; q <= nJ; q++)
@@ -42,13 +52,13 @@ namespace newAlgorithm.Service
                             //44
                             if (1 < q && q <= b + 1)
                             {
-                                int t1 = tnMatrix.GetValue(l, j, q - 1);
+                                int t1 = tnMatrix[l, j, q - 1];
                                 int t2 = 0;
 
-                                for (int s = 1; s <= rMatrix.countType; s++)
+                                for (int s = 1; s <= rMatrix.dataTypesCount; s++)
                                 {
-                                    int timeProces = timeProcessing.GetItem(l, s);
-                                    int ps1 = pMatrix.GetItem(s, j);
+                                    int timeProces = timeProcessing[l-1, s-1];
+                                    int ps1 = pMatrix[s-1, j-1];
 
                                     t2 += timeProces * ps1;
                                 }
@@ -62,19 +72,19 @@ namespace newAlgorithm.Service
                             //45
                             if (b + 1 < q && q <= nJ)
                             {
-                                int t1 = tnMatrix.GetValue(l, j, q - 1);
+                                int t1 = tnMatrix[l, j, q - 1];
                                 int t2 = 0;
 
-                                for (int s = 1; s <= rMatrix.countType; s++)
+                                for (int s = 1; s <= rMatrix.dataTypesCount; s++)
                                 {
-                                    int timeProces = timeProcessing.GetItem(l, s);
-                                    int ps1 = pMatrix.GetItem(s, j);
+                                    int timeProces = timeProcessing[l - 1, s - 1];
+                                    int ps1 = pMatrix[s - 1, j - 1];
 
                                     t2 += timeProces * ps1;
                                 }
 
                                 int value1 = t1 + t2;
-                                int value2 = tnMatrix.GetValue(l + 1, j, q - b);
+                                int value2 = tnMatrix[l + 1, j, q - b];
 
                                 int value = Math.Max(value1, value2);
                                 tnMatrix.AddNode(l, j, q, value);
@@ -89,21 +99,21 @@ namespace newAlgorithm.Service
                             //46
                             if (q == 1)
                             {
-                                int t1 = tnMatrix.GetValue(l, j - 1, nJPrevious);
+                                int t1 = tnMatrix[l, j - 1, nJPrevious];
                                 int t2 = 0;
 
-                                for (int s = 1; s <= rMatrix.countType; s++)
+                                for (int s = 1; s <= rMatrix.dataTypesCount; s++)
                                 {
-                                    int timeProces = timeProcessing.GetItem(l, s);
-                                    int psj = pMatrix.GetItem(s, j - 1);
+                                    int timeProces = timeProcessing[l - 1, s - 1];
+                                    int psj = pMatrix[s - 1, j - 1 - 1];
 
                                     t2 += timeProces * psj;
                                 }
 
-                                int t3 = timeChangeover.GetValue(l, previousType, currentType);
+                                int t3 = timeChangeover[l, previousType, currentType];
 
                                 int value1 = t1 + t2 + t3;
-                                int value2 = tnMatrix.GetValue(l + 1, j - 1, nJPrevious - b + 1);
+                                int value2 = tnMatrix[l + 1, j - 1, nJPrevious - b + 1];
 
                                 int value = Math.Max(value1, value2);
                                 tnMatrix.AddNode(l, j, q, value);
@@ -113,19 +123,19 @@ namespace newAlgorithm.Service
                             //47
                             if (1 < q && q <= b)
                             {
-                                int t1 = tnMatrix.GetValue(l, j, q - 1);
+                                int t1 = tnMatrix[l, j, q - 1];
                                 int t2 = 0;
 
-                                for (int s = 1; s <= rMatrix.countType; s++)
+                                for (int s = 1; s <= rMatrix.dataTypesCount; s++)
                                 {
-                                    int timeProces = timeProcessing.GetItem(l, s);
-                                    int psj = pMatrix.GetItem(s, j);
+                                    int timeProces = timeProcessing[l - 1, s - 1];
+                                    int psj = pMatrix[s - 1, j - 1];
 
                                     t2 += timeProces * psj;
                                 }
 
                                 int value1 = t1 + t2;
-                                int value2 = tnMatrix.GetValue(l + 1, j - 1, nJPrevious - b + q);
+                                int value2 = tnMatrix[l + 1, j - 1, nJPrevious - b + q];
 
                                 int value = Math.Max(value1, value2);
 
@@ -136,19 +146,19 @@ namespace newAlgorithm.Service
                             //48
                             if (b + 1 <= q && q <= nJ)
                             {
-                                int t1 = tnMatrix.GetValue(l, j, q - 1);
+                                int t1 = tnMatrix[l, j, q - 1];
                                 int t2 = 0;
 
-                                for (int s = 1; s <= rMatrix.countType; s++)
+                                for (int s = 1; s <= rMatrix.dataTypesCount; s++)
                                 {
-                                    int timeProces = timeProcessing.GetItem(l, s);
-                                    int psj = pMatrix.GetItem(s, j);
+                                    int timeProces = timeProcessing[l - 1, s - 1];
+                                    int psj = pMatrix[s - 1, j - 1];
 
                                     t2 += timeProces * psj;
                                 }
 
                                 int value1 = t1 + t2;
-                                int value2 = tnMatrix.GetValue(l + 1, j, q - b);
+                                int value2 = tnMatrix[l + 1, j, q - b];
 
                                 int value = Math.Max(value1, value2);
                                 tnMatrix.AddNode(l, j, q, value);
@@ -163,13 +173,13 @@ namespace newAlgorithm.Service
                             //49
                             if (q == 1)
                             {
-                                int t1 = tnMatrix.GetValue(l - 1, j, j);
+                                int t1 = tnMatrix[l - 1, j, j];
                                 int t2 = 0;
 
-                                for (int s = 1; s <= rMatrix.countType; s++)
+                                for (int s = 1; s <= rMatrix.dataTypesCount; s++)
                                 {
-                                    int timeProces = timeProcessing.GetItem(l - 1, s);
-                                    int ps1 = pMatrix.GetItem(s, j);
+                                    int timeProces = timeProcessing[l - 1 - 1, s - 1];
+                                    int ps1 = pMatrix[s - 1, j - 1];
 
                                     t2 += timeProces * ps1;
                                 }
@@ -182,25 +192,25 @@ namespace newAlgorithm.Service
                             //50
                             if (1 < q && q <= b + 1)
                             {
-                                int t1 = tnMatrix.GetValue(l - 1, j, q);
+                                int t1 = tnMatrix[l - 1, j, q];
                                 int t2 = 0;
 
-                                for (int s = 1; s <= rMatrix.countType; s++)
+                                for (int s = 1; s <= rMatrix.dataTypesCount; s++)
                                 {
-                                    int timeProces = timeProcessing.GetItem(l - 1, s);
-                                    int ps1 = pMatrix.GetItem(s, 1);
+                                    int timeProces = timeProcessing[l - 1 - 1, s - 1];
+                                    int ps1 = pMatrix[s - 1, 1 - 1];
 
                                     t2 += timeProces * ps1;
                                 }
 
                                 int value1 = t1 + t2;
 
-                                t1 = tnMatrix.GetValue(l, j, q - 1);
+                                t1 = tnMatrix[l, j, q - 1];
                                 t2 = 0;
-                                for (int s = 1; s <= rMatrix.countType; s++)
+                                for (int s = 1; s <= rMatrix.dataTypesCount; s++)
                                 {
-                                    int timeProces = timeProcessing.GetItem(l, s);
-                                    int ps1 = pMatrix.GetItem(s, j);
+                                    int timeProces = timeProcessing[l - 1, s - 1];
+                                    int ps1 = pMatrix[s - 1, j - 1];
 
                                     t2 += timeProces * ps1;
                                 }
@@ -216,25 +226,25 @@ namespace newAlgorithm.Service
                             //45
                             if (b + 1 < q && q <= nJ)
                             {
-                                int t1 = tnMatrix.GetValue(l - 1, j, q);
+                                int t1 = tnMatrix[l - 1, j, q];
                                 int t2 = 0;
 
-                                for (int s = 1; s <= rMatrix.countType; s++)
+                                for (int s = 1; s <= rMatrix.dataTypesCount; s++)
                                 {
-                                    int timeProces = timeProcessing.GetItem(l - 1, s);
-                                    int ps1 = pMatrix.GetItem(s, 1);
+                                    int timeProces = timeProcessing[l - 1 - 1, s - 1];
+                                    int ps1 = pMatrix[s - 1, 1 - 1];
 
                                     t2 += timeProces * ps1;
                                 }
 
                                 int value1 = t1 + t2;
 
-                                t1 = tnMatrix.GetValue(l, j, q - 1);
+                                t1 = tnMatrix[l, j, q - 1];
                                 t2 = 0;
-                                for (int s = 1; s <= rMatrix.countType; s++)
+                                for (int s = 1; s <= rMatrix.dataTypesCount; s++)
                                 {
-                                    int timeProces = timeProcessing.GetItem(l, s);
-                                    int ps1 = pMatrix.GetItem(s, j);
+                                    int timeProces = timeProcessing[l - 1, s - 1];
+                                    int ps1 = pMatrix[s - 1, j - 1];
 
                                     t2 += timeProces * ps1;
                                 }
@@ -243,7 +253,7 @@ namespace newAlgorithm.Service
 
                                 int value12max = Math.Max(value1, value2);
 
-                                int value3 = tnMatrix.GetValue(l + 1, j, q - b);
+                                int value3 = tnMatrix[l + 1, j, q - b];
 
                                 int value = Math.Max(value12max, value3);
 
@@ -260,27 +270,27 @@ namespace newAlgorithm.Service
                             //52
                             if (q == 1)
                             {
-                                int t1 = tnMatrix.GetValue(l - 1, j, 1);
+                                int t1 = tnMatrix[l - 1, j, 1];
                                 int t2 = 0;
 
-                                for (int s = 1; s <= rMatrix.countType; s++)
+                                for (int s = 1; s <= rMatrix.dataTypesCount; s++)
                                 {
-                                    int timeProces = timeProcessing.GetItem(l - 1, s);
-                                    int psj = pMatrix.GetItem(s, j);
+                                    int timeProces = timeProcessing[l - 1 - 1, s - 1];
+                                    int psj = pMatrix[s - 1, j - 1];
 
                                     t2 += timeProces * psj;
                                 }
 
                                 int value1 = t1 + t2;
 
-                                t1 = tnMatrix.GetValue(l, j - 1, nJPrevious);
+                                t1 = tnMatrix[l, j - 1, nJPrevious];
                                 t2 = 0;
-                                int t3 = timeChangeover.GetValue(l, previousType, currentType);
+                                int t3 = timeChangeover[l, previousType, currentType];
 
-                                for (int s = 1; s <= rMatrix.countType; s++)
+                                for (int s = 1; s <= rMatrix.dataTypesCount; s++)
                                 {
-                                    int timeProces = timeProcessing.GetItem(l, s);
-                                    int psj = pMatrix.GetItem(s, j - 1);
+                                    int timeProces = timeProcessing[l - 1, s - 1];
+                                    int psj = pMatrix[s - 1, j - 1 - 1];
 
                                     t2 += timeProces * psj;
                                 }
@@ -289,7 +299,7 @@ namespace newAlgorithm.Service
 
                                 int value12max = Math.Max(value1, value2);
 
-                                int value3 = tnMatrix.GetValue(l + 1, j - 1, nJPrevious - b + 1);
+                                int value3 = tnMatrix[l + 1, j - 1, nJPrevious - b + 1];
 
                                 int value = Math.Max(value12max, value3);
 
@@ -300,26 +310,26 @@ namespace newAlgorithm.Service
                             //53
                             if (1 < q && q <= b)
                             {
-                                int t1 = tnMatrix.GetValue(l - 1, j, q);
+                                int t1 = tnMatrix[l - 1, j, q];
                                 int t2 = 0;
 
-                                for (int s = 1; s <= rMatrix.countType; s++)
+                                for (int s = 1; s <= rMatrix.dataTypesCount; s++)
                                 {
-                                    int timeProces = timeProcessing.GetItem(l - 1, s);
-                                    int psj = pMatrix.GetItem(s, j);
+                                    int timeProces = timeProcessing[l - 1 - 1, s - 1];
+                                    int psj = pMatrix[s - 1, j - 1];
 
                                     t2 += timeProces * psj;
                                 }
 
                                 int value1 = t1 + t2;
 
-                                t1 = tnMatrix.GetValue(l, j, q - 1);
+                                t1 = tnMatrix[l, j, q - 1];
                                 t2 = 0;
 
-                                for (int s = 1; s <= rMatrix.countType; s++)
+                                for (int s = 1; s <= rMatrix.dataTypesCount; s++)
                                 {
-                                    int timeProces = timeProcessing.GetItem(l, s);
-                                    int psj = pMatrix.GetItem(s, j);
+                                    int timeProces = timeProcessing[l - 1, s - 1];
+                                    int psj = pMatrix[s - 1, j - 1];
 
                                     t2 += timeProces * psj;
                                 }
@@ -328,7 +338,7 @@ namespace newAlgorithm.Service
 
                                 int value12max = Math.Max(value1, value2);
 
-                                int value3 = tnMatrix.GetValue(l + 1, j - 1, nJPrevious - b + q);
+                                int value3 = tnMatrix[l + 1, j - 1, nJPrevious - b + q];
 
                                 int value = Math.Max(value12max, value3);
 
@@ -339,26 +349,26 @@ namespace newAlgorithm.Service
                             //54
                             if (b + 1 <= q && q <= nJ)
                             {
-                                int t1 = tnMatrix.GetValue(l - 1, j, q);
+                                int t1 = tnMatrix[l - 1, j, q];
                                 int t2 = 0;
 
-                                for (int s = 1; s <= rMatrix.countType; s++)
+                                for (int s = 1; s <= rMatrix.dataTypesCount; s++)
                                 {
-                                    int timeProces = timeProcessing.GetItem(l - 1, s);
-                                    int psj = pMatrix.GetItem(s, j);
+                                    int timeProces = timeProcessing[l - 1 - 1, s - 1];
+                                    int psj = pMatrix[s - 1, j - 1];
 
                                     t2 += timeProces * psj;
                                 }
 
                                 int value1 = t1 + t2;
 
-                                t1 = tnMatrix.GetValue(l, j, q - 1);
+                                t1 = tnMatrix[l, j, q - 1];
                                 t2 = 0;
 
-                                for (int s = 1; s <= rMatrix.countType; s++)
+                                for (int s = 1; s <= rMatrix.dataTypesCount; s++)
                                 {
-                                    int timeProces = timeProcessing.GetItem(l, s);
-                                    int psj = pMatrix.GetItem(s, j);
+                                    int timeProces = timeProcessing[l - 1, s - 1];
+                                    int psj = pMatrix[s - 1, j - 1];
 
                                     t2 += timeProces * psj;
                                 }
@@ -367,7 +377,7 @@ namespace newAlgorithm.Service
 
                                 int value12max = Math.Max(value1, value2);
 
-                                int value3 = tnMatrix.GetValue(l + 1, j, q - b);
+                                int value3 = tnMatrix[l + 1, j, q - b];
 
                                 int value = Math.Max(value12max, value3);
 
@@ -388,10 +398,10 @@ namespace newAlgorithm.Service
                                 int value = 0;
                                 for (int li = 1; li <= deviceCount - 1; li++)
                                 {
-                                    for (int si = 1; si <= rMatrix.countType; si++)
+                                    for (int si = 1; si <= rMatrix.dataTypesCount; si++)
                                     {
-                                        int timeProces = timeProcessing.GetItem(li, si);
-                                        int psj = pMatrix.GetItem(si, 1);
+                                        int timeProces = timeProcessing[li - 1, si - 1];
+                                        int psj = pMatrix[si - 1, 1 - 1];
 
                                         value += timeProces * psj;
                                     }
@@ -404,26 +414,26 @@ namespace newAlgorithm.Service
                             //56
                             if (1 < q && q <= nJ)
                             {
-                                int t1 = tnMatrix.GetValue(l - 1, j, q);
+                                int t1 = tnMatrix[l - 1, j, q];
                                 int t2 = 0;
 
-                                for (int s = 1; s <= rMatrix.countType; s++)
+                                for (int s = 1; s <= rMatrix.dataTypesCount; s++)
                                 {
-                                    int timeProces = timeProcessing.GetItem(l - 1, s);
-                                    int psj = pMatrix.GetItem(s, j);
+                                    int timeProces = timeProcessing[l - 1 - 1, s - 1];
+                                    int psj = pMatrix[s - 1, j - 1];
 
                                     t2 += timeProces * psj;
                                 }
 
                                 int value1 = t1 + t2;
 
-                                t1 = tnMatrix.GetValue(l, j, q - 1);
+                                t1 = tnMatrix[l, j, q - 1];
                                 t2 = 0;
 
-                                for (int s = 1; s <= rMatrix.countType; s++)
+                                for (int s = 1; s <= rMatrix.dataTypesCount; s++)
                                 {
-                                    int timeProces = timeProcessing.GetItem(deviceCount, s);
-                                    int psj = pMatrix.GetItem(s, j);
+                                    int timeProces = timeProcessing[deviceCount - 1, s - 1];
+                                    int psj = pMatrix[s - 1, j - 1];
 
                                     t2 += timeProces * psj;
                                 }
@@ -446,27 +456,27 @@ namespace newAlgorithm.Service
                             //57
                             if (q == 1)
                             {
-                                int t1 = tnMatrix.GetValue(l - 1, j, q);
+                                int t1 = tnMatrix[l - 1, j, q];
                                 int t2 = 0;
 
-                                for (int s = 1; s <= rMatrix.countType; s++)
+                                for (int s = 1; s <= rMatrix.dataTypesCount; s++)
                                 {
-                                    int timeProces = timeProcessing.GetItem(deviceCount - 1, s);
-                                    int psj = pMatrix.GetItem(s, j);
+                                    int timeProces = timeProcessing[deviceCount - 1 - 1, s - 1];
+                                    int psj = pMatrix[s - 1, j - 1];
 
                                     t2 += timeProces * psj;
                                 }
 
                                 int value1 = t1 + t2;
 
-                                t1 = tnMatrix.GetValue(deviceCount, j - 1, nJPrevious);
+                                t1 = tnMatrix[deviceCount, j - 1, nJPrevious];
                                 t2 = 0;
-                                int t3 = timeChangeover.GetValue(deviceCount, previousType, currentType);
+                                int t3 = timeChangeover[deviceCount, previousType, currentType];
 
-                                for (int s = 1; s <= rMatrix.countType; s++)
+                                for (int s = 1; s <= rMatrix.dataTypesCount; s++)
                                 {
-                                    int timeProces = timeProcessing.GetItem(deviceCount, s);
-                                    int psj = pMatrix.GetItem(s, j - 1);
+                                    int timeProces = timeProcessing[deviceCount - 1, s - 1];
+                                    int psj = pMatrix[s - 1, j - 1 - 1];
 
                                     t2 += timeProces * psj;
                                 }
@@ -482,26 +492,26 @@ namespace newAlgorithm.Service
                             //58
                             if (1 < q && q <= nJ)
                             {
-                                int t1 = tnMatrix.GetValue(deviceCount - 1, j, q);
+                                int t1 = tnMatrix[deviceCount - 1, j, q];
                                 int t2 = 0;
 
-                                for (int s = 1; s <= rMatrix.countType; s++)
+                                for (int s = 1; s <= rMatrix.dataTypesCount; s++)
                                 {
-                                    int timeProces = timeProcessing.GetItem(deviceCount - 1, s);
-                                    int psj = pMatrix.GetItem(s, j);
+                                    int timeProces = timeProcessing[deviceCount - 1 - 1, s - 1];
+                                    int psj = pMatrix[s - 1, j - 1];
 
                                     t2 += timeProces * psj;
                                 }
 
                                 int value1 = t1 + t2;
 
-                                t1 = tnMatrix.GetValue(deviceCount, j, q - 1);
+                                t1 = tnMatrix[deviceCount, j, q - 1];
                                 t2 = 0;
 
-                                for (int s = 1; s <= rMatrix.countType; s++)
+                                for (int s = 1; s <= rMatrix.dataTypesCount; s++)
                                 {
-                                    int timeProces = timeProcessing.GetItem(deviceCount, s);
-                                    int psj = pMatrix.GetItem(s, j);
+                                    int timeProces = timeProcessing[deviceCount - 1, s - 1];
+                                    int psj = pMatrix[s - 1, j - 1];
 
                                     t2 += timeProces * psj;
                                 }

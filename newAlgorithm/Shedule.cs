@@ -10,16 +10,25 @@ namespace newAlgorithm
 {
     class Shedule
     {
+
         /// <summary>
-        /// Данная статическая переменная определяет длину конвейерной ленты по сути количество приборов
+        /// Данная переменная определяет длину конвейера, как количество приборов
         /// </summary>
-        public static int conveyorLenght;
+        public static int deviceCount;
+
+        /// <summary>
+        /// Данный двумерный список представляет из себя матрицу выполнения задания на приборе l типа i
+        /// </summary>
+        public static List<List<int>> proccessingTime;
+
+        /// <summary>
+        /// Данный трёхмерный список представляет из себя матрицу переналадки прибора l с задания i на задание j
+        /// </summary>
+        public static List<List<List<int>>> changeoverTime;
+
 
         public static Visualizer viz;
-
         private List<List<int>> _r;
-        public static List<List<int>> Treatment;
-        public static List<List<List<int>>> Switching;
         private int _timeConstructShedule;
         private List<List<List<int>>> _startProcessing;
         private List<List<List<int>>> _endProcessing;
@@ -28,13 +37,13 @@ namespace newAlgorithm
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="r"></param>
-        /// <param name="l"></param>
-        public Shedule(List<List<int>> r, int l)
+        /// <param name="matrixR">Матрица R - количества данных i-ых типов в партиях занимающих в последовательности pi_l j-е позиции</param>
+        /// <param name="deviceCount">Количество приборов в конвейерной системе</param>
+        public Shedule(List<List<int>> matrixR, int deviceCount)
         {
-            this._r = r;
-            conveyorLenght = l;
-            viz = new Visualizer(l, r[0].Count);
+            this._r = matrixR;
+            Shedule.deviceCount = deviceCount;
+            viz = new Visualizer(deviceCount, matrixR[0].Count);
         }
 
         /// <summary>
@@ -42,39 +51,48 @@ namespace newAlgorithm
         /// </summary>
         /// <param name="m">входная матрица А</param>
         /// <returns>сформированная матрица для уровня расписания</returns>
-        private List<List<int>> GenerateR(IReadOnlyList<List<int>> m)
+        private List<List<int>> GenerateMatrixR(IReadOnlyList<List<int>> m)
         {
-            var result = new List<List<int>>();
-            var summ = m.Sum(t => t.Count);
-            var maxColumn = 0;
-            for (var j = 0; j < summ; j++)
+
+            // Инициализируем матрицу R [dataTypesCount x max(mi)]
+            var matrixR = new List<List<int>>();
+
+            // Подсчитываем количество элементов в каждой строке
+            var elementsSize = m.Sum(mi => mi.Count);
+
+            // Объявляем максимальный размер колонки
+            var maxColumnSize = 0;
+
+            // Высчитываем максимальный размер колонки
+            foreach (var mi in m)
+                maxColumnSize = (mi.Count > maxColumnSize) ? mi.Count : maxColumnSize;
+
+            for (var element = 0; element < elementsSize; element++)
             {
-                result.Add(new List<int>());
-                for (var i = 0; i < m.Count; i++)
-                {
-                    result[j].Add(0);
-                }
+
+                // Инициализируем каждую строку матрицы R
+                matrixR.Add(new List<int>());
+
+                // Каждой строке матрицы R присваиваем 0, для кадого столбца
+                foreach (var mi in m)
+                    matrixR[element].Add(0);
+
             }
-            for (var i = 0; i < m.Count; i++)
-            {
-                if (m[i].Count > maxColumn)
-                {
-                    maxColumn = m[i].Count;
-                }
-            }
+            
+            
             var ind = 0;
-            for (var j = 0; j < maxColumn; j++)
+            for (var j = 0; j < maxColumnSize; j++)
             {
                 for (var i = 0; i < m.Count; i++)
                 {
                     if (m[i].Count > j)
                     {
-                        result[ind][i] = m[i][j];
+                        matrixR[ind][i] = m[i][j];
                         ind++;
                     }
                 }
             }
-            return result;
+            return matrixR;
         }
 
         /// <summary>
@@ -98,7 +116,7 @@ namespace newAlgorithm
         /// <param name="r">Матрица количества данных</param>
         public Shedule(List<List<int>> r)
         {
-            _r = GenerateR(r);
+            _r = GenerateMatrixR(r);
         }
 
         /// <summary>
@@ -108,7 +126,7 @@ namespace newAlgorithm
         {
             _startProcessing = new List<List<List<int>>>();
             _endProcessing = new List<List<List<int>>>();
-            for (var i = 0; i < conveyorLenght; i++)//количество приборов
+            for (var i = 0; i < deviceCount; i++)//количество приборов
             {
                 _startProcessing.Add(new List<List<int>>());
                 _endProcessing.Add(new List<List<int>>());
@@ -132,7 +150,7 @@ namespace newAlgorithm
             var yy = 0;
             var zz = 0;
             var xx = 0;
-            for (var i = 0; i < conveyorLenght; i++)
+            for (var device = 0; device < deviceCount; device++)
             {
                 for (var j = 0; j < _r.Count; j++)
                 {
@@ -141,17 +159,17 @@ namespace newAlgorithm
 
                     for (var k = 0; k < _r[j][index]; k++)
                     {
-                        var timeToSwitch = (index == xx && j != 0) ? 0 : Switching[0][xx][index];
-                        if (i > 0)
+                        var timeToSwitch = (index == xx && j != 0) ? 0 : changeoverTime[0][xx][index];
+                        if (device > 0)
                         {
-                            _startProcessing[i][j][k] = Math.Max(_endProcessing[i][yy][zz] + timeToSwitch, _endProcessing[i - 1][j][k]);
+                            _startProcessing[device][j][k] = Math.Max(_endProcessing[device][yy][zz] + timeToSwitch, _endProcessing[device - 1][j][k]);
                         }
                         else
                         {
-                            _startProcessing[i][j][k] = _endProcessing[i][yy][zz] + timeToSwitch;
+                            _startProcessing[device][j][k] = _endProcessing[device][yy][zz] + timeToSwitch;
                         }
-                        _endProcessing[i][j][k] = _startProcessing[i][j][k] + Treatment[i][index];
-                        _timeConstructShedule = _endProcessing[i][j][k];
+                        _endProcessing[device][j][k] = _startProcessing[device][j][k] + proccessingTime[device][index];
+                        _timeConstructShedule = _endProcessing[device][j][k];
                         yy = j;
                         zz = k;
                         xx = index;
@@ -163,11 +181,19 @@ namespace newAlgorithm
             }
         }
 
-        private void CalculateSheduleWithBufer(int b, int deviceCount, int countType)
+        /// <summary>
+        /// Данная функция выполняет высчитывание расписания с буфером
+        /// </summary>
+        /// <param name="bufferSize">Размер буфера</param>
+        /// <param name="dataTypesCount">Количество типов данных</param>
+        private void CalculateSheduleWithBufer(int bufferSize, int dataTypesCount)
         {
-            Matrix timeProcessing = new Matrix(Treatment);
 
-            RMatrix rMatrix = new RMatrix(countType);
+            // Инициализируем матрицу времени выполнения заданий
+            Matrix proccessingTimeMatrix = new Matrix(proccessingTime);
+
+            // Инициализируем матрицу R - количества данных i-ых типов в партиях занимающих в последовательноси pi_l j-е позиции
+            RMatrix rMatrix = new RMatrix(dataTypesCount);
 
             for (int column = 0; column < _r.Count; column++)
             {
@@ -203,25 +229,14 @@ namespace newAlgorithm
                 }
             }
 
+            // Инициализируем матрицу P
             Matrix pMatrix = new Matrix(pMatr);
 
-            TreeDimMatrix timeChangeover = new TreeDimMatrix(deviceCount);
-            for (int device = 0; device < Switching.Count; device++)
-            {
-                for (int fromType = 0; fromType < Switching[device].Count; fromType++)
-                {
-                    for (int toType = 0; toType < Switching[device][fromType].Count; toType++)
-                    {
-                        var val = Switching[device][fromType][toType];
-                        if (val != 0)
-                        {
-                            timeChangeover.AddNode(device + 1, fromType + 1, toType + 1, Switching[device][fromType][toType]);
-                        }
-                    }
-                }
-            }
+            // Инициализируем матрицу переналадки приборов
+            TreeDimMatrix timeChangeover = new TreeDimMatrix(changeoverTime);
 
-            TreeDimMatrix tnMatrix = CalculationService.CalculateTnMatrix(rMatrix, pMatrix, timeProcessing, timeChangeover, b);
+
+            TreeDimMatrix tnMatrix = CalculationService.CalculateTnMatrix(rMatrix, pMatrix, proccessingTimeMatrix, timeChangeover, bufferSize);
 
             //if (viz == null)
             //{
@@ -235,10 +250,10 @@ namespace newAlgorithm
             //viz.Visualize(tnMatrix, timeProcessing, rMatrix);
 
             TreeDimMatrixNode lastNode = tnMatrix.treeDimMatrix.Last();
-            int count = lastNode.Count;
-            int type = rMatrix.Find(lastNode.Type).Type;
+            int count = lastNode.time;
+            int type = rMatrix[lastNode.fromDataType].Type;
 
-            int value = timeProcessing.GetItem(lastNode.DeviceNumber, type);
+            int value = proccessingTimeMatrix[lastNode.device-1, type-1];
 
             _timeConstructShedule = count + value;
         }
@@ -278,7 +293,7 @@ namespace newAlgorithm
         }
 
         /// <summary>
-        /// 
+        /// Данная функция выполняет 
         /// </summary>
         /// <param name="ind1"></param>
         /// <param name="ind2"></param>
@@ -332,13 +347,15 @@ namespace newAlgorithm
         }
 
         /// <summary>
-        /// 
+        /// Данная функция выполняет построение расписания с буфером
         /// </summary>
+        /// <param name="bufferSize">Размер буфера</param>
+        /// <param name="dataTypesCount">Количество типов данных</param>
         /// <returns></returns>
-        public List<List<int>> ConstructSheduleWithBuffer(int b, int countType)
+        public List<List<int>> ConstructSheduleWithBuffer(int bufferSize, int dataTypesCount)
         {
             var tempTime = 9999999;
-            CalculateSheduleWithBufer(b, conveyorLenght, countType);
+            CalculateSheduleWithBufer(bufferSize, dataTypesCount);
             var tempR = CopyMatrix(_r);
             tempTime = _timeConstructShedule;
             for (var i = 0; i < _r.Count - 1; i++)
@@ -347,7 +364,7 @@ namespace newAlgorithm
                 {
                     ChangeColum(i, j);
                 }
-                CalculateSheduleWithBufer(b, conveyorLenght, countType);
+                CalculateSheduleWithBufer(bufferSize, dataTypesCount);
                 if (tempTime >= _timeConstructShedule) continue;
                 _r = tempR;
                 _timeConstructShedule = tempTime;
@@ -366,7 +383,7 @@ namespace newAlgorithm
             var criterier = 0;
             ConstructShedule();
 
-            for (int numberPocess = 0; numberPocess < conveyorLenght; numberPocess++)
+            for (int numberPocess = 0; numberPocess < deviceCount; numberPocess++)
             {
                 for (int numberBatch = 0; numberBatch < _startProcessing[numberPocess].Count; numberBatch++)
                 {
@@ -379,7 +396,7 @@ namespace newAlgorithm
                 criterier -= _startProcessing[numberPocess][0][0];
             }
 
-            crit = (tz * conveyorLenght) - criterier;
+            crit = (tz * deviceCount) - criterier;
             return _timeConstructShedule;
         }
 

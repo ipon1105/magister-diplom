@@ -8,6 +8,8 @@ namespace newAlgorithm.Model
     public class RMatrix
     {
 
+        #region Поля данных
+
         /// <summary>
         /// Данная переменная содержит в себе список узлов матрицы R
         /// </summary>
@@ -26,30 +28,56 @@ namespace newAlgorithm.Model
         /// <summary>
         /// Данная пермення содержит количество типов данных
         /// </summary>
-        public int countType;
+        public int dataTypesCount;
+
+        #endregion
 
         /// <summary>
         /// Данный конструктор определяет матрицу количества данных определённых типов в определённых партий. Принимает количество типов и возвращает экземпляр данного класса
         /// </summary>
-        /// <param name="countType">Количетсво типов данных матрицы R</param>
-        public RMatrix(int countType)
+        /// <param name="dataTypesCount">Количетсво типов данных матрицы R</param>
+        public RMatrix(int dataTypesCount)
         {
             rMatrix = new List<RMatrixNode>();
             typePriority = new List<int>();
             lastPosition = 0;
-            this.countType = countType;
+            this.dataTypesCount = dataTypesCount;
         }
 
         /// <summary>
         /// Данная функция добавляет в матрицу R элемент необходимый для увеличения матрицы
         /// </summary>
-        /// <param name="type">Тип данных нового элемента</param>
+        /// <param name="dataType">Тип данных нового элемента</param>
         /// <param name="count">Количество данных в новом элементе</param>
-        public void AddNode(int type, int count)
+        public void AddNode(int dataType, int count)
         {
-            RMatrixNode newNode = new RMatrixNode(type, ++lastPosition, count);
+            RMatrixNode newNode = new RMatrixNode(dataType, ++lastPosition, count);
             rMatrix.Add(newNode);
         }
+
+        /// <summary>
+        /// Данное переопределение оператора индексирования позволяет получить элементы по индексу
+        /// </summary>
+        /// <param name="position">Индекс позиции элемента матрицы RMatrix</param>
+        /// <returns>Целочисленное значение по позиции position</returns>
+        public RMatrixNode this[int position]
+        {
+
+            // Переопределяем возвращение данных из матрицы R
+            get
+            {
+
+                // Выполяем поиск узла по позиции
+                foreach (RMatrixNode rMatrixNode in rMatrix)
+                    if (rMatrixNode.Position == position)
+                        return rMatrixNode;
+
+                // Вовзращаем null в случае отсутствия узла в списке
+                return null;
+            }
+        }
+
+        #region Неиспользуемые функции
 
         /// <summary>
         /// Данная функция выполняет глубокое копирование данного класса
@@ -58,7 +86,7 @@ namespace newAlgorithm.Model
         public RMatrix Clone()
         {
             // Определяем новую матрицу R
-            RMatrix newRMatrix = new RMatrix(countType);
+            RMatrix newRMatrix = new RMatrix(dataTypesCount);
 
             // Определяем новый список узлов
             List<RMatrixNode> newNodeList = new List<RMatrixNode>();
@@ -77,22 +105,6 @@ namespace newAlgorithm.Model
         }
 
         /// <summary>
-        /// Данная функция находит узел в матрице R в заданной позиции
-        /// </summary>
-        /// <param name="position">Позиция узла по которой необходимо выполнить поиск</param>
-        /// <returns>Узел из матрица R</returns>
-        public RMatrixNode Find(int position)
-        {
-            // Выполяем поиск узла по позиции
-            foreach (RMatrixNode rMatrixNode in rMatrix)
-                if (rMatrixNode.Position == position)
-                    return rMatrixNode;
-
-            // Вовзращаем null в случае отсутствия узла в списке
-            return null;
-        }
-
-        /// <summary>
         /// Данная функция возвращает последнюю позицию в матрице R
         /// </summary>
         /// <returns>Индкс последней позиции в матрице R</returns>
@@ -100,5 +112,7 @@ namespace newAlgorithm.Model
         {
             return lastPosition;
         }
+
+        #endregion
     }
 }

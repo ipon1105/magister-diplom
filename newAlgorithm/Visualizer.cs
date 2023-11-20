@@ -11,13 +11,15 @@ namespace newAlgorithm.Service
         _Workbook oWB;
         _Worksheet oSheet;
 
-        private int deep = 0;
-        private int count = 0;
+        private int deep;
+        private int count;
 
-        public Visualizer(int deep, int count)
+        public Visualizer(int deep = 0, int count = 0)
         {
             this.deep = deep;
-            this.count = count;// Запуск Excel и получение объекта приложения
+            this.count = count;
+            
+            // Запуск Excel и получение объекта приложения
             oXL = new Application();
             oXL.Visible = true;
             oWB = oXL.Workbooks.Add(Missing.Value);
@@ -25,16 +27,6 @@ namespace newAlgorithm.Service
             InitExcelList(count);
         }
 
-        /// <summary>
-        /// Создает новый лист в Excel окне
-        /// </summary>
-        public void CreateExcelAppList(int deep, int count)
-        {
-            this.deep = deep;
-            this.count = count;// Запуск Excel и получение объекта приложения// Получение нового листа
-            oSheet = (_Worksheet)oWB.Sheets.Add(After: oWB.Sheets[oWB.Sheets.Count]);
-            InitExcelList(count);
-        }
 
         public void InitExcelList(int count)
         {
@@ -91,16 +83,18 @@ namespace newAlgorithm.Service
             catch (Exception) {}
         }
 
+        #region Неиспользуемые функции
+
         public void Visualize(TreeDimMatrix tnMatrix, Matrix timeProcessing, RMatrix rMatrix)
         {
             foreach (TreeDimMatrixNode node in tnMatrix.treeDimMatrix)
             {
-                int count = node.Count;
-                int type = rMatrix.Find(node.Type).Type;
+                int count = node.time;
+                int type = rMatrix[node.fromDataType].Type;
 
-                int value = timeProcessing.GetItem(node.DeviceNumber, type);
+                int value = timeProcessing[node.device-1, type-1];
 
-                TestDrawExcel(node.DeviceNumber, count, value, type);
+                TestDrawExcel(node.device, count, value, type);
             }
         }
 
@@ -108,5 +102,18 @@ namespace newAlgorithm.Service
         {
             oXL.Quit();
         }
+
+        /// <summary>
+        /// Создает новый лист в Excel окне
+        /// </summary>
+        public void CreateExcelAppList(int deep, int count)
+        {
+            this.deep = deep;
+            this.count = count;// Запуск Excel и получение объекта приложения// Получение нового листа
+            oSheet = (_Worksheet)oWB.Sheets.Add(After: oWB.Sheets[oWB.Sheets.Count]);
+            InitExcelList(count);
+        }
+
+        #endregion
     }
 }
