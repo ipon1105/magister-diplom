@@ -354,7 +354,7 @@ namespace newAlgorithm
                         for (int i = 0; i < n_kom; i++)
                         {
                             compositionSets.Add(new List<int>());
-                            for (var ind = 0; ind < _dataTypesCount; ind++)
+                            for (var dataType = 0; dataType < _dataTypesCount; dataType++)
                             {
                                 temp = rand.Next(10);
                                 if (temp > 5)
@@ -376,9 +376,9 @@ namespace newAlgorithm
                             fileOut.WriteLine($"Kqs= {n_kom_s}");
                             fileOut.WriteLine($"N  = {_dataTypesCount};\tL = {_deviceCount}");
                             fileOut.WriteLine($"Times");
-                            fileOut.WriteLine(printArray(timeSets));
+                            fileOut.WriteLine(ListUtils.MatrixIntToString(timeSets, "\t"));
                             fileOut.WriteLine($"Compositions");
-                            fileOut.WriteLine(printArray(compositionSets));
+                            fileOut.WriteLine(ListUtils.MatrixIntToString(compositionSets, "\t"));
 
                             // Перебираем каждой элемент вектора, как время выполнения задания
                             foreach (var _maxProccessingTime in time)
@@ -466,6 +466,7 @@ namespace newAlgorithm
                             // Для следующих максимальных времён переналадки приборов выполняем обработку
                             for (int _maxChangeoverTime = 2; _maxChangeoverTime <= 32; _maxChangeoverTime *= 2)
                             {
+
                                 // Выводим информацию в выходной файл
                                 file_output_method_GAA.WriteLine($"\t\t{{\n\t\t\tmaxChangeoverTime\t= {_maxChangeoverTime}");
 
@@ -489,10 +490,6 @@ namespace newAlgorithm
                                     {
 
                                         file_outputGAA.WriteLine(ListUtils.MatrixIntToString(elem.GenList, " "));
-                                        foreach (var elem2 in elem.GenList)
-                                        {
-                                            file_outputGAA.WriteLine(ListUtils.VectorIntToString(elem2, " "));
-                                        }
                                         file_outputGAA.WriteLine("_________________________");
                                         file_outputGAA.WriteLine(gaa._fitnesslist[_maxChangeoverTime]);
                                         file_outputGAA.WriteLine("+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=");
@@ -534,9 +531,9 @@ namespace newAlgorithm
         /// <param name="e"></param>
         private void button2_Click(object sender, EventArgs e)
         {
-            int[] N_komplect_type = { 2 };
-            int[] N_komplect_for_type = { 2, 4 };
-            int[] N_komplect_sostav = { 2, 4 };
+
+            // Создаём экземпляр класса Random для генерации рандомных данных
+            var rand = new Random(0);
 
             // Формируем вектор из возможных количеств типов данных
             int[] _dataTypesCountArray = { 5, 10 };
@@ -547,6 +544,10 @@ namespace newAlgorithm
             // Формируем вектор из значений { 2, 4, 8, 16, 32 }, для генерации матриц выполнения и переналадки
             int[] time = { 2, 4, 8, 16, 32 };
 
+            int[] N_komplect_type = { 2 };
+            int[] N_komplect_for_type = { 2, 4 };
+            int[] N_komplect_sostav = { 2, 4 };
+
             using (var file = new StreamWriter("11 - " + checkBox_deadline_on.Checked + ".txt", false))
             {
                 foreach (var n_kom in N_komplect_type)
@@ -555,39 +556,27 @@ namespace newAlgorithm
                     timeSets = new List<List<int>>();
                     foreach (var n_kom_q in N_komplect_for_type)
                     {
+
                         for (int i = 0; i < n_kom; i++)
                         {
-                            var rand = new Random();
                             var temp = rand.Next(10);
                             temp = (temp > 5) ? 150 : 100;
 
                             compositionSets.Add(new List<int>());
                             timeSets.Add(new List<int>());
                             for (int j = 0; j < n_kom_q; j++)
-                            {
                                 timeSets[i].Add((j + 1) * temp);
-                            }
+                            
                         }
+                        
                         foreach (var n_kom_s in N_komplect_sostav)
                         {
                             foreach (var _dataTypesCount in _dataTypesCountArray)
                             {
+
                                 for (int i = 0; i < n_kom; i++)
-                                {
                                     for (var dataType = 0; dataType < _dataTypesCount; dataType++)
-                                    {
-                                        var rand = new Random();
-                                        var temp = rand.Next(10);
-                                        if (temp > 5)
-                                        {
-                                            compositionSets[i].Add(n_kom_s);
-                                        }
-                                        else
-                                        {
-                                            compositionSets[i].Add(2);
-                                        }
-                                    }
-                                }
+                                        compositionSets[i].Add((rand.Next(10) > 5) ? n_kom_s : 2);
 
                                 foreach (var _deviceCount in _deviceCountArray)
                                 {
@@ -622,7 +611,6 @@ namespace newAlgorithm
                                             }
 
                                             var gaa = new GAA(_dataTypesCount, batchCountList, isFixedBatches, batchCount);
-
 
                                             var result = gaa.calcSetsFitnessList(checkBox_deadline_on.Checked, generationCount, xromossomiSize);
 
@@ -1008,41 +996,6 @@ namespace newAlgorithm
         #endregion
 
         #region Вспомогательные функции
-
-        /// <summary>
-        /// Данная функция возвращает список 
-        /// </summary>
-        /// <param name="_in">Экземпляр данных реализующие IEnumerable</param>
-        /// <returns>Список элементов из переданного объекта</returns>
-        private List<int> Copy(IEnumerable<int> _in)
-        {
-            return _in.ToList();
-        }
-
-        /// <summary>
-        /// Данная функция формирует массив в виде строки
-        /// </summary>
-        /// <param name="arr">Массив, который необходимо преобразовать в строку</param>
-        /// <returns></returns>
-        private string printArray(List<List<int>> arr)
-        {
-
-            // Результирующая строку
-            string str = "";
-
-            // Для каждой строки в массиве
-            foreach (List<int> row in arr)
-            {
-
-                // Для каждого столбца в массиве
-                foreach (int col in row)
-                    str += col + "\t";
-                str += "\r\n";
-            }
-
-            // Возвращаем результат
-            return str;
-        }
 
         /// <summary>
         /// Данная функция возвращает вектор длиной в количество типов данных состоящий из максимального размера каждого типа данных.

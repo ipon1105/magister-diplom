@@ -22,7 +22,7 @@ namespace newAlgorithm
         /// <summary>
         /// Данная переменная определяет вектор данных для интерпритации типов данных
         /// </summary>
-        private readonly List<int> _i;                  // Вектор интерпритируемых типов данных
+        private readonly List<int> _i;
         
         private List<List<int>> _ai;                    // Буферизированная матрица составов партий требований на k+1 шаге 
         private List<List<int>> _abuf;                  // Буферизированная матрица составов партий требований на k+1 шаге
@@ -85,8 +85,18 @@ namespace newAlgorithm
         /// </summary>
         public void GenerateStartSolution()
         {
+            
+            // Неизвестная переменная награды
             const int claim = 2;
+
+            // Выполяем отчистку вектора _i и матрицы _a
+            _i.Clear();
+            _a.Clear();
+
+            // Инициализируем матрицу
             _a = new List<List<int>>();
+            
+            // Для каждого типа данных выполняем обработку
             for (var dataType = 0; dataType < dataTypesCount; dataType++)
             {
                 _i.Add(1);
@@ -94,8 +104,11 @@ namespace newAlgorithm
                 _a[dataType].Add(batchCountList[dataType] - claim);
                 _a[dataType].Add(claim);
             }
+
+            // Для каждого типа данных выполняем обработку
             for (var dataType = 0; dataType < dataTypesCount; dataType++)
             {
+
                 if (_a[dataType][0] < 2 || _a[dataType][0] < _a[dataType][1])
                 {
                     _a[dataType].Clear();
@@ -108,15 +121,14 @@ namespace newAlgorithm
         /// <summary>
         /// Функция проверки наличия оставшихся в расмотрении типов
         /// </summary>
-        /// <param name="type">Список всех рассматриваемых типов</param>
         /// <returns>True, если в наличие еще есть рассматриваемые типы, иначе False</returns>
-        private bool CheckType(IReadOnlyList<int> type)
+        private bool CheckType()
         {
             // Для каждого типа данных выполняем проверку на не нулевое количество типов
             for (var dataType = 0; dataType < dataTypesCount; dataType++)
 
                 // Проверяем количество типов
-                if (type[dataType] > 0)
+                if (_i[dataType] > 0)
 
                     // Если в списке количество больше 0, значит типы ещё есть в расмотрении
                     return true;
@@ -124,7 +136,6 @@ namespace newAlgorithm
             // Все типы были расмотрены
             return false;
         }
-
 
         /// <summary>
         /// Построчное формирование матрицы промежуточного решени
@@ -139,7 +150,6 @@ namespace newAlgorithm
                 result[type] = ListUtils.VectorDeepCopy(_a2[type][ind2]);
             return result;
         }
-
 
         /// <summary>
         /// Функция получения неповторяющихся решений в матрице А2 на шаге 9
@@ -168,13 +178,12 @@ namespace newAlgorithm
                     temp.RemoveAt(lastIndexForDelete);
                     inMatrix.RemoveAt(lastIndexForDelete);
                 }
-                countLoops++;
-                if (countLoops > 100)
+
+                if (++countLoops > 100)
                     break;
             }
             return inMatrix;
         }
-
         
         /// <summary>
         /// Удаление повторений новых решений совпадающих с A1
@@ -250,27 +259,6 @@ namespace newAlgorithm
             return result;
         }
 
-
-        /// <summary>
-        /// Формирование новых решений по составим партий текущего типа данных
-        /// </summary>
-        /// <param name="m">матрица А для печати</param>
-        /// <returns>строка с составами партий по типам</returns>
-        private static string PrintA(IEnumerable<List<int>> m)
-        {
-            var result = "";
-            foreach (var t in m)
-            {
-                for (var j = 0; j < t.Count - 1; j++)
-                {
-                    result += t[j] + ", ";
-                }
-                result += t[t.Count - 1] + ";\n";
-            }
-            return result;
-        }
-
-
         /// <summary>
         /// Рекурсивная комбинация всех типов _a2 с фиксированным решением _a
         /// </summary>
@@ -332,12 +320,14 @@ namespace newAlgorithm
                 _i.Clear();
                 _a.Clear();
 
+                // Генерируем начальное решение
                 GenerateStartSolution();
+
                 shedule = new Shedule(_a);
                 //shedule.ConstructShedule();
                 shedule.ConstructSheduleWithBuffer(Form1.buff, dataTypesCount);
                 _f1 = shedule.GetTime();
-                MessageBox.Show(PrintA(_a) + " Время обработки " + _f1);
+                MessageBox.Show(ListUtils.MatrixIntToString(_a, ", ", "", ";") + " Время обработки " + _f1);
                 if (_f1 < _f1Buf)
                 {
                     _abuf = ListUtils.MatrixDeepCopy(_a);
@@ -349,13 +339,15 @@ namespace newAlgorithm
                 {
 
                     // До тех пор, поа не расмотрели все типы выполняем обработку
-                    while (CheckType(_i))
+                    while (CheckType())
                     {
                         // Буферезируем текущее решение для построение нового на его основе
                         _ai = ListUtils.MatrixDeepCopy(_a);
                         if (_typeSolutionFlag)
                         {
                             _a1 = new List<List<List<int>>>();
+
+                            // Для каждого типа данных выполняем обработку
                             for (var dataType = 0; dataType < dataTypesCount; dataType++)
                             {
                                 _a1.Add(new List<List<int>>());
@@ -374,6 +366,8 @@ namespace newAlgorithm
                         _a2 = new List<List<List<int>>>();
                         string s;
                         file.WriteLine("окрестность 1 вида");
+
+                        // Для каждого типа данных выполняем обработку
                         for (var dataType = 0; dataType < dataTypesCount; dataType++)
                         {
                             _a2.Add(new List<List<int>>());
@@ -386,7 +380,7 @@ namespace newAlgorithm
                                 //shedule.ConstructShedule();
                                 shedule.ConstructSheduleWithBuffer(Form1.buff, dataTypesCount);
                                 var fBuf = shedule.GetTime();
-                                s = PrintA(tempA);
+                                s = ListUtils.MatrixIntToString(tempA, ", ", "", ";");
                                 file.Write(s + " " + fBuf);
                                 MessageBox.Show(s + " Время обработки " + fBuf);                                    
                                 if (fBuf < _f1Buf)
@@ -407,20 +401,19 @@ namespace newAlgorithm
 
                         if (_typeSolutionFlag)
                         {
-                            MessageBox.Show("Лучшее решение " + PrintA(_abuf) + " Время обработки " + _f1Buf);
+                            MessageBox.Show("Лучшее решение " + ListUtils.MatrixIntToString(_abuf, ", ", "", ";") + " Время обработки " + _f1Buf);
                             _a = ListUtils.MatrixDeepCopy(_abuf);
                             _f1 = _f1Buf;
+
+                            continue;
                         }
-                        else
+
+                        // Для каждого типа данных выполняем обработку
+                        for (int dataType = 0; dataType < dataTypesCount; dataType++)
                         {
-                            for (int dataType = 0; dataType < dataTypesCount; dataType++)
-                            {
-                                _a1[dataType] = ListUtils.MatrixDeepCopy(_a2[dataType]);
-                                if (!_a1[dataType].Any() || !_a1[dataType][0].Any())
-                                {
-                                    _i[dataType] = 0;
-                                }
-                            }
+                            _a1[dataType] = ListUtils.MatrixDeepCopy(_a2[dataType]);
+                            if (!_a1[dataType].Any() || !_a1[dataType][0].Any())
+                                _i[dataType] = 0;
                         }
                     }
                 }
@@ -439,6 +432,8 @@ namespace newAlgorithm
         ///Менят здесь для _\*РУСЛАН*/_
         private void GenerateCombination(int ind, List<int> _n)
         {
+
+            // Для каждого типа данных выполняем обработку с конца
             for (int dataType = dataTypesCount - 1; dataType >= 0; dataType--)
             {
                 for (int j = 0;j <_a2[dataType].Count; j++)
@@ -458,6 +453,8 @@ namespace newAlgorithm
         private void GetSolution(List<int> _n)
         {
             var tempA = ListUtils.MatrixDeepCopy(_a);
+
+            // Для каждого типа данных выполняем обработку
             for (var dataType = 0; dataType < dataTypesCount; dataType++)
             {
                 if (_n[dataType] >= 0)
@@ -472,7 +469,7 @@ namespace newAlgorithm
             var sets = new Sets(Form1.compositionSets, Form1.timeSets);
             sets.GetSolution(r);
             var time = sets.GetNewCriterion(Form1.direct);
-            var s = PrintA(tempA);
+            //var s = ListUtils.MatrixIntToString(tempA, ", ", "", ";");
             //f.Write(s + " - " + fBuf);
             //MessageBox.Show(s + " Время обработки " + fBuf);
             if (time < _f1Buf)
@@ -505,87 +502,94 @@ namespace newAlgorithm
                 result[0] = _f1Buf;
                 var maxA = ListUtils.MatrixDeepCopy(_a);
                 _typeSolutionFlag = true;
-                if (!isFixedBatches)
+
+                // До тех пор пока в наличие есть оставшиеся типы и партии не фиксированные выполняем обработку
+                while (CheckType() && !isFixedBatches)
                 {
-                    while (CheckType(_i))
+                    // Буферезируем текущее решение для построение нового на его основе
+                    _ai = ListUtils.MatrixDeepCopy(_a);
+                    if (_typeSolutionFlag)
                     {
-                        // Буферезируем текущее решение для построение нового на его основе
-                        _ai = ListUtils.MatrixDeepCopy(_a);
-                        if (_typeSolutionFlag)
-                        {
-                            _a1 = new List<List<List<int>>>();
-                            for (var dataType = 0; dataType < dataTypesCount; dataType++)
-                            {
-                                _a1.Add(new List<List<int>>());
-                                _a1[dataType].Add(new List<int>());
-                                _a1[dataType][0] = ListUtils.VectorDeepCopy(_a[dataType]);
-                            }
-                            _typeSolutionFlag = false;
-                        }
+                        _a1 = new List<List<List<int>>>();
 
-                        var tempA = ListUtils.MatrixDeepCopy(_ai);
-                        _abuf = ListUtils.MatrixDeepCopy(_ai);
-                        _f1Buf = _f1;
-
-                        // Для каждого типа и каждого решения в типе строим новое решение и проверяем его на критерий
-                        _a2 = new List<List<List<int>>>();
-                        string s;
+                        // Для каждого типа данных выполняем обработку
                         for (var dataType = 0; dataType < dataTypesCount; dataType++)
                         {
-                            _a2.Add(new List<List<int>>());
-                            if (_i[dataType] <= 0) continue;
-                            _a2[dataType] = NewData(dataType);
-                            for (var j = 0; j < _a2[dataType].Count; j++)
-                            {
-                                tempA = SetTempAFromA2(dataType, j);
-                                shedule = new Shedule(tempA);
-                                shedule.ConstructShedule();
-                                r = shedule.RetyrnR();
-                                sets = new Sets(Form1.compositionSets, Form1.timeSets);
-                                sets.GetSolution(r);
-                                time = sets.GetNewCriterion(Form1.direct);
-                                s = PrintA(tempA);
-                                //f.Write(s + " - " + time);
-                                if (time < _f1Buf)
-                                {
-                                    _abuf = ListUtils.MatrixDeepCopy(tempA);
-                                    _typeSolutionFlag = true;
-                                    _f1Buf = time;
-                                }
-                                //f.WriteLine();
-                            }
+                            _a1.Add(new List<List<int>>());
+                            _a1[dataType].Add(new List<int>());
+                            _a1[dataType][0] = ListUtils.VectorDeepCopy(_a[dataType]);
                         }
-                        if (!_typeSolutionFlag)
-                        {
-                            List<int> _n = new List<int>();
-                            _nTemp = new List<int>();
-                            for (int dataType = 0; dataType < dataTypesCount; dataType++)
-                            {
-                                _nTemp.Add(0);
-                                _n.Add(_a2[dataType].Count);
-                                if (_n[dataType] == 0) _n[dataType] = -1;
-                            }
-                            GenerateCombination(0, _nTemp);
-                        }
-                        if (_typeSolutionFlag)
-                        {
-                            _a = ListUtils.MatrixDeepCopy(_abuf);
-                            _f1 = _f1Buf;
-                        }
-                        else
-                        {
-                            for (int dataType = 0; dataType < dataTypesCount; dataType++)
-                            {
-                                _a1[dataType] = ListUtils.MatrixDeepCopy(_a2[dataType]);
-                                if (!_a1[dataType].Any() || !_a1[dataType][0].Any())
-                                {
-                                    _i[dataType] = 0;
-                                }
-                            }
-                        }
-                        //f.WriteLine("------------------");
+                        _typeSolutionFlag = false;
                     }
+
+                    var tempA = ListUtils.MatrixDeepCopy(_ai);
+                    _abuf = ListUtils.MatrixDeepCopy(_ai);
+                    _f1Buf = _f1;
+
+                    // Для каждого типа и каждого решения в типе строим новое решение и проверяем его на критерий
+                    _a2 = new List<List<List<int>>>();
+                    string s;
+
+                    // Для кадого типа данных выполняем обработку
+                    for (var dataType = 0; dataType < dataTypesCount; dataType++)
+                    {
+                        _a2.Add(new List<List<int>>());
+                        if (_i[dataType] <= 0) continue;
+                        _a2[dataType] = NewData(dataType);
+                        for (var j = 0; j < _a2[dataType].Count; j++)
+                        {
+                            tempA = SetTempAFromA2(dataType, j);
+                            shedule = new Shedule(tempA);
+                            shedule.ConstructShedule();
+                            r = shedule.RetyrnR();
+                            sets = new Sets(Form1.compositionSets, Form1.timeSets);
+                            sets.GetSolution(r);
+                            time = sets.GetNewCriterion(Form1.direct);
+                            //s = ListUtils.MatrixIntToString(tempA, ", ", "", ";");
+                            //f.Write(s + " - " + time);
+                            if (time < _f1Buf)
+                            {
+                                _abuf = ListUtils.MatrixDeepCopy(tempA);
+                                _typeSolutionFlag = true;
+                                _f1Buf = time;
+                            }
+                            //f.WriteLine();
+                        }
+                    }
+                    if (!_typeSolutionFlag)
+                    {
+                        List<int> _n = new List<int>();
+                        _nTemp = new List<int>();
+
+                        // Для каждого типа данных выполняем обработку
+                        for (int dataType = 0; dataType < dataTypesCount; dataType++)
+                        {
+                            _nTemp.Add(0);
+                            _n.Add(_a2[dataType].Count);
+                            if (_n[dataType] == 0) _n[dataType] = -1;
+                        }
+                        GenerateCombination(0, _nTemp);
+                    }
+                    if (_typeSolutionFlag)
+                    {
+                        _a = ListUtils.MatrixDeepCopy(_abuf);
+                        _f1 = _f1Buf;
+
+                        // Продолжаем цикл
+                        continue;
+                    }
+                    
+                    // Для каждого типа данных выполняем обработку
+                    for (int dataType = 0; dataType < dataTypesCount; dataType++)
+                    {
+                        _a1[dataType] = ListUtils.MatrixDeepCopy(_a2[dataType]);
+                        if (!_a1[dataType].Any() || !_a1[dataType][0].Any())
+                            _i[dataType] = 0;
+                    }
+                    
+                    //f.WriteLine("------------------");
                 }
+
                 result[1] = _f1;
                 //f.Close();
             }

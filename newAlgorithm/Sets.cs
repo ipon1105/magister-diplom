@@ -12,8 +12,6 @@ namespace newAlgorithm
         /// Данная переменная определяем типы данных
         /// </summary>
         private readonly int _types;
-        private readonly List<List<int>> _composition; // состав
-        private readonly List<List<int>> _time;
         private List<List<Kit>> _readySets;
 
         /// <summary>
@@ -24,8 +22,6 @@ namespace newAlgorithm
         public Sets(List<List<int>> composition, List<List<int>> time)
         {
             _types = composition.Count;
-            _composition = composition;
-            _time = time;
             _readySets = new List<List<Kit>>();
 
             // Для каджого из типов данных
@@ -57,60 +53,38 @@ namespace newAlgorithm
             // Если диррективные сроки были установлены
             if (deadline)
             {
+
+                // Для всех строк в готовом множестве
                 foreach (var row in _readySets)
-                {
+
+                    // Для всех столбцов в строке готового множества
                     foreach (var elem in row)
-                    {
+
+                        // Выполяем обработку
                         if (elem.GetTime() > elem.GetCompositionTime())
-                        {
                             res += elem.GetTime() - elem.GetCompositionTime();
-                        }
-                    }
-                }
+                    
+                // Возвращаем результат
+                return res;
             }
-            else
+
+            var count = 0;
+
+            foreach (var row in _readySets)
             {
-                var count = 0;
-
-                foreach (var row in _readySets)
+                count += row.Count;
+                foreach (var elem in row)
                 {
-                    count += row.Count;
-                    foreach (var elem in row)
-                    {
-                        res += elem.GetTime();
-                        if (res < elem.GetTime())
-                        {
-                            res = elem.GetTime();
-                        }
-                    }
+                    res += elem.GetTime();
+                    if (res < elem.GetTime())
+                        res = elem.GetTime();
                 }
-
-                res /= count;
             }
 
             // Возвращаем результат
-            return res;
+            return res / count;
         }
 
-        /// <summary>
-        /// Старый критерий
-        /// </summary>
-        /// <returns></returns>
-        public int GetCriterion()
-        {
-            int res = 0;
-            foreach (var row in _readySets)
-            {
-                foreach (var elem in row)
-                {
-                    if (res < elem.GetTime())
-                    {
-                        res = elem.GetTime();
-                    }
-                }
-            }
-            return res;
-        }
 
         /// <summary>
         /// 
@@ -159,5 +133,25 @@ namespace newAlgorithm
                 AddBatches(element);
             }
         }
+
+        #region Неиспользуемые функции
+
+        /// <summary>
+        /// Старый критерий
+        /// </summary>
+        /// <returns></returns>
+        public int GetCriterion()
+        {
+            int res = 0;
+            foreach (var row in _readySets)
+                foreach (var elem in row)
+                    if (res < elem.GetTime())
+                        res = elem.GetTime();
+
+            // Возвращаем результат
+            return res;
+        }
+
+        #endregion
     }
 }

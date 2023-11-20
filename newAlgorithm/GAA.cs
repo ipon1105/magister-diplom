@@ -53,8 +53,6 @@ namespace newAlgorithm
         // Данный класс описывает хромосому
         public class Xromossomi
         {
-            Random rand = new Random();
-            int N = 10;
             static int size = 10;
             public List<List<int>> GenList = new List<List<int>>();
             public List<int> GenListOst = new List<int>();
@@ -109,13 +107,14 @@ namespace newAlgorithm
 
         public int calcSetsFitnessList(bool directedTime , decimal GenerationCount,int countHromos = 50)
         {
+
+            // Двумерный список
             var flagmanHromosom = new List<List<int>>();
 
-            
+            // Для каждого типа днных выполняем обработку
             for (var dataType = 0; dataType < dataTypesCount; dataType++)
-            {
                 flagmanHromosom.Add( new List<int> {batchCount - 2 ,  2});
-            }
+            
                 
 
             var r = ToArrayList();
@@ -162,7 +161,10 @@ namespace newAlgorithm
             var r = ToArrayList();
             var FitnessList = new List<int>();
             var tuple = new Dictionary<int, List<List<int>>>();
+
+            // Инициализируем вектор
             var listint = new List<int>();
+
             foreach (var elem in r)
             {
                 // Создаём расписание на основе каждого элемента матрица r
@@ -173,6 +175,8 @@ namespace newAlgorithm
                 if(tuple.ContainsKey(time))
                     continue;
                 tuple.Add(time, elem);
+
+                // Добавляем в вектор время
                 listint.Add(time);
 
 
@@ -221,7 +225,7 @@ namespace newAlgorithm
             return xrom;
         }
 
-        #region Функции которые страшно удалять, хоть они и не используются
+        #region Неиспользуемые функции
 
         private void xor(int size, List<Xromossomi> nabr = null)
         {
