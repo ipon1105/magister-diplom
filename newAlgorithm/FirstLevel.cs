@@ -2,9 +2,6 @@
 using System.Linq;
 using System.Windows.Forms;
 using System.IO;
-using System.Security.Cryptography.X509Certificates;
-using System.Reflection;
-using System;
 using magisterDiplom.Utils;
 
 namespace newAlgorithm
@@ -109,19 +106,23 @@ namespace newAlgorithm
         }
 
         /// <summary>
-        /// Функция проверки наличия оставшихся в рассмотрении типов
+        /// Функция проверки наличия оставшихся в расмотрении типов
         /// </summary>
-        /// <param name="type">список всех рассматриваемых типов</param>
-        /// <returns>наличие еще рассматриваемых типов</returns>
+        /// <param name="type">Список всех рассматриваемых типов</param>
+        /// <returns>True, если в наличие еще есть рассматриваемые типы, иначе False</returns>
         private bool CheckType(IReadOnlyList<int> type)
         {
-            var count = 0;
+            // Для каждого типа данных выполняем проверку на не нулевое количество типов
             for (var dataType = 0; dataType < dataTypesCount; dataType++)
-            {
+
+                // Проверяем количество типов
                 if (type[dataType] > 0)
-                    count++;
-            }
-            return count != 0;
+
+                    // Если в списке количество больше 0, значит типы ещё есть в расмотрении
+                    return true;
+
+            // Все типы были расмотрены
+            return false;
         }
 
 
@@ -241,9 +242,7 @@ namespace newAlgorithm
                 }
                 count++;
                 if (count > 3)
-                {
                     break;
-                }
             }
             
             result = SortedMatrix(result);
@@ -295,8 +294,7 @@ namespace newAlgorithm
                 //shedule.ConstructShedule();
                 shedule.ConstructSheduleWithBuffer(Form1.buff, dataTypesCount);
                 var fBuf = shedule.GetTime();
-                string s;
-                s = PrintA(tempM);
+                string s = ListUtils.MatrixIntToString(tempM, ", ", "", ";");
                 file.Write(s + " " + fBuf);
                 MessageBox.Show(s + " Время обработки " + fBuf);
                 if (fBuf < _f1Buf)
@@ -323,7 +321,8 @@ namespace newAlgorithm
                 //shedule.ConstructShedule();
                 shedule.ConstructSheduleWithBuffer(Form1.buff, dataTypesCount);
                 _f1 = shedule.GetTime();
-                MessageBox.Show(PrintA(_a) + " Время обработки " + _f1);
+
+                MessageBox.Show(ListUtils.MatrixIntToString(_a, ", ", "", ";") + "Время обработки " + _f1);
                 _f1Buf = _f1;
                 file.WriteLine(_f1Buf);
                 var maxA = ListUtils.MatrixDeepCopy(_a);
@@ -348,6 +347,8 @@ namespace newAlgorithm
                 }
                 if (!isFixedBatches)
                 {
+
+                    // До тех пор, поа не расмотрели все типы выполняем обработку
                     while (CheckType(_i))
                     {
                         // Буферезируем текущее решение для построение нового на его основе
@@ -590,7 +591,6 @@ namespace newAlgorithm
             }
             return result;
         }
-
 
         #region Неиспользуемые функции
 

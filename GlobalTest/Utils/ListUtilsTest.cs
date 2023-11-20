@@ -15,72 +15,81 @@ namespace GlobalTest.Utils
     {
 
         [TestMethod]
-        public void ListIntToStringTest_default()
+        public void VectorIntToStringTest_default()
         {
+
             List<int> input = new List<int> { 1, 2 };
-            string output = "1 2 ";
-            Assert.AreEqual(ListUtils.ListIntToString(input), output);
+            string output = "1 2";
+            Assert.AreEqual(ListUtils.VectorIntToString(input), output);
         }
 
         [TestMethod]
-        public void ListIntToStringTest_separator()
+        public void VectorIntToStringTest_separator()
         {
+
             List<int> input = new List<int> { 1, 2 };
-            string output = "155255";
-            Assert.AreEqual(ListUtils.ListIntToString(input, "55"), output);
+            string output = "1552";
+            Assert.AreEqual(ListUtils.VectorIntToString(input, "55"), output);
         }
 
         [TestMethod]
-        public void ListIntToStringTest_prefix()
+        public void VectorIntToStringTest_prefix()
         {
+
             List<int> input = new List<int> { 1, 2 };
-            string output = "\t1 2 ";
-            Assert.AreEqual(ListUtils.ListIntToString(input, " ", "\t"), output);
+            string output = "\t1 2";
+            Assert.AreEqual(ListUtils.VectorIntToString(input, " ", "\t"), output);
         }
 
         [TestMethod]
-        public void ListIntToStringTest_postfix()
+        public void VectorIntToStringTest_postfix()
         {
+
             List<int> input = new List<int> { 1, 2 };
-            string output = "1 2 \t";
-            Assert.AreEqual(ListUtils.ListIntToString(input, " ", "", "\t"), output);
+            string output = "1 2\t";
+            Assert.AreEqual(ListUtils.VectorIntToString(input, " ", "", "\t"), output);
         }
 
         [TestMethod]
-        public void ListListIntToStringTest_default()
+        public void MatrixIntToStringTest_default()
         {
+
             List<List<int>> input = new List<List<int>> {new List<int> { 1, 2 }, new List<int> { 3, 4 }};
-            string output = $"1 2 {Environment.NewLine}3 4 {Environment.NewLine}";
-            Assert.AreEqual(ListUtils.ListListIntToString(input), output);
+            string output = $"1 2{Environment.NewLine}3 4{Environment.NewLine}";
+            Assert.AreEqual(ListUtils.MatrixIntToString(input), output);
         }
 
         [TestMethod]
-        public void ListListIntToStringTest_separator()
+        public void MatrixIntToStringTest_separator()
         {
+
             List<List<int>> input = new List<List<int>> { new List<int> { 1, 2 }, new List<int> { 3, 4 } };
-            string output = $"15582558{Environment.NewLine}35584558{Environment.NewLine}";
-            Assert.AreEqual(ListUtils.ListListIntToString(input, "558"), output);
+            string output = $"15582{Environment.NewLine}35584{Environment.NewLine}";
+            Assert.AreEqual(ListUtils.MatrixIntToString(input, "558"), output);
         }
 
         [TestMethod]
-        public void ListListIntToStringTest_prefix()
+        public void MatrixIntToStringTest_prefix()
         {
+
             List<List<int>> input = new List<List<int>> { new List<int> { 1, 2 }, new List<int> { 3, 4 } };
-            string output = $"\t1 2 {Environment.NewLine}\t3 4 {Environment.NewLine}";
-            Assert.AreEqual(ListUtils.ListListIntToString(input, " ", "\t"), output);
+            string output = $"\t1 2{Environment.NewLine}\t3 4{Environment.NewLine}";
+            Assert.AreEqual(ListUtils.MatrixIntToString(input, " ", "\t"), output);
         }
 
         [TestMethod]
-        public void ListListIntToStringTest_postfix()
+        public void MatrixIntToStringTest_postfix()
         {
+
             List<List<int>> input = new List<List<int>> { new List<int> { 1, 2 }, new List<int> { 3, 4 } };
-            string output = $"\t1 2 \t{Environment.NewLine}\t3 4 \t{Environment.NewLine}";
-            Assert.AreEqual(ListUtils.ListListIntToString(input, " ", "\t", "\t"), output);
+            string output = $"\t1 2\t{Environment.NewLine}\t3 4\t{Environment.NewLine}";
+            Assert.AreEqual(ListUtils.MatrixIntToString(input, " ", "\t", "\t"), output);
         }
 
         [TestMethod]
-        public void ListDeepCopy()
+        public void VectorDeepCopy()
         {
+
             List<int> input = new List<int> { 1, 2 };
             List<int> output = ListUtils.VectorDeepCopy(input);
 
@@ -95,8 +104,9 @@ namespace GlobalTest.Utils
         }
 
         [TestMethod]
-        public void ListListDeepCopy()
+        public void MatrixDeepCopy()
         {
+
             List<List<int>> input = new List<List<int>> { new List<int> { 1, 2 }, new List<int> { 3, 4 } };
             List<List<int>> output = ListUtils.MatrixDeepCopy(input);
 
@@ -113,8 +123,7 @@ namespace GlobalTest.Utils
             Assert.AreEqual(input[0][1], output[0][1]);
             Assert.AreEqual(input[1][0], output[1][0]);
             Assert.AreNotEqual(input[1][1], output[1][1]);
-
         }
-    }
 
+    }
 }

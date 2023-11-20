@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace magisterDiplom.Utils
 {
@@ -14,34 +12,34 @@ namespace magisterDiplom.Utils
     {
 
         /// <summary>
-        /// Данная статическая функция выполняет конкатинацию списка в строку
+        /// Данная статическая функция выполняет конкатинацию вектора в строку
         /// </summary>
-        /// <param name="list">Целочисленный список для преобразования в строку</param>
+        /// <param name="vector">Целочисленный список (вектор) для преобразования в строку</param>
         /// <param name="separator">Раздилитель между элементами списка, по умолчанию пробел</param>
         /// <param name="prefix">Префикс в начале всей строки, по умолчанию пустая строка</param>
         /// <param name="postfix">Постфикс в конце всей строки, по умолчанию пустая строка</param>
         /// <returns>Строка со всеми элементами разделёнными separator</returns>
-        public static string ListIntToString(List<int> list, string separator=" ", string prefix="", string postfix="")
+        public static string VectorIntToString(List<int> vector, string separator=" ", string prefix="", string postfix="")
         {
             string result = prefix;
-            foreach (var element in list)
-                result += element + separator;
+            foreach (var element in vector)
+                result += element + ( (element == vector.Last()) ? "" : separator);
             return result + postfix;
         }
 
         /// <summary>
-        /// Данная статическая функция выполняет конкатинацию вложенного списка в строки раздлённые переводами строки
+        /// Данная статическая функция выполняет конкатинацию матрицы в строки раздлённые переводами строки
         /// </summary>
-        /// <param name="listList">Вложенный список</param>
+        /// <param name="matrix">Вложенный список - матрица</param>
         /// <param name="separator">Разделитель между элементами крайнего списка, по умолчанию пробел</param>
         /// <param name="prefix">Префикс перед каждой строкой, по умолчанию пустая строка</param>
         /// <param name="postfix">Постфикс после каждой строки, по умолчанию пустая строка</param>
         /// <returns>Строка со всеми элементами вложенного списка разделёнными separator и переводами строк</returns>
-        public static string ListListIntToString(List<List<int>> listList, string separator = " ", string prefix = "", string postfix = "")
+        public static string MatrixIntToString(List<List<int>> matrix, string separator = " ", string prefix = "", string postfix = "")
         {
             string result = "";
-            foreach (var list in listList)
-                result += ListIntToString(list, separator, prefix, postfix) + Environment.NewLine;
+            foreach (var list in matrix)
+                result += VectorIntToString(list, separator, prefix, postfix) + Environment.NewLine;
             return result;
         }
 

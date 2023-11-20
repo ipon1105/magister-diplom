@@ -488,10 +488,10 @@ namespace newAlgorithm
                                     foreach (var elem in gaa.nabor)
                                     {
 
-                                        file_outputGAA.WriteLine(ListUtils.ListListIntToString(elem.GenList, " "));
+                                        file_outputGAA.WriteLine(ListUtils.MatrixIntToString(elem.GenList, " "));
                                         foreach (var elem2 in elem.GenList)
                                         {
-                                            file_outputGAA.WriteLine(ListUtils.ListIntToString(elem2, " "));
+                                            file_outputGAA.WriteLine(ListUtils.VectorIntToString(elem2, " "));
                                         }
                                         file_outputGAA.WriteLine("_________________________");
                                         file_outputGAA.WriteLine(gaa._fitnesslist[_maxChangeoverTime]);
