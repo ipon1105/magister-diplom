@@ -390,7 +390,7 @@
             this.numeric_max_proccessing_time.Size = new System.Drawing.Size(45, 20);
             this.numeric_max_proccessing_time.TabIndex = 39;
             this.numeric_max_proccessing_time.Value = new decimal(new int[] {
-            4,
+            2,
             0,
             0,
             0});
@@ -450,7 +450,7 @@
             this.numeric_max_changeover_time.Size = new System.Drawing.Size(45, 20);
             this.numeric_max_changeover_time.TabIndex = 38;
             this.numeric_max_changeover_time.Value = new decimal(new int[] {
-            4,
+            2,
             0,
             0,
             0});
