@@ -78,6 +78,43 @@ namespace GlobalTest.Utils
             Assert.AreEqual(ListUtils.ListListIntToString(input, " ", "\t", "\t"), output);
         }
 
+        [TestMethod]
+        public void ListDeepCopy()
+        {
+            List<int> input = new List<int> { 1, 2 };
+            List<int> output = ListUtils.VectorDeepCopy(input);
+
+            // Проверяем результат копирования
+            Assert.AreEqual(input[0], output[0]);
+            Assert.AreEqual(input[1], output[1]);
+
+            // Изменяем исходный вектор и выполняем проверку
+            input[0] = 0;
+            Assert.AreNotEqual(input[0], output[0]);
+            Assert.AreEqual(input[1], output[1]);
+        }
+
+        [TestMethod]
+        public void ListListDeepCopy()
+        {
+            List<List<int>> input = new List<List<int>> { new List<int> { 1, 2 }, new List<int> { 3, 4 } };
+            List<List<int>> output = ListUtils.MatrixDeepCopy(input);
+
+            // Проверяем результат копирования
+            Assert.AreEqual(input[0][0], output[0][0]);
+            Assert.AreEqual(input[0][1], output[0][1]);
+            Assert.AreEqual(input[1][0], output[1][0]);
+            Assert.AreEqual(input[1][1], output[1][1]);
+
+            // Изменяем исходный вектор и выполняем проверку
+            input[0][0] = 0;
+            input[1][1] = 0;
+            Assert.AreNotEqual(input[0][0], output[0][0]);
+            Assert.AreEqual(input[0][1], output[0][1]);
+            Assert.AreEqual(input[1][0], output[1][0]);
+            Assert.AreNotEqual(input[1][1], output[1][1]);
+
+        }
     }
 
 }

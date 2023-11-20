@@ -45,5 +45,25 @@ namespace magisterDiplom.Utils
             return result;
         }
 
+        /// <summary>
+        /// Данная статическая фукнция выполняет глубокое копирования целочисленного вектора
+        /// </summary>
+        /// <param name="vector">Вектор который необходимо скопировать в новый вектор</param>
+        /// <returns>Скопированный вектор</returns>
+        public static List<int> VectorDeepCopy(List<int> vector)
+        {
+            return vector.ToList();
+        }
+
+        /// <summary>
+        /// Данная статическая фукнция выполняет глубокое копирования целочисленной матрицы
+        /// </summary>
+        /// <param name="matrix">Матрица которую необходимо скопировать в новую</param>
+        /// <returns>Скопированная матрица</returns>
+        public static List<List<int>> MatrixDeepCopy(List<List<int>> matrix)
+        {
+            return matrix.Select(VectorDeepCopy).ToList();
+        }
+
     }
 }

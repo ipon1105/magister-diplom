@@ -5,6 +5,7 @@ using System.IO;
 using System.Security.Cryptography.X509Certificates;
 using System.Reflection;
 using System;
+using magisterDiplom.Utils;
 
 namespace newAlgorithm
 {
@@ -54,28 +55,6 @@ namespace newAlgorithm
             this.batchCountList = batchCountList;
             this.isFixedBatches = isFixedBatches;
             _i = new List<int>(this.dataTypesCount);
-        }
-
-
-        /// <summary>
-        /// Функция копирования значений между матрицами, предотвращающая копирование указателей
-        /// </summary>
-        /// <param name="inMatrix">Входная матрица</param>
-        /// <returns>Выходная матрица</returns>
-        private List<List<int>> CopyMatrix(IEnumerable<List<int>> inMatrix)
-        {
-            return inMatrix.Select(CopyVector).ToList();
-        }
-
-
-        /// <summary>
-        /// Функция копирования значений между векторами, предотвращающая копирование указателей
-        /// </summary>
-        /// <param name="inMatrix">Входной вектор</param>
-        /// <returns>Выходной вектор</returns>
-        private static List<int> CopyVector(List<int> inMatrix)
-        {
-            return inMatrix.ToList();
         }
 
         /// <summary>
@@ -154,9 +133,9 @@ namespace newAlgorithm
         /// <returns>матрица А с подставленным новым решением в соответствующий тип</returns>
         private List<List<int>> SetTempAFromA2(int type, int ind2)
         {
-            var result = CopyMatrix(_a);
+            var result = ListUtils.MatrixDeepCopy(_a);
             if (ind2 < _a2[type].Count)
-                result[type] = CopyVector(_a2[type][ind2]);
+                result[type] = ListUtils.VectorDeepCopy(_a2[type][ind2]);
             return result;
         }
 
@@ -168,7 +147,7 @@ namespace newAlgorithm
         /// <returns>Новые решения без повторений</returns>
         public List<List<int>> SortedMatrix(List<List<int>> inMatrix)
         {
-            var temp = CopyMatrix(inMatrix);
+            var temp = ListUtils.MatrixDeepCopy(inMatrix);
             //Удаление повторяющихся строк
             var countLoops = 0;
             while (true)
@@ -231,7 +210,7 @@ namespace newAlgorithm
             {
                 for (var j = 1; j < row.Count; j++)
                 {
-                    result.Add(CopyVector(row));
+                    result.Add(ListUtils.VectorDeepCopy(row));
                     if (row[0] <= row[j] + 1) continue;
                     result[result.Count - 1][0]--;
                     result[result.Count - 1][j]++;
@@ -305,15 +284,8 @@ namespace newAlgorithm
             {
                 for (var variantOfSplitIndex = 0; variantOfSplitIndex < _a2[type].Count; variantOfSplitIndex++)
                 {
-                    List<List<int>> tempB;
-                    if (tempM != null)
-                    {
-                        tempB = CopyMatrix(tempM);
-                    } else
-                    {
+                    List<List<int>> tempB = (tempM != null) ? tempB = ListUtils.MatrixDeepCopy(tempM) : tempB = new List<List<int>>();
 
-                        tempB = new List<List<int>>();
-                    }
                     tempB.Add(tempMatrix[type][variantOfSplitIndex]);
                     CombinationType(file, tempMatrix, type + 1, tempB, ref solutionFlag);
                 }
@@ -329,7 +301,7 @@ namespace newAlgorithm
                 MessageBox.Show(s + " Время обработки " + fBuf);
                 if (fBuf < _f1Buf)
                 {
-                    _abuf = CopyMatrix(tempM);
+                    _abuf = ListUtils.MatrixDeepCopy(tempM);
                     solutionFlag = true;
                     _f1Buf = fBuf;
                     file.Write(" +");
@@ -354,7 +326,7 @@ namespace newAlgorithm
                 MessageBox.Show(PrintA(_a) + " Время обработки " + _f1);
                 _f1Buf = _f1;
                 file.WriteLine(_f1Buf);
-                var maxA = CopyMatrix(_a);
+                var maxA = ListUtils.MatrixDeepCopy(_a);
                 _typeSolutionFlag = true;
 
                 // Выполяем отчистку вектора _i и матрицы _a
@@ -369,7 +341,7 @@ namespace newAlgorithm
                 MessageBox.Show(PrintA(_a) + " Время обработки " + _f1);
                 if (_f1 < _f1Buf)
                 {
-                    _abuf = CopyMatrix(_a);
+                    _abuf = ListUtils.MatrixDeepCopy(_a);
                     _typeSolutionFlag = true;
                     _f1Buf = _f1;
                     file.Write(" +");
@@ -379,7 +351,7 @@ namespace newAlgorithm
                     while (CheckType(_i))
                     {
                         // Буферезируем текущее решение для построение нового на его основе
-                        _ai = CopyMatrix(_a);
+                        _ai = ListUtils.MatrixDeepCopy(_a);
                         if (_typeSolutionFlag)
                         {
                             _a1 = new List<List<List<int>>>();
@@ -387,13 +359,13 @@ namespace newAlgorithm
                             {
                                 _a1.Add(new List<List<int>>());
                                 _a1[dataType].Add(new List<int>());
-                                _a1[dataType][0] = CopyVector(_a[dataType]);
+                                _a1[dataType][0] = ListUtils.VectorDeepCopy(_a[dataType]);
                             }
                             _typeSolutionFlag = false;
                         }
 
-                        var tempA = CopyMatrix(_ai);
-                        _abuf = CopyMatrix(_ai);
+                        var tempA = ListUtils.MatrixDeepCopy(_ai);
+                        _abuf = ListUtils.MatrixDeepCopy(_ai);
                         _f1Buf = _f1;
 
                         // Для каждого типа и каждого решения в типе строим новое решение и проверяем его на критерий
@@ -418,7 +390,7 @@ namespace newAlgorithm
                                 MessageBox.Show(s + " Время обработки " + fBuf);                                    
                                 if (fBuf < _f1Buf)
                                 {
-                                    _abuf = CopyMatrix(tempA);
+                                    _abuf = ListUtils.MatrixDeepCopy(tempA);
                                     _typeSolutionFlag = true;
                                     _f1Buf = fBuf;
                                     file.Write(" +");
@@ -435,14 +407,14 @@ namespace newAlgorithm
                         if (_typeSolutionFlag)
                         {
                             MessageBox.Show("Лучшее решение " + PrintA(_abuf) + " Время обработки " + _f1Buf);
-                            _a = CopyMatrix(_abuf);
+                            _a = ListUtils.MatrixDeepCopy(_abuf);
                             _f1 = _f1Buf;
                         }
                         else
                         {
                             for (int dataType = 0; dataType < dataTypesCount; dataType++)
                             {
-                                _a1[dataType] = CopyMatrix(_a2[dataType]);
+                                _a1[dataType] = ListUtils.MatrixDeepCopy(_a2[dataType]);
                                 if (!_a1[dataType].Any() || !_a1[dataType][0].Any())
                                 {
                                     _i[dataType] = 0;
@@ -484,12 +456,12 @@ namespace newAlgorithm
         /// <param name="f">Файл для записей логов</param>
         private void GetSolution(List<int> _n)
         {
-            var tempA = CopyMatrix(_a);
+            var tempA = ListUtils.MatrixDeepCopy(_a);
             for (var dataType = 0; dataType < dataTypesCount; dataType++)
             {
                 if (_n[dataType] >= 0)
                 {
-                    tempA[dataType] = CopyVector(SetTempAFromA2(dataType, _n[dataType])[dataType]);
+                    tempA[dataType] = ListUtils.VectorDeepCopy(SetTempAFromA2(dataType, _n[dataType])[dataType]);
                 }
             }
             var shedule = new Shedule(tempA);
@@ -504,7 +476,7 @@ namespace newAlgorithm
             //MessageBox.Show(s + " Время обработки " + fBuf);
             if (time < _f1Buf)
             {
-                _abuf = CopyMatrix(tempA);
+                _abuf = ListUtils.MatrixDeepCopy(tempA);
                 _typeSolutionFlag = true;
                 _f1Buf = time;
                 //file.Write(" +");
@@ -530,14 +502,14 @@ namespace newAlgorithm
                 var _f1 = time;
                 _f1Buf = _f1;
                 result[0] = _f1Buf;
-                var maxA = CopyMatrix(_a);
+                var maxA = ListUtils.MatrixDeepCopy(_a);
                 _typeSolutionFlag = true;
                 if (!isFixedBatches)
                 {
                     while (CheckType(_i))
                     {
                         // Буферезируем текущее решение для построение нового на его основе
-                        _ai = CopyMatrix(_a);
+                        _ai = ListUtils.MatrixDeepCopy(_a);
                         if (_typeSolutionFlag)
                         {
                             _a1 = new List<List<List<int>>>();
@@ -545,13 +517,13 @@ namespace newAlgorithm
                             {
                                 _a1.Add(new List<List<int>>());
                                 _a1[dataType].Add(new List<int>());
-                                _a1[dataType][0] = CopyVector(_a[dataType]);
+                                _a1[dataType][0] = ListUtils.VectorDeepCopy(_a[dataType]);
                             }
                             _typeSolutionFlag = false;
                         }
 
-                        var tempA = CopyMatrix(_ai);
-                        _abuf = CopyMatrix(_ai);
+                        var tempA = ListUtils.MatrixDeepCopy(_ai);
+                        _abuf = ListUtils.MatrixDeepCopy(_ai);
                         _f1Buf = _f1;
 
                         // Для каждого типа и каждого решения в типе строим новое решение и проверяем его на критерий
@@ -575,7 +547,7 @@ namespace newAlgorithm
                                 //f.Write(s + " - " + time);
                                 if (time < _f1Buf)
                                 {
-                                    _abuf = CopyMatrix(tempA);
+                                    _abuf = ListUtils.MatrixDeepCopy(tempA);
                                     _typeSolutionFlag = true;
                                     _f1Buf = time;
                                 }
@@ -596,14 +568,14 @@ namespace newAlgorithm
                         }
                         if (_typeSolutionFlag)
                         {
-                            _a = CopyMatrix(_abuf);
+                            _a = ListUtils.MatrixDeepCopy(_abuf);
                             _f1 = _f1Buf;
                         }
                         else
                         {
                             for (int dataType = 0; dataType < dataTypesCount; dataType++)
                             {
-                                _a1[dataType] = CopyMatrix(_a2[dataType]);
+                                _a1[dataType] = ListUtils.MatrixDeepCopy(_a2[dataType]);
                                 if (!_a1[dataType].Any() || !_a1[dataType][0].Any())
                                 {
                                     _i[dataType] = 0;
