@@ -1,4 +1,5 @@
 ﻿using magisterDiplom;
+using magisterDiplom.Utils;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -487,13 +488,10 @@ namespace newAlgorithm
                                     foreach (var elem in gaa.nabor)
                                     {
 
+                                        file_outputGAA.WriteLine(ListUtils.ListListIntToString(elem.GenList, " "));
                                         foreach (var elem2 in elem.GenList)
                                         {
-                                            foreach (var elem3 in elem2)
-                                            {
-                                                file_outputGAA.Write(elem3 + " ");
-                                            }
-                                            file_outputGAA.WriteLine();
+                                            file_outputGAA.WriteLine(ListUtils.ListIntToString(elem2, " "));
                                         }
                                         file_outputGAA.WriteLine("_________________________");
                                         file_outputGAA.WriteLine(gaa._fitnesslist[_maxChangeoverTime]);

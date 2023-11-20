@@ -7,7 +7,7 @@ namespace newAlgorithm.Service
     {
 
         /// <summary>
-        /// Ультралютая фукнция на 500 строк непотно чего
+        /// Ультралютая функция на 500 строк непотно чего
         /// </summary>
         /// <param name="rMatrix"></param>
         /// <param name="pMatrix"></param>

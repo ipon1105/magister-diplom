@@ -83,6 +83,7 @@
     <Compile Include="Sets.cs" />
     <Compile Include="Shedule.cs" />
     <Compile Include="SheduleElement.cs" />
+    <Compile Include="Utils\ListUtils.cs" />
     <Compile Include="Visualizer.cs" />
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
