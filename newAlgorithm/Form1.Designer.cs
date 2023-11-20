@@ -415,7 +415,7 @@
             this.numeric_batch_count.Size = new System.Drawing.Size(45, 20);
             this.numeric_batch_count.TabIndex = 37;
             this.numeric_batch_count.Value = new decimal(new int[] {
-            3,
+            12,
             0,
             0,
             0});
