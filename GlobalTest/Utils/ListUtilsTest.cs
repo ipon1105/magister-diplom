@@ -20,7 +20,7 @@ namespace GlobalTest.Utils
 
             List<int> input = new List<int> { 1, 2 };
             string output = "1 2";
-            Assert.AreEqual(ListUtils.VectorIntToString(input), output);
+            Assert.AreEqual(output, ListUtils.VectorIntToString(input));
         }
 
         [TestMethod]
@@ -29,7 +29,7 @@ namespace GlobalTest.Utils
 
             List<int> input = new List<int> { 1, 2 };
             string output = "1552";
-            Assert.AreEqual(ListUtils.VectorIntToString(input, "55"), output);
+            Assert.AreEqual(output, ListUtils.VectorIntToString(input, "55"));
         }
 
         [TestMethod]
@@ -38,7 +38,7 @@ namespace GlobalTest.Utils
 
             List<int> input = new List<int> { 1, 2 };
             string output = "\t1 2";
-            Assert.AreEqual(ListUtils.VectorIntToString(input, " ", "\t"), output);
+            Assert.AreEqual(output, ListUtils.VectorIntToString(input, " ", "\t"));
         }
 
         [TestMethod]
@@ -47,7 +47,15 @@ namespace GlobalTest.Utils
 
             List<int> input = new List<int> { 1, 2 };
             string output = "1 2\t";
-            Assert.AreEqual(ListUtils.VectorIntToString(input, " ", "", "\t"), output);
+            Assert.AreEqual(output, ListUtils.VectorIntToString(input, " ", "", "\t"));
+        }
+
+        [TestMethod]
+        public void VectorIntToStringTest_equalsValuesDeafault()
+        {
+            List<int> input = new List<int> { 6, 6 };
+            string output = "6 6";
+            Assert.AreEqual(output, ListUtils.VectorIntToString(input, " ", "", ""));
         }
 
         [TestMethod]
@@ -56,7 +64,7 @@ namespace GlobalTest.Utils
 
             List<List<int>> input = new List<List<int>> {new List<int> { 1, 2 }, new List<int> { 3, 4 }};
             string output = $"1 2{Environment.NewLine}3 4{Environment.NewLine}";
-            Assert.AreEqual(ListUtils.MatrixIntToString(input), output);
+            Assert.AreEqual(output, ListUtils.MatrixIntToString(input));
         }
 
         [TestMethod]
@@ -65,7 +73,7 @@ namespace GlobalTest.Utils
 
             List<List<int>> input = new List<List<int>> { new List<int> { 1, 2 }, new List<int> { 3, 4 } };
             string output = $"15582{Environment.NewLine}35584{Environment.NewLine}";
-            Assert.AreEqual(ListUtils.MatrixIntToString(input, "558"), output);
+            Assert.AreEqual(output, ListUtils.MatrixIntToString(input, "558"));
         }
 
         [TestMethod]
@@ -74,7 +82,7 @@ namespace GlobalTest.Utils
 
             List<List<int>> input = new List<List<int>> { new List<int> { 1, 2 }, new List<int> { 3, 4 } };
             string output = $"\t1 2{Environment.NewLine}\t3 4{Environment.NewLine}";
-            Assert.AreEqual(ListUtils.MatrixIntToString(input, " ", "\t"), output);
+            Assert.AreEqual(output, ListUtils.MatrixIntToString(input, " ", "\t"));
         }
 
         [TestMethod]
@@ -83,7 +91,7 @@ namespace GlobalTest.Utils
 
             List<List<int>> input = new List<List<int>> { new List<int> { 1, 2 }, new List<int> { 3, 4 } };
             string output = $"\t1 2\t{Environment.NewLine}\t3 4\t{Environment.NewLine}";
-            Assert.AreEqual(ListUtils.MatrixIntToString(input, " ", "\t", "\t"), output);
+            Assert.AreEqual(output, ListUtils.MatrixIntToString(input, " ", "\t", "\t"));
         }
 
         [TestMethod]
@@ -94,13 +102,13 @@ namespace GlobalTest.Utils
             List<int> output = ListUtils.VectorDeepCopy(input);
 
             // Проверяем результат копирования
-            Assert.AreEqual(input[0], output[0]);
-            Assert.AreEqual(input[1], output[1]);
+            Assert.AreEqual(output[0], input[0]);
+            Assert.AreEqual(output[1], input[1]);
 
             // Изменяем исходный вектор и выполняем проверку
             input[0] = 0;
-            Assert.AreNotEqual(input[0], output[0]);
-            Assert.AreEqual(input[1], output[1]);
+            Assert.AreNotEqual(output[0], input[0]);
+            Assert.AreEqual(output[1], input[1]);
         }
 
         [TestMethod]
@@ -111,18 +119,18 @@ namespace GlobalTest.Utils
             List<List<int>> output = ListUtils.MatrixDeepCopy(input);
 
             // Проверяем результат копирования
-            Assert.AreEqual(input[0][0], output[0][0]);
-            Assert.AreEqual(input[0][1], output[0][1]);
-            Assert.AreEqual(input[1][0], output[1][0]);
-            Assert.AreEqual(input[1][1], output[1][1]);
+            Assert.AreEqual(output[0][0], input[0][0]);
+            Assert.AreEqual(output[0][1], input[0][1]);
+            Assert.AreEqual(output[1][0], input[1][0]);
+            Assert.AreEqual(output[1][1], input[1][1]);
 
             // Изменяем исходный вектор и выполняем проверку
             input[0][0] = 0;
             input[1][1] = 0;
-            Assert.AreNotEqual(input[0][0], output[0][0]);
-            Assert.AreEqual(input[0][1], output[0][1]);
-            Assert.AreEqual(input[1][0], output[1][0]);
-            Assert.AreNotEqual(input[1][1], output[1][1]);
+            Assert.AreNotEqual(output[0][0], input[0][0]);
+            Assert.AreEqual(output[0][1], input[0][1]);
+            Assert.AreEqual(output[1][0], input[1][0]);
+            Assert.AreNotEqual(output[1][1], input[1][1]);
         }
 
     }

@@ -22,8 +22,9 @@ namespace magisterDiplom.Utils
         public static string VectorIntToString(List<int> vector, string separator=" ", string prefix="", string postfix="")
         {
             string result = prefix;
+            int index = 1;
             foreach (var element in vector)
-                result += element + ( (element == vector.Last()) ? "" : separator);
+                result += element + ((index++ == vector.Count) ? "" : separator);
             return result + postfix;
         }
 
