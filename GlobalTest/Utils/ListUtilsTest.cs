@@ -1,4 +1,6 @@
 ﻿using magisterDiplom.Utils;
+using Microsoft.VisualStudio.TestPlatform.Utilities;
+using newAlgorithm;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -95,11 +97,11 @@ namespace GlobalTest.Utils
         }
 
         [TestMethod]
-        public void VectorDeepCopy()
+        public void VectorIntDeepCopy()
         {
 
             List<int> input = new List<int> { 1, 2 };
-            List<int> output = ListUtils.VectorDeepCopy(input);
+            List<int> output = ListUtils.VectorIntDeepCopy(input);
 
             // Проверяем результат копирования
             Assert.AreEqual(output[0], input[0]);
@@ -112,11 +114,11 @@ namespace GlobalTest.Utils
         }
 
         [TestMethod]
-        public void MatrixDeepCopy()
+        public void MatrixIntDeepCopy()
         {
 
             List<List<int>> input = new List<List<int>> { new List<int> { 1, 2 }, new List<int> { 3, 4 } };
-            List<List<int>> output = ListUtils.MatrixDeepCopy(input);
+            List<List<int>> output = ListUtils.MatrixIntDeepCopy(input);
 
             // Проверяем результат копирования
             Assert.AreEqual(output[0][0], input[0][0]);
@@ -133,6 +135,131 @@ namespace GlobalTest.Utils
             Assert.AreNotEqual(output[1][1], input[1][1]);
         }
 
+        [TestMethod]
+        public void MatrixIntRowSwapTest()
+        {
+
+            var output = new List<List<int>> { new List<int> { 3, 4 }, new List<int> { 1, 2 }, new List<int> { 5, 6 } };
+            var input = new List<List<int>> { new List<int> { 1, 2 }, new List<int> { 3, 4 }, new List<int> { 5, 6 } };
+            ListUtils.MatrixIntRowSwap(input, 0, 1);
+
+            for (int i = 0; i < output.Count; i++)
+                for (int j = 0; j < output[i].Count; j++)
+                    Assert.AreEqual(output[i][j], input[i][j]);
+
+        }
+
+        [TestMethod]
+        public void MatrixIntRowSwapTest_Panic()
+        {
+
+            var output = new List<List<int>> { new List<int> { 1, 2 }, new List<int> { 3, 4 }, new List<int> { 5, 6 } };
+            var input = new List<List<int>> { new List<int> { 1, 2 }, new List<int> { 3, 4 }, new List<int> { 5, 6 } };
+            ListUtils.MatrixIntRowSwap(input, 0, 5);
+
+            for (int i = 0; i < output.Count; i++)
+                for (int j = 0; j < output[i].Count; j++)
+                    Assert.AreEqual(output[i][j], input[i][j]);
+
+        }
+
+        [TestMethod]
+        public void MatrixIntColumnSwapTest()
+        {
+
+            var output = new List<List<int>> {
+                new List<int> { 2, 1 },
+                new List<int> { 4, 3 },
+                new List<int> { 6, 5 }
+            };
+            var input = new List<List<int>> {
+                new List<int> { 1, 2 },
+                new List<int> { 3, 4 },
+                new List<int> { 5, 6 }
+            };
+            ListUtils.MatrixIntColumnSwap(input, 0, 1);
+
+            for (int i = 0; i < output.Count; i++)
+                for (int j = 0; j < output[i].Count; j++)
+                    Assert.AreEqual(output[i][j], input[i][j]);
+
+        }
+
+        [TestMethod]
+        public void MatrixIntColumnSwapTest_Panic()
+        {
+
+            var output = new List<List<int>> {
+                new List<int> { 1, 2 },
+                new List<int> { 3, 4 },
+                new List<int> { 5, 6 }
+            };
+            var input = new List<List<int>> {
+                new List<int> { 1, 2 },
+                new List<int> { 3, 4 },
+                new List<int> { 5, 6 }
+            };
+            ListUtils.MatrixIntColumnSwap(input, 0, 5);
+
+            for (int i = 0; i < output.Count; i++)
+                for (int j = 0; j < output[i].Count; j++)
+                    Assert.AreEqual(output[i][j], input[i][j]);
+
+        }
+
+        [TestMethod]
+        public void IsMatrixIntEqualTest_1()
+        {
+
+            var output = new List<List<int>> {
+                new List<int> { 1, 2 },
+                new List<int> { 3, 4 },
+                new List<int> { 5, 6 }
+            };
+            var input = new List<List<int>> {
+                new List<int> { 1, 2 },
+                new List<int> { 3, 4 },
+                new List<int> { 5, 6 }
+            };
+
+            Assert.IsTrue(ListUtils.IsMatrixIntEqual(output, input));
+        }
+
+        [TestMethod]
+        public void IsMatrixIntEqualTest_2()
+        {
+
+            var output = new List<List<int>> {
+                new List<int> { 2, 2 },
+                new List<int> { 2, 2 },
+                new List<int> { 2, 2 }
+            };
+            var input = new List<List<int>> {
+                new List<int> { 3, 3 },
+                new List<int> { 3, 3 },
+                new List<int> { 3, 3 }
+            };
+
+            Assert.IsFalse(ListUtils.IsMatrixIntEqual(output, input));
+        }
+
+        [TestMethod]
+        public void IsMatrixIntEqualTest_3()
+        {
+
+            var output = new List<List<int>> {
+                new List<int> { 2, 2 },
+                new List<int> { 2, 2, 4 },
+                new List<int> { 2, 2 }
+            };
+            var input = new List<List<int>> {
+                new List<int> { 3, 3 },
+                new List<int> { 3, 3 },
+                new List<int> { 3, 3 }
+            };
+
+            Assert.IsFalse(ListUtils.IsMatrixIntEqual(output, input));
+        }
     }
 
 }
