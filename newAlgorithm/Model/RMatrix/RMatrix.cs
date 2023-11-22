@@ -69,7 +69,7 @@ namespace newAlgorithm.Model
 
                 // Выполяем поиск узла по позиции
                 foreach (RMatrixNode rMatrixNode in rMatrix)
-                    if (rMatrixNode.Position == position)
+                    if (rMatrixNode.position == position)
                         return rMatrixNode;
 
                 // Вовзращаем null в случае отсутствия узла в списке
@@ -93,7 +93,7 @@ namespace newAlgorithm.Model
 
             // Выполяем глубокое копирования каждого элемента матрица
             foreach (RMatrixNode rMatrixNode in rMatrix)
-                newNodeList.Add(new RMatrixNode(rMatrixNode.Type, rMatrixNode.Position, rMatrixNode.Count));
+                newNodeList.Add(new RMatrixNode(rMatrixNode.dataType, rMatrixNode.position, rMatrixNode.batchCount));
 
             // Выполняем необходимое переопределение данных для нового класса
             newRMatrix.rMatrix = newNodeList;

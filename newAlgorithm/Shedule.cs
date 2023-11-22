@@ -1,4 +1,5 @@
-﻿using newAlgorithm.Model;
+﻿using magisterDiplom.Utils;
+using newAlgorithm.Model;
 using newAlgorithm.Service;
 using System;
 using System.Collections.Generic;
@@ -13,86 +14,115 @@ namespace newAlgorithm
 
         /// <summary>
         /// Данная переменная определяет длину конвейера, как количество приборов
+        /// TODO: Убрать статическое определение количества приборов, с целью масштабируемости
         /// </summary>
         public static int deviceCount;
 
         /// <summary>
         /// Данный двумерный список представляет из себя матрицу выполнения задания на приборе l типа i
+        /// TODO: Убрать статическое определение матрицы выполнения задания, с целью масштабируемости
         /// </summary>
         public static List<List<int>> proccessingTime;
 
         /// <summary>
         /// Данный трёхмерный список представляет из себя матрицу переналадки прибора l с задания i на задание j
+        /// TODO: Убрать статическое определение матрицы переналадки приборов, с целью масштабируемости
         /// </summary>
         public static List<List<List<int>>> changeoverTime;
 
+        /// <summary>
+        /// Матрица количества данных i-ых типов в партиях,
+        /// занимающих в последовательностях pi_l j-ые позиции
+        /// Данная матрица имеет представление, где в строке все элементы 0,
+        /// кроме одно например для матрицы 3x3:
+        /// [ [1,0,0], [0,1,0], [0,0,1] ]
+        /// TODO: Данная реализация подразумеваем перевернутую матрицу R, где количество строк, это возможные позиции в последовательность, а количество столбцов, это типы данных, необходимо будет исправить данную оплошность
+        /// </summary>
+        private List<List<int>> matrixR;
 
         public static Visualizer viz;
-        private List<List<int>> _r;
         private int _timeConstructShedule;
-        private List<List<List<int>>> _startProcessing;
-        private List<List<List<int>>> _endProcessing;
+        private List<List<List<int>>> _startProcessing; // [deviceCount x ??? x ???]
+        private List<List<List<int>>> _endProcessing; // [deviceCount x ??? x ???]
         private List<SheduleElement> _rWithTime;
 
         /// <summary>
-        /// 
+        /// Данный конструктор вовзращает экземпляр данного класса на основе переданного параметра матрицы R
         /// </summary>
         /// <param name="matrixR">Матрица R - количества данных i-ых типов в партиях занимающих в последовательности pi_l j-е позиции</param>
         /// <param name="deviceCount">Количество приборов в конвейерной системе</param>
         public Shedule(List<List<int>> matrixR, int deviceCount)
         {
-            this._r = matrixR;
+            this.matrixR = matrixR;
             Shedule.deviceCount = deviceCount;
             viz = new Visualizer(deviceCount, matrixR[0].Count);
         }
 
         /// <summary>
-        /// Формирование матрицы для передачи её в модуль расписания
+        /// Данный конструктор вовзращает экземпляр данного класса на основе переданной матрицы A
         /// </summary>
-        /// <param name="m">входная матрица А</param>
-        /// <returns>сформированная матрица для уровня расписания</returns>
-        private List<List<int>> GenerateMatrixR(IReadOnlyList<List<int>> m)
+        /// <param name="matrixA">Матрица составов партий - матрица А</param>
+        public Shedule(List<List<int>> matrixA)
+        {
+            InitMatrixR(matrixA);
+        }
+
+        /// <summary>
+        /// Данная функция инициализируем матрицу R с помощью переданной в неё матрицы A
+        /// </summary>
+        /// <param name="matrixA">Матрица составов партий - матрица A </param>
+        private void InitMatrixR(IReadOnlyList<List<int>> matrixA)
         {
 
-            // Инициализируем матрицу R [dataTypesCount x max(mi)]
-            var matrixR = new List<List<int>>();
+            // Отчищаем существующие матрицы R, если они есть
+            if (matrixR != null)
+                matrixR.Clear();
 
-            // Подсчитываем количество элементов в каждой строке
-            var elementsSize = m.Sum(mi => mi.Count);
+            // Инициализируем новую матрицу R [dataTypesCount x max(mi)]
+            matrixR = new List<List<int>>();
 
-            // Объявляем максимальный размер колонки
-            var maxColumnSize = 0;
+            // Подсчитываем количество элементов в каждой строке (sum(mi))
+            // batchesList представляет из себя множество партий с одним типом
+            // например, скажем для типа 1, это может быть [10, 2]. Тогда 
+            // batchesList.Count = mi = 2 - Количество партий данных 1-ого типа
+            // Тогда сумма всех количеств партий (batchPositionCount), представляет из себя
+            // количество возможных позиций партий в последовательности pi_l
+            var batchPositionCount = matrixA.Sum(batchesList => batchesList.Count);
 
-            // Высчитываем максимальный размер колонки
-            foreach (var mi in m)
-                maxColumnSize = (mi.Count > maxColumnSize) ? mi.Count : maxColumnSize;
+            // Объявляем максимальный количество партий (max(mi))
+            var maxBatchCount = 0;
 
-            for (var element = 0; element < elementsSize; element++)
+            // Высчитываем максимальный размер колонки, 
+            foreach (var mi in matrixA)
+                maxBatchCount = (mi.Count > maxBatchCount) ? mi.Count : maxBatchCount;
+
+            // Пробегаемся по всем возможным позициям партий в матрице R
+            for (var batchPosition = 0; batchPosition < batchPositionCount; batchPosition++)
             {
 
-                // Инициализируем каждую строку матрицы R
+                // Инициализируем каждую строку матрицы R, как возможную позицию партии
                 matrixR.Add(new List<int>());
 
-                // Каждой строке матрицы R присваиваем 0, для кадого столбца
-                foreach (var mi in m)
-                    matrixR[element].Add(0);
+                // Каждой строке матрицы R (позиции batchPosition) присваиваем 0, для кадого столбца
+                foreach (var mi in matrixA)
+                    matrixR[batchPosition].Add(0);
+            }
+            
+            // Данная переменная описывает позицию в последовательности pi_l
+            var position = 0;
 
-            }
-            
-            
-            var ind = 0;
-            for (var j = 0; j < maxColumnSize; j++)
-            {
-                for (var i = 0; i < m.Count; i++)
-                {
-                    if (m[i].Count > j)
-                    {
-                        matrixR[ind][i] = m[i][j];
-                        ind++;
-                    }
-                }
-            }
-            return matrixR;
+            // Пробегаемся по всем возможным пакетам - колонкам(max(mi)) матрицы R
+            for (var batchIndex = 0; batchIndex < maxBatchCount; batchIndex++)
+
+                // Пробегаемся по всем типам данных
+                for (var dataType = 0; dataType < matrixA.Count; dataType++)
+
+                    // Если количество партий данных i-ого типа (mi) > (h) индекс пакета
+                    if (matrixA[dataType].Count > batchIndex)
+
+                        // Выполяем присвоение
+                        matrixR[position++][dataType] = matrixA[dataType][batchIndex];
+
         }
 
         /// <summary>
@@ -104,80 +134,100 @@ namespace newAlgorithm
             _rWithTime = new List<SheduleElement>();
             for (int i = 0; i < _endProcessing[_endProcessing.Count - 1].Count; i++)
             {
-                var ind = ReturnRIndex(i);
-                _rWithTime.Add(new SheduleElement(_r[i][ind], ind, _endProcessing[_endProcessing.Count - 1][i]));
+
+                // Получаем индекс ненулевого элемента в строке
+                var index = ReturnRIndex(i);
+                _rWithTime.Add(new SheduleElement(matrixR[i][index], index, _endProcessing[_endProcessing.Count - 1][i]));
             }
             return _rWithTime;
         }
-        
-        /// <summary>
-        /// Данный конструктор вовзращает экземпляр данного класса на основе переданного параметра r
-        /// </summary>
-        /// <param name="r">Матрица количества данных</param>
-        public Shedule(List<List<int>> r)
-        {
-            _r = GenerateMatrixR(r);
-        }
+
 
         /// <summary>
         /// 
         /// </summary>
         private void CalculateShedule()
         {
-            _startProcessing = new List<List<List<int>>>();
-            _endProcessing = new List<List<List<int>>>();
-            for (var i = 0; i < deviceCount; i++)//количество приборов
-            {
-                _startProcessing.Add(new List<List<int>>());
-                _endProcessing.Add(new List<List<int>>());
-                for (var k = 0; k < _r.Count; k++)//количество партий
+            // Выполняем инициализацию трёхмерных матриц
+            _startProcessing = new List<List<List<int>>>(deviceCount);
+            _startProcessing.AddRange(Enumerable.Repeat(new List<List<int>>(matrixR.Count), deviceCount));
+            _endProcessing = new List<List<List<int>>>(deviceCount);
+            _endProcessing.AddRange(Enumerable.Repeat(new List<List<int>>(matrixR.Count), deviceCount));
+
+            // Для каждого прибора выполняем перебор
+            for (var device = 0; device < deviceCount; device++)
+
+                // Для каждой возможной позиции выполняем обработку
+                for (var position = 0; position < matrixR.Count; position++)//количество партий
                 {
-                    var ind = ReturnRIndex(k);
-                    var elem = _r[k][ind];
+
+                    // Получаем индекс ненулевого элемента в строке
+                    var index = ReturnRIndex(position);
+
+                    // Получаем элемент по ненулевому индексу в матрице R
+                    var elem = matrixR[position][index];
                     if (elem == -1)
-                    {
                         elem = 1;
-                    }
-                    _startProcessing[i].Add(new List<int>());
-                    _endProcessing[i].Add(new List<int>());
+                    
+                    // Для временных матриц выполняем иницаиализацию 
+                    _startProcessing[device].Add(new List<int>(elem));
+                    _endProcessing[device].Add(new List<int>(elem));
                     for (var p = 0; p < elem; p++)//количество требований
                     {
-                        _startProcessing[i][k].Add(0);
-                        _endProcessing[i][k].Add(0);
+                        _startProcessing[device][position].Add(0);
+                        _endProcessing[device][position].Add(0);
                     }
                 }
-            }
-            var yy = 0;
-            var zz = 0;
-            var xx = 0;
+            
+            var previousPosition = 0;
+            var previousBatch = 0;
+            var previousIndex = 0;
+
+            // Для каждого прибора выполняем высчитывание времён конца и начала обработки партий
             for (var device = 0; device < deviceCount; device++)
             {
-                for (var j = 0; j < _r.Count; j++)
+
+                // Для каждой возможной позиции выполняем обработку
+                for (var position = 0; position < matrixR.Count; position++)
                 {
-                    var index = ReturnRIndex(j);
 
+                    // Получаем индекс ненулевого элемента в строке
+                    var index = ReturnRIndex(position);
 
-                    for (var k = 0; k < _r[j][index]; k++)
+                    // Перебираем все партии
+                    for (var batch = 0; batch < matrixR[position][index]; batch++)
                     {
-                        var timeToSwitch = (index == xx && j != 0) ? 0 : changeoverTime[0][xx][index];
+
+                        // Для каждого требования высчитываем время переналадки
+                        var timeToSwitch = (index == previousIndex && position != 0) ? 0 : changeoverTime[0][previousIndex][index];
+
+                        // Выполяем высчитывания времён начала обработки пакета batch на приборе device в позиции position
                         if (device > 0)
-                        {
-                            _startProcessing[device][j][k] = Math.Max(_endProcessing[device][yy][zz] + timeToSwitch, _endProcessing[device - 1][j][k]);
-                        }
+
+                            // Время начала выполнения партии batch на приборе device в позиции position
+                            // высчитываем, как время конца выполнения предыдущей партии previousBatch на приборе device в предыдущей позиции 
+                            //                + время переналадки на выполнение партии данного типа, которое может быть равно 0 или
+                            // как время конца выполнения данной партии batch на предыдущем приборе device - 1 в текущей позиции position
+                            _startProcessing[device][position][batch] = Math.Max(_endProcessing[device][previousPosition][previousBatch] + timeToSwitch, _endProcessing[device - 1][position][batch]);
+                        
                         else
-                        {
-                            _startProcessing[device][j][k] = _endProcessing[device][yy][zz] + timeToSwitch;
-                        }
-                        _endProcessing[device][j][k] = _startProcessing[device][j][k] + proccessingTime[device][index];
-                        _timeConstructShedule = _endProcessing[device][j][k];
-                        yy = j;
-                        zz = k;
-                        xx = index;
+
+                            // Время начала выполнения партии batch на приборе device в позиции position
+                            // высчитываем, как время конца выполнения предыдущей партии previousBatch на приборе device в предыдущей позиции 
+                            //                + время переналадки на выполнение партии данного типа, которое может быть равно 0.
+                            _startProcessing[device][position][batch] = _endProcessing[device][previousPosition][previousBatch] + timeToSwitch;
+
+                        _endProcessing[device][position][batch] = _startProcessing[device][position][batch] + proccessingTime[device][index];
+                        _timeConstructShedule = _endProcessing[device][position][batch];
+                        previousPosition = position;
+                        previousBatch = batch;
+                        previousIndex = index;
                     }
                 }
-                yy = 0;
-                zz = 0;
-                xx = 0;
+
+                previousPosition = 0;
+                previousBatch = 0;
+                previousIndex = 0;
             }
         }
 
@@ -195,39 +245,39 @@ namespace newAlgorithm
             // Инициализируем матрицу R - количества данных i-ых типов в партиях занимающих в последовательноси pi_l j-е позиции
             RMatrix rMatrix = new RMatrix(dataTypesCount);
 
-            for (int column = 0; column < _r.Count; column++)
+            // Для каждого позиции в последовательности выполняем перебор
+            for (int position = 0; position < matrixR.Count; position++)
             {
-                for (int row = 0; row < _r[column].Count; row++)
-                {
-                    var val = _r[column][row];
-                    if(val != 0)
-                    {
-                        rMatrix.AddNode(row + 1, val);
-                        break;
-                    }
-                }
+                int dataType = ReturnRIndex(position);
+                rMatrix.AddNode(dataType + 1, matrixR[position][dataType]);
             }
 
-            List<List<int>> pMatr = new List<List<int>>();
-            for (int row = 0; row < _r[0].Count; row++)
+            // Выполяем инициализацию двумерного списка P
+            List<List<int>> pMatr = new List<List<int>>(matrixR[0].Count);
+
+            // Для каждого типа данных выполяем перебор
+            for (int dataType = 0; dataType < matrixR[0].Count; dataType++)
             {
+
+                // Инициализируем временную матрицу
                 List<int> tmp = new List<int>();
-                for (int column = 0; column < _r.Count; column++)
-                {
+                for (int position = 0; position < matrixR.Count; position++)
                     tmp.Add(0);
-                }
+                
+                // В каждую строку матрицы P добавляем элементы из 0
                 pMatr.Add(tmp);
             }
-            for (int column = 0; column < _r.Count; column++)
-            {
-                for (int row = 0; row < _r[column].Count; row++)
-                {
-                    if (_r[column][row] != 0)
-                    {
-                        pMatr[row][column] = 1;
-                    }
-                }
-            }
+
+            // Для каждой позиции в последовательности выполняем перебор
+            for (int position = 0; position < matrixR.Count; position++)
+            
+                // Для каждого типа данных выполняем перебор
+                for (int dataType = 0; dataType < matrixR[position].Count; dataType++)
+                
+                    // Если значение в позиции и типа не равно 0, инвертируем его в новой матрице pMatr
+                    if (matrixR[position][dataType] != 0)
+                        pMatr[dataType][position] = 1;
+                    
 
             // Инициализируем матрицу P
             Matrix pMatrix = new Matrix(pMatr);
@@ -251,7 +301,7 @@ namespace newAlgorithm
 
             TreeDimMatrixNode lastNode = tnMatrix.treeDimMatrix.Last();
             int count = lastNode.time;
-            int type = rMatrix[lastNode.fromDataType].Type;
+            int type = rMatrix[lastNode.fromDataType].dataType;
 
             int value = proccessingTimeMatrix[lastNode.device-1, type-1];
 
@@ -259,67 +309,16 @@ namespace newAlgorithm
         }
 
         /// <summary>
-        /// 
+        /// Данная функция возвращает индекс ненулевого элемента в матрице R в позиции position
         /// </summary>
-        /// <param name="j"></param>
-        /// <returns></returns>
-        public int ReturnRIndex(int j)
+        /// <param name="position">Позиция в последовательности</param>
+        /// <returns>Индекс ненулевого элемента или -1 в случае неудачи</returns>
+        public int ReturnRIndex(int position)
         {
-            for (var i = 0; i < _r[j].Count; i++)
-            {
-                if (_r[j][i] > 0)
+            for (var i = 0; i < matrixR[position].Count; i++)
+                if (matrixR[position][i] > 0)
                     return i;
-            }
             return -1;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="inMatrix"></param>
-        /// <returns></returns>
-        private static List<List<int>> CopyMatrix(IReadOnlyList<List<int>> inMatrix)
-        {
-            var ret = new List<List<int>>();
-            for (var i = 0; i < inMatrix.Count; i++)
-            {
-                ret.Add(new List<int>());
-                for (var j = 0; j < inMatrix[i].Count; j++)
-                {
-                    ret[i].Add(inMatrix[i][j]);
-                }
-            }
-            return ret;
-        }
-
-        /// <summary>
-        /// Данная функция выполняет 
-        /// </summary>
-        /// <param name="ind1"></param>
-        /// <param name="ind2"></param>
-        private void ChangeColum(int ind1, int ind2)
-        {
-            var indd1 = 0;
-            var indd2 = 0;
-            for (var i = 0; i < _r[ind1].Count; i++)
-            {
-                if (_r[ind1][i] > 0)
-                {
-                    indd1 = i;
-                }
-            }
-            for (var i = 0; i < _r[ind2].Count; i++)
-            {
-                if (_r[ind2][i] > 0)
-                {
-                    indd2 = i;
-                }
-            }
-            var temp = _r[ind1][indd1];
-            _r[ind1][indd1] = 0;
-            _r[ind1][indd2] = _r[ind2][indd2];
-            _r[ind2][indd2] = 0;
-            _r[ind2][indd1] = temp;
         }
 
         /// <summary>
@@ -330,20 +329,22 @@ namespace newAlgorithm
         {
             var tempTime = 9999999;
             CalculateShedule();
-            var tempR = CopyMatrix(_r);
+            var tempR = ListUtils.MatrixIntDeepCopy(matrixR);
             tempTime = _timeConstructShedule;
-            for (var i = 0; i < _r.Count - 1; i++)
+            for (var i = 0; i < matrixR.Count - 1; i++)
             {
-                for (var j = i + 1; j < _r.Count; j++)
-                {
-                    ChangeColum(i, j);
-                }
+                for (var j = i + 1; j < matrixR.Count; j++)
+                
+                    // Ранее использовалась функция "ChangeColum(i, j);", которая в результате выполняла перестановку строку
+                    // Выполяем перестановку местами строки i и j
+                    ListUtils.MatrixIntRowSwap(matrixR, i, j);
+                
                 CalculateShedule();
                 if (tempTime >= _timeConstructShedule) continue;
-                _r = tempR;
+                matrixR = tempR;
                 _timeConstructShedule = tempTime;
             }
-            return _r;
+            return matrixR;
         }
 
         /// <summary>
@@ -356,20 +357,31 @@ namespace newAlgorithm
         {
             var tempTime = 9999999;
             CalculateSheduleWithBufer(bufferSize, dataTypesCount);
-            var tempR = CopyMatrix(_r);
+            var tempR = ListUtils.MatrixIntDeepCopy(matrixR);
             tempTime = _timeConstructShedule;
-            for (var i = 0; i < _r.Count - 1; i++)
+
+            // Выполяем все возможные перестановки позиций
+            // Для всех позиций от 0 до matrixR.Count - 1 выполняем перебор
+            for (var pos1 = 0; pos1 < matrixR.Count - 1; pos1++)
             {
-                for (var j = i + 1; j < _r.Count; j++)
-                {
-                    ChangeColum(i, j);
-                }
+
+                // Для всех позиций от pos1 + 1 до matrixR.Count выполняем все перестановку строк (представляющие из себя позицию)
+                for (var pos2 = pos1 + 1; pos2 < matrixR.Count; pos2++)
+                
+                    // Ранее использовалась функция "ChangeColum(i, j);", которая в результате выполняла перестановку строку
+                    // Выполяем перестановку местами строки i и j
+                    ListUtils.MatrixIntRowSwap(matrixR, pos1, pos2);
+                
+                // Выполяем высчитывание расписания с буфером для всех возможных последовательностей
                 CalculateSheduleWithBufer(bufferSize, dataTypesCount);
-                if (tempTime >= _timeConstructShedule) continue;
-                _r = tempR;
+
+                // Если результат перестановки по времени хуже 
+                if (tempTime >= _timeConstructShedule)
+                    continue;
+                matrixR = tempR;
                 _timeConstructShedule = tempTime;
             }
-            return _r;
+            return matrixR;
         }
 
         /// <summary>
@@ -409,5 +421,39 @@ namespace newAlgorithm
             //ConstructShedule();
             return _timeConstructShedule;
         }
+
+        #region Неиспользуемые фукнции, которые страшно удалять
+
+        /// <summary>
+        /// Данная функция выполняет 
+        /// </summary>
+        /// <param name="position1"></param>
+        /// <param name="position2"></param>
+        private void ChangeColum(int position1, int position2)
+        {
+            var indd1 = 0;
+            var indd2 = 0;
+            for (var i = 0; i < matrixR[position1].Count; i++)
+            {
+                if (matrixR[position1][i] > 0)
+                {
+                    indd1 = i;
+                }
+            }
+            for (var i = 0; i < matrixR[position2].Count; i++)
+            {
+                if (matrixR[position2][i] > 0)
+                {
+                    indd2 = i;
+                }
+            }
+            var temp = matrixR[position1][indd1];
+            matrixR[position1][indd1] = 0;
+            matrixR[position1][indd2] = matrixR[position2][indd2];
+            matrixR[position2][indd2] = 0;
+            matrixR[position2][indd1] = temp;
+        }
+
+        #endregion
     }
 }

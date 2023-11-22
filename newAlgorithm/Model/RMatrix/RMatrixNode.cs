@@ -10,38 +10,38 @@
         /// <summary>
         /// Данная переменная представляет из себя тип задания данного узла
         /// </summary>
-        public int Type { get; }
+        public int dataType { get; }
 
         /// <summary>
         /// Данная переменная представляет из себя позицию в матрице данного узла
         /// </summary>
-        public int Position { get; }
+        public int position { get; }
 
         /// <summary>
         ///  Данная переменная содержит в себе количество пакетов в текущей позиции текущего типа данного узла
         /// </summary>
-        public int Count { get; private set; }
+        public int batchCount { get; private set; }
 
         /// <summary>
         /// Данный конструктор принимает 3 параметра и возвращает экземпляр класса узла матрицы R
         /// </summary>
-        /// <param name="type">Определяет тип задания, данного узла</param>
+        /// <param name="dataType">Определяет тип задания, данного узла</param>
         /// <param name="position">Определяет позицию задания, данного узла</param>
-        /// <param name="count">Определяет количество данных в данном узле</param>
-        public RMatrixNode(int type, int position, int count)
+        /// <param name="batchCount">Определяет количество данных в данном узле</param>
+        public RMatrixNode(int dataType, int position, int batchCount)
         {
-            Type = type;
-            Position = position;
-            Count = count;
+            this.dataType = dataType;
+            this.position = position;
+            this.batchCount = batchCount;
         }
 
         /// <summary>
         /// Данная функция выполняет установку данных количества пакетов
         /// </summary>
-        /// <param name="value">Количество пакетов</param>
-        public void setCount(int value)
+        /// <param name="batchCount">Количество пакетов</param>
+        public void setBatchCount(int batchCount)
         {
-            Count = value;
+            this.batchCount = batchCount;
         }
     }
 }

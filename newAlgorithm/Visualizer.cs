@@ -90,7 +90,7 @@ namespace newAlgorithm.Service
             foreach (TreeDimMatrixNode node in tnMatrix.treeDimMatrix)
             {
                 int count = node.time;
-                int type = rMatrix[node.fromDataType].Type;
+                int type = rMatrix[node.fromDataType].dataType;
 
                 int value = timeProcessing[node.device-1, type-1];
 

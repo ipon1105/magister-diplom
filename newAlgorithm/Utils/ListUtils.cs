@@ -49,7 +49,7 @@ namespace magisterDiplom.Utils
         /// </summary>
         /// <param name="vector">Вектор который необходимо скопировать в новый вектор</param>
         /// <returns>Скопированный вектор</returns>
-        public static List<int> VectorDeepCopy(List<int> vector)
+        public static List<int> VectorIntDeepCopy(List<int> vector)
         {
             return vector.ToList();
         }
@@ -59,9 +59,96 @@ namespace magisterDiplom.Utils
         /// </summary>
         /// <param name="matrix">Матрица которую необходимо скопировать в новую</param>
         /// <returns>Скопированная матрица</returns>
-        public static List<List<int>> MatrixDeepCopy(List<List<int>> matrix)
+        public static List<List<int>> MatrixIntDeepCopy(List<List<int>> matrix)
         {
-            return matrix.Select(VectorDeepCopy).ToList();
+            return matrix.Select(VectorIntDeepCopy).ToList();
+        }
+
+        /// <summary>
+        /// Данная статическая функция выполняет перестановку двух строк в матрице
+        /// </summary>
+        /// <param name="matrix">Матрица в которой необходимо выполнить перестановку двух строку</param>
+        /// <param name="rowIndex1">Индекс первой строки для перестановки</param>
+        /// <param name="rowIndex2">Индекс второй строки для перестановки</param>
+        public static void MatrixIntRowSwap(List<List<int>> matrix, int rowIndex1, int rowIndex2)
+        {
+
+            // Выполняем проверку на инициализацию матрицы
+            if (matrix == null)
+                return;
+
+            // Выполяем проверку на крайние случаи
+            if (matrix.Count <= rowIndex1 || matrix.Count <= rowIndex2 || rowIndex1 < 0 || rowIndex2 < 0 || rowIndex1 == rowIndex2 || matrix[rowIndex1].Count != matrix[rowIndex2].Count)
+                return;
+
+            // Выполняем перестановку двух строк
+            List<int> row1 = matrix[rowIndex1];
+            List<int> row2 = matrix[rowIndex2];
+            matrix[rowIndex1] = row2;
+            matrix[rowIndex2] = row1;
+        }
+
+        /// <summary>
+        /// Данная статическая функция выполняет перестановку двух колонок в матрице
+        /// </summary>
+        /// <param name="matrix">Матрица в которой необходимо выполнить перестановку двух колонок</param>
+        /// <param name="colIndex1">Индекс первой колонки для перестановки</param>
+        /// <param name="colIndex2">Индекс второй колонки для перестановки</param>
+        public static void MatrixIntColumnSwap(List<List<int>> matrix, int colIndex1, int colIndex2)
+        {
+
+            // Выполняем проверку на инициализацию матрицы
+            if (matrix == null)
+                return;
+
+            // Выполяем проверку на крайние случаи
+            if (matrix[0].Count <= colIndex1 || matrix[0].Count <= colIndex2 || colIndex1 < 0 || colIndex2 < 0 || colIndex1 == colIndex2)
+                return;
+
+            // Выполняем перестановку двух колонок
+            List<int> col = new List<int>(matrix.Count);
+            for (int row = 0; row < matrix.Count; row++) { 
+                col.Add(matrix[row][colIndex1]);
+                matrix[row][colIndex1] = matrix[row][colIndex2];
+            }
+            for (int row = 0; row < matrix.Count; row++)
+                matrix[row][colIndex2] = col[row];
+        }
+
+        /// <summary>
+        /// Данная статическая функция выполняем сравнение двух матриц и возвращаем логический результат
+        /// </summary>
+        /// <param name="matrix1">Целочисленная матрица 1</param>
+        /// <param name="matrix2">Целочисленная матрица 2</param>
+        /// <returns>True, если матрицы идентичны, иначе False</returns>
+        public static bool IsMatrixIntEqual(List<List<int>> matrix1, List<List<int>> matrix2)
+        {
+
+            // Выполняем проверку на инициализацию матрицы
+            if (matrix1 == null || matrix2 == null)
+                return false;
+
+            // Выполяем проверку на размеры матриц
+            if (matrix1.Count != matrix2.Count)
+                return false;
+            
+            // Для каждой строки выполняем сравнение
+            for (int row = 0; row < matrix1.Count; row++)
+            {
+
+                // Выполяем проверку на размеры матриц
+                if (matrix1[row].Count != matrix2[row].Count)
+                    return false;
+
+                // Для каждой колонки выполняем сравнение
+                for(int col = 0; col < matrix1[row].Count; col++)
+
+                    // Если значения не равны возврщаем false
+                    if (matrix1[row][col] != matrix2[row][col])
+                        return false;
+            }
+
+            return true;
         }
 
     }

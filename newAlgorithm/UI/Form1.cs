@@ -283,8 +283,8 @@ namespace newAlgorithm
                                 int criteria;
                                 int flCrit;
                                 var listInt = !isOptimization
-                                    ? oldSecondLevel.CalcFitnessList(firstLevel._a, out criteria, out flCrit)
-                                    : oldSecondLevel.CalcOptimalFitnessList(firstLevel._a, out criteria, out flCrit);
+                                    ? oldSecondLevel.CalcFitnessList(firstLevel.matrixA_Prime, out criteria, out flCrit)
+                                    : oldSecondLevel.CalcOptimalFitnessList(firstLevel.matrixA_Prime, out criteria, out flCrit);
 
                                 // Выводим информацию в файл
                                 file.WriteLine($"Tz = {tz}");
