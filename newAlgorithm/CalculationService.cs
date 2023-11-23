@@ -75,145 +75,145 @@ namespace newAlgorithm.Service
                     }
 
 
-                    for (int device = 1; device <= deviceCount; device++)
+                    for (int device = 0; device < deviceCount; device++)
                     {
                         //4.1 (4)
-                        if (device == 1 && batchIndex == 1)
+                        if (device + 1 == 1 && batchIndex == 1)
                         {
                             //43
                             if (q == 1)
-                                tnMatrix.AddNode(device, batchIndex, q, 0);
+                                tnMatrix.AddNode(device + 1, batchIndex, q, 0);
                             
 
                             //44
                             if (1 < q && q <= b + 1)
                             {
-                                int t1 = tnMatrix[device, batchIndex, q - 1];
-                                int t2 = timeCalc(device - 1, batchIndex - 1);
+                                int t1 = tnMatrix[device + 1, batchIndex, q - 1];
+                                int t2 = timeCalc(device + 1 - 1, batchIndex - 1);
 
                                 int value = t1 + t2;
-                                tnMatrix.AddNode(device, batchIndex, q, value);
+                                tnMatrix.AddNode(device + 1, batchIndex, q, value);
                                 continue;
                             }
 
                             //45
                             if (b + 1 < q && q <= currentbatchCount)
                             {
-                                int t1 = tnMatrix[device, batchIndex, q - 1];
-                                int t2 = timeCalc(device - 1, batchIndex - 1);
+                                int t1 = tnMatrix[device + 1, batchIndex, q - 1];
+                                int t2 = timeCalc(device + 1 - 1, batchIndex - 1);
 
                                 int value1 = t1 + t2;
-                                int value2 = tnMatrix[device + 1, batchIndex, q - b];
+                                int value2 = tnMatrix[device + 1 + 1, batchIndex, q - b];
 
                                 int value = Math.Max(value1, value2);
-                                tnMatrix.AddNode(device, batchIndex, q, value);
+                                tnMatrix.AddNode(device + 1, batchIndex, q, value);
                             }
                             continue;
                         }
 
 
                         //4.2 (5)
-                        if (device == 1 && 2 <= batchIndex && batchIndex <= batchesForAllDataTypes)
+                        if (device + 1 == 1 && 2 <= batchIndex && batchIndex <= batchesForAllDataTypes)
                         {
                             //46
                             if (q == 1)
                             {
-                                int t1 = tnMatrix[device, batchIndex - 1, nJPrevious];
-                                int t2 = timeCalc(device - 1, batchIndex - 1 - 1);
-                                int t3 = timeChangeover[device, previousType, currentDataType];
+                                int t1 = tnMatrix[device + 1, batchIndex - 1, nJPrevious];
+                                int t2 = timeCalc(device + 1 - 1, batchIndex - 1 - 1);
+                                int t3 = timeChangeover[device + 1, previousType, currentDataType];
 
                                 int value1 = t1 + t2 + t3;
-                                int value2 = tnMatrix[device + 1, batchIndex - 1, nJPrevious - b + 1];
+                                int value2 = tnMatrix[device + 1 + 1, batchIndex - 1, nJPrevious - b + 1];
 
                                 int value = Math.Max(value1, value2);
-                                tnMatrix.AddNode(device, batchIndex, q, value);
+                                tnMatrix.AddNode(device + 1, batchIndex, q, value);
                                 continue;
                             }
 
                             //47
                             if (1 < q && q <= b)
                             {
-                                int t1 = tnMatrix[device, batchIndex, q - 1];
-                                int t2 = timeCalc(device - 1, batchIndex - 1);
+                                int t1 = tnMatrix[device + 1, batchIndex, q - 1];
+                                int t2 = timeCalc(device + 1 - 1, batchIndex - 1);
 
                                 int value1 = t1 + t2;
-                                int value2 = tnMatrix[device + 1, batchIndex - 1, nJPrevious - b + q];
+                                int value2 = tnMatrix[device + 1 + 1, batchIndex - 1, nJPrevious - b + q];
 
                                 int value = Math.Max(value1, value2);
 
-                                tnMatrix.AddNode(device, batchIndex, q, value);
+                                tnMatrix.AddNode(device + 1, batchIndex, q, value);
                                 continue;
                             }
 
                             //48
                             if (b + 1 <= q && q <= currentbatchCount)
                             {
-                                int t1 = tnMatrix[device, batchIndex, q - 1];
-                                int t2 = timeCalc(device - 1, batchIndex - 1);
+                                int t1 = tnMatrix[device + 1, batchIndex, q - 1];
+                                int t2 = timeCalc(device + 1 - 1, batchIndex - 1);
 
                                 int value1 = t1 + t2;
-                                int value2 = tnMatrix[device + 1, batchIndex, q - b];
+                                int value2 = tnMatrix[device + 1 + 1, batchIndex, q - b];
 
                                 int value = Math.Max(value1, value2);
-                                tnMatrix.AddNode(device, batchIndex, q, value);
+                                tnMatrix.AddNode(device + 1, batchIndex, q, value);
                             }
                             continue;
                         }
 
 
                         //4.3 (6)
-                        if (2 <= device && device <= deviceCount - 1 && batchIndex == 1)
+                        if (2 <= device + 1 && device + 1 <= deviceCount - 1 && batchIndex == 1)
                         {
                             //49
                             if (q == 1)
                             {
-                                int t1 = tnMatrix[device - 1, batchIndex, batchIndex];
-                                int t2 = timeCalc(device - 1 - 1, batchIndex - 1);
+                                int t1 = tnMatrix[device + 1 - 1, batchIndex, batchIndex];
+                                int t2 = timeCalc(device + 1 - 1 - 1, batchIndex - 1);
 
                                 int value = t1 + t2;
-                                tnMatrix.AddNode(device, batchIndex, q, value);
+                                tnMatrix.AddNode(device + 1, batchIndex, q, value);
                                 continue;
                             }
 
                             //50
                             if (1 < q && q <= b + 1)
                             {
-                                int t1 = tnMatrix[device - 1, batchIndex, q];
-                                int t2 = timeCalc(device - 1 - 1, 1 - 1);
+                                int t1 = tnMatrix[device + 1 - 1, batchIndex, q];
+                                int t2 = timeCalc(device + 1 - 1 - 1, 1 - 1);
 
                                 int value1 = t1 + t2;
 
-                                t1 = tnMatrix[device, batchIndex, q - 1];
-                                t2 = timeCalc(device - 1, batchIndex - 1);
+                                t1 = tnMatrix[device + 1, batchIndex, q - 1];
+                                t2 = timeCalc(device + 1 - 1, batchIndex - 1);
 
                                 int value2 = t1 + t2;
 
                                 int value = Math.Max(value1, value2);
 
-                                tnMatrix.AddNode(device, batchIndex, q, value);
+                                tnMatrix.AddNode(device + 1, batchIndex, q, value);
                                 continue;
                             }
 
                             //45
                             if (b + 1 < q && q <= currentbatchCount)
                             {
-                                int t1 = tnMatrix[device - 1, batchIndex, q];
-                                int t2 = timeCalc(device - 1 - 1, 1 - 1);
+                                int t1 = tnMatrix[device + 1 - 1, batchIndex, q];
+                                int t2 = timeCalc(device + 1 - 1 - 1, 1 - 1);
 
                                 int value1 = t1 + t2;
 
-                                t1 = tnMatrix[device, batchIndex, q - 1];
-                                t2 = timeCalc(device - 1, batchIndex - 1);
+                                t1 = tnMatrix[device + 1, batchIndex, q - 1];
+                                t2 = timeCalc(device + 1 - 1, batchIndex - 1);
 
                                 int value2 = t1 + t2;
 
                                 int value12max = Math.Max(value1, value2);
 
-                                int value3 = tnMatrix[device + 1, batchIndex, q - b];
+                                int value3 = tnMatrix[device + 1 + 1, batchIndex, q - b];
 
                                 int value = Math.Max(value12max, value3);
 
-                                tnMatrix.AddNode(device, batchIndex, q, value);
+                                tnMatrix.AddNode(device + 1, batchIndex, q, value);
                             }
                             continue;
                         }
@@ -221,89 +221,89 @@ namespace newAlgorithm.Service
 
 
                         //4.4 (7)
-                        if (2 <= device && device <= deviceCount - 1 && 2 <= batchIndex && batchIndex <= batchesForAllDataTypes)
+                        if (2 <= device + 1 && device + 1 <= deviceCount - 1 && 2 <= batchIndex && batchIndex <= batchesForAllDataTypes)
                         {
                             //52
                             if (q == 1)
                             {
-                                int t1 = tnMatrix[device - 1, batchIndex, 1];
+                                int t1 = tnMatrix[device + 1 - 1, batchIndex, 1];
 
-                                int t2 = timeCalc(device - 1, batchIndex - 1);
+                                int t2 = timeCalc(device + 1 - 1, batchIndex - 1);
 
                                 int value1 = t1 + t2;
 
-                                t1 = tnMatrix[device, batchIndex - 1, nJPrevious];
+                                t1 = tnMatrix[device + 1, batchIndex - 1, nJPrevious];
                                 t2 = 0;
-                                int t3 = timeChangeover[device, previousType, currentDataType];
+                                int t3 = timeChangeover[device + 1, previousType, currentDataType];
 
-                                t2 = timeCalc(device - 1, batchIndex - 1 - 1);
+                                t2 = timeCalc(device + 1 - 1, batchIndex - 1 - 1);
 
                                 int value2 = t1 + t2 + t3;
 
                                 int value12max = Math.Max(value1, value2);
 
-                                int value3 = tnMatrix[device + 1, batchIndex - 1, nJPrevious - b + 1];
+                                int value3 = tnMatrix[device + 1 + 1, batchIndex - 1, nJPrevious - b + 1];
 
                                 int value = Math.Max(value12max, value3);
 
-                                tnMatrix.AddNode(device, batchIndex, q, value);
+                                tnMatrix.AddNode(device + 1, batchIndex, q, value);
                                 continue;
                             }
 
                             //53
                             if (1 < q && q <= b)
                             {
-                                int t1 = tnMatrix[device - 1, batchIndex, q];
-                                int t2 = timeCalc(device - 1 - 1, batchIndex - 1);
+                                int t1 = tnMatrix[device + 1 - 1, batchIndex, q];
+                                int t2 = timeCalc(device + 1 - 1 - 1, batchIndex - 1);
 
                                 int value1 = t1 + t2;
 
-                                t1 = tnMatrix[device, batchIndex, q - 1];
+                                t1 = tnMatrix[device + 1, batchIndex, q - 1];
                                 t2 = 0;
 
-                                t2 = timeCalc(device - 1, batchIndex - 1);
+                                t2 = timeCalc(device + 1 - 1, batchIndex - 1);
 
                                 int value2 = t1 + t2;
 
                                 int value12max = Math.Max(value1, value2);
 
-                                int value3 = tnMatrix[device + 1, batchIndex - 1, nJPrevious - b + q];
+                                int value3 = tnMatrix[device + 1 + 1, batchIndex - 1, nJPrevious - b + q];
 
                                 int value = Math.Max(value12max, value3);
 
-                                tnMatrix.AddNode(device, batchIndex, q, value);
+                                tnMatrix.AddNode(device + 1, batchIndex, q, value);
                                 continue;
                             }
 
                             //54
                             if (b + 1 <= q && q <= currentbatchCount)
                             {
-                                int t1 = tnMatrix[device - 1, batchIndex, q];
-                                int t2 = timeCalc(device - 1 - 1, batchIndex - 1);
+                                int t1 = tnMatrix[device + 1 - 1, batchIndex, q];
+                                int t2 = timeCalc(device + 1 - 1 - 1, batchIndex - 1);
 
                                 int value1 = t1 + t2;
 
-                                t1 = tnMatrix[device, batchIndex, q - 1];
+                                t1 = tnMatrix[device + 1, batchIndex, q - 1];
                                 t2 = 0;
 
-                                t2 = timeCalc(device - 1, batchIndex - 1 - 1);
+                                t2 = timeCalc(device + 1 - 1, batchIndex - 1 - 1);
 
                                 int value2 = t1 + t2;
 
                                 int value12max = Math.Max(value1, value2);
 
-                                int value3 = tnMatrix[device + 1, batchIndex, q - b];
+                                int value3 = tnMatrix[device + 1 + 1, batchIndex, q - b];
 
                                 int value = Math.Max(value12max, value3);
 
-                                tnMatrix.AddNode(device, batchIndex, q, value);
+                                tnMatrix.AddNode(device + 1, batchIndex, q, value);
                             }
                             continue;
                         }
 
 
 
-                        if (device == deviceCount)
+                        if (device + 1 == deviceCount)
                         {
 
                             //4.5 (8)
@@ -328,13 +328,13 @@ namespace newAlgorithm.Service
                                 //56
                                 if (1 < q && q <= currentbatchCount)
                                 {
-                                    int t1 = tnMatrix[device - 1, batchIndex, q];
+                                    int t1 = tnMatrix[device + 1 - 1, batchIndex, q];
 
-                                    int t2 = timeCalc(device - 1 - 1, batchIndex - 1);
+                                    int t2 = timeCalc(device + 1 - 1 - 1, batchIndex - 1);
 
                                     int value1 = t1 + t2;
 
-                                    t1 = tnMatrix[device, batchIndex, q - 1];
+                                    t1 = tnMatrix[device + 1, batchIndex, q - 1];
                                     t2 = 0;
 
                                     t2 = timeCalc(deviceCount - 1, batchIndex - 1);
@@ -354,7 +354,7 @@ namespace newAlgorithm.Service
                                 //57
                                 if (q == 1)
                                 {
-                                    int t1 = tnMatrix[device - 1, batchIndex, q];
+                                    int t1 = tnMatrix[device + 1 - 1, batchIndex, q];
                                     int t2 = 0;
                                     t2 = timeCalc(deviceCount - 1 - 1, batchIndex - 1 - 1);
 
