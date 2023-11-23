@@ -385,8 +385,8 @@ namespace newAlgorithm
                             {
                                 tempA = SetTempAFromA2(dataType, batchIndex);
                                 shedule = new Shedule(tempA);
-                                shedule.ConstructShedule();
-                                //shedule.ConstructSheduleWithBuffer(Form1.buff, dataTypesCount);
+                                //shedule.ConstructShedule();
+                                shedule.ConstructSheduleWithBuffer(Form1.buff, dataTypesCount);
                                 var fBuf = shedule.GetTime();
                                 s = ListUtils.MatrixIntToString(tempA, ", ", "", ";");
                                 file.Write(s + " " + fBuf);
