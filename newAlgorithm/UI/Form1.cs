@@ -1195,7 +1195,7 @@ namespace newAlgorithm
                     for (var col_dataType = 0; col_dataType < dataTypesCount; col_dataType++)
 
                         // Считываем данные во внутрнние таблицы
-                        changeoverTime[device][row_dataType][col_dataType] = Convert.ToInt32(dataGridView_changeover_time.Rows[row_dataType + device * dataTypesCount].Cells[0].Value);
+                        changeoverTime[device][row_dataType][col_dataType] = Convert.ToInt32(dataGridView_changeover_time.Rows[row_dataType + device * dataTypesCount].Cells[col_dataType].Value);
                 }
         }
 
