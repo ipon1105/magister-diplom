@@ -322,8 +322,8 @@ namespace newAlgorithm
                 GenerateStartSolution();
                 //GenerateFixedBatchesSolution();
                 var shedule = new Shedule(matrixA_Prime);
-                //shedule.ConstructShedule();
-                shedule.ConstructSheduleWithBuffer(Form1.buff, dataTypesCount);
+                shedule.ConstructShedule();
+                //shedule.ConstructSheduleWithBuffer(Form1.buff, dataTypesCount);
                 _f1 = shedule.GetTime();
 
                 MessageBox.Show(ListUtils.MatrixIntToString(matrixA_Prime, ", ", "", ";") + "Время обработки " + _f1);
@@ -331,22 +331,6 @@ namespace newAlgorithm
                 file.WriteLine(_f1Buf);
                 var maxA = ListUtils.MatrixIntDeepCopy(matrixA_Prime);
                 _typeSolutionFlag = true;
-
-                // Генерируем начальное решение
-                GenerateStartSolution();
-
-                shedule = new Shedule(matrixA_Prime);
-                //shedule.ConstructShedule();
-                shedule.ConstructSheduleWithBuffer(Form1.buff, dataTypesCount);
-                _f1 = shedule.GetTime();
-                MessageBox.Show(ListUtils.MatrixIntToString(matrixA_Prime, ", ", "", ";") + " Время обработки " + _f1);
-                if (_f1 < _f1Buf)
-                {
-                    _abuf = ListUtils.MatrixIntDeepCopy(matrixA_Prime);
-                    _typeSolutionFlag = true;
-                    _f1Buf = _f1;
-                    file.Write(" +");
-                }
                 if (!isFixedBatches)
                 {
 
