@@ -35,17 +35,6 @@ namespace newAlgorithm
             this.Q = new Groups(5);
         }
 
-        public void InitialConditions(int j)//this.groups.Z
-        {
-            for (int i = 0; i < this.groups.Z;i++)
-                this.groups.k.Add(0);
-            this.Q.k.Add(0);
-            this.groups.Set_I1(j);//допустим
-            this.groups.Set_I2(j);//допустим 
-            this.groups.Set_M(j);//допустим 
-            this.Q.Set_M(1);//допустим
-        }
-
         public List<int> CalcFitnessList(List<List<int>> r, out int criteria, out int firstLevelCrit)
         {
             criteria = 0;
@@ -234,38 +223,6 @@ namespace newAlgorithm
             return Res;
         }
 
-        public void Algoritm_1()
-        {
-            int buff,buff2;
-
-            for (int i = 0; i < groups.Nz1.Count; i++)
-            {
-                for (int j = 0; j < groups.Nz1[i].Count; j++)
-                {
-                    for (int k = 0; k < groups.Nz1[i][j].Count; k++)
-                    {
-                        for (int l = 0; l < Q.Nz1[0].Count; l++)
-                        {
-                            for (int t = 0; t < Q.Nz1[0][l].Count; t++)
-                            {
-                                this.shedule = new Shedule(this.BuildR(groups.Nz1[i]), countL);
-                                this.shedule.ConstructShedule();
-                                buff2 = shedule.GetTime();
-                                buff = groups.Nz1[i][j][k];
-                                groups.Nz1[i][l][k] = Q.Nz1[0][l][t];
-                                this.shedule = new Shedule(this.BuildR(groups.Nz1[i]), countL);
-                                this.shedule.ConstructShedule();
-                                if (shedule.GetTime() > buff2)
-                                {
-                                    groups.Nz1[i][j][k] = buff;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            Algoritm_3();
-        }
         public List<List<List<int>>> Algoritm_2()
         {
             int logi = 0;//номер группы текущий расматриваемый 
@@ -406,6 +363,55 @@ namespace newAlgorithm
             //this.Algoritm_1();
             return true;
         }
+
+        #region Неиспользуемые функции
+
+        public void InitialConditions(int j)//this.groups.Z
+        {
+            for (int i = 0; i < this.groups.Z; i++)
+                this.groups.k.Add(0);
+            this.Q.k.Add(0);
+            this.groups.Set_I1(j);//допустим
+            this.groups.Set_I2(j);//допустим 
+            this.groups.Set_M(j);//допустим 
+            this.Q.Set_M(1);//допустим
+        }
+
+        public void Algoritm_1()
+        {
+            int buff, buff2;
+
+            for (int i = 0; i < groups.Nz1.Count; i++)
+            {
+                for (int j = 0; j < groups.Nz1[i].Count; j++)
+                {
+                    for (int k = 0; k < groups.Nz1[i][j].Count; k++)
+                    {
+                        for (int l = 0; l < Q.Nz1[0].Count; l++)
+                        {
+                            for (int t = 0; t < Q.Nz1[0][l].Count; t++)
+                            {
+                                this.shedule = new Shedule(this.BuildR(groups.Nz1[i]), countL);
+                                this.shedule.ConstructShedule();
+                                buff2 = shedule.GetTime();
+                                buff = groups.Nz1[i][j][k];
+                                groups.Nz1[i][l][k] = Q.Nz1[0][l][t];
+                                this.shedule = new Shedule(this.BuildR(groups.Nz1[i]), countL);
+                                this.shedule.ConstructShedule();
+                                if (shedule.GetTime() > buff2)
+                                {
+                                    groups.Nz1[i][j][k] = buff;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            Algoritm_3();
+        }
+
+        #endregion
+
     }
-    
+
 }

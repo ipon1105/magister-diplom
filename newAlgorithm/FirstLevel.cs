@@ -156,13 +156,13 @@ namespace newAlgorithm
         /// Построчное формирование матрицы промежуточного решени
         /// </summary>
         /// <param name="dataType">тип рассматриваемого решения</param>
-        /// <param name="position">индекс подставляемого решения</param>
+        /// <param name="batchIndex">индекс подставляемого решения</param>
         /// <returns>матрица А с подставленным новым решением в соответствующий тип</returns>
-        private List<List<int>> SetTempAFromA2(int dataType, int position)
+        private List<List<int>> SetTempAFromA2(int dataType, int batchIndex)
         {
             var result = ListUtils.MatrixIntDeepCopy(matrixA_Prime);
-            if (position < _a2[dataType].Count)
-                result[dataType] = ListUtils.VectorIntDeepCopy(_a2[dataType][position]);
+            if (batchIndex < _a2[dataType].Count)
+                result[dataType] = ListUtils.VectorIntDeepCopy(_a2[dataType][batchIndex]);
             return result;
         }
 
@@ -392,11 +392,13 @@ namespace newAlgorithm
                                 // Пропускаем итерацию
                                 continue;
 
-                            // Формируем новый состав партий
+                            // Формируем новый состав партий для типа dataType
                             _a2[dataType] = NewData(dataType);
-                            for (var j = 0; j < _a2[dataType].Count; j++)
+
+                            // Для каждого пакета в новом составе партий выполняем обработку
+                            for (var batchIndex = 0; batchIndex < _a2[dataType].Count; batchIndex++)
                             {
-                                tempA = SetTempAFromA2(dataType, j);
+                                tempA = SetTempAFromA2(dataType, batchIndex);
                                 shedule = new Shedule(tempA);
                                 //shedule.ConstructShedule();
                                 shedule.ConstructSheduleWithBuffer(Form1.buff, dataTypesCount);

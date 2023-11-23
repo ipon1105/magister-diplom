@@ -8,20 +8,20 @@ namespace newAlgorithm
 {
     class SheduleElement
     {
-        private int _value;
-        private int _type = 0;
+        private int jobCount;
+        private int dataType = 0;
         private List<int> _time;
         
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="value"></param>
-        /// <param name="type"></param>
+        /// <param name="jobCount"></param>
+        /// <param name="dataType"></param>
         /// <param name="time"></param>
-        public SheduleElement(int value, int type, List<int> time)
+        public SheduleElement(int jobCount, int dataType, List<int> time)
         {
-            _value = value;
-            _type = type;
+            this.jobCount = jobCount;
+            this.dataType = dataType;
             _time = new List<int>(time);
         }
 
@@ -31,7 +31,7 @@ namespace newAlgorithm
         /// <returns></returns>
         public int getValue()
         {
-            return _value;
+            return jobCount;
         }
 
         /// <summary>
@@ -40,7 +40,7 @@ namespace newAlgorithm
         /// <returns>Тип</returns>
         public int getType()
         {
-            return _type;
+            return dataType;
         }
 
         /// <summary>

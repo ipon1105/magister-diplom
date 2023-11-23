@@ -260,6 +260,105 @@ namespace GlobalTest.Utils
 
             Assert.IsFalse(ListUtils.IsMatrixIntEqual(output, input));
         }
+
+        [TestMethod]
+        public void InitVectorIntTest_default()
+        {
+            List<int> output = new List<int>(3) { 0, 0, 0 };
+            List<int> res = ListUtils.InitVectorInt(3);
+
+            if (output.Count != res.Count)
+                Assert.Fail();
+
+            for (int i = 0; i < res.Count; i++)
+                Assert.AreEqual(output[i], res[i]);
+        }
+
+        [TestMethod]
+        public void InitVectorIntTest_1()
+        {
+            List<int> output = new List<int>(3) { 3, 3, 3 };
+            List<int> res = ListUtils.InitVectorInt(3, 3);
+
+            if (output.Count != res.Count)
+                Assert.Fail();
+
+            for (int i = 0; i < res.Count; i++)
+                Assert.AreEqual(output[i], res[i]);
+        }
+
+        [TestMethod]
+        public void InitVectorIntTest_2()
+        {
+            List<int> res = ListUtils.InitVectorInt(-1);
+
+            if (res != null)
+                Assert.Fail();
+        }
+
+        [TestMethod]
+        public void InitMatrixIntTest_default()
+        {
+            List<List<int>> output = new List<List<int>> { new List<int> { 0, 0, 0 }, new List<int> { 0, 0, 0 }, new List<int> { 0, 0, 0 } };
+            List<List<int>> matrix = ListUtils.InitMatrixInt(3, 3);
+
+            Assert.IsTrue(ListUtils.IsMatrixIntEqual(output, matrix));
+        }
+
+        [TestMethod]
+        public void InitMatrixIntTest_1()
+        {
+            List<List<int>> output = new List<List<int>> { new List<int> { 4, 4, 4 }, new List<int> { 4, 4, 4 }, new List<int> { 4, 4, 4 } };
+            List<List<int>> matrix = ListUtils.InitMatrixInt(3, 3, 4);
+
+            Assert.IsTrue(ListUtils.IsMatrixIntEqual(output, matrix));
+        }
+
+        [TestMethod]
+        public void MatrixIntFlipTest_1()
+        {
+            List<List<int>> output = new List<List<int>> {
+                new List<int> { 4, 4, 4 },
+                new List<int> { 4, 4, 4 },
+                new List<int> { 4, 4, 4 }
+            };
+            List<List<int>> matrix = ListUtils.MatrixIntFlip(output);
+
+            Assert.IsTrue(ListUtils.IsMatrixIntEqual(output, matrix));
+        }
+
+        [TestMethod]
+        public void MatrixIntFlipTest_2()
+        {
+            List<List<int>> output = new List<List<int>> {
+                new List<int> { 4, 4, 4 },
+                new List<int> { 4, 3, 4 },
+                new List<int> { 4, 4, 4 }
+            };
+            List<List<int>> matrix = ListUtils.MatrixIntFlip(output);
+
+            Assert.IsTrue(ListUtils.IsMatrixIntEqual(output, matrix));
+        }
+
+        [TestMethod]
+        public void MatrixIntFlipTest_3()
+        {
+            List<List<int>> input = new List<List<int>> {
+                new List<int> { 1, 4, 4, 4 },
+                new List<int> { 4, 2, 4, 4 },
+                new List<int> { 4, 4, 3, 5 }
+            };
+            List<List<int>> output = new List<List<int>> {
+                new List<int> { 1, 4, 4 },
+                new List<int> { 4, 2, 4 },
+                new List<int> { 4, 4, 3 },
+                new List<int> { 4, 4, 5 },
+            };
+            List<List<int>> matrix = ListUtils.MatrixIntFlip(input);
+
+            Assert.IsTrue(ListUtils.IsMatrixIntEqual(output, matrix));
+        }
+
     }
 
 }

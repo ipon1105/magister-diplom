@@ -139,6 +139,8 @@ namespace newAlgorithm
         private void button3_Click(object sender, EventArgs e)
         {
 
+            // TODO: Перед вызовом данной функции необходимо выполнить присваивание для Form1.compositionSets и Form1.timeSets
+
             // Инициализируем вектор длиной dataTypesCount, каждый элемент которого будет равен batchCount
             List<int> batchCountList = CreateBatchCountList();
 

@@ -12,6 +12,50 @@ namespace magisterDiplom.Utils
     {
 
         /// <summary>
+        /// Данная статическая функция выполняет инициализацию вектора длиной size заполненного элементами value
+        /// </summary>
+        /// <param name="size">Длина векора</param>
+        /// <param name="value">Значение для заполнения вектора, по умолчанию 0</param>
+        /// <returns>Список из целочисленных значений длиной size</returns>
+        public static List<int> InitVectorInt(int size, int value = 0)
+        {
+
+            // Выполяем проверку входных параметров
+            if (size <= 0)
+                return null;
+
+            // Выполяем инициализацию вектора
+            List<int> list = new List<int>(size);
+            list.AddRange(Enumerable.Repeat(value, size));
+
+            // Возвращаем вектор
+            return list;
+        }
+
+        /// <summary>
+        /// Данная статическая функция выполняет инициализацию вектора высотой rowCount и шириной colCount заполненного элементами value
+        /// </summary>
+        /// <param name="rowCount">Количество строк</param>
+        /// <param name="colCount">Количество столбцов</param>
+        /// <param name="value">Значение для заполнения матрицы, по умолчанию 0</param>
+        /// <returns>Массив из целочисленных значений размера [rowCount x colCount]</returns>
+        public static List<List<int>> InitMatrixInt(int rowCount, int colCount, int value = 0)
+        {
+
+            // Выполяем проверку входных параметров
+            if (rowCount <= 0 || colCount <= 0)
+                return null;
+
+            // Выполяем инициализацию матрицы
+            List<List<int>> matrix = new List<List<int>>(rowCount);
+            for (int i = 0; i < rowCount; i++)
+                matrix.Add(InitVectorInt(colCount, value));
+
+            // Возвращаем матрицы
+            return matrix;
+        }
+
+        /// <summary>
         /// Данная статическая функция выполняет конкатинацию вектора в строку
         /// </summary>
         /// <param name="vector">Целочисленный список (вектор) для преобразования в строку</param>
@@ -151,5 +195,32 @@ namespace magisterDiplom.Utils
             return true;
         }
 
+        /// <summary>
+        /// Данная статическая функция выполняем поворот матрицы и возвращает новую матрицу
+        /// </summary>
+        /// <param name="matrix">Целочисленная матрица для поворота</param>
+        /// <returns>Новая целочисленная матрица после поворота</returns>
+        public static List<List<int>> MatrixIntFlip(List<List<int>> matrix)
+        {
+
+            // Выполняем проверку на null
+            if (matrix == null || matrix.Count == 0)
+                return null;
+
+            // Создаём новую матрицу и выполняем её инициализацию
+            List<List<int>> newMatrix = InitMatrixInt(matrix[0].Count, matrix.Count);
+            for (int i = 0; i < matrix.Count; i++)
+                for (int j = 0; j < matrix[0].Count; j++) {
+
+                    // Выполняем проверку на однородность матрицы
+                    if (matrix[i].Count != matrix[0].Count)
+                        return null;
+
+                    newMatrix[j][i] = matrix[i][j];
+                }
+
+            // Возвращаем результат
+            return newMatrix;
+        }
     }
 }
