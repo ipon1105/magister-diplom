@@ -24,7 +24,6 @@ namespace newAlgorithm.Service
             )
         {
 
-
             TreeDimMatrix tnMatrix = new TreeDimMatrix(timeChangeover.deviceCount);
 
             // Количество пакетов для всех типов данных, так же известное как n_p
@@ -75,145 +74,210 @@ namespace newAlgorithm.Service
                     }
 
 
-                    for (int device = 0; device < deviceCount; device++)
+                    for (int device = 1; device <= deviceCount; device++)
                     {
                         //4.1 (4)
-                        if (device + 1 == 1 && batchIndex == 1)
+                        if (device == 1 && batchIndex == 1)
                         {
                             //43
                             if (q == 1)
-                                tnMatrix.AddNode(device + 1, batchIndex, q, 0);
-                            
+                                tnMatrix.AddNode(device, batchIndex, q, 0);
+
 
                             //44
                             if (1 < q && q <= b + 1)
                             {
-                                int t1 = tnMatrix[device + 1, batchIndex, q - 1];
-                                int t2 = timeCalc(device + 1 - 1, batchIndex - 1);
+                                int t1 = tnMatrix[device, batchIndex, q - 1];
+                                int t2 = 0;// timeCalc(device - 1, batchIndex - 1);
+                                for (int _dataType = 1; _dataType <= rMatrix.dataTypesCount; _dataType++)
+                                {
+                                    int timeProces = timeProcessing[device - 1, _dataType - 1];
+                                    int ps1 = pMatrix[_dataType - 1, batchIndex - 1];
 
+                                    t2 += timeProces * ps1;
+                                }
                                 int value = t1 + t2;
-                                tnMatrix.AddNode(device + 1, batchIndex, q, value);
+                                tnMatrix.AddNode(device, batchIndex, q, value);
                                 continue;
                             }
 
                             //45
                             if (b + 1 < q && q <= currentbatchCount)
                             {
-                                int t1 = tnMatrix[device + 1, batchIndex, q - 1];
-                                int t2 = timeCalc(device + 1 - 1, batchIndex - 1);
+                                int t1 = tnMatrix[device, batchIndex, q - 1];
+                                int t2 = 0; //timeCalc(device - 1, batchIndex - 1)
+                                for (int _dataType = 1; _dataType <= rMatrix.dataTypesCount; _dataType++)
+                                {
+                                    int timeProces = timeProcessing[device - 1, _dataType - 1];
+                                    int ps1 = pMatrix[_dataType - 1, batchIndex - 1];
 
+                                    t2 += timeProces * ps1;
+                                }
                                 int value1 = t1 + t2;
-                                int value2 = tnMatrix[device + 1 + 1, batchIndex, q - b];
+                                int value2 = tnMatrix[device + 1, batchIndex, q - b];
 
                                 int value = Math.Max(value1, value2);
-                                tnMatrix.AddNode(device + 1, batchIndex, q, value);
+                                tnMatrix.AddNode(device, batchIndex, q, value);
                             }
                             continue;
                         }
 
 
                         //4.2 (5)
-                        if (device + 1 == 1 && 2 <= batchIndex && batchIndex <= batchesForAllDataTypes)
+                        if (device == 1 && 2 <= batchIndex && batchIndex <= batchesForAllDataTypes)
                         {
                             //46
                             if (q == 1)
                             {
-                                int t1 = tnMatrix[device + 1, batchIndex - 1, nJPrevious];
-                                int t2 = timeCalc(device + 1 - 1, batchIndex - 1 - 1);
-                                int t3 = timeChangeover[device + 1, previousType, currentDataType];
+                                int t1 = tnMatrix[device, batchIndex - 1, nJPrevious];
+                                int t2 = 0; // timeCalc(device - 1, batchIndex - 1 - 1);
+                                for (int _dataType = 1; _dataType <= rMatrix.dataTypesCount; _dataType++)
+                                {
+                                    int timeProces = timeProcessing[device - 1, _dataType - 1];
+                                    int psj = pMatrix[_dataType - 1, batchIndex - 1 - 1];
+
+                                    t2 += timeProces * psj;
+                                }
+                                int t3 = timeChangeover[device, previousType, currentDataType];
 
                                 int value1 = t1 + t2 + t3;
-                                int value2 = tnMatrix[device + 1 + 1, batchIndex - 1, nJPrevious - b + 1];
+                                int value2 = tnMatrix[device + 1, batchIndex - 1, nJPrevious - b + 1];
 
                                 int value = Math.Max(value1, value2);
-                                tnMatrix.AddNode(device + 1, batchIndex, q, value);
+                                tnMatrix.AddNode(device, batchIndex, q, value);
                                 continue;
                             }
 
                             //47
                             if (1 < q && q <= b)
                             {
-                                int t1 = tnMatrix[device + 1, batchIndex, q - 1];
-                                int t2 = timeCalc(device + 1 - 1, batchIndex - 1);
+                                int t1 = tnMatrix[device, batchIndex, q - 1];
+                                int t2 = 0;// timeCalc(device - 1, batchIndex - 1);
+                                for (int _dataType = 1; _dataType <= rMatrix.dataTypesCount; _dataType++)
+                                {
+                                    int timeProces = timeProcessing[device - 1, _dataType - 1];
+                                    int psj = pMatrix[_dataType - 1, batchIndex - 1];
 
+                                    t2 += timeProces * psj;
+                                }
                                 int value1 = t1 + t2;
-                                int value2 = tnMatrix[device + 1 + 1, batchIndex - 1, nJPrevious - b + q];
+                                int value2 = tnMatrix[device + 1, batchIndex - 1, nJPrevious - b + q];
 
                                 int value = Math.Max(value1, value2);
 
-                                tnMatrix.AddNode(device + 1, batchIndex, q, value);
+                                tnMatrix.AddNode(device, batchIndex, q, value);
                                 continue;
                             }
 
                             //48
                             if (b + 1 <= q && q <= currentbatchCount)
                             {
-                                int t1 = tnMatrix[device + 1, batchIndex, q - 1];
-                                int t2 = timeCalc(device + 1 - 1, batchIndex - 1);
+                                int t1 = tnMatrix[device, batchIndex, q - 1];
+                                int t2 = 0;// timeCalc(device - 1, batchIndex - 1);
+
+                                for (int _dataType = 1; _dataType <= rMatrix.dataTypesCount; _dataType++)
+                                {
+                                    int timeProces = timeProcessing[device - 1, _dataType - 1];
+                                    int psj = pMatrix[_dataType - 1, batchIndex - 1];
+
+                                    t2 += timeProces * psj;
+                                }
 
                                 int value1 = t1 + t2;
-                                int value2 = tnMatrix[device + 1 + 1, batchIndex, q - b];
+                                int value2 = tnMatrix[device + 1, batchIndex, q - b];
 
                                 int value = Math.Max(value1, value2);
-                                tnMatrix.AddNode(device + 1, batchIndex, q, value);
+                                tnMatrix.AddNode(device, batchIndex, q, value);
                             }
                             continue;
                         }
 
 
                         //4.3 (6)
-                        if (2 <= device + 1 && device + 1 <= deviceCount - 1 && batchIndex == 1)
+                        if (2 <= device && device <= deviceCount - 1 && batchIndex == 1)
                         {
                             //49
                             if (q == 1)
                             {
-                                int t1 = tnMatrix[device + 1 - 1, batchIndex, batchIndex];
-                                int t2 = timeCalc(device + 1 - 1 - 1, batchIndex - 1);
+                                int t1 = tnMatrix[device - 1, batchIndex, batchIndex];
+                                int t2 = 0; // timeCalc(device - 1 - 1, batchIndex - 1);
+                                for (int _dataType = 1; _dataType <= rMatrix.dataTypesCount; _dataType++)
+                                {
+                                    int timeProces = timeProcessing[device - 1 - 1, _dataType - 1];
+                                    int ps1 = pMatrix[_dataType - 1, batchIndex - 1];
 
+                                    t2 += timeProces * ps1;
+                                }
                                 int value = t1 + t2;
-                                tnMatrix.AddNode(device + 1, batchIndex, q, value);
+                                tnMatrix.AddNode(device, batchIndex, q, value);
                                 continue;
                             }
 
                             //50
                             if (1 < q && q <= b + 1)
                             {
-                                int t1 = tnMatrix[device + 1 - 1, batchIndex, q];
-                                int t2 = timeCalc(device + 1 - 1 - 1, 1 - 1);
+                                int t1 = tnMatrix[device - 1, batchIndex, q];
+                                int t2 = 0; // timeCalc(device - 1 - 1, 1 - 1);
 
+                                for (int _dataType = 1; _dataType <= rMatrix.dataTypesCount; _dataType++)
+                                {
+                                    int timeProces = timeProcessing[device - 1 - 1, _dataType - 1];
+                                    int ps1 = pMatrix[_dataType - 1, 1 - 1];
+
+                                    t2 += timeProces * ps1;
+                                }
                                 int value1 = t1 + t2;
 
-                                t1 = tnMatrix[device + 1, batchIndex, q - 1];
-                                t2 = timeCalc(device + 1 - 1, batchIndex - 1);
+                                t1 = tnMatrix[device, batchIndex, q - 1];
+                                t2 = 0; // timeCalc(device - 1, batchIndex - 1);
+                                for (int _dataType = 1; _dataType <= rMatrix.dataTypesCount; _dataType++)
+                                {
+                                    int timeProces = timeProcessing[device - 1, _dataType - 1];
+                                    int ps1 = pMatrix[_dataType - 1, batchIndex - 1];
 
+                                    t2 += timeProces * ps1;
+                                }
                                 int value2 = t1 + t2;
 
                                 int value = Math.Max(value1, value2);
 
-                                tnMatrix.AddNode(device + 1, batchIndex, q, value);
+                                tnMatrix.AddNode(device, batchIndex, q, value);
                                 continue;
                             }
 
                             //45
                             if (b + 1 < q && q <= currentbatchCount)
                             {
-                                int t1 = tnMatrix[device + 1 - 1, batchIndex, q];
-                                int t2 = timeCalc(device + 1 - 1 - 1, 1 - 1);
+                                int t1 = tnMatrix[device - 1, batchIndex, q];
+                                int t2 = 0; // timeCalc(device - 1 - 1, 1 - 1);
 
+                                for (int _dataType = 1; _dataType <= rMatrix.dataTypesCount; _dataType++)
+                                {
+                                    int timeProces = timeProcessing[device - 1 - 1, _dataType - 1];
+                                    int ps1 = pMatrix[_dataType - 1, 1 - 1];
+
+                                    t2 += timeProces * ps1;
+                                }
                                 int value1 = t1 + t2;
 
-                                t1 = tnMatrix[device + 1, batchIndex, q - 1];
-                                t2 = timeCalc(device + 1 - 1, batchIndex - 1);
+                                t1 = tnMatrix[device, batchIndex, q - 1];
+                                t2 = 0; // timeCalc(device - 1, batchIndex - 1);
+                                for (int _dataType = 1; _dataType <= rMatrix.dataTypesCount; _dataType++)
+                                {
+                                    int timeProces = timeProcessing[device - 1, _dataType - 1];
+                                    int ps1 = pMatrix[_dataType - 1, batchIndex - 1];
 
+                                    t2 += timeProces * ps1;
+                                }
                                 int value2 = t1 + t2;
 
                                 int value12max = Math.Max(value1, value2);
 
-                                int value3 = tnMatrix[device + 1 + 1, batchIndex, q - b];
+                                int value3 = tnMatrix[device + 1, batchIndex, q - b];
 
                                 int value = Math.Max(value12max, value3);
 
-                                tnMatrix.AddNode(device + 1, batchIndex, q, value);
+                                tnMatrix.AddNode(device, batchIndex, q, value);
                             }
                             continue;
                         }
@@ -221,89 +285,136 @@ namespace newAlgorithm.Service
 
 
                         //4.4 (7)
-                        if (2 <= device + 1 && device + 1 <= deviceCount - 1 && 2 <= batchIndex && batchIndex <= batchesForAllDataTypes)
+                        if (2 <= device && device <= deviceCount - 1 && 2 <= batchIndex && batchIndex <= batchesForAllDataTypes)
                         {
                             //52
                             if (q == 1)
                             {
-                                int t1 = tnMatrix[device + 1 - 1, batchIndex, 1];
+                                int t1 = tnMatrix[device - 1, batchIndex, 1];
 
-                                int t2 = timeCalc(device + 1 - 1, batchIndex - 1);
+                                int t2 = 0; // timeCalc(device - 1 - 2, batchIndex - 1);
 
+                                for (int _dataType = 1; _dataType <= rMatrix.dataTypesCount; _dataType++)
+                                {
+                                    int timeProces = timeProcessing[device - 1 - 1, _dataType - 1];
+                                    int psj = pMatrix[_dataType - 1, batchIndex - 1];
+
+                                    t2 += timeProces * psj;
+                                }
                                 int value1 = t1 + t2;
 
-                                t1 = tnMatrix[device + 1, batchIndex - 1, nJPrevious];
+                                t1 = tnMatrix[device, batchIndex - 1, nJPrevious];
                                 t2 = 0;
-                                int t3 = timeChangeover[device + 1, previousType, currentDataType];
+                                int t3 = timeChangeover[device, previousType, currentDataType];
 
-                                t2 = timeCalc(device + 1 - 1, batchIndex - 1 - 1);
+                                t2 = 0; // timeCalc(device - 1, batchIndex - 1 - 1);
 
+                                for (int _dataType = 1; _dataType <= rMatrix.dataTypesCount; _dataType++)
+                                {
+                                    int timeProces = timeProcessing[device - 1, _dataType - 1];
+                                    int psj = pMatrix[_dataType - 1, batchIndex - 1 - 1];
+
+                                    t2 += timeProces * psj;
+                                }
                                 int value2 = t1 + t2 + t3;
 
                                 int value12max = Math.Max(value1, value2);
 
-                                int value3 = tnMatrix[device + 1 + 1, batchIndex - 1, nJPrevious - b + 1];
+                                int value3 = tnMatrix[device + 1, batchIndex - 1, nJPrevious - b + 1];
 
                                 int value = Math.Max(value12max, value3);
 
-                                tnMatrix.AddNode(device + 1, batchIndex, q, value);
+                                tnMatrix.AddNode(device, batchIndex, q, value);
                                 continue;
                             }
 
                             //53
                             if (1 < q && q <= b)
                             {
-                                int t1 = tnMatrix[device + 1 - 1, batchIndex, q];
-                                int t2 = timeCalc(device + 1 - 1 - 1, batchIndex - 1);
+                                int t1 = tnMatrix[device - 1, batchIndex, q];
+                                int t2 = 0; // timeCalc(device - 1 - 1, batchIndex - 1);
 
+
+                                for (int _dataType = 1; _dataType <= rMatrix.dataTypesCount; _dataType++)
+                                {
+                                    int timeProces = timeProcessing[device - 1 - 1, _dataType - 1];
+                                    int psj = pMatrix[_dataType - 1, batchIndex - 1];
+
+                                    t2 += timeProces * psj;
+                                }
                                 int value1 = t1 + t2;
 
-                                t1 = tnMatrix[device + 1, batchIndex, q - 1];
+                                t1 = tnMatrix[device, batchIndex, q - 1];
                                 t2 = 0;
 
-                                t2 = timeCalc(device + 1 - 1, batchIndex - 1);
+                                t2 = 0; // timeCalc(device - 1, batchIndex - 1);
+
+                                for (int _dataType = 1; _dataType <= rMatrix.dataTypesCount; _dataType++)
+                                {
+                                    int timeProces = timeProcessing[device - 1, _dataType - 1];
+                                    int psj = pMatrix[_dataType - 1, batchIndex - 1];
+
+                                    t2 += timeProces * psj;
+                                }
 
                                 int value2 = t1 + t2;
 
                                 int value12max = Math.Max(value1, value2);
 
-                                int value3 = tnMatrix[device + 1 + 1, batchIndex - 1, nJPrevious - b + q];
+                                int value3 = tnMatrix[device + 1, batchIndex - 1, nJPrevious - b + q];
 
                                 int value = Math.Max(value12max, value3);
 
-                                tnMatrix.AddNode(device + 1, batchIndex, q, value);
+                                tnMatrix.AddNode(device, batchIndex, q, value);
                                 continue;
                             }
 
                             //54
                             if (b + 1 <= q && q <= currentbatchCount)
                             {
-                                int t1 = tnMatrix[device + 1 - 1, batchIndex, q];
-                                int t2 = timeCalc(device + 1 - 1 - 1, batchIndex - 1);
+                                int t1 = tnMatrix[device - 1, batchIndex, q];
+                                int t2 = 0; // timeCalc(device - 1 - 1, batchIndex - 1);
+
+                                for (int _dataType = 1; _dataType <= rMatrix.dataTypesCount; _dataType++)
+                                {
+                                    int timeProces = timeProcessing[device - 1 - 1, _dataType - 1];
+                                    int psj = pMatrix[_dataType - 1, batchIndex - 1];
+
+                                    t2 += timeProces * psj;
+                                }
 
                                 int value1 = t1 + t2;
 
-                                t1 = tnMatrix[device + 1, batchIndex, q - 1];
+                                t1 = tnMatrix[device, batchIndex, q - 1];
                                 t2 = 0;
 
-                                t2 = timeCalc(device + 1 - 1, batchIndex - 1 - 1);
+                                t2 = 0;// timeCalc(device - 1, batchIndex - 1 - 1); // TODO: или  batchIndex - 1 - 1
+
+                                for (int _dataType = 1; _dataType <= rMatrix.dataTypesCount; _dataType++)
+                                {
+                                    int timeProces = timeProcessing[device - 1, _dataType - 1];
+                                    int psj = pMatrix[_dataType - 1, batchIndex - 1];
+
+                                    t2 += timeProces * psj;
+                                }
+
 
                                 int value2 = t1 + t2;
 
                                 int value12max = Math.Max(value1, value2);
 
-                                int value3 = tnMatrix[device + 1 + 1, batchIndex, q - b];
+                                int value3 = tnMatrix[device + 1, batchIndex, q - b];
 
                                 int value = Math.Max(value12max, value3);
 
-                                tnMatrix.AddNode(device + 1, batchIndex, q, value);
+                                tnMatrix.AddNode(device, batchIndex, q, value);
                             }
                             continue;
                         }
 
 
 
-                        if (device + 1 == deviceCount)
+                        if (device == deviceCount)
                         {
 
                             //4.5 (8)
@@ -317,8 +428,14 @@ namespace newAlgorithm.Service
                                     for (int li = 1; li <= deviceCount - 1; li++)
                                     {
 
-                                        value += timeCalc(li - 1, 1 - 1);
+                                        // value += timeCalc(li - 1, 1 - 1);
+                                        for (int si = 1; si <= rMatrix.dataTypesCount; si++)
+                                        {
+                                            int timeProces = timeProcessing[li - 1, si - 1];
+                                            int psj = pMatrix[si - 1, 1 - 1];
 
+                                            value += timeProces * psj;
+                                        }
                                     }
 
                                     tnMatrix.AddNode(deviceCount, batchIndex, q, value);
@@ -328,16 +445,32 @@ namespace newAlgorithm.Service
                                 //56
                                 if (1 < q && q <= currentbatchCount)
                                 {
-                                    int t1 = tnMatrix[device + 1 - 1, batchIndex, q];
+                                    int t1 = tnMatrix[device - 1, batchIndex, q];
 
-                                    int t2 = timeCalc(device + 1 - 1 - 1, batchIndex - 1);
+                                    int t2 = 0; // timeCalc(device - 1 - 1, batchIndex - 1);
+
+                                    for (int _dataType = 1; _dataType <= rMatrix.dataTypesCount; _dataType++)
+                                    {
+                                        int timeProces = timeProcessing[device - 1 - 1, _dataType - 1];
+                                        int psj = pMatrix[_dataType - 1, batchIndex - 1];
+
+                                        t2 += timeProces * psj;
+                                    }
 
                                     int value1 = t1 + t2;
 
-                                    t1 = tnMatrix[device + 1, batchIndex, q - 1];
+                                    t1 = tnMatrix[device, batchIndex, q - 1];
                                     t2 = 0;
 
-                                    t2 = timeCalc(deviceCount - 1, batchIndex - 1);
+                                    t2 = 0; // timeCalc(deviceCount - 1, batchIndex - 1);
+
+                                    for (int _dataType = 1; _dataType <= rMatrix.dataTypesCount; _dataType++)
+                                    {
+                                        int timeProces = timeProcessing[deviceCount - 1, _dataType - 1];
+                                        int psj = pMatrix[_dataType - 1, batchIndex - 1];
+
+                                        t2 += timeProces * psj;
+                                    }
 
                                     int value2 = t1 + t2;
 
@@ -354,9 +487,17 @@ namespace newAlgorithm.Service
                                 //57
                                 if (q == 1)
                                 {
-                                    int t1 = tnMatrix[device + 1 - 1, batchIndex, q];
+                                    int t1 = tnMatrix[device - 1, batchIndex, q];
                                     int t2 = 0;
-                                    t2 = timeCalc(deviceCount - 1 - 1, batchIndex - 1 - 1);
+                                    t2 = 0; // timeCalc(deviceCount - 1 - 1, batchIndex - 1);
+
+                                    for (int _dataType = 1; _dataType <= rMatrix.dataTypesCount; _dataType++)
+                                    {
+                                        int timeProces = timeProcessing[deviceCount - 1 - 1, _dataType - 1];
+                                        int psj = pMatrix[_dataType - 1, batchIndex - 1];
+
+                                        t2 += timeProces * psj;
+                                    }
 
                                     int value1 = t1 + t2;
 
@@ -364,8 +505,15 @@ namespace newAlgorithm.Service
                                     t2 = 0;
                                     int t3 = timeChangeover[deviceCount, previousType, currentDataType];
 
-                                    t2 = timeCalc(deviceCount - 1, batchIndex - 1 - 1);
+                                    t2 = 0; // timeCalc(deviceCount - 1, batchIndex - 1 - 1);
 
+                                    for (int _dataType = 1; _dataType <= rMatrix.dataTypesCount; _dataType++)
+                                    {
+                                        int timeProces = timeProcessing[deviceCount - 1, _dataType - 1];
+                                        int psj = pMatrix[_dataType - 1, batchIndex - 1 - 1];
+
+                                        t2 += timeProces * psj;
+                                    }
                                     int value2 = t1 + t2 + t3;
 
                                     int value = Math.Max(value1, value2);
@@ -379,14 +527,29 @@ namespace newAlgorithm.Service
                                 {
                                     int t1 = tnMatrix[deviceCount - 1, batchIndex, q];
                                     int t2 = 0;
-                                    t2 = timeCalc(deviceCount - 1 - 1, batchIndex - 1);
+                                    t2 = 0; // timeCalc(deviceCount - 1 - 1, batchIndex - 1);
 
+
+                                    for (int _dataType = 1; _dataType <= rMatrix.dataTypesCount; _dataType++)
+                                    {
+                                        int timeProces = timeProcessing[deviceCount - 1 - 1, _dataType - 1];
+                                        int psj = pMatrix[_dataType - 1, batchIndex - 1];
+
+                                        t2 += timeProces * psj;
+                                    }
                                     int value1 = t1 + t2;
 
                                     t1 = tnMatrix[deviceCount, batchIndex, q - 1];
                                     t2 = 0;
-                                    t2 = timeCalc(deviceCount - 1, batchIndex - 1);
+                                    t2 = 0; // timeCalc(deviceCount - 1, batchIndex - 1);
 
+                                    for (int _dataType = 1; _dataType <= rMatrix.dataTypesCount; _dataType++)
+                                    {
+                                        int timeProces = timeProcessing[deviceCount - 1, _dataType - 1];
+                                        int psj = pMatrix[_dataType - 1, batchIndex - 1];
+
+                                        t2 += timeProces * psj;
+                                    }
                                     int value2 = t1 + t2;
 
                                     int value = Math.Max(value1, value2);
