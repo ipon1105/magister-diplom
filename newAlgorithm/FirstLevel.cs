@@ -319,7 +319,8 @@ namespace newAlgorithm
         {
             using (var file = new StreamWriter(fileName))
             {
-                GenerateFixedBatchesSolution();
+                GenerateStartSolution();
+                //GenerateFixedBatchesSolution();
                 var shedule = new Shedule(matrixA_Prime);
                 //shedule.ConstructShedule();
                 shedule.ConstructSheduleWithBuffer(Form1.buff, dataTypesCount);
