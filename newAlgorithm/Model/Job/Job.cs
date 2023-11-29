@@ -12,17 +12,23 @@
         public int Type { get; private set; }
 
         /// <summary>
-        /// Данная переменная представляет из себя данные о позиции задания в системе, которые описываются целочисленным типом int
+        /// Данная переменная представляет из себя данные о позиции задания в системе, которые описываются целочисленным типом int и определяется, как (buffer+1)*deviceCount
         /// </summary>
-        public int Position { get; private set; }
+        private int Position;
 
         /// <summary>
         /// Данная переменная представляет из себя данные о состоянии задания в системе и может принимать значения в диапазоне от -1 до n включительно.
-        /// Когда State = -1, данное задание не имеет определённую позицию в системе
-        /// Когда State = 0, данное задание находися в буфере
-        /// Когда State = 1 и более, данное задание находится на обработке в приборе
+        /// Когда State = 0b00, тогда ("Задание в буфере" или "Задание вне системы") и "Спереди занято"
+        /// Когда State = 0b01, тогда "Задание в приборе" и "Спереди занято"
+        /// Когда State = 0b10, тогда ("Задание в буфере" или "Задание вне системы") и "Спереди свободно"
+        /// Когда State = 0b11, тогда "Задание в приборе" и "Спереди свободно"
         /// </summary>
-        private int State { get; set; }
+        public int State { get; set; }
+
+        /// <summary>
+        /// Время выполнения задания в системе
+        /// </summary>
+        private int proccessingTime;
 
         /// <summary>
         /// Данный конструктор принимает 3 параметра и возвращает экземпляр класса задания
@@ -36,5 +42,56 @@
             Position = position;
             State = state;
         }
+
+        /// <summary>
+        /// Сбрасываем значения задания по умолчанию
+        /// </summary>
+        public void Reset()
+        {
+
+            Position = 0;
+            State = -1;
+        }
+
+        /// <summary>
+        /// Возвращаем позицию
+        /// </summary>
+        /// <returns>Позиция</returns>
+        public int GetPosition()
+        {
+            return Position;
+        }
+
+        /// <summary>
+        /// Выполняем установку времени выполнения текущего задания
+        /// </summary>
+        /// <param name="proccessingTime"></param>
+        public void SetProccessingTime(int proccessingTime)
+        {
+            this.proccessingTime = proccessingTime;
+        }
+
+        /// <summary>
+        /// Выполняем единичный шаг для одного задания
+        /// </summary>
+        public void Step()
+        {
+
+            // Шаг длиной 1 временной промежуток
+            const int step = 1;
+
+            // Из текущего времени выполнения 
+            proccessingTime -= step;
+        }
+
+        /// <summary>
+        /// Возвращаем состояние задания, как завершённое
+        /// </summary>
+        /// <returns>True - Значит задание выполнено, иначе False</returns>
+        public bool IsFinish()
+        {
+            return proccessingTime <= 0;
+        }
+
     }
 }

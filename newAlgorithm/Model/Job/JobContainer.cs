@@ -49,7 +49,7 @@ namespace newAlgorithm.Model
             // Используем итераторы для увеличения производительности
             foreach (Job job in JobList)
             {
-                if (job.Position == position)
+                if (job.GetPosition() == position)
                     return job;
             }
 
