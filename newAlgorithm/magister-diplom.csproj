@@ -56,6 +56,7 @@
     <Compile Include="BatchTypeClaims.cs" />
     <Compile Include="CalculationService.cs" />
     <Compile Include="FirstLevel.cs" />
+    <Compile Include="Model\Batch.cs" />
     <Compile Include="UI\Form1.cs">
       <SubType>Form</SubType>
     </Compile>
