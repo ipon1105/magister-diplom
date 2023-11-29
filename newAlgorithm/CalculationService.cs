@@ -36,19 +36,19 @@ namespace newAlgorithm.Service
             int previousType = 0;
             int nJPrevious = 0;
 
-            // Для всех пакетов выполняем обработку. batchIndex так же известен, как h
+            // Для всех пакето выполняем обработку. batchIndex так же известен, как h
             for (int batchIndex = 1; batchIndex <= batchesForAllDataTypes; batchIndex++)
             {
 
-                // Получаем узел матрицы R в позиции batchIndex
+                // Получаем узел матрицы R
                 RMatrixNode currentNode = rMatrix[batchIndex];
 
-                // Из узла матрицы R вытаскиваем тип данных и количество заданий данного типа
-                int currentJobCount = currentNode.batchCount;
+                // Из узла матрицы R вытаскиваем тип данных и количество пакетов 
+                int currentbatchCount = currentNode.batchCount;
                 int currentDataType = currentNode.dataType;
 
-                // Для всех заданий выполняем обработку. job так же известен, как q
-                for (int job = 1; job <= currentJobCount; job++)
+                // Для всех пакетов выполняем обработку
+                for (int q = 1; q <= currentbatchCount; q++)
                 {
 
                     // Данная функция высчитываем время
@@ -74,377 +74,497 @@ namespace newAlgorithm.Service
                     }
 
 
-                    // Для всех приборов выполняем обработку
                     for (int device = 1; device <= deviceCount; device++)
                     {
-
-                        // Для первого прибора выполняем обработку
-                        if (device == 1)
+                        //4.1 (4)
+                        if (device == 1 && batchIndex == 1)
                         {
+                            //43
+                            if (q == 1)
+                                tnMatrix.AddNode(device, batchIndex, q, 0);
 
-                            // Для первого пакета в последовательности выполняем обработку
-                            // 4.1 (4)
-                            if (batchIndex == 1)
+
+                            //44
+                            if (1 < q && q <= b + 1)
                             {
-
-                                // Если данное задание является первым в пакете, добавляем его в матрицу
-                                if (job == 1)
-                                    tnMatrix.AddNode(device, batchIndex, job, 0);
-
-                                // Если данное задание не первое и не превышает размер буфера, выполняем обработку
-                                if (1 < job && job <= b + 1)
+                                int t1 = tnMatrix[device, batchIndex, q - 1];
+                                int t2 = 0;// timeCalc(device - 1, batchIndex - 1);
+                                for (int _dataType = 1; _dataType <= rMatrix.dataTypesCount; _dataType++)
                                 {
-                                    int t1 = tnMatrix[device, batchIndex, job - 1];
-                                    int t2 = timeCalc(device - 1, batchIndex - 1);
+                                    int timeProces = timeProcessing[device - 1, _dataType - 1];
+                                    int ps1 = pMatrix[_dataType - 1, batchIndex - 1];
 
-                                    int value = t1 + t2;
-                                    tnMatrix.AddNode(device, batchIndex, job, value);
-                                    continue;
+                                    t2 += timeProces * ps1;
                                 }
-
-                                // Если данное задание превышает размер буфера, выполняем обработку
-                                // 45
-                                // TODO: нет необходимости обрабатывать случай (job <= currentJobCount), если значение job не имзеняется динамично, так как условие прописано в 
-                                if (b + 1 < job && job <= currentJobCount)
-                                {
-                                    int t1 = tnMatrix[device, batchIndex, job - 1];
-                                    int t2 = timeCalc(device - 1, batchIndex - 1);
-
-                                    int value1 = t1 + t2;
-                                    int value2 = tnMatrix[device + 1, batchIndex, job - b];
-
-                                    int value = Math.Max(value1, value2);
-                                    tnMatrix.AddNode(device, batchIndex, job, value);
-                                }
-
-                                // Продолжаем вычисления для следующего прибора
-                                continue;
-
-                            }
-
-                            // Для любого не первого пакета в последовательности выполняем обработку
-                            // TODO: нет необходимости обрабатывать случай (batchIndex <= batchesForAllDataTypes), если значение batchIndex не имзеняется динамично, так как условие прописано в цикле
-                            if (2 <= batchIndex && batchIndex <= batchesForAllDataTypes)
-                            {
-
-                                // Для первого задания в пакете выполняем обработку
-                                if (job == 1)
-                                {
-                                    int t1 = tnMatrix[device, batchIndex - 1, nJPrevious];
-                                    int t2 = timeCalc(device - 1, batchIndex - 1 - 1);
-
-                                    int t3 = timeChangeover[device, previousType, currentDataType];
-
-                                    int value1 = t1 + t2 + t3;
-                                    int value2 = tnMatrix[device + 1, batchIndex - 1, nJPrevious - b + 1];
-
-                                    int value = Math.Max(value1, value2);
-                                    tnMatrix.AddNode(device, batchIndex, job, value);
-                                    continue;
-                                }
-
-                                // Если данное задание не первое и не превышает размер буфера, выполняем обработку
-                                if (1 < job && job <= b)
-                                {
-                                    int t1 = tnMatrix[device, batchIndex, job - 1];
-                                    int t2 = timeCalc(device - 1, batchIndex - 1);
-
-                                    int value1 = t1 + t2;
-                                    int value2 = tnMatrix[device + 1, batchIndex - 1, nJPrevious - b + job];
-
-                                    int value = Math.Max(value1, value2);
-
-                                    tnMatrix.AddNode(device, batchIndex, job, value);
-                                    continue;
-                                }
-
-                                // Если данное задание превышает размер буфера, выполняем обработку
-                                // 45
-                                // TODO: нет необходимости обрабатывать случай (job <= currentJobCount), если значение job не имзеняется динамично, так как условие прописано в 
-                                if (b + 1 <= job && job <= currentJobCount)
-                                {
-                                    int t1 = tnMatrix[device, batchIndex, job - 1];
-                                    int t2 = timeCalc(device - 1, batchIndex - 1);
-
-                                    int value1 = t1 + t2;
-                                    int value2 = tnMatrix[device + 1, batchIndex, job - b];
-
-                                    int value = Math.Max(value1, value2);
-                                    tnMatrix.AddNode(device, batchIndex, job, value);
-                                }
-
-                                // Продолжаем подсчёт
+                                int value = t1 + t2;
+                                tnMatrix.AddNode(device, batchIndex, q, value);
                                 continue;
                             }
 
+                            //45
+                            if (b + 1 < q && q <= currentbatchCount)
+                            {
+                                int t1 = tnMatrix[device, batchIndex, q - 1];
+                                int t2 = 0; //timeCalc(device - 1, batchIndex - 1)
+                                for (int _dataType = 1; _dataType <= rMatrix.dataTypesCount; _dataType++)
+                                {
+                                    int timeProces = timeProcessing[device - 1, _dataType - 1];
+                                    int ps1 = pMatrix[_dataType - 1, batchIndex - 1];
+
+                                    t2 += timeProces * ps1;
+                                }
+                                int value1 = t1 + t2;
+                                int value2 = tnMatrix[device + 1, batchIndex, q - b];
+
+                                int value = Math.Max(value1, value2);
+                                tnMatrix.AddNode(device, batchIndex, q, value);
+                            }
+                            continue;
                         }
 
-                        // Для любого не первого и не последнего прибора выполняем обработку
+
+                        //4.2 (5)
+                        if (device == 1 && 2 <= batchIndex && batchIndex <= batchesForAllDataTypes)
+                        {
+                            //46
+                            if (q == 1)
+                            {
+                                int t1 = tnMatrix[device, batchIndex - 1, nJPrevious];
+                                int t2 = 0; // timeCalc(device - 1, batchIndex - 1 - 1);
+                                for (int _dataType = 1; _dataType <= rMatrix.dataTypesCount; _dataType++)
+                                {
+                                    int timeProces = timeProcessing[device - 1, _dataType - 1];
+                                    int psj = pMatrix[_dataType - 1, batchIndex - 1 - 1];
+
+                                    t2 += timeProces * psj;
+                                }
+                                int t3 = timeChangeover[device, previousType, currentDataType];
+
+                                int value1 = t1 + t2 + t3;
+                                int value2 = tnMatrix[device + 1, batchIndex - 1, nJPrevious - b + 1];
+
+                                int value = Math.Max(value1, value2);
+                                tnMatrix.AddNode(device, batchIndex, q, value);
+                                continue;
+                            }
+
+                            //47
+                            if (1 < q && q <= b)
+                            {
+                                int t1 = tnMatrix[device, batchIndex, q - 1];
+                                int t2 = 0;// timeCalc(device - 1, batchIndex - 1);
+                                for (int _dataType = 1; _dataType <= rMatrix.dataTypesCount; _dataType++)
+                                {
+                                    int timeProces = timeProcessing[device - 1, _dataType - 1];
+                                    int psj = pMatrix[_dataType - 1, batchIndex - 1];
+
+                                    t2 += timeProces * psj;
+                                }
+                                int value1 = t1 + t2;
+                                int value2 = tnMatrix[device + 1, batchIndex - 1, nJPrevious - b + q];
+
+                                int value = Math.Max(value1, value2);
+
+                                tnMatrix.AddNode(device, batchIndex, q, value);
+                                continue;
+                            }
+
+                            //48
+                            if (b + 1 <= q && q <= currentbatchCount)
+                            {
+                                int t1 = tnMatrix[device, batchIndex, q - 1];
+                                int t2 = 0;// timeCalc(device - 1, batchIndex - 1);
+
+                                for (int _dataType = 1; _dataType <= rMatrix.dataTypesCount; _dataType++)
+                                {
+                                    int timeProces = timeProcessing[device - 1, _dataType - 1];
+                                    int psj = pMatrix[_dataType - 1, batchIndex - 1];
+
+                                    t2 += timeProces * psj;
+                                }
+
+                                int value1 = t1 + t2;
+                                int value2 = tnMatrix[device + 1, batchIndex, q - b];
+
+                                int value = Math.Max(value1, value2);
+                                tnMatrix.AddNode(device, batchIndex, q, value);
+                            }
+                            continue;
+                        }
+
+
                         //4.3 (6)
-                        if (2 <= device && device <= deviceCount - 1)
+                        if (2 <= device && device <= deviceCount - 1 && batchIndex == 1)
                         {
-
-                            // Для первого пакета в последовательности выполняем обработку
-                            if(batchIndex == 1)
+                            //49
+                            if (q == 1)
                             {
-
-                                // Для первого задания в пакете выполняем обработку
-                                // 49
-                                if (job == 1)
+                                int t1 = tnMatrix[device - 1, batchIndex, batchIndex];
+                                int t2 = 0; // timeCalc(device - 1 - 1, batchIndex - 1);
+                                for (int _dataType = 1; _dataType <= rMatrix.dataTypesCount; _dataType++)
                                 {
-                                    int t1 = tnMatrix[device - 1, batchIndex, batchIndex];
-                                    int t2 = timeCalc(device - 1 - 1, batchIndex - 1);
+                                    int timeProces = timeProcessing[device - 1 - 1, _dataType - 1];
+                                    int ps1 = pMatrix[_dataType - 1, batchIndex - 1];
 
-                                    int value = t1 + t2;
-                                    tnMatrix.AddNode(device, batchIndex, job, value);
-
-                                    // Продолжаем вычисления для следующего прибора
-                                    continue;
+                                    t2 += timeProces * ps1;
                                 }
-
-                                // Если данное задание не первое и не превышает размер буфера, выполняем обработку
-                                //50
-                                if (1 < job && job <= b + 1)
-                                {
-                                    int t1 = tnMatrix[device - 1, batchIndex, job];
-                                    int t2 = timeCalc(device - 1 - 1, 1 - 1);
-
-                                    int value1 = t1 + t2;
-
-                                    t1 = tnMatrix[device, batchIndex, job - 1];
-                                    t2 = timeCalc(device - 1, batchIndex - 1);
-
-                                    int value2 = t1 + t2;
-
-                                    int value = Math.Max(value1, value2);
-
-                                    tnMatrix.AddNode(device, batchIndex, job, value);
-
-                                    // Продолжаем вычисления для следующего прибора
-                                    continue;
-                                }
-
-                                // Если данное задание превышает размер буфера, выполняем обработку
-                                // 45
-                                // TODO: нет необходимости обрабатывать случай (job <= currentJobCount), если значение job не имзеняется динамично, так как условие прописано в 
-                                if (b + 1 < job && job <= currentJobCount)
-                                {
-                                    int t1 = tnMatrix[device - 1, batchIndex, job];
-                                    int t2 = timeCalc(device - 1 - 1, 1 - 1);
-
-                                    int value1 = t1 + t2;
-
-                                    t1 = tnMatrix[device, batchIndex, job - 1];
-                                    t2 = timeCalc(device - 1, batchIndex - 1);
-
-                                    int value2 = t1 + t2;
-
-                                    int value12max = Math.Max(value1, value2);
-
-                                    int value3 = tnMatrix[device + 1, batchIndex, job - b];
-
-                                    int value = Math.Max(value12max, value3);
-
-                                    tnMatrix.AddNode(device, batchIndex, job, value);
-                                }
-
-                                // Продолжаем вычисления для следующего прибора
+                                int value = t1 + t2;
+                                tnMatrix.AddNode(device, batchIndex, q, value);
                                 continue;
                             }
 
-                            // Для любого не первого пакета в последовательности выполняем обработку
-                            //4.4 (7)
-                            // TODO: нет необходимости обрабатывать случай (batchIndex <= batchesForAllDataTypes), если значение batchIndex не имзеняется динамично, так как условие прописано в цикле
-                            if (2 <= batchIndex && batchIndex <= batchesForAllDataTypes)
+                            //50
+                            if (1 < q && q <= b + 1)
                             {
-                                
-                                // Для первого задания в пакете выполняем обработку
-                                if (job == 1)
+                                int t1 = tnMatrix[device - 1, batchIndex, q];
+                                int t2 = 0; // timeCalc(device - 1 - 1, 1 - 1);
+
+                                for (int _dataType = 1; _dataType <= rMatrix.dataTypesCount; _dataType++)
                                 {
-                                    int t1 = tnMatrix[device - 1, batchIndex, 1];
-                                    int t2 = timeCalc(device - 1 - 1, batchIndex - 1);
+                                    int timeProces = timeProcessing[device - 1 - 1, _dataType - 1];
+                                    int ps1 = pMatrix[_dataType - 1, 1 - 1];
 
-                                    int value1 = t1 + t2;
-
-                                    t1 = tnMatrix[device, batchIndex - 1, nJPrevious];
-                                    t2 = timeCalc(device - 1, batchIndex - 1 - 1);
-                                    int t3 = timeChangeover[device, previousType, currentDataType];
-
-                                    int value2 = t1 + t2 + t3;
-
-                                    int value12max = Math.Max(value1, value2);
-
-                                    int value3 = tnMatrix[device + 1, batchIndex - 1, nJPrevious - b + 1];
-
-                                    int value = Math.Max(value12max, value3);
-
-                                    tnMatrix.AddNode(device, batchIndex, job, value);
-
-                                    // Продолжаем вычисления для следующего прибора
-                                    continue;
+                                    t2 += timeProces * ps1;
                                 }
+                                int value1 = t1 + t2;
 
-                                // Если данное задание не первое и не превышает размер буфера, выполняем обработку
-                                //53
-                                if (1 < job && job <= b)
+                                t1 = tnMatrix[device, batchIndex, q - 1];
+                                t2 = 0; // timeCalc(device - 1, batchIndex - 1);
+                                for (int _dataType = 1; _dataType <= rMatrix.dataTypesCount; _dataType++)
                                 {
-                                    int t1 = tnMatrix[device - 1, batchIndex, job];
-                                    int t2 = timeCalc(device - 1 - 1, batchIndex - 1);
+                                    int timeProces = timeProcessing[device - 1, _dataType - 1];
+                                    int ps1 = pMatrix[_dataType - 1, batchIndex - 1];
 
-                                    int value1 = t1 + t2;
-
-                                    t1 = tnMatrix[device, batchIndex, job - 1];
-                                    t2 = timeCalc(device - 1, batchIndex - 1);
-
-                                    int value2 = t1 + t2;
-
-                                    int value12max = Math.Max(value1, value2);
-
-                                    int value3 = tnMatrix[device + 1, batchIndex - 1, nJPrevious - b + job];
-
-                                    int value = Math.Max(value12max, value3);
-
-                                    tnMatrix.AddNode(device, batchIndex, job, value);
-
-                                    // Продолжаем вычисления для следующего прибора
-                                    continue;
+                                    t2 += timeProces * ps1;
                                 }
+                                int value2 = t1 + t2;
 
-                                // Если данное задание превышает размер буфера, выполняем обработку
-                                // 54
-                                // TODO: нет необходимости обрабатывать случай (job <= currentJobCount), если значение job не имзеняется динамично, так как условие прописано в 
-                                if (b + 1 <= job && job <= currentJobCount)
-                                {
-                                    int t1 = tnMatrix[device - 1, batchIndex, job];
-                                    int t2 = timeCalc(device - 1 - 1, batchIndex - 1);
+                                int value = Math.Max(value1, value2);
 
-                                    int value1 = t1 + t2;
-
-                                    t1 = tnMatrix[device, batchIndex, job - 1];
-                                    t2 = timeCalc(device - 1, batchIndex - 1);
-
-                                    int value2 = t1 + t2;
-
-                                    int value12max = Math.Max(value1, value2);
-
-                                    int value3 = tnMatrix[device + 1, batchIndex, job - b];
-
-                                    int value = Math.Max(value12max, value3);
-
-                                    tnMatrix.AddNode(device, batchIndex, job, value);
-                                }
-
-                                // Продолжаем вычисления для следующего прибора
+                                tnMatrix.AddNode(device, batchIndex, q, value);
                                 continue;
                             }
 
+                            //45
+                            if (b + 1 < q && q <= currentbatchCount)
+                            {
+                                int t1 = tnMatrix[device - 1, batchIndex, q];
+                                int t2 = 0; // timeCalc(device - 1 - 1, 1 - 1);
+
+                                for (int _dataType = 1; _dataType <= rMatrix.dataTypesCount; _dataType++)
+                                {
+                                    int timeProces = timeProcessing[device - 1 - 1, _dataType - 1];
+                                    int ps1 = pMatrix[_dataType - 1, 1 - 1];
+
+                                    t2 += timeProces * ps1;
+                                }
+                                int value1 = t1 + t2;
+
+                                t1 = tnMatrix[device, batchIndex, q - 1];
+                                t2 = 0; // timeCalc(device - 1, batchIndex - 1);
+                                for (int _dataType = 1; _dataType <= rMatrix.dataTypesCount; _dataType++)
+                                {
+                                    int timeProces = timeProcessing[device - 1, _dataType - 1];
+                                    int ps1 = pMatrix[_dataType - 1, batchIndex - 1];
+
+                                    t2 += timeProces * ps1;
+                                }
+                                int value2 = t1 + t2;
+
+                                int value12max = Math.Max(value1, value2);
+
+                                int value3 = tnMatrix[device + 1, batchIndex, q - b];
+
+                                int value = Math.Max(value12max, value3);
+
+                                tnMatrix.AddNode(device, batchIndex, q, value);
+                            }
+                            continue;
                         }
 
-                        // Для последнего прибора выполняем обработку
+
+
+                        //4.4 (7)
+                        if (2 <= device && device <= deviceCount - 1 && 2 <= batchIndex && batchIndex <= batchesForAllDataTypes)
+                        {
+                            //52
+                            if (q == 1)
+                            {
+                                int t1 = tnMatrix[device - 1, batchIndex, 1];
+
+                                int t2 = 0; // timeCalc(device - 1 - 2, batchIndex - 1);
+
+                                for (int _dataType = 1; _dataType <= rMatrix.dataTypesCount; _dataType++)
+                                {
+                                    int timeProces = timeProcessing[device - 1 - 1, _dataType - 1];
+                                    int psj = pMatrix[_dataType - 1, batchIndex - 1];
+
+                                    t2 += timeProces * psj;
+                                }
+                                int value1 = t1 + t2;
+
+                                t1 = tnMatrix[device, batchIndex - 1, nJPrevious];
+                                t2 = 0;
+                                int t3 = timeChangeover[device, previousType, currentDataType];
+
+                                t2 = 0; // timeCalc(device - 1, batchIndex - 1 - 1);
+
+                                for (int _dataType = 1; _dataType <= rMatrix.dataTypesCount; _dataType++)
+                                {
+                                    int timeProces = timeProcessing[device - 1, _dataType - 1];
+                                    int psj = pMatrix[_dataType - 1, batchIndex - 1 - 1];
+
+                                    t2 += timeProces * psj;
+                                }
+                                int value2 = t1 + t2 + t3;
+
+                                int value12max = Math.Max(value1, value2);
+
+                                int value3 = tnMatrix[device + 1, batchIndex - 1, nJPrevious - b + 1];
+
+                                int value = Math.Max(value12max, value3);
+
+                                tnMatrix.AddNode(device, batchIndex, q, value);
+                                continue;
+                            }
+
+                            //53
+                            if (1 < q && q <= b)
+                            {
+                                int t1 = tnMatrix[device - 1, batchIndex, q];
+                                int t2 = 0; // timeCalc(device - 1 - 1, batchIndex - 1);
+
+
+                                for (int _dataType = 1; _dataType <= rMatrix.dataTypesCount; _dataType++)
+                                {
+                                    int timeProces = timeProcessing[device - 1 - 1, _dataType - 1];
+                                    int psj = pMatrix[_dataType - 1, batchIndex - 1];
+
+                                    t2 += timeProces * psj;
+                                }
+                                int value1 = t1 + t2;
+
+                                t1 = tnMatrix[device, batchIndex, q - 1];
+                                t2 = 0;
+
+                                t2 = 0; // timeCalc(device - 1, batchIndex - 1);
+
+                                for (int _dataType = 1; _dataType <= rMatrix.dataTypesCount; _dataType++)
+                                {
+                                    int timeProces = timeProcessing[device - 1, _dataType - 1];
+                                    int psj = pMatrix[_dataType - 1, batchIndex - 1];
+
+                                    t2 += timeProces * psj;
+                                }
+
+                                int value2 = t1 + t2;
+
+                                int value12max = Math.Max(value1, value2);
+
+                                int value3 = tnMatrix[device + 1, batchIndex - 1, nJPrevious - b + q];
+
+                                int value = Math.Max(value12max, value3);
+
+                                tnMatrix.AddNode(device, batchIndex, q, value);
+                                continue;
+                            }
+
+                            //54
+                            if (b + 1 <= q && q <= currentbatchCount)
+                            {
+                                int t1 = tnMatrix[device - 1, batchIndex, q];
+                                int t2 = 0; // timeCalc(device - 1 - 1, batchIndex - 1);
+
+                                for (int _dataType = 1; _dataType <= rMatrix.dataTypesCount; _dataType++)
+                                {
+                                    int timeProces = timeProcessing[device - 1 - 1, _dataType - 1];
+                                    int psj = pMatrix[_dataType - 1, batchIndex - 1];
+
+                                    t2 += timeProces * psj;
+                                }
+
+                                int value1 = t1 + t2;
+
+                                t1 = tnMatrix[device, batchIndex, q - 1];
+                                t2 = 0;
+
+                                t2 = 0;// timeCalc(device - 1, batchIndex - 1 - 1); // TODO: или  batchIndex - 1 - 1
+
+                                for (int _dataType = 1; _dataType <= rMatrix.dataTypesCount; _dataType++)
+                                {
+                                    int timeProces = timeProcessing[device - 1, _dataType - 1];
+                                    int psj = pMatrix[_dataType - 1, batchIndex - 1];
+
+                                    t2 += timeProces * psj;
+                                }
+
+
+                                int value2 = t1 + t2;
+
+                                int value12max = Math.Max(value1, value2);
+
+                                int value3 = tnMatrix[device + 1, batchIndex, q - b];
+
+                                int value = Math.Max(value12max, value3);
+
+                                tnMatrix.AddNode(device, batchIndex, q, value);
+                            }
+                            continue;
+                        }
+
+
+
                         if (device == deviceCount)
                         {
 
-                            // Для первого пакета в последовательности выполняем обработку
+                            //4.5 (8)
                             if (batchIndex == 1)
                             {
 
-                                // Для первого задания в пакете выполняем обработку
-                                if (job == 1)
+                                //55
+                                if (q == 1)
                                 {
                                     int value = 0;
                                     for (int li = 1; li <= deviceCount - 1; li++)
                                     {
-                                        value += timeCalc(li - 1, 1 - 1);
+
+                                        // value += timeCalc(li - 1, 1 - 1);
+                                        for (int si = 1; si <= rMatrix.dataTypesCount; si++)
+                                        {
+                                            int timeProces = timeProcessing[li - 1, si - 1];
+                                            int psj = pMatrix[si - 1, 1 - 1];
+
+                                            value += timeProces * psj;
+                                        }
                                     }
 
-                                    tnMatrix.AddNode(deviceCount, batchIndex, job, value);
-
-                                    // Продолжаем вычисления для следующего прибора
+                                    tnMatrix.AddNode(deviceCount, batchIndex, q, value);
                                     continue;
                                 }
 
-                                // Если данное задание превышает размер буфера, выполняем обработку
-                                // 45
-                                // TODO: нет необходимости обрабатывать случай (job <= currentJobCount), если значение job не имзеняется динамично, так как условие прописано в 
-                                if (1 < job && job <= currentJobCount)
+                                //56
+                                if (1 < q && q <= currentbatchCount)
                                 {
-                                    int t1 = tnMatrix[device - 1, batchIndex, job];
-                                    int t2 = timeCalc(device - 1 - 1, batchIndex - 1);
+                                    int t1 = tnMatrix[device - 1, batchIndex, q];
+
+                                    int t2 = 0; // timeCalc(device - 1 - 1, batchIndex - 1);
+
+                                    for (int _dataType = 1; _dataType <= rMatrix.dataTypesCount; _dataType++)
+                                    {
+                                        int timeProces = timeProcessing[device - 1 - 1, _dataType - 1];
+                                        int psj = pMatrix[_dataType - 1, batchIndex - 1];
+
+                                        t2 += timeProces * psj;
+                                    }
 
                                     int value1 = t1 + t2;
 
-                                    t1 = tnMatrix[device, batchIndex, job - 1];
-                                    t2 = timeCalc(deviceCount - 1, batchIndex - 1);
+                                    t1 = tnMatrix[device, batchIndex, q - 1];
+                                    t2 = 0;
+
+                                    t2 = 0; // timeCalc(deviceCount - 1, batchIndex - 1);
+
+                                    for (int _dataType = 1; _dataType <= rMatrix.dataTypesCount; _dataType++)
+                                    {
+                                        int timeProces = timeProcessing[deviceCount - 1, _dataType - 1];
+                                        int psj = pMatrix[_dataType - 1, batchIndex - 1];
+
+                                        t2 += timeProces * psj;
+                                    }
 
                                     int value2 = t1 + t2;
 
                                     int value = Math.Max(value1, value2);
 
-                                    tnMatrix.AddNode(deviceCount, batchIndex, job, value);
+                                    tnMatrix.AddNode(deviceCount, batchIndex, q, value);
                                 }
-
-                                // Продолжаем вычисления для следующего прибора
                                 continue;
                             }
 
-                            // Дл
-                            // 4.5 (9)
-                            // TODO: нет необходимости обрабатывать случай (batchIndex <= batchesForAllDataTypes), если значение batchIndex не имзеняется динамично, так как условие прописано в цикле
+                            //4.5 (9)
                             if (2 <= batchIndex && batchIndex <= batchesForAllDataTypes)
                             {
-
-                                // Для первого задания в пакете выполняем 
-                                if (job == 1)
+                                //57
+                                if (q == 1)
                                 {
-                                    int t1 = tnMatrix[device - 1, batchIndex, job];
-                                    int t2 = timeCalc(deviceCount - 1 - 1, batchIndex - 1);
+                                    int t1 = tnMatrix[device - 1, batchIndex, q];
+                                    int t2 = 0;
+                                    t2 = 0; // timeCalc(deviceCount - 1 - 1, batchIndex - 1);
+
+                                    for (int _dataType = 1; _dataType <= rMatrix.dataTypesCount; _dataType++)
+                                    {
+                                        int timeProces = timeProcessing[deviceCount - 1 - 1, _dataType - 1];
+                                        int psj = pMatrix[_dataType - 1, batchIndex - 1];
+
+                                        t2 += timeProces * psj;
+                                    }
 
                                     int value1 = t1 + t2;
 
                                     t1 = tnMatrix[deviceCount, batchIndex - 1, nJPrevious];
-                                    t2 = timeCalc(deviceCount - 1, batchIndex - 1 - 1);
+                                    t2 = 0;
                                     int t3 = timeChangeover[deviceCount, previousType, currentDataType];
 
+                                    t2 = 0; // timeCalc(deviceCount - 1, batchIndex - 1 - 1);
+
+                                    for (int _dataType = 1; _dataType <= rMatrix.dataTypesCount; _dataType++)
+                                    {
+                                        int timeProces = timeProcessing[deviceCount - 1, _dataType - 1];
+                                        int psj = pMatrix[_dataType - 1, batchIndex - 1 - 1];
+
+                                        t2 += timeProces * psj;
+                                    }
                                     int value2 = t1 + t2 + t3;
 
                                     int value = Math.Max(value1, value2);
 
-                                    tnMatrix.AddNode(deviceCount, batchIndex, job, value);
-
-                                    // Продолжаем вычисления для следующего прибора
+                                    tnMatrix.AddNode(deviceCount, batchIndex, q, value);
                                     continue;
                                 }
 
-
-                                // Если данное задание превышает размер буфера, выполняем обработку
-                                // 48
-                                // TODO: нет необходимости обрабатывать случай (job <= currentJobCount), если значение job не имзеняется динамично, так как условие прописано в 
-                                if (1 < job && job <= currentJobCount)
+                                //58
+                                if (1 < q && q <= currentbatchCount)
                                 {
-                                    int t1 = tnMatrix[deviceCount - 1, batchIndex, job];
-                                    int t2 = timeCalc(deviceCount - 1 - 1, batchIndex - 1);
+                                    int t1 = tnMatrix[deviceCount - 1, batchIndex, q];
+                                    int t2 = 0;
+                                    t2 = 0; // timeCalc(deviceCount - 1 - 1, batchIndex - 1);
 
+
+                                    for (int _dataType = 1; _dataType <= rMatrix.dataTypesCount; _dataType++)
+                                    {
+                                        int timeProces = timeProcessing[deviceCount - 1 - 1, _dataType - 1];
+                                        int psj = pMatrix[_dataType - 1, batchIndex - 1];
+
+                                        t2 += timeProces * psj;
+                                    }
                                     int value1 = t1 + t2;
 
-                                    t1 = tnMatrix[deviceCount, batchIndex, job - 1];
-                                    t2 = timeCalc(deviceCount - 1, batchIndex - 1);
+                                    t1 = tnMatrix[deviceCount, batchIndex, q - 1];
+                                    t2 = 0;
+                                    t2 = 0; // timeCalc(deviceCount - 1, batchIndex - 1);
+
+                                    for (int _dataType = 1; _dataType <= rMatrix.dataTypesCount; _dataType++)
+                                    {
+                                        int timeProces = timeProcessing[deviceCount - 1, _dataType - 1];
+                                        int psj = pMatrix[_dataType - 1, batchIndex - 1];
+
+                                        t2 += timeProces * psj;
+                                    }
                                     int value2 = t1 + t2;
 
                                     int value = Math.Max(value1, value2);
 
-                                    tnMatrix.AddNode(deviceCount, batchIndex, job, value);
-
-                                    // Продолжаем вычисления для следующего прибора
+                                    tnMatrix.AddNode(deviceCount, batchIndex, q, value);
                                     continue;
                                 }
-
                             }
+
                         }
                     }
                 }
 
                 previousType = currentNode.dataType;
-                nJPrevious = currentJobCount;
+                nJPrevious = currentbatchCount;
             }
 
             return tnMatrix;

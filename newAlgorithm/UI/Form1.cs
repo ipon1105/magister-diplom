@@ -930,7 +930,6 @@ namespace newAlgorithm
         private void numeric_buffer_ValueChanged(object sender, EventArgs e)
         {
             buffer = Convert.ToInt32(numeric_buffer.Value);
-            Form1.buff = buffer;
         }
 
         /// <summary>
@@ -1111,7 +1110,6 @@ namespace newAlgorithm
             isOptimization = checkBox_optimization.Checked;
             selectoinType = SelectoinType.Undefined;
             isValueChagedToUpdate = false;
-            Form1.buff = buffer;
 
             // Инициализируем перменные для данных таблиц
             changeoverTime = new List<List<List<int>>>();
