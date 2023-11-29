@@ -43,6 +43,17 @@ namespace newAlgorithm.Model
             //         throw new Exception();
         }
 
+        public int GetItem(int i, int j)
+        {
+            try
+            {
+                return matrix[i - 1][j - 1];
+            }
+            catch (System.Exception)
+            {
+                return 0;
+            }
+        }
         /// <summary>
         /// Данное переопределение оператора индексирования позволяет присвоить и получить элементы по индексу
         /// </summary>
