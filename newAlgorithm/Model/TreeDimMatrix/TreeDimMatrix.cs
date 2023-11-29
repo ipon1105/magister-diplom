@@ -77,6 +77,16 @@ namespace newAlgorithm.Model
             return this;
         }
 
+        public int GetValue(int deviceNumber, int type, int position)
+        {
+            foreach (TreeDimMatrixNode node in treeDimMatrix)
+            {
+                if (node.device == deviceNumber && node.fromDataType == type && node.toDataType == position)
+                    return node.time;
+            }
+
+            return 0;
+        }
         public int this[int deviceIndex, int fromDataTypeIndex, int toDataTypeIndex]
         {
 
