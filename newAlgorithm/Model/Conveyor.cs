@@ -48,8 +48,9 @@ namespace magisterDiplom.Model
                 string.Concat("+------+", Environment.NewLine) +
                 string.Concat("|device|", Environment.NewLine) +
                 string.Concat("+------+", Environment.NewLine);
+            res = string.Copy(deviceElement);
 
-            for (int i = 0; i < deviceCount; i++)
+            for (int i = 0; i < deviceCount - 1; i++)
                 res += string.Concat(Enumerable.Repeat(bufferElement, buffer)) + deviceElement;
 
             return res;

@@ -1,4 +1,6 @@
-﻿using System;
+﻿using magisterDiplom.Model;
+using newAlgorithm.Model;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -25,9 +27,42 @@ namespace newAlgorithm
         [STAThread]
         static void Main()
         {
-            Application.EnableVisualStyles();
-            Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new Form1());
+            /// Для тестов
+            List<Job> jobs = new List<Job>()
+            {
+                new Job(0, 0),
+                new Job(1, 0),
+                new Job(2, 0),
+                new Job(3, 0),
+            };
+            int deviceCount = 3;
+            int buffer = 2;
+            Matrix proccessingTime = new Matrix(
+                new List<List<int>>
+                {
+                    new List<int>{4, 3, 2, 1},
+                    new List<int>{4, 3, 2, 1},
+                }
+            );
+            WorkSchedule schedule = new WorkSchedule(
+                jobs,
+                deviceCount,
+                buffer,
+                proccessingTime
+            );
+
+            bool a = false;
+
+            schedule.Step();
+            schedule.Step();
+            schedule.Step();
+            schedule.Step();
+            schedule.Step();
+
+            ///
+            ///Application.EnableVisualStyles();
+            ///Application.SetCompatibleTextRenderingDefault(false);
+            ///Application.Run(new Form1());
         }
     }
 }

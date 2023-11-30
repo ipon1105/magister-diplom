@@ -3,7 +3,7 @@
     /// <summary>
     /// Данный класс описывает задание в системе, которое обладает позицией и типом.
     /// </summary>
-    public class Job
+    public class Job : System.ICloneable
     {
         
         /// <summary>
@@ -93,5 +93,21 @@
             return proccessingTime <= 0;
         }
 
+        /// <summary>
+        /// Реализация интерфейса клонирования
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="System.NotImplementedException"></exception>
+        public object Clone()
+        {
+            Job j = new Job(this.Type, this.Position);
+            j.SetProccessingTime(this.proccessingTime);
+            return j;
+        }
+    
+        public override string ToString()
+        {
+            return this.proccessingTime.ToString();
+        }
     }
 }
