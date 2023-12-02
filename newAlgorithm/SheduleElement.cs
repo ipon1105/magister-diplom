@@ -6,38 +6,54 @@ using System.Threading.Tasks;
 
 namespace newAlgorithm
 {
+
+    /// <summary>
+    /// Описывает класс элемента расписания
+    /// </summary>
     class SheduleElement
     {
+
+        /// <summary>
+        /// Количество заданий
+        /// </summary>
         private int jobCount;
-        private int dataType = 0;
-        private List<int> _time;
+
+        /// <summary>
+        /// Тип данных
+        /// </summary>
+        private int dataType;
+
+        /// <summary>
+        /// Список из времён
+        /// </summary>
+        private List<int> time;
         
         /// <summary>
-        /// 
+        /// Создаём экземпляр класса SheduleElement
         /// </summary>
-        /// <param name="jobCount"></param>
-        /// <param name="dataType"></param>
-        /// <param name="time"></param>
+        /// <param name="jobCount">Количество заданий</param>
+        /// <param name="dataType">Тип данных</param>
+        /// <param name="time">Список времён</param>
         public SheduleElement(int jobCount, int dataType, List<int> time)
         {
             this.jobCount = jobCount;
             this.dataType = dataType;
-            _time = new List<int>(time);
+            this.time = new List<int>(time);
         }
 
         /// <summary>
-        /// 
+        /// Возвращаем количество заданий
         /// </summary>
-        /// <returns></returns>
-        public int getValue()
+        /// <returns>Количество заданий в партии</returns>
+        public int getJobCount()
         {
             return jobCount;
         }
 
         /// <summary>
-        /// Данная функция вовзращает тип
+        /// Данная функция вовзращает тип задания
         /// </summary>
-        /// <returns>Тип</returns>
+        /// <returns>Тип заданияы</returns>
         public int getType()
         {
             return dataType;
@@ -49,7 +65,7 @@ namespace newAlgorithm
         /// <returns>Список из элементов времени</returns>
         public List<int> getTime()
         {
-            return _time;
+            return time;
         }
     }
 }

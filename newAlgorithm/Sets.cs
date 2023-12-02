@@ -111,14 +111,14 @@ namespace newAlgorithm
 
             foreach (var kit in sets)
             {
+
+                // Если комплект не заполнен переопределяем элемент расписания
                 if (!kit.IsSetAllComposition())
-                {
-                    sheduleElement = kit.AddBatch(sheduleElement.getValue(), sheduleElement.getType(), sheduleElement.getTime());
-                }
-                if (sheduleElement.getValue() <= 0)
-                {
+                    sheduleElement = kit.AddBatch(sheduleElement.getJobCount(), sheduleElement.getType(), sheduleElement.getTime());
+
+                // Если количество заданий меньше или равно 0, прекращаем обрабтку
+                if (sheduleElement.getJobCount() <= 0)
                     return;
-                }
             }
         }
 
