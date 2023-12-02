@@ -35,7 +35,7 @@ namespace newAlgorithm
             this.Q = new Groups(5);
         }
 
-        public List<int> CalcFitnessList(List<List<int>> r, out int criteria, out int firstLevelCrit)
+        public List<int> CalcFitnessList(List<List<int>> matrixR, out int criteria, out int firstLevelCrit)
         {
             criteria = 0;
             firstLevelCrit = 0;
@@ -46,7 +46,7 @@ namespace newAlgorithm
             var time = 0;
 
             // Пробегаемся по всем типам в матрице R
-            foreach (var type in r)
+            foreach (var type in matrixR)
             {
                 
                 // Если количество частей будет больше количества групп, то прекращаем цикл
@@ -56,7 +56,7 @@ namespace newAlgorithm
                 // Пробегаемся по всем частям в векторе Type метрицы R
                 foreach (var party in type)
                 {
-                    PartyList[countParty][r.IndexOf(type)].Add(party);
+                    PartyList[countParty][matrixR.IndexOf(type)].Add(party);
                     
                     time += new Shedule(PartyList[countParty]).GetTimeWithCriterium(Tz, out criteria);
 
@@ -70,17 +70,17 @@ namespace newAlgorithm
                         }
                         timeListResult.Add(timeList.Last());
                         PartyList.Add(new List<List<int>>());
-                        PartyList[countParty][r.IndexOf(type)].Remove(PartyList[countParty][r.IndexOf(type)].Last());
+                        PartyList[countParty][matrixR.IndexOf(type)].Remove(PartyList[countParty][matrixR.IndexOf(type)].Last());
                         countParty++;
 
                         // Если количество частей будет больше количества групп, то прекращаем цикл
                         if (countParty >= countGroup)
                             break;
-                        while (PartyList[countParty].Count <= r.IndexOf(type))
+                        while (PartyList[countParty].Count <= matrixR.IndexOf(type))
                         {
                             PartyList[countParty].Add(new List<int>());
                         }
-                        PartyList[countParty][r.IndexOf(type)].Add(party);
+                        PartyList[countParty][matrixR.IndexOf(type)].Add(party);
                         time = 0;
                     }
                 }
