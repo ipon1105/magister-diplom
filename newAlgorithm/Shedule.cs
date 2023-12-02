@@ -27,6 +27,7 @@ namespace newAlgorithm
         /// <summary>
         /// Данный трёхмерный список представляет из себя матрицу переналадки прибора l с задания i на задание j
         /// TODO: Убрать статическое определение матрицы переналадки приборов, с целью масштабируемости
+        /// TODO: Переопределить трёхмерный матрица, как словарь с двумерными матрицами
         /// </summary>
         public static List<List<List<int>>> changeoverTime;
 
@@ -137,7 +138,7 @@ namespace newAlgorithm
 
 
         /// <summary>
-        /// 
+        /// Данная функция выполняет инициализацию матриц _startProcessing и _endProcessing в зависимости от матрицы matrixR
         /// </summary>
         private void CalculateShedule()
         {
