@@ -131,7 +131,8 @@ namespace newAlgorithm
                 {
                     var shedule = new Shedule(elem);
                     shedule.ConstructShedule();
-                    test.GetSolution(shedule.RetyrnR());
+                    shedule.BuildMatrixRWithTime();
+                    test.GetSolution(shedule.ReturnMatrixRWithTime());
                     CountTime.Add(test.GetNewCriterion(directedTime));
                 }
             }

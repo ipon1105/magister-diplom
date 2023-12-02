@@ -47,7 +47,7 @@ namespace newAlgorithm
         /// <summary>
         /// Данная переменная определяет время выполнения пакета в последней позиции на последнем устройстве
         /// </summary>
-        private int _timeConstructShedule;
+        private int timeOfLastScheduleExecution;
 
         /// <summary>
         /// Данный словарь определяет для каждого прибора собственную матрицу начала времени обработки. Каждая строка матрицы представляет из себя вектор заданий.
@@ -55,7 +55,7 @@ namespace newAlgorithm
         private Dictionary<int, List<List<int>>> startProcessing; // [deviceCount] : [maxBatchesPositions x jobCount]
 
         /// <summary>
-        /// Данный словарь определяет для каждого прибора собственную матрицу конца времени обработки. Каждая строка матрицы представляет из себя вектор заданий.
+        /// Данный словарь определяет для каждого прибора собственную матрицу конца времени обработки. Каждая строка матрицы представляет из себя вектор длиной в количество заданий и каждый элемент вектора это время конца обработки.
         /// </summary>
         private Dictionary<int, List<List<int>>> stopProcessing; // [deviceCount] : [maxBatchesPositions x jobCount]
 
@@ -64,7 +64,10 @@ namespace newAlgorithm
         /// </summary>
         public static Visualizer viz;
 
-        private List<SheduleElement> _rWithTime;
+        /// <summary>
+        /// Представляем матрицу R в виде списка классов SheduleElement
+        /// </summary>
+        private List<SheduleElement> matrixRWithTime;
 
         /// <summary>
         /// Данный конструктор вовзращает экземпляр данного класса на основе переданного параметра матрицы R
@@ -152,22 +155,53 @@ namespace newAlgorithm
         }
 
         /// <summary>
-        /// 
+        /// Выполяем построение матрицы R со временем окончания заданий
         /// </summary>
-        /// <returns></returns>
-        public List<SheduleElement> RetyrnR()
+        public void BuildMatrixRWithTime()
         {
-            _rWithTime = new List<SheduleElement>();
+
+            // Если матрица уже существует, отчищаем её
+            if (matrixRWithTime != null)
+                matrixRWithTime.Clear();
+
+            // Инициализируем матрицу R со временем
+            matrixRWithTime = new List<SheduleElement>();
+
+            // Для последнего прибора вычисляем матрицу R со временем
             for (int batchIndex = 0; batchIndex < stopProcessing[stopProcessing.Count - 1].Count; batchIndex++)
             {
 
-                // Получаем индекс ненулевого элемента в строке
+                // Получаем тип данных для матрицы R
                 var dataType = ReturnRDataType(batchIndex);
-                _rWithTime.Add(new SheduleElement(matrixR[batchIndex][dataType], dataType, stopProcessing[stopProcessing.Count - 1][batchIndex]));
+                var jobCount = matrixR[batchIndex][dataType];
+                var stopProcessingVector = stopProcessing[stopProcessing.Count - 1][batchIndex];
+
+                // Для каждой позиции создаём элемент расписания
+                SheduleElement element = new SheduleElement(
+                    jobCount,
+                    dataType,
+                    stopProcessingVector
+                );
+
+                // Добавляем элемент в список
+                matrixRWithTime.Add(element);
             }
-            return _rWithTime;
         }
 
+        /// <summary>
+        /// Возвращаем список из элементов ScheduleElement
+        /// </summary>
+        /// <returns>Список из элементов ScheduleElement</returns>
+        public List<SheduleElement> ReturnMatrixRWithTime()
+        {
+
+            // Если матрица не существует, вызываем функцию построения матрицы
+            if (matrixRWithTime == null)
+                BuildMatrixRWithTime();
+
+            // Возвращаем список матрицы R с временем
+            return matrixRWithTime;
+        }
 
         /// <summary>
         /// Данная функция выполняет инициализацию матриц _startProcessing и _endProcessing в зависимости от матрицы matrixR
@@ -252,7 +286,7 @@ namespace newAlgorithm
                         stopProcessing[device][batchIndex][job] = startProcessing[device][batchIndex][job] + proccessingTime[device][dataType];
 
                         // Определяем данную переменную, как время выполнения пакета в последней позиции на последнем устройстве
-                        _timeConstructShedule = stopProcessing[device][batchIndex][job];
+                        timeOfLastScheduleExecution = stopProcessing[device][batchIndex][job];
                         previousBatchIndex = batchIndex;
                         previousJob = job;
                         previousDataType = dataType;
@@ -282,8 +316,8 @@ namespace newAlgorithm
             // Для каждого позиции в последовательности выполняем перебор
             for (int batchIndex = 0; batchIndex < matrixR.Count; batchIndex++)
             {
-                int dataType = ReturnRDataType(batchIndex);
-                rMatrix.AddNode(dataType + 1, matrixR[batchIndex][dataType]);
+                int _dataType = ReturnRDataType(batchIndex);
+                rMatrix.AddNode(_dataType + 1, matrixR[batchIndex][_dataType]);
             }
 
             // Выполяем инициализацию матрицы P
@@ -293,11 +327,11 @@ namespace newAlgorithm
             for (int batchIndex = 0; batchIndex < matrixR.Count; batchIndex++)
             
                 // Для каждого типа данных выполняем перебор
-                for (int dataType = 0; dataType < matrixR[batchIndex].Count; dataType++)
+                for (int _dataType = 0; _dataType < matrixR[batchIndex].Count; _dataType++)
                 
                     // Если значение в позиции и типа не равно 0, инвертируем его в новой матрице pMatr
-                    if (matrixR[batchIndex][dataType] != 0)
-                        pMatr[dataType][batchIndex] = 1;
+                    if (matrixR[batchIndex][_dataType] != 0)
+                        pMatr[_dataType][batchIndex] = 1;
 
             // Инициализируем матрицу P
             Matrix pMatrix = new Matrix(pMatr);
@@ -305,22 +339,30 @@ namespace newAlgorithm
             // Инициализируем матрицу переналадки приборов
             TreeDimMatrix timeChangeover = new TreeDimMatrix(changeoverTime);
 
-
+            // Выполняем построение матрицы времён начала заданий
             TreeDimMatrix tnMatrix = CalculationService.CalculateTnMatrix(rMatrix, pMatrix, proccessingTimeMatrix, timeChangeover, bufferSize);
 
+            // Если визуализация включена отображаем Excel
             if (Form1.vizualizationOn)
             {
                 viz.CreateExcelAppList(deviceCount, dataTypesCount);
                 viz.Visualize(tnMatrix, proccessingTimeMatrix, rMatrix);
             }
 
+            // Достаём последний элемент из матрицы времён начала заданий
             TreeDimMatrixNode lastNode = tnMatrix.treeDimMatrix.Last();
-            int count = lastNode.time;
-            int type = rMatrix[lastNode.fromDataType].dataType;
 
-            int value = proccessingTimeMatrix[lastNode.device-1, type-1];
+            // Из последнего элемента матрицы достаём время начала обработки последнего задания
+            int startTime = lastNode.time;
 
-            _timeConstructShedule = count + value;
+            // Определяем тип последнего задания
+            int dataType = rMatrix[lastNode.fromDataType].dataType;
+
+            // Определяем время обработки последнего задания в системе
+            int procTime = proccessingTimeMatrix[lastNode.device-1, dataType-1];
+
+            // Определяем новое время выполнения последнего задания в расписании
+            timeOfLastScheduleExecution = startTime + procTime;
         }
 
         /// <summary>
@@ -358,7 +400,7 @@ namespace newAlgorithm
         {
             CalculateShedule();
             var matrixRCopy = ListUtils.MatrixIntDeepCopy(matrixR);
-            var tempTime = _timeConstructShedule;
+            var tempTime = timeOfLastScheduleExecution;
 
             for (var batchIndex_i = 0; batchIndex_i < matrixR.Count - 1; batchIndex_i++)
             {
@@ -369,12 +411,12 @@ namespace newAlgorithm
                     ListUtils.MatrixIntRowSwap(matrixR, batchIndex_i, batchIndex_j);
                 
                 CalculateShedule();
-                if (tempTime >= _timeConstructShedule) continue;
+                if (tempTime >= timeOfLastScheduleExecution) continue;
 
                 // TODO: Данная строчка может являеться не корректной, так как выполняет поверхностое
                 // копирования и после первого прохода будет ссылаться на одну и ту же матрицу
                 matrixR = matrixRCopy;
-                _timeConstructShedule = tempTime;
+                timeOfLastScheduleExecution = tempTime;
             }
             
         }
@@ -389,7 +431,7 @@ namespace newAlgorithm
         {
             CalculateSheduleWithBufer(bufferSize, dataTypesCount);
             var tempR = ListUtils.MatrixIntDeepCopy(matrixR);
-            var tempTime = _timeConstructShedule;
+            var tempTime = timeOfLastScheduleExecution;
 
             // Выполяем все возможные перестановки позиций
             // Для всех позиций от 0 до matrixR.Count - 1 выполняем перебор
@@ -407,13 +449,13 @@ namespace newAlgorithm
                 CalculateSheduleWithBufer(bufferSize, dataTypesCount);
 
                 // Если результат перестановки по времени хуже 
-                if (tempTime >= _timeConstructShedule)
+                if (tempTime >= timeOfLastScheduleExecution)
                     continue;
                 
                 // TODO: Данная строчка может являеться не корректной, так как выполняет поверхностое
                 // копирования и после первого прохода будет ссылаться на одну и ту же матрицу
                 matrixR = tempR;
-                _timeConstructShedule = tempTime;
+                timeOfLastScheduleExecution = tempTime;
             }
         }
 
@@ -445,7 +487,7 @@ namespace newAlgorithm
             }
 
             crit = (tz * deviceCount) - proccessingTime;
-            return _timeConstructShedule;
+            return timeOfLastScheduleExecution;
         }
 
         /// <summary>
@@ -455,7 +497,7 @@ namespace newAlgorithm
         public int GetTime()
         {
             //ConstructShedule();
-            return _timeConstructShedule;
+            return timeOfLastScheduleExecution;
         }
 
         #region Неиспользуемые фукнции, которые страшно удалять

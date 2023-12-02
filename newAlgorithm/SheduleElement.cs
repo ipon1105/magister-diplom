@@ -27,13 +27,13 @@ namespace newAlgorithm
         /// Список из времён
         /// </summary>
         private List<int> time;
-        
+
         /// <summary>
         /// Создаём экземпляр класса SheduleElement
         /// </summary>
         /// <param name="jobCount">Количество заданий</param>
         /// <param name="dataType">Тип данных</param>
-        /// <param name="time">Список времён</param>
+        /// <param name="time">Вектор длиной в количество заданий (jobCount) и каждый элемент вектора это время конца обработки</param>
         public SheduleElement(int jobCount, int dataType, List<int> time)
         {
             this.jobCount = jobCount;

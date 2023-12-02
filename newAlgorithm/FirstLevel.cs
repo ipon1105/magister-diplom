@@ -488,9 +488,12 @@ namespace newAlgorithm
             var shedule = new Shedule(tempA);
             //shedule.ConstructShedule();
             shedule.ConstructSheduleWithBuffer(3, dataTypesCount);
-            var r = shedule.RetyrnR();
+
+            shedule.BuildMatrixRWithTime();
+            var matrixRWithTime = shedule.ReturnMatrixRWithTime();
+
             var sets = new Sets(Form1.compositionSets, Form1.timeSets);
-            sets.GetSolution(r);
+            sets.GetSolution(matrixRWithTime);
             var time = sets.GetNewCriterion(Form1.direct);
             //var s = ListUtils.MatrixIntToString(tempA, ", ", "", ";");
             //f.Write(s + " - " + fBuf);
@@ -524,8 +527,9 @@ namespace newAlgorithm
                 // Выполяем построение расписания
                 shedule.ConstructShedule();
 
-                var r = shedule.RetyrnR();
-                sets.GetSolution(r);
+                shedule.BuildMatrixRWithTime();
+                var matrixRWithTime = shedule.ReturnMatrixRWithTime();
+                sets.GetSolution(matrixRWithTime);
                 var time = sets.GetNewCriterion(Form1.direct);
                 var _f1 = time;
                 _f1Buf = _f1;
@@ -571,9 +575,12 @@ namespace newAlgorithm
                             tempA = SetTempAFromA2(dataType, j);
                             shedule = new Shedule(tempA);
                             shedule.ConstructShedule();
-                            r = shedule.RetyrnR();
+
+                            shedule.BuildMatrixRWithTime();
+                            matrixRWithTime = shedule.ReturnMatrixRWithTime();
+
                             sets = new Sets(Form1.compositionSets, Form1.timeSets);
-                            sets.GetSolution(r);
+                            sets.GetSolution(matrixRWithTime);
                             time = sets.GetNewCriterion(Form1.direct);
                             //s = ListUtils.MatrixIntToString(tempA, ", ", "", ";");
                             //f.Write(s + " - " + time);

@@ -125,10 +125,10 @@ namespace newAlgorithm
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="shedule"></param>
-        public void GetSolution(List<SheduleElement> shedule)
+        /// <param name="matrixRWithTime"></param>
+        public void GetSolution(List<SheduleElement> matrixRWithTime)
         {
-            foreach (var scheduleElement in shedule)
+            foreach (var scheduleElement in matrixRWithTime)
             {
                 AddBatches(scheduleElement);
             }
