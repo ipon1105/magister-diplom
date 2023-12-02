@@ -5,6 +5,10 @@ using System.Reflection;
 
 namespace newAlgorithm.Service
 {
+
+    /// <summary>
+    /// Класс ответственный за отображения расписания в Excel
+    /// </summary>
     public class Visualizer
     {
         Application oXL;

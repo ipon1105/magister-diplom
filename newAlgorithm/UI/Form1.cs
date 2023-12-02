@@ -1135,6 +1135,12 @@ namespace newAlgorithm
             isValueChagedToUpdate = false;
             Form1.buff = buffer;
 
+            // Выполняем проверку на наличие Excel на компьютере
+            if (Type.GetTypeFromProgID("Excel.Application") == null)
+
+                // Выключаем графический компонент checkBox_visualization, если Excel нет на компьютере
+                checkBox_visualization.Enabled = false;
+
             // Инициализируем перменные для данных таблиц
             changeoverTime = new List<List<List<int>>>();
             proccessingTime = new List<List<int>>();
@@ -1260,5 +1266,4 @@ namespace newAlgorithm
         #endregion
 
     }
-
 }
