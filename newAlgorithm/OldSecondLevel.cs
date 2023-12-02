@@ -14,7 +14,7 @@ namespace newAlgorithm
         private Shedule shedule;
         private List<List<int>> A;
         public static int countL = 4;
-        private int L  = 4;
+        private int deviceCount  = 4;
         public static int Tz = 80;//вот здесь надо менять время обработки при 40 оно успеваетполностьюобработать все партии
         public int[] Prostoi = new int[4];
         public List<List<List<int>>> PartyList = new List<List<List<int>>>();
@@ -26,11 +26,11 @@ namespace newAlgorithm
             Q = new Groups(5);
         }
 
-        public OldSecondLevel(int tz, int countGroup, int l)
+        public OldSecondLevel(int tz, int countGroup, int deviceCount)
         {
             Tz = tz;
             this.countGroup = countGroup;
-            this.L = l;
+            this.deviceCount = deviceCount;
             this.groups = new Groups(5);
             this.Q = new Groups(5);
         }

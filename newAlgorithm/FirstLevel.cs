@@ -69,7 +69,7 @@ namespace newAlgorithm
         /// Алгоритм формирования фиксированных партий
         /// Данная функция выполняет инициализацию матрицы _a и вектора _i.
         /// Вектор _i инициализируется, как вектор из 1 длиной dataTypesCount.
-        /// Матрица _a инициализируется, как матрица [dataTypesCount x 1].
+        /// Матрица matrixA_Prime инициализируется, как матрица [dataTypesCount x 1] = [n x ].
         /// </summary>
         public void GenerateFixedBatchesSolution()
         {

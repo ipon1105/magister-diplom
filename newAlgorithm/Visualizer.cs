@@ -83,7 +83,6 @@ namespace newAlgorithm.Service
             catch (Exception) {}
         }
 
-        #region Неиспользуемые функции
 
         public void Visualize(TreeDimMatrix tnMatrix, Matrix timeProcessing, RMatrix rMatrix)
         {
@@ -113,6 +112,7 @@ namespace newAlgorithm.Service
             oSheet = (_Worksheet)oWB.Sheets.Add(After: oWB.Sheets[oWB.Sheets.Count]);
             InitExcelList(count);
         }
+        #region Неиспользуемые функции
 
         #endregion
     }

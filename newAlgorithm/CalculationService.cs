@@ -27,7 +27,7 @@ namespace newAlgorithm.Service
             TreeDimMatrix tnMatrix = new TreeDimMatrix(timeChangeover.deviceCount);
 
             // Количество пакетов для всех типов данных, так же известное как n_p
-            int batchesForAllDataTypes = pMatrix.columnCount;
+            int maxBatchesPositions = pMatrix.columnCount;
 
             // Количество приборов в конвейерной системе
             int deviceCount = timeChangeover.deviceCount;
@@ -37,7 +37,7 @@ namespace newAlgorithm.Service
             int nJPrevious = 0;
 
             // Для всех пакетов выполняем обработку. batchIndex так же известен, как h
-            for (int batchIndex = 1; batchIndex <= batchesForAllDataTypes; batchIndex++)
+            for (int batchIndex = 1; batchIndex <= maxBatchesPositions; batchIndex++)
             {
 
                 // Получаем узел матрицы R в позиции batchIndex
@@ -124,7 +124,7 @@ namespace newAlgorithm.Service
 
                             // Для любого не первого пакета в последовательности выполняем обработку
                             // TODO: нет необходимости обрабатывать случай (batchIndex <= batchesForAllDataTypes), если значение batchIndex не имзеняется динамично, так как условие прописано в цикле
-                            if (2 <= batchIndex && batchIndex <= batchesForAllDataTypes)
+                            if (2 <= batchIndex && batchIndex <= maxBatchesPositions)
                             {
 
                                 // Для первого задания в пакете выполняем обработку
@@ -255,7 +255,7 @@ namespace newAlgorithm.Service
                             // Для любого не первого пакета в последовательности выполняем обработку
                             //4.4 (7)
                             // TODO: нет необходимости обрабатывать случай (batchIndex <= batchesForAllDataTypes), если значение batchIndex не имзеняется динамично, так как условие прописано в цикле
-                            if (2 <= batchIndex && batchIndex <= batchesForAllDataTypes)
+                            if (2 <= batchIndex && batchIndex <= maxBatchesPositions)
                             {
                                 
                                 // Для первого задания в пакете выполняем обработку
@@ -390,7 +390,7 @@ namespace newAlgorithm.Service
                             // Дл
                             // 4.5 (9)
                             // TODO: нет необходимости обрабатывать случай (batchIndex <= batchesForAllDataTypes), если значение batchIndex не имзеняется динамично, так как условие прописано в цикле
-                            if (2 <= batchIndex && batchIndex <= batchesForAllDataTypes)
+                            if (2 <= batchIndex && batchIndex <= maxBatchesPositions)
                             {
 
                                 // Для первого задания в пакете выполняем 

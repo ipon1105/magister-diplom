@@ -93,6 +93,9 @@ namespace newAlgorithm
         public Shedule(List<List<int>> matrixA)
         {
             InitMatrixR(matrixA);
+
+            // Инициализируем экземпляр класс для визуализации
+            viz = new Visualizer(deviceCount, matrixR[0].Count);
         }
 
         /// <summary>
@@ -299,16 +302,16 @@ namespace newAlgorithm
 
             TreeDimMatrix tnMatrix = CalculationService.CalculateTnMatrix(rMatrix, pMatrix, proccessingTimeMatrix, timeChangeover, bufferSize);
 
-            //if (viz == null)
-            //{
-            //    viz = new Visualizer(deviceCount, countType);
-            //}
-            //else
-            //{
-            //    viz.CreateExcelAppList(deviceCount, countType);
-            //}
+            if (viz == null)
+            {
+                viz = new Visualizer(deviceCount, dataTypesCount);
+            }
+            else
+            {
+                viz.CreateExcelAppList(deviceCount, dataTypesCount);
+            }
 
-            //viz.Visualize(tnMatrix, timeProcessing, rMatrix);
+            viz.Visualize(tnMatrix, proccessingTimeMatrix, rMatrix);
 
             TreeDimMatrixNode lastNode = tnMatrix.treeDimMatrix.Last();
             int count = lastNode.time;
