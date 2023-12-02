@@ -323,16 +323,26 @@ namespace newAlgorithm
             // Формируем вектор из значений { 2, 4, 8, 16, 32 }, для генерации матриц выполнения и переналадки
             int[] time = { 2, 4, 8, 16, 32 };
 
-            var file = "test/testFile_";
+            var file = "testFile_";
             var str = "direct";
             if (!Form1.direct)
             {
                 str = "first_task";
             }
-            var n_kom = Convert.ToInt32(textBox1.Text);
+
+            var n_kom = 2;
+            var n_kom_q = 2;
+            try
+            {
+                n_kom = Convert.ToInt32(textBox1.Text);
+                n_kom_q = Convert.ToInt32(textBox2.Text);
+            } catch (Exception ex)
+            {
+                n_kom = 2;
+                n_kom_q = 2;
+            }
             var rand = new Random((int)DateTime.Now.ToBinary());
             var temp = 0;
-            var n_kom_q = Convert.ToInt32(textBox2.Text);
             var fileOut = new StreamWriter(file + "All_" + str + "_" + n_kom + "_" + n_kom_q + "_new.txt", true);
 
             timeSets = new List<List<int>>();
