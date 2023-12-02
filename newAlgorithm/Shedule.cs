@@ -48,7 +48,7 @@ namespace newAlgorithm
 
         public static Visualizer viz;
         private Dictionary<int, List<List<int>>> startProcessing; // [deviceCount] : [??? x ???]
-        private List<List<List<int>>> _endProcessing; // [deviceCount x ??? x ???]
+        private Dictionary<int, List<List<int>>> stopProcessing; // [deviceCount] : [??? x ???]
         private List<SheduleElement> _rWithTime;
 
         /// <summary>
@@ -126,12 +126,12 @@ namespace newAlgorithm
         public List<SheduleElement> RetyrnR()
         {
             _rWithTime = new List<SheduleElement>();
-            for (int batchIndex = 0; batchIndex < _endProcessing[_endProcessing.Count - 1].Count; batchIndex++)
+            for (int batchIndex = 0; batchIndex < stopProcessing[stopProcessing.Count - 1].Count; batchIndex++)
             {
 
                 // Получаем индекс ненулевого элемента в строке
                 var dataType = ReturnRDataType(batchIndex);
-                _rWithTime.Add(new SheduleElement(matrixR[batchIndex][dataType], dataType, _endProcessing[_endProcessing.Count - 1][batchIndex]));
+                _rWithTime.Add(new SheduleElement(matrixR[batchIndex][dataType], dataType, stopProcessing[stopProcessing.Count - 1][batchIndex]));
             }
             return _rWithTime;
         }
@@ -142,18 +142,23 @@ namespace newAlgorithm
         /// </summary>
         private void CalculateShedule()
         {
-            // Выполняем инициализацию трёхмерных матриц
+
+            // Проверка на инициализацию словаря
             if (startProcessing != null)
                 startProcessing.Clear();
-
             
+            // Проверка на инициализацию словаря
+            if (stopProcessing != null)
+                stopProcessing.Clear();
+
+
             startProcessing = new Dictionary<int, List<List<int>>>();
-            _endProcessing = new List<List<List<int>>>(deviceCount);
-            _endProcessing.AddRange(Enumerable.Repeat(new List<List<int>>(matrixR.Count), deviceCount));
+            stopProcessing = new Dictionary<int, List<List<int>>>();
 
             // Для каждого прибора выполняем перебор
             for (var device = 0; device < deviceCount; device++) { 
                 List<List<int>> startProccessingMatrix = new List<List<int>>();
+                List<List<int>> stopProccessingMatrix = new List<List<int>>();
 
                 // Для каждой возможной позиции выполняем обработку
                 for (var batchIndex = 0; batchIndex < matrixR.Count; batchIndex++)//количество партий
@@ -167,17 +172,14 @@ namespace newAlgorithm
                     if (jobCount == -1)
                         jobCount = 1;
 
-                    // Для временных матриц выполняем иницаиализацию 
-                    startProccessingMatrix.Add(new List<int>(jobCount));
-                    _endProcessing[device].Add(new List<int>(jobCount));
-                    for (var job = 0; job < jobCount; job++)//количество требований
-                    {
-                        startProccessingMatrix[batchIndex].Add(0);
-                        _endProcessing[device][batchIndex].Add(0);
-                    }
+                    // Для временных матриц выполняем инициализацию 
+                    startProccessingMatrix.Add(ListUtils.InitVectorInt(jobCount, 0));
+                    stopProccessingMatrix.Add(ListUtils.InitVectorInt(jobCount, 0));
                 }
 
+                // Добавляем матрицы в словари
                 startProcessing.Add(device, startProccessingMatrix);
+                stopProcessing.Add(device, stopProccessingMatrix);
             }
 
             var previousBatchIndex = 0;
@@ -209,19 +211,19 @@ namespace newAlgorithm
                             // высчитываем, как время конца выполнения предыдущей партии previousBatch на приборе device в предыдущей позиции 
                             //                + время переналадки на выполнение партии данного типа, которое может быть равно 0 или
                             // как время конца выполнения данной партии batch на предыдущем приборе device - 1 в текущей позиции position
-                            startProcessing[device][batchIndex][job] = Math.Max(_endProcessing[device][previousBatchIndex][previousJob] + timeToSwitch, _endProcessing[device - 1][batchIndex][job]);
+                            startProcessing[device][batchIndex][job] = Math.Max(stopProcessing[device][previousBatchIndex][previousJob] + timeToSwitch, stopProcessing[device - 1][batchIndex][job]);
                         
                         else
 
                             // Время начала выполнения партии batch на приборе device в позиции position
                             // высчитываем, как время конца выполнения предыдущей партии previousBatch на приборе device в предыдущей позиции 
                             //                + время переналадки на выполнение партии данного типа, которое может быть равно 0.
-                            startProcessing[device][batchIndex][job] = _endProcessing[device][previousBatchIndex][previousJob] + timeToSwitch;
+                            startProcessing[device][batchIndex][job] = stopProcessing[device][previousBatchIndex][previousJob] + timeToSwitch;
 
-                        _endProcessing[device][batchIndex][job] = startProcessing[device][batchIndex][job] + proccessingTime[device][dataType];
+                        stopProcessing[device][batchIndex][job] = startProcessing[device][batchIndex][job] + proccessingTime[device][dataType];
 
                         // Определяем данную переменную, как время выполнения пакета в последней позиции на последнем устройстве
-                        _timeConstructShedule = _endProcessing[device][batchIndex][job];
+                        _timeConstructShedule = stopProcessing[device][batchIndex][job];
                         previousBatchIndex = batchIndex;
                         previousJob = job;
                         previousDataType = dataType;
@@ -397,7 +399,7 @@ namespace newAlgorithm
                 {
                     for (int numberWork = 0; numberWork < startProcessing[device][numberBatch].Count; numberWork++)
                     {
-                        proccessingTime += _endProcessing[device][numberBatch][numberWork] - startProcessing[device][numberBatch][numberWork];
+                        proccessingTime += stopProcessing[device][numberBatch][numberWork] - startProcessing[device][numberBatch][numberWork];
                     }
                 }
 
