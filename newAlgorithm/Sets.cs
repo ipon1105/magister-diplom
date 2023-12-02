@@ -11,7 +11,7 @@ namespace newAlgorithm
         /// <summary>
         /// Данная переменная определяем типы данных
         /// </summary>
-        private readonly int _types;
+        private readonly int dataTypesCount;
         private List<List<Kit>> _readySets;
 
         /// <summary>
@@ -21,21 +21,21 @@ namespace newAlgorithm
         /// <param name="time"></param>
         public Sets(List<List<int>> composition, List<List<int>> time)
         {
-            _types = composition.Count;
+            dataTypesCount = composition.Count;
             _readySets = new List<List<Kit>>();
 
             // Для каджого из типов данных
-            for (int i = 0; i < _types; i++)
+            for (int dataType = 0; dataType < dataTypesCount; dataType++)
             {
 
                 // Создаём набор и добавляем их в переменную _readySets
                 _readySets.Add(new List<Kit>());
 
                 // Для каждого из списка 
-                for (int j = 0; j < time[i].Count; j++)
+                for (int j = 0; j < time[dataType].Count; j++)
                 {
 
-                    _readySets[i].Add(new Kit(composition[i], time[i][j]));
+                    _readySets[dataType].Add(new Kit(composition[dataType], time[dataType][j]));
                 }
             }
         }
@@ -58,11 +58,11 @@ namespace newAlgorithm
                 foreach (var row in _readySets)
 
                     // Для всех столбцов в строке готового множества
-                    foreach (var elem in row)
+                    foreach (var kit in row)
 
                         // Выполяем обработку
-                        if (elem.GetTime() > elem.GetCompositionTime())
-                            res += elem.GetTime() - elem.GetCompositionTime();
+                        if (kit.GetTime() > kit.GetCompositionTime())
+                            res += kit.GetTime() - kit.GetCompositionTime();
                     
                 // Возвращаем результат
                 return res;
@@ -109,11 +109,11 @@ namespace newAlgorithm
                 
             );
 
-            foreach (var elem in sets)
+            foreach (var kit in sets)
             {
-                if (!elem.IsSetAllComposition())
+                if (!kit.IsSetAllComposition())
                 {
-                    sheduleElement = elem.AddBatch(sheduleElement.getValue(), sheduleElement.getType(), sheduleElement.getTime());
+                    sheduleElement = kit.AddBatch(sheduleElement.getValue(), sheduleElement.getType(), sheduleElement.getTime());
                 }
                 if (sheduleElement.getValue() <= 0)
                 {
@@ -128,9 +128,9 @@ namespace newAlgorithm
         /// <param name="shedule"></param>
         public void GetSolution(List<SheduleElement> shedule)
         {
-            foreach (var element in shedule)
+            foreach (var scheduleElement in shedule)
             {
-                AddBatches(element);
+                AddBatches(scheduleElement);
             }
         }
 
