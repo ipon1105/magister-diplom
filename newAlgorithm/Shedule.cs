@@ -47,7 +47,7 @@ namespace newAlgorithm
         private int _timeConstructShedule;
 
         public static Visualizer viz;
-        private List<List<List<int>>> _startProcessing; // [deviceCount x ??? x ???]
+        private Dictionary<int, List<List<int>>> startProcessing; // [deviceCount] : [??? x ???]
         private List<List<List<int>>> _endProcessing; // [deviceCount x ??? x ???]
         private List<SheduleElement> _rWithTime;
 
@@ -143,13 +143,17 @@ namespace newAlgorithm
         private void CalculateShedule()
         {
             // Выполняем инициализацию трёхмерных матриц
-            _startProcessing = new List<List<List<int>>>(deviceCount);
-            _startProcessing.AddRange(Enumerable.Repeat(new List<List<int>>(matrixR.Count), deviceCount));
+            if (startProcessing != null)
+                startProcessing.Clear();
+
+            
+            startProcessing = new Dictionary<int, List<List<int>>>();
             _endProcessing = new List<List<List<int>>>(deviceCount);
             _endProcessing.AddRange(Enumerable.Repeat(new List<List<int>>(matrixR.Count), deviceCount));
 
             // Для каждого прибора выполняем перебор
-            for (var device = 0; device < deviceCount; device++)
+            for (var device = 0; device < deviceCount; device++) { 
+                List<List<int>> startProccessingMatrix = new List<List<int>>();
 
                 // Для каждой возможной позиции выполняем обработку
                 for (var batchIndex = 0; batchIndex < matrixR.Count; batchIndex++)//количество партий
@@ -162,17 +166,20 @@ namespace newAlgorithm
                     var jobCount = matrixR[batchIndex][dataType];
                     if (jobCount == -1)
                         jobCount = 1;
-                    
+
                     // Для временных матриц выполняем иницаиализацию 
-                    _startProcessing[device].Add(new List<int>(jobCount));
+                    startProccessingMatrix.Add(new List<int>(jobCount));
                     _endProcessing[device].Add(new List<int>(jobCount));
                     for (var job = 0; job < jobCount; job++)//количество требований
                     {
-                        _startProcessing[device][batchIndex].Add(0);
+                        startProccessingMatrix[batchIndex].Add(0);
                         _endProcessing[device][batchIndex].Add(0);
                     }
                 }
-            
+
+                startProcessing.Add(device, startProccessingMatrix);
+            }
+
             var previousBatchIndex = 0;
             var previousJob = 0;
             var previousDataType = 0;
@@ -202,16 +209,16 @@ namespace newAlgorithm
                             // высчитываем, как время конца выполнения предыдущей партии previousBatch на приборе device в предыдущей позиции 
                             //                + время переналадки на выполнение партии данного типа, которое может быть равно 0 или
                             // как время конца выполнения данной партии batch на предыдущем приборе device - 1 в текущей позиции position
-                            _startProcessing[device][batchIndex][job] = Math.Max(_endProcessing[device][previousBatchIndex][previousJob] + timeToSwitch, _endProcessing[device - 1][batchIndex][job]);
+                            startProcessing[device][batchIndex][job] = Math.Max(_endProcessing[device][previousBatchIndex][previousJob] + timeToSwitch, _endProcessing[device - 1][batchIndex][job]);
                         
                         else
 
                             // Время начала выполнения партии batch на приборе device в позиции position
                             // высчитываем, как время конца выполнения предыдущей партии previousBatch на приборе device в предыдущей позиции 
                             //                + время переналадки на выполнение партии данного типа, которое может быть равно 0.
-                            _startProcessing[device][batchIndex][job] = _endProcessing[device][previousBatchIndex][previousJob] + timeToSwitch;
+                            startProcessing[device][batchIndex][job] = _endProcessing[device][previousBatchIndex][previousJob] + timeToSwitch;
 
-                        _endProcessing[device][batchIndex][job] = _startProcessing[device][batchIndex][job] + proccessingTime[device][dataType];
+                        _endProcessing[device][batchIndex][job] = startProcessing[device][batchIndex][job] + proccessingTime[device][dataType];
 
                         // Определяем данную переменную, как время выполнения пакета в последней позиции на последнем устройстве
                         _timeConstructShedule = _endProcessing[device][batchIndex][job];
@@ -386,15 +393,15 @@ namespace newAlgorithm
             // Для каждого прибора высчитываем время выполнения
             for (int device = 0; device < deviceCount; device++)
             {
-                for (int numberBatch = 0; numberBatch < _startProcessing[device].Count; numberBatch++)
+                for (int numberBatch = 0; numberBatch < startProcessing[device].Count; numberBatch++)
                 {
-                    for (int numberWork = 0; numberWork < _startProcessing[device][numberBatch].Count; numberWork++)
+                    for (int numberWork = 0; numberWork < startProcessing[device][numberBatch].Count; numberWork++)
                     {
-                        proccessingTime += _endProcessing[device][numberBatch][numberWork] - _startProcessing[device][numberBatch][numberWork];
+                        proccessingTime += _endProcessing[device][numberBatch][numberWork] - startProcessing[device][numberBatch][numberWork];
                     }
                 }
 
-                proccessingTime -= _startProcessing[device][0][0];
+                proccessingTime -= startProcessing[device][0][0];
             }
 
             crit = (tz * deviceCount) - proccessingTime;
