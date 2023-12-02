@@ -34,9 +34,12 @@ namespace newAlgorithm
         /// <summary>
         /// Матрица количества данных i-ых типов в партиях,
         /// занимающих в последовательностях pi_l j-ые позиции
-        /// Данная матрица имеет представление, где в строке все элементы 0,
+        /// Данная матрица имеет представление, где в строке 
+        /// (строка есть позиция) все элементы 0 (столбец есть тип данных),
         /// кроме одно например для матрицы 3x3:
-        /// [ [3,0,0], [0,3,0], [0,0,3] ]
+        /// [ [3,0,0],
+        ///   [0,3,0],
+        ///   [0,0,3],]
         /// TODO: Данная реализация подразумеваем перевернутую матрицу R, где количество строк, это возможные позиции в последовательность, а количество столбцов, это типы данных, необходимо будет исправить данную оплошность
         /// </summary>
         private List<List<int>> matrixR;
@@ -46,9 +49,17 @@ namespace newAlgorithm
         /// </summary>
         private int _timeConstructShedule;
 
+        /// <summary>
+        /// Данный словарь определяет для каждого прибора собственную матрицу начала времени обработки. Каждая строка матрицы представляет из себя вектор заданий.
+        /// </summary>
+        private Dictionary<int, List<List<int>>> startProcessing; // [deviceCount] : [maxBatchesPositions x jobCount]
+
+        /// <summary>
+        /// Данный словарь определяет для каждого прибора собственную матрицу конца времени обработки. Каждая строка матрицы представляет из себя вектор заданий.
+        /// </summary>
+        private Dictionary<int, List<List<int>>> stopProcessing; // [deviceCount] : [maxBatchesPositions x jobCount]
+
         public static Visualizer viz;
-        private Dictionary<int, List<List<int>>> startProcessing; // [deviceCount] : [??? x ???]
-        private Dictionary<int, List<List<int>>> stopProcessing; // [deviceCount] : [??? x ???]
         private List<SheduleElement> _rWithTime;
 
         /// <summary>
@@ -58,8 +69,20 @@ namespace newAlgorithm
         /// <param name="deviceCount">Количество приборов в конвейерной системе</param>
         public Shedule(List<List<int>> matrixR, int deviceCount)
         {
+
+            // Проверяем инициализацю матрицы
+            if (this.matrixR != null)
+
+                // Если матрицу уже существует - отчищаем её
+                this.matrixR.Clear();
+
+            // Выполняем переопределение новой матрицы
             this.matrixR = matrixR;
+
+            // Определяем новое количество приборов
             Shedule.deviceCount = deviceCount;
+
+            // Инициализируем экземпляр класс для визуализации
             viz = new Visualizer(deviceCount, matrixR[0].Count);
         }
 
@@ -90,32 +113,32 @@ namespace newAlgorithm
             // Тогда сумма всех количеств партий (batchesForAllDataTypes, так же
             // известное, как n_p), представляет из себя количество возможных позиций
             // партий в последовательности pi_l
-            var batchesForAllDataTypes = matrixA.Sum(batchesList => batchesList.Count);
+            var maxBatchesPositions = matrixA.Sum(batchesList => batchesList.Count);
 
             // Объявляем максимальный количество партий (max(mi))
-            var maxBatchCount = 0;
+            var maxBatchSize = 0;
 
             // Высчитываем максимальный размер колонки, 
             foreach (var mi in matrixA)
-                maxBatchCount = (mi.Count > maxBatchCount) ? mi.Count : maxBatchCount;
+                maxBatchSize = (mi.Count > maxBatchSize) ? mi.Count : maxBatchSize;
 
-            // Создаём матрицу из 0, как [n_p x dataTypesCount]
-            matrixR = ListUtils.InitMatrixInt(batchesForAllDataTypes, matrixA.Count, 0);
+            // Создаём матрицу из 0, как [maxBatchesPositions x dataTypesCount] = [n_p x n]
+            matrixR = ListUtils.InitMatrixInt(maxBatchesPositions, matrixA.Count, 0);
             
             // Данная переменная описывает позицию в последовательности pi_l
             var batchIndex = 0;
 
             // Пробегаемся по всем возможным пакетам - колонкам(max(mi)) матрицы R
-            for (var batch = 0; batch < maxBatchCount; batch++)
+            for (var batchSize = 0; batchSize < maxBatchSize; batchSize++)
 
                 // Пробегаемся по всем типам данных матрицы A
                 for (var dataType = 0; dataType < matrixA.Count; dataType++)
 
                     // Если количество партий данных i-ого типа (mi) > (h) индекс пакета
-                    if (matrixA[dataType].Count > batch)
+                    if (matrixA[dataType].Count > batchSize)
 
                         // Выполяем присвоение
-                        matrixR[batchIndex++][dataType] = matrixA[dataType][batch];
+                        matrixR[batchIndex++][dataType] = matrixA[dataType][batchSize];
 
         }
 
@@ -151,7 +174,7 @@ namespace newAlgorithm
             if (stopProcessing != null)
                 stopProcessing.Clear();
 
-
+            // Выполняем инициализацию словарей
             startProcessing = new Dictionary<int, List<List<int>>>();
             stopProcessing = new Dictionary<int, List<List<int>>>();
 
@@ -164,11 +187,8 @@ namespace newAlgorithm
                 for (var batchIndex = 0; batchIndex < matrixR.Count; batchIndex++)//количество партий
                 {
 
-                    // Получаем индекс ненулевого элемента в строке
-                    var dataType = ReturnRDataType(batchIndex);
-
-                    // Получаем элемент по ненулевому индексу в матрице R
-                    var jobCount = matrixR[batchIndex][dataType];
+                    // Получаем количество заданий в позиции batchIndex
+                    var jobCount = ReturnRJobCount(batchIndex);
                     if (jobCount == -1)
                         jobCount = 1;
 
@@ -309,6 +329,20 @@ namespace newAlgorithm
             for (var dataType = 0; dataType < matrixR[batchIndex].Count; dataType++)
                 if (matrixR[batchIndex][dataType] > 0)
                     return dataType;
+            return -1;
+        }
+
+
+        /// <summary>
+        /// Данная функция возвращает количество заданий из матрице R в позиции batchIndex
+        /// </summary>
+        /// <param name="batchIndex">Индекс партии в последовательности, так же известный, как h</param>
+        /// <returns>Количество заданий или -1 в случае неудачи</returns>
+        public int ReturnRJobCount(int batchIndex)
+        {
+            for (var dataType = 0; dataType < matrixR[batchIndex].Count; dataType++)
+                if (matrixR[batchIndex][dataType] > 0)
+                    return matrixR[batchIndex][dataType];
             return -1;
         }
 

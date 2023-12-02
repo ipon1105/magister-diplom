@@ -10,7 +10,7 @@ namespace newAlgorithm.Service
         /// Ультралютая функция на 500 строк непотно чего. Данная фукнция помогает высчитать время конца текущего состава пакетов
         /// </summary>
         /// <param name="rMatrix">Матрица R</param>
-        /// <param name="pMatrix">Матрица P - матрица порядка обработка партий [dataTypesCount x n_p]</param>
+        /// <param name="pMatrix">Матрица P - матрица порядка обработка партий [dataTypesCount x maxBatchesPositions] = [n x n_p]</param>
         /// <param name="timeProcessing">Матрица времени выполнения</param>
         /// <param name="timeChangeover">Трёхмерная матрица времени переналадки</param>
         /// <param name="bufferSize">Целочисленный размер буфера</param>

@@ -14,7 +14,7 @@ namespace newAlgorithm
     l = device - индекс (идентификатор) прибора
     A' = matrixA_Prime - Матрица составов партий
     mi = matrixA[i].Count (или matrixA_Prime[i].Count) - Количество партий данных i-ого типа
-    n_p = batchesForAllDataTypes = sum(mi) = sum(matrixA[i].Count) - количество партий в последовательности pi_l
+    n_p = maxBatchesPositions = sum(mi) = sum(matrixA[i].Count) - максимальное количество партий в последовательности pi_l
     h  = batchIndex = matrixA[i][0..batchCount-1] (или matrixA_Prime[i][0..batchCount-1]) - h (0..batchCount-1) Индекс количества партий
      */
     static class Program
