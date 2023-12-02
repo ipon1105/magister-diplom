@@ -34,7 +34,7 @@ namespace newAlgorithm.Service
 
             // Предыдущий тип
             int previousType = 0;
-            int nJPrevious = 0;
+            int previousJob = 0;
 
             // Для всех пакетов выполняем обработку. batchIndex так же известен, как h
             for (int batchIndex = 1; batchIndex <= maxBatchesPositions; batchIndex++)
@@ -73,7 +73,6 @@ namespace newAlgorithm.Service
                         return _time;
                     }
 
-
                     // Для всех приборов выполняем обработку
                     for (int device = 1; device <= deviceCount; device++)
                     {
@@ -94,10 +93,10 @@ namespace newAlgorithm.Service
                                 // Если данное задание не первое и не превышает размер буфера, выполняем обработку
                                 if (1 < job && job <= bufferSize + 1)
                                 {
-                                    int t1 = tnMatrix[device, batchIndex, job - 1];
-                                    int t2 = timeCalc(device - 1, batchIndex - 1);
+                                    int startTime = tnMatrix[device, batchIndex, job - 1];
+                                    int procTime = timeCalc(device - 1, batchIndex - 1);
 
-                                    int value = t1 + t2;
+                                    int value = startTime + procTime;
                                     tnMatrix.AddNode(device, batchIndex, job, value);
                                     continue;
                                 }
@@ -130,13 +129,13 @@ namespace newAlgorithm.Service
                                 // Для первого задания в пакете выполняем обработку
                                 if (job == 1)
                                 {
-                                    int t1 = tnMatrix[device, batchIndex - 1, nJPrevious];
+                                    int t1 = tnMatrix[device, batchIndex - 1, previousJob];
                                     int t2 = timeCalc(device - 1, batchIndex - 1 - 1);
 
                                     int t3 = timeChangeover[device, previousType, currentDataType];
 
                                     int value1 = t1 + t2 + t3;
-                                    int value2 = tnMatrix[device + 1, batchIndex - 1, nJPrevious - bufferSize + 1];
+                                    int value2 = tnMatrix[device + 1, batchIndex - 1, previousJob - bufferSize + 1];
 
                                     int value = Math.Max(value1, value2);
                                     tnMatrix.AddNode(device, batchIndex, job, value);
@@ -150,7 +149,7 @@ namespace newAlgorithm.Service
                                     int t2 = timeCalc(device - 1, batchIndex - 1);
 
                                     int value1 = t1 + t2;
-                                    int value2 = tnMatrix[device + 1, batchIndex - 1, nJPrevious - bufferSize + job];
+                                    int value2 = tnMatrix[device + 1, batchIndex - 1, previousJob - bufferSize + job];
 
                                     int value = Math.Max(value1, value2);
 
@@ -266,7 +265,7 @@ namespace newAlgorithm.Service
 
                                     int value1 = t1 + t2;
 
-                                    t1 = tnMatrix[device, batchIndex - 1, nJPrevious];
+                                    t1 = tnMatrix[device, batchIndex - 1, previousJob];
                                     t2 = timeCalc(device - 1, batchIndex - 1 - 1);
                                     int t3 = timeChangeover[device, previousType, currentDataType];
 
@@ -274,7 +273,7 @@ namespace newAlgorithm.Service
 
                                     int value12max = Math.Max(value1, value2);
 
-                                    int value3 = tnMatrix[device + 1, batchIndex - 1, nJPrevious - bufferSize + 1];
+                                    int value3 = tnMatrix[device + 1, batchIndex - 1, previousJob - bufferSize + 1];
 
                                     int value = Math.Max(value12max, value3);
 
@@ -300,7 +299,7 @@ namespace newAlgorithm.Service
 
                                     int value12max = Math.Max(value1, value2);
 
-                                    int value3 = tnMatrix[device + 1, batchIndex - 1, nJPrevious - bufferSize + job];
+                                    int value3 = tnMatrix[device + 1, batchIndex - 1, previousJob - bufferSize + job];
 
                                     int value = Math.Max(value12max, value3);
 
@@ -401,7 +400,7 @@ namespace newAlgorithm.Service
 
                                     int value1 = t1 + t2;
 
-                                    t1 = tnMatrix[deviceCount, batchIndex - 1, nJPrevious];
+                                    t1 = tnMatrix[deviceCount, batchIndex - 1, previousJob];
                                     t2 = timeCalc(deviceCount - 1, batchIndex - 1 - 1);
                                     int t3 = timeChangeover[deviceCount, previousType, currentDataType];
 
@@ -444,7 +443,7 @@ namespace newAlgorithm.Service
                 }
 
                 previousType = currentNode.dataType;
-                nJPrevious = currentJobCount;
+                previousJob = currentJobCount;
             }
 
             return tnMatrix;
