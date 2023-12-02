@@ -75,6 +75,7 @@
             this.dataGridView_changeover_time = new System.Windows.Forms.DataGridView();
             this.randomizePreprocessingTime = new System.Windows.Forms.Button();
             this.label6 = new System.Windows.Forms.Label();
+            this.checkBox_visualization = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.numeric_data_types_count)).BeginInit();
             this.tabControl.SuspendLayout();
             this.tabPage1.SuspendLayout();
@@ -211,6 +212,7 @@
             // 
             // groupBox_system_setup
             // 
+            this.groupBox_system_setup.Controls.Add(this.checkBox_visualization);
             this.groupBox_system_setup.Controls.Add(this.numeric_data_types_count);
             this.groupBox_system_setup.Controls.Add(this.textBox2);
             this.groupBox_system_setup.Controls.Add(this.numeric_generation_count);
@@ -698,6 +700,17 @@
             this.label6.Text = "Время переналадки приборов";
             this.label6.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
+            // checkBox_visualization
+            // 
+            this.checkBox_visualization.AutoSize = true;
+            this.checkBox_visualization.Location = new System.Drawing.Point(305, 276);
+            this.checkBox_visualization.Name = "checkBox_visualization";
+            this.checkBox_visualization.Size = new System.Drawing.Size(141, 17);
+            this.checkBox_visualization.TabIndex = 41;
+            this.checkBox_visualization.Text = "Отображение в EXCEL";
+            this.checkBox_visualization.UseVisualStyleBackColor = true;
+            this.checkBox_visualization.CheckedChanged += new System.EventHandler(this.checkBox_visualization_CheckedChanged);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -780,6 +793,7 @@
         private System.Windows.Forms.NumericUpDown numeric_device_count;
         private System.Windows.Forms.GroupBox groupBox_system_setup;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel;
+        private System.Windows.Forms.CheckBox checkBox_visualization;
     }
 }
 

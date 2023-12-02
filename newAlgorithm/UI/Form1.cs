@@ -96,6 +96,7 @@ namespace newAlgorithm
         // TODO: разобраться со статическими типами данных
         public static int buff;
         public static bool direct;
+        public static bool vizualizationOn;
         public static List<List<int>> compositionSets;
         public static List<List<int>> timeSets;
 
@@ -975,6 +976,16 @@ namespace newAlgorithm
         }
 
         /// <summary>
+        /// Данная функция определяет входные параметры с графического компонента checkBox_visualization и записывает их в vizualizationOn
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void checkBox_visualization_CheckedChanged(object sender, EventArgs e)
+        {
+            Form1.vizualizationOn = checkBox_visualization.Checked;
+        }
+
+        /// <summary>
         /// Данная функция определяет входные параметры с графического компонента numeric_random и записывает их в randomValue
         /// </summary>
         /// <param name="sender"></param>
@@ -1120,6 +1131,7 @@ namespace newAlgorithm
             isFixedBatches = checkBox_fixed_batches.Checked;
             isOptimization = checkBox_optimization.Checked;
             selectoinType = SelectoinType.Undefined;
+            Form1.vizualizationOn = false;
             isValueChagedToUpdate = false;
             Form1.buff = buffer;
 
@@ -1246,6 +1258,7 @@ namespace newAlgorithm
         }
         */
         #endregion
+
     }
 
 }

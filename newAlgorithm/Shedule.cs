@@ -59,7 +59,11 @@ namespace newAlgorithm
         /// </summary>
         private Dictionary<int, List<List<int>>> stopProcessing; // [deviceCount] : [maxBatchesPositions x jobCount]
 
+        /// <summary>
+        /// Экземпляр класса визуализации для отображения в Excel
+        /// </summary>
         public static Visualizer viz;
+
         private List<SheduleElement> _rWithTime;
 
         /// <summary>
@@ -83,7 +87,8 @@ namespace newAlgorithm
             Shedule.deviceCount = deviceCount;
 
             // Инициализируем экземпляр класс для визуализации
-            viz = new Visualizer(deviceCount, matrixR[0].Count);
+            if (Form1.vizualizationOn)
+                viz = new Visualizer(deviceCount, matrixR[0].Count);
         }
 
         /// <summary>
@@ -95,7 +100,8 @@ namespace newAlgorithm
             InitMatrixR(matrixA);
 
             // Инициализируем экземпляр класс для визуализации
-            viz = new Visualizer(deviceCount, matrixR[0].Count);
+            if (Form1.vizualizationOn)
+                viz = new Visualizer(deviceCount, matrixR[0].Count);
         }
 
         /// <summary>
@@ -302,16 +308,11 @@ namespace newAlgorithm
 
             TreeDimMatrix tnMatrix = CalculationService.CalculateTnMatrix(rMatrix, pMatrix, proccessingTimeMatrix, timeChangeover, bufferSize);
 
-            if (viz == null)
-            {
-                viz = new Visualizer(deviceCount, dataTypesCount);
-            }
-            else
+            if (Form1.vizualizationOn)
             {
                 viz.CreateExcelAppList(deviceCount, dataTypesCount);
+                viz.Visualize(tnMatrix, proccessingTimeMatrix, rMatrix);
             }
-
-            viz.Visualize(tnMatrix, proccessingTimeMatrix, rMatrix);
 
             TreeDimMatrixNode lastNode = tnMatrix.treeDimMatrix.Last();
             int count = lastNode.time;
