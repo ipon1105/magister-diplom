@@ -13,14 +13,14 @@ namespace newAlgorithm.Service
         /// <param name="pMatrix">Матрица P - матрица порядка обработка партий [dataTypesCount x n_p]</param>
         /// <param name="timeProcessing">Матрица времени выполнения</param>
         /// <param name="timeChangeover">Трёхмерная матрица времени переналадки</param>
-        /// <param name="b">b?</param>
+        /// <param name="bufferSize">Целочисленный размер буфера</param>
         /// <returns></returns>
         public static TreeDimMatrix CalculateTnMatrix(
             RMatrix rMatrix,
             Matrix pMatrix,
             Matrix timeProcessing,
             TreeDimMatrix timeChangeover,
-            int b
+            int bufferSize
             )
         {
 
@@ -92,7 +92,7 @@ namespace newAlgorithm.Service
                                     tnMatrix.AddNode(device, batchIndex, job, 0);
 
                                 // Если данное задание не первое и не превышает размер буфера, выполняем обработку
-                                if (1 < job && job <= b + 1)
+                                if (1 < job && job <= bufferSize + 1)
                                 {
                                     int t1 = tnMatrix[device, batchIndex, job - 1];
                                     int t2 = timeCalc(device - 1, batchIndex - 1);
@@ -105,13 +105,13 @@ namespace newAlgorithm.Service
                                 // Если данное задание превышает размер буфера, выполняем обработку
                                 // 45
                                 // TODO: нет необходимости обрабатывать случай (job <= currentJobCount), если значение job не имзеняется динамично, так как условие прописано в 
-                                if (b + 1 < job && job <= currentJobCount)
+                                if (bufferSize + 1 < job && job <= currentJobCount)
                                 {
                                     int t1 = tnMatrix[device, batchIndex, job - 1];
                                     int t2 = timeCalc(device - 1, batchIndex - 1);
 
                                     int value1 = t1 + t2;
-                                    int value2 = tnMatrix[device + 1, batchIndex, job - b];
+                                    int value2 = tnMatrix[device + 1, batchIndex, job - bufferSize];
 
                                     int value = Math.Max(value1, value2);
                                     tnMatrix.AddNode(device, batchIndex, job, value);
@@ -136,7 +136,7 @@ namespace newAlgorithm.Service
                                     int t3 = timeChangeover[device, previousType, currentDataType];
 
                                     int value1 = t1 + t2 + t3;
-                                    int value2 = tnMatrix[device + 1, batchIndex - 1, nJPrevious - b + 1];
+                                    int value2 = tnMatrix[device + 1, batchIndex - 1, nJPrevious - bufferSize + 1];
 
                                     int value = Math.Max(value1, value2);
                                     tnMatrix.AddNode(device, batchIndex, job, value);
@@ -144,13 +144,13 @@ namespace newAlgorithm.Service
                                 }
 
                                 // Если данное задание не первое и не превышает размер буфера, выполняем обработку
-                                if (1 < job && job <= b)
+                                if (1 < job && job <= bufferSize)
                                 {
                                     int t1 = tnMatrix[device, batchIndex, job - 1];
                                     int t2 = timeCalc(device - 1, batchIndex - 1);
 
                                     int value1 = t1 + t2;
-                                    int value2 = tnMatrix[device + 1, batchIndex - 1, nJPrevious - b + job];
+                                    int value2 = tnMatrix[device + 1, batchIndex - 1, nJPrevious - bufferSize + job];
 
                                     int value = Math.Max(value1, value2);
 
@@ -161,13 +161,13 @@ namespace newAlgorithm.Service
                                 // Если данное задание превышает размер буфера, выполняем обработку
                                 // 45
                                 // TODO: нет необходимости обрабатывать случай (job <= currentJobCount), если значение job не имзеняется динамично, так как условие прописано в 
-                                if (b + 1 <= job && job <= currentJobCount)
+                                if (bufferSize + 1 <= job && job <= currentJobCount)
                                 {
                                     int t1 = tnMatrix[device, batchIndex, job - 1];
                                     int t2 = timeCalc(device - 1, batchIndex - 1);
 
                                     int value1 = t1 + t2;
-                                    int value2 = tnMatrix[device + 1, batchIndex, job - b];
+                                    int value2 = tnMatrix[device + 1, batchIndex, job - bufferSize];
 
                                     int value = Math.Max(value1, value2);
                                     tnMatrix.AddNode(device, batchIndex, job, value);
@@ -204,7 +204,7 @@ namespace newAlgorithm.Service
 
                                 // Если данное задание не первое и не превышает размер буфера, выполняем обработку
                                 //50
-                                if (1 < job && job <= b + 1)
+                                if (1 < job && job <= bufferSize + 1)
                                 {
                                     int t1 = tnMatrix[device - 1, batchIndex, job];
                                     int t2 = timeCalc(device - 1 - 1, 1 - 1);
@@ -227,7 +227,7 @@ namespace newAlgorithm.Service
                                 // Если данное задание превышает размер буфера, выполняем обработку
                                 // 45
                                 // TODO: нет необходимости обрабатывать случай (job <= currentJobCount), если значение job не имзеняется динамично, так как условие прописано в 
-                                if (b + 1 < job && job <= currentJobCount)
+                                if (bufferSize + 1 < job && job <= currentJobCount)
                                 {
                                     int t1 = tnMatrix[device - 1, batchIndex, job];
                                     int t2 = timeCalc(device - 1 - 1, 1 - 1);
@@ -241,7 +241,7 @@ namespace newAlgorithm.Service
 
                                     int value12max = Math.Max(value1, value2);
 
-                                    int value3 = tnMatrix[device + 1, batchIndex, job - b];
+                                    int value3 = tnMatrix[device + 1, batchIndex, job - bufferSize];
 
                                     int value = Math.Max(value12max, value3);
 
@@ -274,7 +274,7 @@ namespace newAlgorithm.Service
 
                                     int value12max = Math.Max(value1, value2);
 
-                                    int value3 = tnMatrix[device + 1, batchIndex - 1, nJPrevious - b + 1];
+                                    int value3 = tnMatrix[device + 1, batchIndex - 1, nJPrevious - bufferSize + 1];
 
                                     int value = Math.Max(value12max, value3);
 
@@ -286,7 +286,7 @@ namespace newAlgorithm.Service
 
                                 // Если данное задание не первое и не превышает размер буфера, выполняем обработку
                                 //53
-                                if (1 < job && job <= b)
+                                if (1 < job && job <= bufferSize)
                                 {
                                     int t1 = tnMatrix[device - 1, batchIndex, job];
                                     int t2 = timeCalc(device - 1 - 1, batchIndex - 1);
@@ -300,7 +300,7 @@ namespace newAlgorithm.Service
 
                                     int value12max = Math.Max(value1, value2);
 
-                                    int value3 = tnMatrix[device + 1, batchIndex - 1, nJPrevious - b + job];
+                                    int value3 = tnMatrix[device + 1, batchIndex - 1, nJPrevious - bufferSize + job];
 
                                     int value = Math.Max(value12max, value3);
 
@@ -313,7 +313,7 @@ namespace newAlgorithm.Service
                                 // Если данное задание превышает размер буфера, выполняем обработку
                                 // 54
                                 // TODO: нет необходимости обрабатывать случай (job <= currentJobCount), если значение job не имзеняется динамично, так как условие прописано в 
-                                if (b + 1 <= job && job <= currentJobCount)
+                                if (bufferSize + 1 <= job && job <= currentJobCount)
                                 {
                                     int t1 = tnMatrix[device - 1, batchIndex, job];
                                     int t2 = timeCalc(device - 1 - 1, batchIndex - 1);
@@ -327,7 +327,7 @@ namespace newAlgorithm.Service
 
                                     int value12max = Math.Max(value1, value2);
 
-                                    int value3 = tnMatrix[device + 1, batchIndex, job - b];
+                                    int value3 = tnMatrix[device + 1, batchIndex, job - bufferSize];
 
                                     int value = Math.Max(value12max, value3);
 
