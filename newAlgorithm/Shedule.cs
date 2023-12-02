@@ -204,7 +204,7 @@ namespace newAlgorithm
         }
 
         /// <summary>
-        /// Данная функция выполняет инициализацию матриц _startProcessing и _endProcessing в зависимости от матрицы matrixR
+        /// Данная функция выполняет инициализацию startProcessing и stopProcessing в зависимости от матрицы matrixR
         /// </summary>
         private void CalculateShedule()
         {
@@ -378,7 +378,6 @@ namespace newAlgorithm
             return -1;
         }
 
-
         /// <summary>
         /// Данная функция возвращает количество заданий из матрице R в позиции batchIndex
         /// </summary>
@@ -393,32 +392,45 @@ namespace newAlgorithm
         }
 
         /// <summary>
-        /// 
+        /// Выполняем построения расписания, что подразумевает поиск наилучшего времени выполнения всех пакетов заданий в разных позициях
         /// </summary>
-        /// <returns></returns>
         public void ConstructShedule()
         {
+
+            // Высчитываем временные критерии
             CalculateShedule();
+
+            // Выполняем копирование матрицы R
             var matrixRCopy = ListUtils.MatrixIntDeepCopy(matrixR);
+
+            // Сохраняем лучший результат времени выполнения последнего задания
             var tempTime = timeOfLastScheduleExecution;
 
+            // Пробегаемся по всем позициям матриц R
             for (var batchIndex_i = 0; batchIndex_i < matrixR.Count - 1; batchIndex_i++)
             {
+
+                // Пробегаемся по всем позициям матриц R
                 for (var batchIndex_j = batchIndex_i + 1; batchIndex_j < matrixR.Count; batchIndex_j++)
                 
-                    // Ранее использовалась функция "ChangeColum(i, j);", которая в результате выполняла перестановку строку
+                    // Ранее использовалась функция "ChangeColum(i, j);", которая в результате выполняла перестановку строк
                     // Выполяем перестановку местами строки i и j
                     ListUtils.MatrixIntRowSwap(matrixR, batchIndex_i, batchIndex_j);
                 
+                // Для новой матрицы выполняем высчитывание временных критерией
                 CalculateShedule();
-                if (tempTime >= timeOfLastScheduleExecution) continue;
+
+                // Если сохранённый результат хуже, чем новый, пропускаем итерацию
+                if (tempTime >= timeOfLastScheduleExecution)
+                    continue;
 
                 // TODO: Данная строчка может являеться не корректной, так как выполняет поверхностое
                 // копирования и после первого прохода будет ссылаться на одну и ту же матрицу
                 matrixR = matrixRCopy;
+
+                // Выполняем переопределение нового лучшего времени
                 timeOfLastScheduleExecution = tempTime;
             }
-            
         }
 
         /// <summary>
@@ -429,8 +441,14 @@ namespace newAlgorithm
         /// <returns></returns>
         public void ConstructSheduleWithBuffer(int bufferSize, int dataTypesCount)
         {
+
+            // Высчитываем временные критерии
             CalculateSheduleWithBufer(bufferSize, dataTypesCount);
+
+            // Выполняем копирование матрицы R
             var tempR = ListUtils.MatrixIntDeepCopy(matrixR);
+
+            // Сохраняем лучший результат времени выполнения последнего задания
             var tempTime = timeOfLastScheduleExecution;
 
             // Выполяем все возможные перестановки позиций
@@ -448,13 +466,15 @@ namespace newAlgorithm
                 // Выполяем высчитывание расписания с буфером для всех возможных последовательностей
                 CalculateSheduleWithBufer(bufferSize, dataTypesCount);
 
-                // Если результат перестановки по времени хуже 
+                // Если сохранённый результат хуже, чем новый, пропускаем итерацию
                 if (tempTime >= timeOfLastScheduleExecution)
                     continue;
                 
                 // TODO: Данная строчка может являеться не корректной, так как выполняет поверхностое
                 // копирования и после первого прохода будет ссылаться на одну и ту же матрицу
                 matrixR = tempR;
+
+                // Выполняем переопределение нового лучшего времени
                 timeOfLastScheduleExecution = tempTime;
             }
         }
@@ -462,41 +482,48 @@ namespace newAlgorithm
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="tz"></param>
-        /// <param name="crit"></param>
-        /// <returns></returns>
+        /// <param name="tz">Бог видит, tz это Тарчок Запоздалый(Неизвестная переменная)</param>
+        /// <param name="crit">Переменная для записи критерий</param>
+        /// <returns>Время выполнения всех заданий</returns>
         public int GetTimeWithCriterium(int tz, out int crit)
         {
 
-            // Данная переменная необходима для подсчёта времени выполнения всеъ заданий в системе
+            // Данная переменная необходима для подсчёта времени выполнения всех заданий в системе
             var proccessingTime = 0;
+
+            // Выполяем построение расписания
             ConstructShedule();
 
-            // Для каждого прибора высчитываем время выполнения
+            // Для каждого прибора выполняем обработку
             for (int device = 0; device < deviceCount; device++)
             {
-                for (int numberBatch = 0; numberBatch < startProcessing[device].Count; numberBatch++)
-                {
-                    for (int numberWork = 0; numberWork < startProcessing[device][numberBatch].Count; numberWork++)
-                    {
-                        proccessingTime += stopProcessing[device][numberBatch][numberWork] - startProcessing[device][numberBatch][numberWork];
-                    }
-                }
 
+                // Для каждой партии выполняем обработку
+                for (int batchIndex = 0; batchIndex < startProcessing[device].Count; batchIndex++)
+                
+                    // Для каждого задания выполняем обработку
+                    for (int job = 0; job < startProcessing[device][batchIndex].Count; job++)
+
+                        // Сумируем разницу между времен конца и временем начала обработки задания job в партии batchIndex на приборе device
+                        proccessingTime += stopProcessing[device][batchIndex][job] - startProcessing[device][batchIndex][job];
+                    
+                // Отнимаем время начала первого задания в первом пакете (наладку)
                 proccessingTime -= startProcessing[device][0][0];
             }
 
+            // Переопределяем критерий
             crit = (tz * deviceCount) - proccessingTime;
+            
+            // Возвращаем время выполнения последнего задания в последнем пакете на последнем приборе
             return timeOfLastScheduleExecution;
         }
 
         /// <summary>
-        /// 
+        /// Возвращаем значение времени выполнения всех заданий
         /// </summary>
-        /// <returns></returns>
+        /// <returns>Время выполнения всех заданий</returns>
         public int GetTime()
         {
-            //ConstructShedule();
             return timeOfLastScheduleExecution;
         }
 
