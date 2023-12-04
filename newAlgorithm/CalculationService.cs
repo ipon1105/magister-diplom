@@ -52,25 +52,27 @@ namespace newAlgorithm.Service
                 {
 
                     // Данная функция высчитываем время
-                    int timeCalc(int _device, int _batchIndex)
+                    int getProccessingTimeOnDeviceInBatch(int _device, int _batchIndex)
                     {
-                        int _time = 0;
 
-                        // Для всех типов данных матрицы R выполняем обработку
-                        for (int dataType = 0; dataType < rMatrix.dataTypesCount; dataType++)
+                        // Время выполнения
+                        int _procTime = 0;
+                        int _dataType = 0;
+
+                        // До тех пор, пока не нашли нужное время выполнения
+                        while (_procTime == 0)
                         {
-
                             // Подсчёт времени выполнения типа данных dataType на устройстве _device
-                            int _proccessingTime = timeProcessing[_device, dataType];
-
-                            // Получаем позицию типа данных dataType в партии _batchIndex
-                            int _position = pMatrix[dataType, _batchIndex];
+                            int _position = pMatrix[_dataType, _batchIndex];
+                            
+                            // Получаем время выполнения типа _dataType на приборе _device
+                            int _proccessingTime = timeProcessing[_device, _dataType++];
 
                             // Выполяем подсчёт времени выполнения на позицию
-                            _time += _proccessingTime * _position;
+                            _procTime = _proccessingTime * _position;
                         }
 
-                        return _time;
+                        return _procTime;
                     }
 
                     // Для всех приборов выполняем обработку
@@ -98,7 +100,7 @@ namespace newAlgorithm.Service
 
                                     // Высчитываем время начала и выполнения задания
                                     int startTime = tnMatrix[device, batchIndex, job - 1];
-                                    int procTime = timeCalc(device - 1, batchIndex - 1);
+                                    int procTime = getProccessingTimeOnDeviceInBatch(device - 1, batchIndex - 1);
 
                                     // Высчитываем время конца выполнения задания
                                     int stopTime = startTime + procTime;
@@ -118,7 +120,7 @@ namespace newAlgorithm.Service
 
                                     // Высчитываем время начала и выполнения задания
                                     int startTime = tnMatrix[device, batchIndex, job - 1];
-                                    int procTime = timeCalc(device - 1, batchIndex - 1);
+                                    int procTime = getProccessingTimeOnDeviceInBatch(device - 1, batchIndex - 1);
 
                                     // Высчитываем время конца выполнения задания
                                     int stopTime = startTime + procTime;
@@ -148,7 +150,7 @@ namespace newAlgorithm.Service
 
                                     // Высчитываем время начала и выполнения задания
                                     int startTime = tnMatrix[device, batchIndex - 1, previousJob];
-                                    int procTime = timeCalc(device - 1, batchIndex - 1 - 1);
+                                    int procTime = getProccessingTimeOnDeviceInBatch(device - 1, batchIndex - 1 - 1);
 
                                     // Высчитываем время переналадки с предыдущего типа на текущий
                                     int changeTime = timeChangeover[device, previousType, currentDataType];
@@ -175,7 +177,7 @@ namespace newAlgorithm.Service
 
                                     // Высчитываем время начала и выполнения задания
                                     int startTime = tnMatrix[device, batchIndex, job - 1];
-                                    int procTime = timeCalc(device - 1, batchIndex - 1);
+                                    int procTime = getProccessingTimeOnDeviceInBatch(device - 1, batchIndex - 1);
 
                                     // Высчитываем время конца выполнения задания
                                     int stopTime = startTime + procTime;
@@ -201,7 +203,7 @@ namespace newAlgorithm.Service
 
                                     // Высчитываем время начала и выполнения задания
                                     int startTime = tnMatrix[device, batchIndex, job - 1];
-                                    int procTime = timeCalc(device - 1, batchIndex - 1);
+                                    int procTime = getProccessingTimeOnDeviceInBatch(device - 1, batchIndex - 1);
 
                                     // Высчитываем время конца выполнения задания
                                     int stopTime = startTime + procTime;
@@ -237,7 +239,7 @@ namespace newAlgorithm.Service
 
                                     // Высчитываем время начала и выполнения задания
                                     int startTime = tnMatrix[device - 1, batchIndex, batchIndex];
-                                    int procTime = timeCalc(device - 1 - 1, batchIndex - 1);
+                                    int procTime = getProccessingTimeOnDeviceInBatch(device - 1 - 1, batchIndex - 1);
 
                                     // Высчитываем время конца выполнения задания
                                     int stopTime = startTime + procTime;
@@ -256,14 +258,14 @@ namespace newAlgorithm.Service
 
                                     // Высчитываем время начала и выполнения задания
                                     int startTime = tnMatrix[device - 1, batchIndex, job];
-                                    int procTime = timeCalc(device - 1 - 1, 1 - 1);
+                                    int procTime = getProccessingTimeOnDeviceInBatch(device - 1 - 1, 1 - 1);
 
                                     // Высчитываем время конца выполнения задания
                                     int stopTimeCurrentJob = startTime + procTime;
 
                                     // Высчитываем время начала и выполнения предыдущего задания
                                     startTime = tnMatrix[device, batchIndex, job - 1];
-                                    procTime = timeCalc(device - 1, batchIndex - 1);
+                                    procTime = getProccessingTimeOnDeviceInBatch(device - 1, batchIndex - 1);
 
                                     // Высчитываем время конца выполнения предыдущего задания
                                     int stopTimePreviousJob = startTime + procTime;
@@ -286,14 +288,14 @@ namespace newAlgorithm.Service
 
                                     // Высчитываем время начала и выполнения задания
                                     int startTime = tnMatrix[device - 1, batchIndex, job];
-                                    int procTime = timeCalc(device - 1 - 1, 1 - 1);
+                                    int procTime = getProccessingTimeOnDeviceInBatch(device - 1 - 1, 1 - 1);
 
                                     // Высчитываем время конца выполнения задания
                                     int stopTimeCurrentJob = startTime + procTime;
 
                                     // Высчитываем время начала и выполнения предыдущего задания
                                     startTime = tnMatrix[device, batchIndex, job - 1];
-                                    procTime = timeCalc(device - 1, batchIndex - 1);
+                                    procTime = getProccessingTimeOnDeviceInBatch(device - 1, batchIndex - 1);
 
                                     // Высчитываем время конца выполнения предыдущего задания
                                     int stopTimePreviousJob = startTime + procTime;
@@ -327,14 +329,14 @@ namespace newAlgorithm.Service
 
                                     // Высчитываем время начала и выполнения задания
                                     int startTime = tnMatrix[device - 1, batchIndex, 1];
-                                    int procTime = timeCalc(device - 1 - 1, batchIndex - 1);
+                                    int procTime = getProccessingTimeOnDeviceInBatch(device - 1 - 1, batchIndex - 1);
 
                                     // Высчитываем время конца выполнения задания
                                     int stopTimeCurrentJob = startTime + procTime;
 
                                     // Высчитываем время начала и выполнения предыдущего задания
                                     startTime = tnMatrix[device, batchIndex - 1, previousJob];
-                                    procTime = timeCalc(device - 1, batchIndex - 1 - 1);
+                                    procTime = getProccessingTimeOnDeviceInBatch(device - 1, batchIndex - 1 - 1);
 
                                     // Время переналадки прибора с предыдущего типа на текущий
                                     int changeTime = timeChangeover[device, previousType, currentDataType];
@@ -365,14 +367,14 @@ namespace newAlgorithm.Service
 
                                     // Высчитываем время начала и выполнения задания
                                     int startTime = tnMatrix[device - 1, batchIndex, job];
-                                    int procTime = timeCalc(device - 1 - 1, batchIndex - 1);
+                                    int procTime = getProccessingTimeOnDeviceInBatch(device - 1 - 1, batchIndex - 1);
 
                                     // Высчитываем время конца выполнения задания
                                     int stopTimeCurrentJob = startTime + procTime;
 
                                     // Высчитываем время начала и выполнения предыдущего задания
                                     startTime = tnMatrix[device, batchIndex, job - 1];
-                                    procTime = timeCalc(device - 1, batchIndex - 1);
+                                    procTime = getProccessingTimeOnDeviceInBatch(device - 1, batchIndex - 1);
 
                                     // Высчитываем время конца выполнения предыдущего задания
                                     int stopTimePreviousJob = startTime + procTime;
@@ -401,14 +403,14 @@ namespace newAlgorithm.Service
 
                                     // Высчитываем время начала и выполнения задания
                                     int startTime = tnMatrix[device - 1, batchIndex, job];
-                                    int procTime = timeCalc(device - 1 - 1, batchIndex - 1);
+                                    int procTime = getProccessingTimeOnDeviceInBatch(device - 1 - 1, batchIndex - 1);
 
                                     // Высчитываем время конца выполнения задания
                                     int stopTimeCurrentJob = startTime + procTime;
 
                                     // Высчитываем время начала и выполнения предыдущего задания
                                     startTime = tnMatrix[device, batchIndex, job - 1];
-                                    procTime = timeCalc(device - 1, batchIndex - 1);
+                                    procTime = getProccessingTimeOnDeviceInBatch(device - 1, batchIndex - 1);
 
                                     // Высчитываем время конца выполнения предыдущего задания
                                     int stopTimePreviousJob = startTime + procTime;
@@ -446,7 +448,7 @@ namespace newAlgorithm.Service
                                     // Подсчитываем время выполнения для всех пакетов
                                     int result = 0;
                                     for (int li = 1; li <= deviceCount - 1; li++)
-                                        result += timeCalc(li - 1, 0);
+                                        result += getProccessingTimeOnDeviceInBatch(li - 1, 0);
 
                                     // Добавляем результат в матрицу
                                     tnMatrix.AddNode(deviceCount, batchIndex, job, result);
@@ -463,14 +465,14 @@ namespace newAlgorithm.Service
 
                                     // Высчитываем время начала и выполнения задания
                                     int startTime = tnMatrix[device - 1, batchIndex, job];
-                                    int procTime = timeCalc(device - 1 - 1, batchIndex - 1);
+                                    int procTime = getProccessingTimeOnDeviceInBatch(device - 1 - 1, batchIndex - 1);
 
                                     // Высчитываем время конца выполнения задания
                                     int stopTimeCurrentJob = startTime + procTime;
 
                                     // Высчитываем время начала и выполнения предыдущего задания
                                     startTime = tnMatrix[device, batchIndex, job - 1];
-                                    procTime = timeCalc(deviceCount - 1, batchIndex - 1);
+                                    procTime = getProccessingTimeOnDeviceInBatch(deviceCount - 1, batchIndex - 1);
 
                                     // Высчитываем время конца выполнения предыдущего задания
                                     int stopTimePreviousJob = startTime + procTime;
@@ -498,14 +500,14 @@ namespace newAlgorithm.Service
 
                                     // Высчитываем время начала и выполнения задания
                                     int startTime = tnMatrix[device - 1, batchIndex, job];
-                                    int procTime = timeCalc(deviceCount - 1 - 1, batchIndex - 1);
+                                    int procTime = getProccessingTimeOnDeviceInBatch(deviceCount - 1 - 1, batchIndex - 1);
 
                                     // Высчитываем время конца выполнения задания
                                     int stopTimeCurrentJob = startTime + procTime;
 
                                     // Высчитываем время начала и выполнения предыдущего задания
                                     startTime = tnMatrix[deviceCount, batchIndex - 1, previousJob];
-                                    procTime = timeCalc(deviceCount - 1, batchIndex - 1 - 1);
+                                    procTime = getProccessingTimeOnDeviceInBatch(deviceCount - 1, batchIndex - 1 - 1);
 
                                     // Время переналадки с предыдущего типа на текущей
                                     int changeTime = timeChangeover[deviceCount, previousType, currentDataType];
@@ -532,14 +534,14 @@ namespace newAlgorithm.Service
 
                                     // Высчитываем время начала и выполнения задания
                                     int startTime = tnMatrix[deviceCount - 1, batchIndex, job];
-                                    int procTime = timeCalc(deviceCount - 1 - 1, batchIndex - 1);
+                                    int procTime = getProccessingTimeOnDeviceInBatch(deviceCount - 1 - 1, batchIndex - 1);
 
                                     // Высчитываем время конца выполнения задания
                                     int stopTimeCurrentJob = startTime + procTime;
 
                                     // Высчитываем время начала и выполнения предыдущего задания
                                     startTime = tnMatrix[deviceCount, batchIndex, job - 1];
-                                    procTime = timeCalc(deviceCount - 1, batchIndex - 1);
+                                    procTime = getProccessingTimeOnDeviceInBatch(deviceCount - 1, batchIndex - 1);
 
                                     // Высчитываем время конца выполнения предыдущего задания
                                     int stopTimePreviousJob = startTime + procTime;
