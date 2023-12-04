@@ -39,6 +39,7 @@
             this.tabControl = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
             this.groupBox_system_setup = new System.Windows.Forms.GroupBox();
+            this.checkBox_visualization = new System.Windows.Forms.CheckBox();
             this.textBox2 = new System.Windows.Forms.TextBox();
             this.numeric_generation_count = new System.Windows.Forms.NumericUpDown();
             this.label10 = new System.Windows.Forms.Label();
@@ -75,7 +76,9 @@
             this.dataGridView_changeover_time = new System.Windows.Forms.DataGridView();
             this.randomizePreprocessingTime = new System.Windows.Forms.Button();
             this.label6 = new System.Windows.Forms.Label();
-            this.checkBox_visualization = new System.Windows.Forms.CheckBox();
+            this.dataGridView_pre_maintenance = new System.Windows.Forms.DataGridView();
+            this.label8 = new System.Windows.Forms.Label();
+            this.randomizePreMaintenances = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.numeric_data_types_count)).BeginInit();
             this.tabControl.SuspendLayout();
             this.tabPage1.SuspendLayout();
@@ -93,6 +96,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.numeric_random)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView_proccessing_time)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView_changeover_time)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dataGridView_pre_maintenance)).BeginInit();
             this.SuspendLayout();
             // 
             // numeric_data_types_count
@@ -191,7 +195,7 @@
             this.tabControl.Location = new System.Drawing.Point(0, 0);
             this.tabControl.Name = "tabControl";
             this.tabControl.SelectedIndex = 0;
-            this.tabControl.Size = new System.Drawing.Size(771, 500);
+            this.tabControl.Size = new System.Drawing.Size(1008, 601);
             this.tabControl.TabIndex = 12;
             this.tabControl.Selecting += new System.Windows.Forms.TabControlCancelEventHandler(this.tabControl_time_setup_Selecting);
             // 
@@ -245,6 +249,17 @@
             this.groupBox_system_setup.TabIndex = 41;
             this.groupBox_system_setup.TabStop = false;
             this.groupBox_system_setup.Text = "Настройки системы";
+            // 
+            // checkBox_visualization
+            // 
+            this.checkBox_visualization.AutoSize = true;
+            this.checkBox_visualization.Location = new System.Drawing.Point(305, 276);
+            this.checkBox_visualization.Name = "checkBox_visualization";
+            this.checkBox_visualization.Size = new System.Drawing.Size(141, 17);
+            this.checkBox_visualization.TabIndex = 41;
+            this.checkBox_visualization.Text = "Отображение в EXCEL";
+            this.checkBox_visualization.UseVisualStyleBackColor = true;
+            this.checkBox_visualization.CheckedChanged += new System.EventHandler(this.checkBox_visualization_CheckedChanged);
             // 
             // textBox2
             // 
@@ -570,7 +585,7 @@
             this.tabPage2.Location = new System.Drawing.Point(4, 22);
             this.tabPage2.Name = "tabPage2";
             this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(763, 474);
+            this.tabPage2.Size = new System.Drawing.Size(1000, 575);
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "Установка времени";
             this.tabPage2.UseVisualStyleBackColor = true;
@@ -578,11 +593,15 @@
             // tableLayoutPanel
             // 
             this.tableLayoutPanel.AutoSize = true;
-            this.tableLayoutPanel.ColumnCount = 4;
-            this.tableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.tableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.tableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.tableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.tableLayoutPanel.ColumnCount = 6;
+            this.tableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 16.66667F));
+            this.tableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 16.66667F));
+            this.tableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 16.66667F));
+            this.tableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 16.66667F));
+            this.tableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 16.66667F));
+            this.tableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 16.66667F));
+            this.tableLayoutPanel.Controls.Add(this.randomizePreMaintenances, 4, 2);
+            this.tableLayoutPanel.Controls.Add(this.label8, 4, 0);
             this.tableLayoutPanel.Controls.Add(this.randomizeProcessingTime, 1, 2);
             this.tableLayoutPanel.Controls.Add(this.numeric_random, 0, 2);
             this.tableLayoutPanel.Controls.Add(this.dataGridView_proccessing_time, 0, 1);
@@ -591,22 +610,23 @@
             this.tableLayoutPanel.Controls.Add(this.dataGridView_changeover_time, 2, 1);
             this.tableLayoutPanel.Controls.Add(this.randomizePreprocessingTime, 2, 2);
             this.tableLayoutPanel.Controls.Add(this.label6, 2, 0);
+            this.tableLayoutPanel.Controls.Add(this.dataGridView_pre_maintenance, 4, 1);
             this.tableLayoutPanel.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel.Location = new System.Drawing.Point(3, 3);
             this.tableLayoutPanel.Name = "tableLayoutPanel";
             this.tableLayoutPanel.RowCount = 3;
-            this.tableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 8.277405F));
+            this.tableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 8.277401F));
             this.tableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 91.7226F));
             this.tableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 54F));
-            this.tableLayoutPanel.Size = new System.Drawing.Size(757, 468);
+            this.tableLayoutPanel.Size = new System.Drawing.Size(994, 569);
             this.tableLayoutPanel.TabIndex = 23;
             // 
             // randomizeProcessingTime
             // 
             this.randomizeProcessingTime.Dock = System.Windows.Forms.DockStyle.Top;
-            this.randomizeProcessingTime.Location = new System.Drawing.Point(192, 416);
+            this.randomizeProcessingTime.Location = new System.Drawing.Point(168, 517);
             this.randomizeProcessingTime.Name = "randomizeProcessingTime";
-            this.randomizeProcessingTime.Size = new System.Drawing.Size(183, 20);
+            this.randomizeProcessingTime.Size = new System.Drawing.Size(159, 20);
             this.randomizeProcessingTime.TabIndex = 13;
             this.randomizeProcessingTime.Text = "Рандом времени обработки";
             this.randomizeProcessingTime.UseVisualStyleBackColor = true;
@@ -615,9 +635,9 @@
             // numeric_random
             // 
             this.numeric_random.Dock = System.Windows.Forms.DockStyle.Top;
-            this.numeric_random.Location = new System.Drawing.Point(3, 416);
+            this.numeric_random.Location = new System.Drawing.Point(3, 517);
             this.numeric_random.Name = "numeric_random";
-            this.numeric_random.Size = new System.Drawing.Size(183, 20);
+            this.numeric_random.Size = new System.Drawing.Size(159, 20);
             this.numeric_random.TabIndex = 22;
             this.numeric_random.Value = new decimal(new int[] {
             6,
@@ -628,22 +648,24 @@
             // 
             // dataGridView_proccessing_time
             // 
+            this.dataGridView_proccessing_time.AllowUserToAddRows = false;
+            this.dataGridView_proccessing_time.AllowUserToDeleteRows = false;
             this.dataGridView_proccessing_time.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.AllCells;
             this.dataGridView_proccessing_time.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.tableLayoutPanel.SetColumnSpan(this.dataGridView_proccessing_time, 2);
             this.dataGridView_proccessing_time.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.dataGridView_proccessing_time.Location = new System.Drawing.Point(3, 37);
+            this.dataGridView_proccessing_time.Location = new System.Drawing.Point(3, 45);
             this.dataGridView_proccessing_time.Name = "dataGridView_proccessing_time";
             this.dataGridView_proccessing_time.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.AutoSizeToAllHeaders;
-            this.dataGridView_proccessing_time.Size = new System.Drawing.Size(372, 373);
+            this.dataGridView_proccessing_time.Size = new System.Drawing.Size(324, 466);
             this.dataGridView_proccessing_time.TabIndex = 17;
             // 
             // copyPreprocessingTime
             // 
             this.copyPreprocessingTime.Dock = System.Windows.Forms.DockStyle.Top;
-            this.copyPreprocessingTime.Location = new System.Drawing.Point(570, 416);
+            this.copyPreprocessingTime.Location = new System.Drawing.Point(498, 517);
             this.copyPreprocessingTime.Name = "copyPreprocessingTime";
-            this.copyPreprocessingTime.Size = new System.Drawing.Size(184, 20);
+            this.copyPreprocessingTime.Size = new System.Drawing.Size(159, 20);
             this.copyPreprocessingTime.TabIndex = 21;
             this.copyPreprocessingTime.Text = "Копировать с первого";
             this.copyPreprocessingTime.UseVisualStyleBackColor = true;
@@ -656,32 +678,31 @@
             this.label7.Font = new System.Drawing.Font("Microsoft Sans Serif", 14F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.label7.Location = new System.Drawing.Point(3, 0);
             this.label7.Name = "label7";
-            this.label7.Size = new System.Drawing.Size(372, 34);
+            this.label7.Size = new System.Drawing.Size(324, 42);
             this.label7.TabIndex = 18;
             this.label7.Text = "Время обработки требований";
             this.label7.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // dataGridView_changeover_time
             // 
-            this.dataGridView_changeover_time.AllowDrop = true;
             this.dataGridView_changeover_time.AllowUserToAddRows = false;
             this.dataGridView_changeover_time.AllowUserToDeleteRows = false;
             this.dataGridView_changeover_time.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.AllCells;
             this.dataGridView_changeover_time.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.tableLayoutPanel.SetColumnSpan(this.dataGridView_changeover_time, 2);
             this.dataGridView_changeover_time.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.dataGridView_changeover_time.Location = new System.Drawing.Point(381, 37);
+            this.dataGridView_changeover_time.Location = new System.Drawing.Point(333, 45);
             this.dataGridView_changeover_time.Name = "dataGridView_changeover_time";
             this.dataGridView_changeover_time.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.AutoSizeToAllHeaders;
-            this.dataGridView_changeover_time.Size = new System.Drawing.Size(373, 373);
+            this.dataGridView_changeover_time.Size = new System.Drawing.Size(324, 466);
             this.dataGridView_changeover_time.TabIndex = 19;
             // 
             // randomizePreprocessingTime
             // 
             this.randomizePreprocessingTime.Dock = System.Windows.Forms.DockStyle.Top;
-            this.randomizePreprocessingTime.Location = new System.Drawing.Point(381, 416);
+            this.randomizePreprocessingTime.Location = new System.Drawing.Point(333, 517);
             this.randomizePreprocessingTime.Name = "randomizePreprocessingTime";
-            this.randomizePreprocessingTime.Size = new System.Drawing.Size(183, 20);
+            this.randomizePreprocessingTime.Size = new System.Drawing.Size(159, 20);
             this.randomizePreprocessingTime.TabIndex = 21;
             this.randomizePreprocessingTime.Text = "Рандом времени";
             this.randomizePreprocessingTime.UseVisualStyleBackColor = true;
@@ -693,29 +714,56 @@
             this.tableLayoutPanel.SetColumnSpan(this.label6, 2);
             this.label6.Dock = System.Windows.Forms.DockStyle.Fill;
             this.label6.Font = new System.Drawing.Font("Microsoft Sans Serif", 14F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.label6.Location = new System.Drawing.Point(381, 0);
+            this.label6.Location = new System.Drawing.Point(333, 0);
             this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(373, 34);
+            this.label6.Size = new System.Drawing.Size(324, 42);
             this.label6.TabIndex = 20;
             this.label6.Text = "Время переналадки приборов";
             this.label6.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
-            // checkBox_visualization
+            // dataGridView_pre_maintenance
             // 
-            this.checkBox_visualization.AutoSize = true;
-            this.checkBox_visualization.Location = new System.Drawing.Point(305, 276);
-            this.checkBox_visualization.Name = "checkBox_visualization";
-            this.checkBox_visualization.Size = new System.Drawing.Size(141, 17);
-            this.checkBox_visualization.TabIndex = 41;
-            this.checkBox_visualization.Text = "Отображение в EXCEL";
-            this.checkBox_visualization.UseVisualStyleBackColor = true;
-            this.checkBox_visualization.CheckedChanged += new System.EventHandler(this.checkBox_visualization_CheckedChanged);
+            this.dataGridView_pre_maintenance.AllowUserToAddRows = false;
+            this.dataGridView_pre_maintenance.AllowUserToDeleteRows = false;
+            this.dataGridView_pre_maintenance.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.AllCells;
+            this.dataGridView_pre_maintenance.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.tableLayoutPanel.SetColumnSpan(this.dataGridView_pre_maintenance, 2);
+            this.dataGridView_pre_maintenance.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.dataGridView_pre_maintenance.Location = new System.Drawing.Point(663, 45);
+            this.dataGridView_pre_maintenance.Name = "dataGridView_pre_maintenance";
+            this.dataGridView_pre_maintenance.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.AutoSizeToAllHeaders;
+            this.dataGridView_pre_maintenance.Size = new System.Drawing.Size(328, 466);
+            this.dataGridView_pre_maintenance.TabIndex = 23;
+            // 
+            // label8
+            // 
+            this.label8.AutoSize = true;
+            this.tableLayoutPanel.SetColumnSpan(this.label8, 2);
+            this.label8.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.label8.Font = new System.Drawing.Font("Microsoft Sans Serif", 14F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.label8.Location = new System.Drawing.Point(663, 0);
+            this.label8.Name = "label8";
+            this.label8.Size = new System.Drawing.Size(328, 42);
+            this.label8.TabIndex = 24;
+            this.label8.Text = "Время длительности ПТО";
+            this.label8.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // randomizePreMaintenances
+            // 
+            this.randomizePreMaintenances.Dock = System.Windows.Forms.DockStyle.Top;
+            this.randomizePreMaintenances.Location = new System.Drawing.Point(663, 517);
+            this.randomizePreMaintenances.Name = "randomizePreMaintenances";
+            this.randomizePreMaintenances.Size = new System.Drawing.Size(159, 20);
+            this.randomizePreMaintenances.TabIndex = 25;
+            this.randomizePreMaintenances.Text = "Рандом времени";
+            this.randomizePreMaintenances.UseVisualStyleBackColor = true;
+            this.randomizePreMaintenances.Click += new System.EventHandler(this.randomizePreMaintenanceTime_Click);
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(771, 500);
+            this.ClientSize = new System.Drawing.Size(1008, 601);
             this.Controls.Add(this.tabControl);
             this.Name = "Form1";
             this.Text = "Form1";
@@ -740,6 +788,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.numeric_random)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView_proccessing_time)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView_changeover_time)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dataGridView_pre_maintenance)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -794,6 +843,9 @@
         private System.Windows.Forms.GroupBox groupBox_system_setup;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel;
         private System.Windows.Forms.CheckBox checkBox_visualization;
+        private System.Windows.Forms.DataGridView dataGridView_pre_maintenance;
+        private System.Windows.Forms.Label label8;
+        private System.Windows.Forms.Button randomizePreMaintenances;
     }
 }
 

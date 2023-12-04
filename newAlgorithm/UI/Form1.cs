@@ -93,6 +93,12 @@ namespace newAlgorithm
         /// </summary>ы
         List<List<int>> proccessingTime = new List<List<int>>();
 
+        /// <summary>
+        /// Данная переменная содержим в себе список из времён вермени выполнения ПТО для соответсвующего прибора.
+        /// preMaintenanceTimes = [deviceCount]
+        /// </summary>
+        List<int> preMaintenanceTimes;
+
         // TODO: разобраться со статическими типами данных
         public static int buff;
         public static bool direct;
@@ -130,7 +136,7 @@ namespace newAlgorithm
 
         #region Обработка событий разного рода
 
-            #region Обработка кнопок
+        #region Обработка кнопок
 
         /// <summary>
         /// Данная функция вызывается при нажание на кнопку "Второй метод"
@@ -166,7 +172,7 @@ namespace newAlgorithm
         {
             // Инициализируем вектор длиной dataTypesCount, каждый элемент которого будет равен batchCount
             List<int> batchCountList = CreateBatchCountList();
-
+            
             // Инициализируем расписание
             Shedule.deviceCount = deviceCount;
             Shedule.changeoverTime = changeoverTime;
@@ -337,7 +343,8 @@ namespace newAlgorithm
             {
                 n_kom = Convert.ToInt32(textBox1.Text);
                 n_kom_q = Convert.ToInt32(textBox2.Text);
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 n_kom = 2;
                 n_kom_q = 2;
@@ -579,9 +586,9 @@ namespace newAlgorithm
                             timeSets.Add(new List<int>());
                             for (int j = 0; j < n_kom_q; j++)
                                 timeSets[i].Add((j + 1) * temp);
-                            
+
                         }
-                        
+
                         foreach (var n_kom_s in N_komplect_sostav)
                         {
                             foreach (var _dataTypesCount in _dataTypesCountArray)
@@ -664,9 +671,9 @@ namespace newAlgorithm
             testType.Add(secondType);
         }
 
-            #endregion
+        #endregion
 
-            #region Выбор способа обработки данных
+        #region Выбор способа обработки данных
 
         /// <summary>
         /// Данная функция обрабатывает выбор обработки данных и отмечает выбора, как SelectoinType.TournamentSelection (Турнирная селекция)
@@ -708,9 +715,9 @@ namespace newAlgorithm
             selectoinType = SelectoinType.SigmaClipping;
         }
 
-            #endregion
+        #endregion
 
-            #region Обработка рандомизаций и выбора вкладки
+        #region Обработка рандомизаций и выбора вкладки
 
         /// <summary>
         /// Данная функция обрабатываем переключение между вкладками "Установка параметров" и "Установка времени"
@@ -746,6 +753,9 @@ namespace newAlgorithm
 
                     // Выполняем рандомизацию для таблицы времени переналадки приборов
                     randomizeChangeoverTime_Click();
+
+                    // Выполняем рандомизацию для таблицы времени ПТО
+                    randomizePreMaintenanceTime_Click();
 
                     break;
 
@@ -807,7 +817,7 @@ namespace newAlgorithm
         }
 
         /// <summary>
-        /// Данная функция выполняет рандомизацию таблицы справа (таблица времени переналадки)
+        /// Данная функция выполняет рандомизацию таблицы посередине (таблица времени переналадки)
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -865,9 +875,33 @@ namespace newAlgorithm
             GetTime();
         }
 
+        /// <summary>
+        /// Данная функция выполняем рандомизацию таблицы справа (таблица времени ПТО)
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void randomizePreMaintenanceTime_Click(object sender = null, EventArgs e = null)
+        {
+            // Формируем второе рандомное значение, как половина от введённого
+            int _randomValue = randomValue / 2;
+
+            // Устанавливаем заголовок столбца
+            dataGridView_pre_maintenance.Columns[0].HeaderCell.Value = "Time";
+
+            // Для каждого устройства
+            for (int device = 0; device < deviceCount; device++)
+            {
+
+                // Устанавливаем заголовок строки
+                dataGridView_pre_maintenance.Rows[device].HeaderCell.Value = string.Format("Device {0}", device);
+                dataGridView_pre_maintenance.Rows[device].Cells[0].Value = (device % 2 == 0) ? randomValue : _randomValue;
+            }
+
+            GetTime();
+        }
         #endregion
 
-            #region Определяем входные параметры
+        #region Определяем входные параметры
 
         /// <summary>
         /// Данная функция обрабатываем копирования данных в таблицы dataGridView_changeover_time с первого устройства на все остальные
@@ -1054,7 +1088,7 @@ namespace newAlgorithm
         {
             // Объявляем переменную для хранения матрицы времени выполнения заданий
             List<List<int>> _proccessingTime = new List<List<int>>();
-            
+
             // Инициализируем переменную для генерации данных
             int count = 0;
 
@@ -1096,7 +1130,8 @@ namespace newAlgorithm
                 _changeoverTime.Add(new List<List<int>>());
 
                 // Для каждого типа данных выполняем генерацию
-                for (var row_dataType = 0; row_dataType < _dataTypesCount; row_dataType++) {
+                for (var row_dataType = 0; row_dataType < _dataTypesCount; row_dataType++)
+                {
 
                     // Выполняем инициализацию матрицы
                     _changeoverTime[device].Add(new List<int>());
@@ -1144,6 +1179,7 @@ namespace newAlgorithm
             // Инициализируем перменные для данных таблиц
             changeoverTime = new List<List<List<int>>>();
             proccessingTime = new List<List<int>>();
+            preMaintenanceTimes = new List<int>();
 
             // Выполняем инициализацию графических таблиц
             InitDataGridView();
@@ -1156,6 +1192,9 @@ namespace newAlgorithm
 
             // Выполняем рандомизацию для таблицы времени переналадки приборов
             randomizeChangeoverTime_Click();
+
+            // Выполняем рандомизацию для таблиц ПТО
+            randomizePreMaintenanceTime_Click();
         }
 
         /// <summary>
@@ -1163,6 +1202,9 @@ namespace newAlgorithm
         /// </summary>
         private void InitTables()
         {
+            // Инициализируем вектор времени ПТО
+            preMaintenanceTimes = ListUtils.InitVectorInt(deviceCount, 0);
+
             // Для каждого прибора выполняем обработку
             for (var device = 0; device < deviceCount; device++)
             {
@@ -1197,12 +1239,18 @@ namespace newAlgorithm
             dataGridView_proccessing_time.Columns.Clear();
             dataGridView_changeover_time.Rows.Clear();
             dataGridView_changeover_time.Columns.Clear();
+            dataGridView_pre_maintenance.Rows.Clear();
+            dataGridView_pre_maintenance.Columns.Clear();
 
             // Определяем новую структуру
             dataGridView_proccessing_time.RowCount = deviceCount;
             dataGridView_proccessing_time.ColumnCount = dataTypesCount;
             dataGridView_changeover_time.RowCount = deviceCount * dataTypesCount;
             dataGridView_changeover_time.ColumnCount = dataTypesCount;
+
+            // Определяем новую таблицу времени ПТО
+            dataGridView_pre_maintenance.RowCount = deviceCount;
+            dataGridView_pre_maintenance.ColumnCount = 1;
         }
 
         /// <summary>
@@ -1213,6 +1261,10 @@ namespace newAlgorithm
 
             // Для каждого прибора выполняем считывание
             for (int device = 0; device < deviceCount; device++)
+            {
+
+                // Считываем данные во внутрнние таблицы
+                preMaintenanceTimes[device] = Convert.ToInt32(dataGridView_pre_maintenance.Rows[device].Cells[0].Value);
 
                 // Для каждого типа данных выполняем считывание
                 for (int row_dataType = 0; row_dataType < dataTypesCount; row_dataType++)
@@ -1227,6 +1279,7 @@ namespace newAlgorithm
                         // Считываем данные во внутрнние таблицы
                         changeoverTime[device][row_dataType][col_dataType] = Convert.ToInt32(dataGridView_changeover_time.Rows[row_dataType + device * dataTypesCount].Cells[col_dataType].Value);
                 }
+            }
         }
 
         #endregion
