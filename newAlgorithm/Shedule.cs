@@ -561,4 +561,44 @@ namespace newAlgorithm
 
         #endregion
     }
+
+    /// <summary>
+    /// Класс PreM (Preliminary maintenance) предоставляет функции для работы с предварительным обслуживанием приборов
+    /// </summary>
+    public class PreM
+    {
+
+        /// <summary>
+        /// Матрица Y - матрица порядка реализации ПТО l приборов в j позиции.
+        /// Матрица Y - состоит из 0 и 1. Если Y[l, j]=1, то ПТО выполняется на приборе l после пакета j, иначе 0.
+        /// Матрица Y = [deviceCount x maxBatchesPositions] = [L x n_p].
+        /// </summary>
+        private Matrix matrixY;
+
+        /// <summary>
+        /// Матрица T - моментов начала реализации ПТО на l приборе в позиции j
+        /// Матрица T - [deviceCount x maxBatchesPositions] = [L x n_p].
+        /// Значение T[l, j] != 0, когда реализация ПТО на приборе l следуюет за пакетом заданий в j-ои позиции, тоесть Y[l,j] != 0.
+        /// Значение T[l, j] == 0, когда Y[l, j] == 0.
+        /// </summary>
+        private Matrix matrixT;
+
+        /// <summary>
+        /// Конструктор возвращающий экземпляр класса PreM
+        /// </summary>
+        /// <param name="deviceCount">Количество приборов</param>
+        /// <param name="maxBatchesPositions">Максимальное количество позиций для пакетов</param>
+        public PreM(int deviceCount, int maxBatchesPositions)
+        {
+
+            // Инициализируем матрицы Y и T
+            matrixY = new Matrix(ListUtils.InitMatrixInt(deviceCount, maxBatchesPositions));
+            matrixT = new Matrix(ListUtils.InitMatrixInt(deviceCount, maxBatchesPositions));
+        }
+
+        public void BuildMatrixT()
+        {
+
+        }
+    }
 }
