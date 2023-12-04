@@ -1,10 +1,51 @@
 ﻿using newAlgorithm.Model;
 using System;
+using System.Collections.Generic;
 
 namespace newAlgorithm.Service
 {
     public class CalculationService
     {
+
+        /// <summary>
+        /// Матрица P представляет из себя матрицу последовательностей состоящая из 0 и 1. Структура матрица следующая [dataTypesCount x maxBatchesPositions]
+        /// </summary>
+        /// <param name="pMatrix">Двойной список P</param>
+        /// <param name="batchIndex">Индекс партии в последовательности</param>
+        /// <returns>Тип данных</returns>
+        public static int CalculationDataTypeFromBatch(List<List<int>> pMatrix, int batchIndex)
+        {
+
+            // Инициализируем тип данных
+            int dataType = 0;
+
+            // До тех пор, пока не нашли
+            while (true)
+                if (pMatrix[dataType][batchIndex] == 1)
+                    return dataType;
+                else
+                    dataType++;
+        }
+
+        /// <summary>
+        /// Матрица P представляет из себя матрицу последовательностей состоящая из 0 и 1. Структура матрица следующая [dataTypesCount x maxBatchesPositions]
+        /// </summary>
+        /// <param name="pMatrix">Матрица P</param>
+        /// <param name="batchIndex">Индекс партии в последовательности</param>
+        /// <returns>Тип данных</returns>
+        public static int CalculationDataTypeFromBatch(Matrix pMatrix, int batchIndex)
+        {
+
+            // Инициализируем тип данных
+            int dataType = 0;
+
+            // До тех пор, пока не нашли
+            while (true)
+                if (pMatrix[dataType, batchIndex] == 1)
+                    return dataType;
+                else 
+                    dataType++;
+        }
 
         /// <summary>
         /// Ультралютая функция на 500 строк непотно чего. Данная фукнция помогает высчитать время конца текущего состава пакетов
