@@ -57,6 +57,7 @@
     <Compile Include="CalculationService.cs" />
     <Compile Include="FirstLevel.cs" />
     <Compile Include="Model\Batch.cs" />
+    <Compile Include="Model\Config.cs" />
     <Compile Include="Model\Vector.cs" />
     <Compile Include="UI\Form1.cs">
       <SubType>Form</SubType>
