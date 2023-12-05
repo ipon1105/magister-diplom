@@ -608,7 +608,7 @@ namespace newAlgorithm
                                     // Перебираем каждой элемент вектора, как время выполнения задания
                                     foreach (var _maxProccessingTime in time)
                                     {
-
+                                        
                                         // Перебираем каждой элемент вектора, как время переналадки приборов
                                         foreach (var _maxChangeoverTime in time)
                                         {
@@ -784,6 +784,7 @@ namespace newAlgorithm
             // Random rand = new Random(randomValue);
 
             // Формируем второе рандомное значение, как половина от введённого
+            // TODO: Выполнить инициализацию второй переменной с введённого числа с View.
             int _randomValue = randomValue / 2;
 
             // Для каждого прибора (проходимся по всем строкам таблицы dataGridView_proccessing_time)
