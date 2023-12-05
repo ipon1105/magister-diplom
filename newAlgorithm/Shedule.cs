@@ -1,4 +1,5 @@
-﻿using magisterDiplom.Utils;
+﻿using magisterDiplom.Model;
+using magisterDiplom.Utils;
 using newAlgorithm.Model;
 using newAlgorithm.Service;
 using System;
@@ -569,6 +570,21 @@ namespace newAlgorithm
     {
 
         /// <summary>
+        /// Данная переменная содержит в себе информацию о конфигурации системе
+        /// </summary>
+        private Config config;
+
+        /// <summary>
+        /// Данная переменная определяет длину конвейера, как количество приборов
+        /// </summary>
+        private int deviceCount;
+
+        /// <summary>
+        /// Данная переменная определяем максимальное количество партий в последовательности pi_l, так же известное, как n_p
+        /// </summary>
+        private int maxBatchesPositions;
+
+        /// <summary>
         /// Матрица Y - матрица порядка реализации ПТО l приборов в j позиции.
         /// Матрица Y - состоит из 0 и 1. Если Y[l, j]=1, то ПТО выполняется на приборе l после пакета j, иначе 0.
         /// Матрица Y = [deviceCount x maxBatchesPositions] = [L x n_p].
@@ -584,21 +600,56 @@ namespace newAlgorithm
         private Matrix matrixT;
 
         /// <summary>
+        /// Вектор D - вектор времени выполнения ПТО на соответсвующем приборе
+        /// Вектор D - [deviceCount]
+        /// Значение D[l] есть время выполнения ПТО на приборе l.
+        /// </summary>
+        private Vector vectorD;
+
+        /// <summary>
         /// Конструктор возвращающий экземпляр класса PreM
         /// </summary>
         /// <param name="deviceCount">Количество приборов</param>
         /// <param name="maxBatchesPositions">Максимальное количество позиций для пакетов</param>
-        public PreM(int deviceCount, int maxBatchesPositions)
+        /// <param name="vectorD">Вектор времени выполнения ПТО</param>
+        public PreM(Config config, Vector vectorD)
         {
+            // Инициализируем конфигурацию системы
+            this.config = config;
 
             // Инициализируем матрицы Y и T
-            matrixY = new Matrix(ListUtils.InitMatrixInt(deviceCount, maxBatchesPositions));
-            matrixT = new Matrix(ListUtils.InitMatrixInt(deviceCount, maxBatchesPositions));
+            this.matrixY = new Matrix(ListUtils.InitMatrixInt(deviceCount, maxBatchesPositions));
+            this.matrixT = new Matrix(ListUtils.InitMatrixInt(deviceCount, maxBatchesPositions));
+
+            // Инициализируем вектор D
+            this.vectorD = vectorD;
         }
 
-        public void BuildMatrixT()
+        public void BuildMatrixT(
+            Matrix proccesingTime,
+            Dictionary<int, Matrix> changeoverTime,
+            Dictionary<int, Matrix> startTimes
+            )
         {
 
+            int res = 0;
+
+            for (int device = 0; device < deviceCount; device++)
+            {
+                for (int batchIndex = 0; batchIndex < maxBatchesPositions; batchIndex++)
+                {
+
+                    // Если Y[l,j] = 0, то T[l,j] = 0
+                    if (matrixY[device, batchIndex] == 0)
+                    {
+                        matrixT[device, batchIndex] = 0;
+                        continue;
+                    }
+
+                    // Если Y[l,j] != 0, то T[l,j] = Время начала + Время выполнения
+                    matrixT[device, batchIndex] = startTimes[device][batchIndex, startTimes[device].columnCount - 1] + 0 ;
+                }
+            }
         }
     }
 }
