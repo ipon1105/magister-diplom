@@ -609,17 +609,17 @@ namespace newAlgorithm
         /// <summary>
         /// Конструктор возвращающий экземпляр класса PreM
         /// </summary>
-        /// <param name="deviceCount">Количество приборов</param>
-        /// <param name="maxBatchesPositions">Максимальное количество позиций для пакетов</param>
+        /// <param name="config">Структура файла конфигурации</param>
         /// <param name="vectorD">Вектор времени выполнения ПТО</param>
-        public PreM(Config config, Vector vectorD)
+        /// <param name="maxBatchesPositions">Максимальное количество позиций для пакетов</param>
+        public PreM(Config config, Vector vectorD, int maxBatchesPositions)
         {
             // Инициализируем конфигурацию системы
             this.config = config;
 
             // Инициализируем матрицы Y и T
-            this.matrixY = new Matrix(ListUtils.InitMatrixInt(deviceCount, maxBatchesPositions));
-            this.matrixT = new Matrix(ListUtils.InitMatrixInt(deviceCount, maxBatchesPositions));
+            this.matrixY = new Matrix(ListUtils.InitMatrixInt(config.deviceCount, maxBatchesPositions));
+            this.matrixT = new Matrix(ListUtils.InitMatrixInt(config.deviceCount, maxBatchesPositions));
 
             // Инициализируем вектор D
             this.vectorD = vectorD;
@@ -627,14 +627,13 @@ namespace newAlgorithm
 
         public void BuildMatrixT(
             Matrix proccesingTime,
-            Dictionary<int, Matrix> changeoverTime,
             Dictionary<int, Matrix> startTimes
             )
         {
 
             int res = 0;
 
-            for (int device = 0; device < deviceCount; device++)
+            for (int device = 0; device < config.deviceCount; device++)
             {
                 for (int batchIndex = 0; batchIndex < maxBatchesPositions; batchIndex++)
                 {
