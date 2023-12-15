@@ -146,6 +146,9 @@ namespace newAlgorithm
         private void button3_Click(object sender, EventArgs e)
         {
 
+            // Выполняем перестроение матриц
+            tablesRebuild();
+
             // TODO: Перед вызовом данной функции необходимо выполнить присваивание для Form1.compositionSets и Form1.timeSets
 
             // Инициализируем вектор длиной dataTypesCount, каждый элемент которого будет равен batchCount
@@ -170,6 +173,10 @@ namespace newAlgorithm
         /// <param name="e"></param>
         private void button1_Click(object sender, EventArgs e)
         {
+
+            // Выполняем перестроение матриц
+            tablesRebuild();
+
             // Инициализируем вектор длиной dataTypesCount, каждый элемент которого будет равен batchCount
             List<int> batchCountList = CreateBatchCountList();
             
@@ -192,6 +199,10 @@ namespace newAlgorithm
         /// <param name="e"></param>
         private void OldSecondLevelAll_Click(object sender, EventArgs e)
         {
+
+            // Выполняем перестроение матриц
+            tablesRebuild();
+
             // Формируем вектор из значений { 2, 4, 8, 16, 32 }, для генерации матриц выполнения и переналадки
             int[] array = { 2, 4, 8, 16, 32 };
 
@@ -258,6 +269,10 @@ namespace newAlgorithm
         /// <param name="e"></param>
         private void OldSecondLevelButton_Click(object sender, EventArgs e)
         {
+
+            // Выполняем перестроение матриц
+            tablesRebuild();
+
             // Формируем вектор из значений { 2, 4, 8, 16, 32 }, для генерации матриц выполнения и переналадки
             var array = new[] { 2, 4, 8, 16, 32 };
 
@@ -318,6 +333,10 @@ namespace newAlgorithm
         /// <param name="e"></param>
         private void button4_Click(object sender, EventArgs e)
         {
+
+            // Выполняем перестроение матриц
+            tablesRebuild();
+
             Form1.direct = checkBox_deadline_on.Checked;
             int[] N_komplect_sostav = { 2, 4 };
 
@@ -451,6 +470,11 @@ namespace newAlgorithm
         /// <param name="e"></param>
         private void button5_Click(object sender, EventArgs e)
         {
+
+
+            // Выполняем перестроение матриц
+            tablesRebuild();
+
             // Инициализируем выходной файл на добавление
             StreamWriter file_output_method_GAA = new StreamWriter("outputGAASimpleResult.txt", true);
 
@@ -551,6 +575,9 @@ namespace newAlgorithm
         /// <param name="e"></param>
         private void button2_Click(object sender, EventArgs e)
         {
+
+            // Выполняем перестроение матриц
+            tablesRebuild();
 
             // Создаём экземпляр класса Random для генерации рандомных данных
             var rand = new Random(0);
@@ -655,6 +682,10 @@ namespace newAlgorithm
         /// <param name="e"></param>
         private void setsBtn_Click(object sender, EventArgs e)
         {
+
+            // Выполняем перестроение матриц
+            tablesRebuild();
+
             var firstType = new List<int>();
             var secondType = new List<int>();
             var testTime = new List<int>();
@@ -720,50 +751,63 @@ namespace newAlgorithm
         #region Обработка рандомизаций и выбора вкладки
 
         /// <summary>
+        /// Данная функция выполняет перестроение таблиц
+        /// </summary>
+        private void tablesRebuild()
+        {
+
+            // Определяем необходимость переопределения данных таблиц
+            if (!isValueChagedToUpdate)
+                return;
+
+            // Отчищаем внутреннии таблицы
+            changeoverTime.Clear();
+            proccessingTime.Clear();
+
+            // Выполняем инициализацию графических таблиц
+            InitDataGridView();
+
+            // Выполняем инициализацию внутренних таблиц
+            InitTables();
+
+            // Выполяем рандомизацию для таблицы времени обработки
+            randomizeProcessingTime_Click();
+
+            // Выполняем рандомизацию для таблицы времени переналадки приборов
+            randomizeChangeoverTime_Click();
+
+            // Выполняем рандомизацию для таблицы времени ПТО
+            randomizePreMaintenanceTime_Click();
+
+            // Сбрасываем необходимость переопределения данных таблиц
+            isValueChagedToUpdate = false;
+        }
+
+        /// <summary>
         /// Данная функция обрабатываем переключение между вкладками "Установка параметров" и "Установка времени"
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void tabControl_time_setup_Selecting(object sender, TabControlCancelEventArgs e)
         {
-
+            // TODO: БАГ. Проблема вызова. При переопределении переменных не переопределяются матрицы
             // Вычисляем выбранную вкладку
             switch (e.TabPageIndex)
             {
-                // Вкладка "Установка параметров"
-                case 0:
-
-                    // При переключении на данную вкладку в случае изменений параметров таблицы выполняем обработку
-                    // Определяем необходимость переопределения данных таблиц
-                    if (!isValueChagedToUpdate)
-                        return;
-
-                    // Отчищаем внутреннии таблицы
-                    changeoverTime.Clear();
-                    proccessingTime.Clear();
-
-                    // Выполняем инициализацию графических таблиц
-                    InitDataGridView();
-
-                    // Выполняем инициализацию внутренних таблиц
-                    InitTables();
-
-                    // Выполяем рандомизацию для таблицы времени обработки
-                    randomizeProcessingTime_Click();
-
-                    // Выполняем рандомизацию для таблицы времени переналадки приборов
-                    randomizeChangeoverTime_Click();
-
-                    // Выполняем рандомизацию для таблицы времени ПТО
-                    randomizePreMaintenanceTime_Click();
-
-                    break;
 
                 // Вкладка "Установка времени"
-                case 1:
+                case 0:
 
                     // При переключении на данную вкладку считываем новые данные с таблиц
                     GetTime();
+                    break;
+
+                // Вкладка "Установка параметров"
+                case 1:
+
+                    // При переключении на данную вкладку в случае изменений параметров таблицы выполняем обработку
+                    tablesRebuild();
+
                     break;
 
                 // Невозможный случай
@@ -1278,6 +1322,7 @@ namespace newAlgorithm
                     for (var col_dataType = 0; col_dataType < dataTypesCount; col_dataType++)
 
                         // Считываем данные во внутрнние таблицы
+                        // TODO: ИСПРАВИТЬ БАГ при вызове (разного количества приборов и типов) 3 приборов и 5 типов
                         changeoverTime[device][row_dataType][col_dataType] = Convert.ToInt32(dataGridView_changeover_time.Rows[row_dataType + device * dataTypesCount].Cells[col_dataType].Value);
                 }
             }
