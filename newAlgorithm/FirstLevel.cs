@@ -15,11 +15,6 @@ namespace newAlgorithm
         private readonly Config config;
 
         /// <summary>
-        /// Данная переменная определяет количество типов данных
-        /// </summary>
-        private readonly int dataTypesCount;
-
-        /// <summary>
         /// Данная переменная определяет вектор данных для интерпритации типов данных
         /// </summary>
         private readonly List<int> _i;
@@ -56,9 +51,8 @@ namespace newAlgorithm
         public FirstLevel(Config config, List<int> batchCountList)
         {
             this.config = config;
-            this.isFixedBatches = config.isFixedBatches;
             this.batchCountList = batchCountList;
-            _i = new List<int>(this.dataTypesCount);
+            _i = new List<int>(config.dataTypesCount);
         }
 
         /// <summary>
