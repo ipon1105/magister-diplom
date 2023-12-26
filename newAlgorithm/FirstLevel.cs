@@ -9,6 +9,10 @@ namespace newAlgorithm
 {
     public class FirstLevel
     {
+        /// <summary>
+        /// Данная структура данных содержит информацию о конфигурации конвейерной системы
+        /// </summary>
+        private readonly Config config;
 
         /// <summary>
         /// Данная переменная определяет фиксированные ли партии.
@@ -51,29 +55,14 @@ namespace newAlgorithm
         private List<int> _nTemp;
         private bool _typeSolutionFlag;
 
-
-        /// <summary>
-        /// Конструктор с параметрами
-        /// </summary>
-        /// <param name="dataTypesCount">Количество типов данных</param>
-        /// <param name="batchCountList">Вектор длиной dataTypesCount, каждый элемент это количество элементов в партии</param>
-        /// <param name="isFixedBatches">Являются ли партии фиксированными</param>
-        public FirstLevel(int dataTypesCount, List<int> batchCountList, bool isFixedBatches)
-        {
-            this.dataTypesCount = dataTypesCount;
-            this.batchCountList = batchCountList;
-            this.isFixedBatches = isFixedBatches;
-            _i = new List<int>(this.dataTypesCount);
-        }
-
         /// <summary>
         /// Конструктор с параметрами принимающий структуру конфигурации
         /// </summary>
         /// <param name="config">Структура конифгурации содержащая в себе информацию о конвейерной системе</param>
-        /// <param name="batchCountList">Вектор длиной dataTypesCount, каждый элемент которого - это количество элементов в партии</param>
+        /// <param name="batchCountList">Вектор длиной config.dataTypesCount, каждый элемент которого - это количество элементов в партии</param>
         public FirstLevel(Config config, List<int> batchCountList)
         {
-            this.dataTypesCount = config.dataTypesCount;
+            this.config = config;
             this.isFixedBatches = config.isFixedBatches;
             this.batchCountList = batchCountList;
             _i = new List<int>(this.dataTypesCount);
@@ -91,7 +80,7 @@ namespace newAlgorithm
             matrixA_Prime = new List<List<int>>();
 
             // Для каждого типа данных выполняем обработку
-            for (var dataType = 0; dataType < dataTypesCount; dataType++)
+            for (var dataType = 0; dataType < config.dataTypesCount; dataType++)
             {
 
                 // Добавляем в вектор _i элемент 1 в конец списка
@@ -123,7 +112,7 @@ namespace newAlgorithm
             matrixA_Prime = new List<List<int>>();
             
             // Для каждого типа данных выполняем обработку
-            for (var dataType = 0; dataType < dataTypesCount; dataType++)
+            for (var dataType = 0; dataType < config.dataTypesCount; dataType++)
             {
 
                 // Для каждого типа указываем, что они находятся на расмотрении
@@ -136,7 +125,7 @@ namespace newAlgorithm
             }
 
             // Для каждого типа данных выполняем проверку
-            for (var dataType = 0; dataType < dataTypesCount; dataType++)
+            for (var dataType = 0; dataType < config.dataTypesCount; dataType++)
             
                 // Выполяем проверку на отсутсвие единичных партий
                 if (matrixA_Prime[dataType][0] < 2 || matrixA_Prime[dataType][0] < matrixA_Prime[dataType][1])
@@ -154,7 +143,7 @@ namespace newAlgorithm
         private bool CheckType()
         {
             // Для каждого типа данных выполняем проверку на не нулевое количество типов
-            for (var dataType = 0; dataType < dataTypesCount; dataType++)
+            for (var dataType = 0; dataType < config.dataTypesCount; dataType++)
 
                 // Проверяем количество типов
                 if (_i[dataType] > 0)
@@ -296,7 +285,7 @@ namespace newAlgorithm
         /// <param name="type"></param>
         public void CombinationType(StreamWriter file, List<List<List<int>>> tempMatrix, int type, List<List<int>> tempM, ref bool solutionFlag )
         {
-            if (type < dataTypesCount)
+            if (type < config.dataTypesCount)
             {
                 for (var variantOfSplitIndex = 0; variantOfSplitIndex < _a2[type].Count; variantOfSplitIndex++)
                 {
@@ -309,7 +298,7 @@ namespace newAlgorithm
             {
                 var shedule = new Shedule(tempM);
                 //shedule.ConstructShedule();
-                shedule.ConstructSheduleWithBuffer(Form1.buff, dataTypesCount);
+                shedule.ConstructSheduleWithBuffer(Form1.buff, config.dataTypesCount);
                 var fBuf = shedule.GetTime();
                 string s = ListUtils.MatrixIntToString(tempM, ", ", "", ";");
                 file.Write(s + " " + fBuf);
@@ -336,7 +325,7 @@ namespace newAlgorithm
                 GenerateFixedBatchesSolution();
                 var shedule = new Shedule(matrixA_Prime);
                 //shedule.ConstructShedule();
-                shedule.ConstructSheduleWithBuffer(Form1.buff, dataTypesCount);
+                shedule.ConstructSheduleWithBuffer(Form1.buff, config.dataTypesCount);
                 _f1 = shedule.GetTime();
 
                 MessageBox.Show(ListUtils.MatrixIntToString(matrixA_Prime, ", ", "", ";") + "Время обработки " + _f1);
@@ -350,7 +339,7 @@ namespace newAlgorithm
 
                 shedule = new Shedule(matrixA_Prime);
                 //shedule.ConstructShedule();
-                shedule.ConstructSheduleWithBuffer(Form1.buff, dataTypesCount);
+                shedule.ConstructSheduleWithBuffer(Form1.buff, config.dataTypesCount);
                 _f1 = shedule.GetTime();
                 MessageBox.Show(ListUtils.MatrixIntToString(matrixA_Prime, ", ", "", ";") + " Время обработки " + _f1);
                 if (_f1 < _f1Buf)
@@ -373,7 +362,7 @@ namespace newAlgorithm
                             _a1 = new List<List<List<int>>>();
 
                             // Для каждого типа данных выполняем обработку
-                            for (var dataType = 0; dataType < dataTypesCount; dataType++)
+                            for (var dataType = 0; dataType < config.dataTypesCount; dataType++)
                             {
                                 _a1.Add(new List<List<int>>());
                                 _a1[dataType].Add(new List<int>());
@@ -388,16 +377,16 @@ namespace newAlgorithm
 
                         // Для каждого типа и каждого решения в типе строим новое решение и проверяем его на критерий
                         // Строим A2 и параллельно проверяем критерий
-                        _a2 = new List<List<List<int>>>(dataTypesCount);
+                        _a2 = new List<List<List<int>>>(config.dataTypesCount);
 
                         // Выполяем инициализацию
-                        _a2.AddRange(Enumerable.Repeat(new List<List<int>>(), dataTypesCount));
+                        _a2.AddRange(Enumerable.Repeat(new List<List<int>>(), config.dataTypesCount));
                         
                         string s;
                         file.WriteLine("окрестность 1 вида");
 
                         // Для каждого типа данных в рассмотрении (_i[dataType] != 0) выполняем обработку
-                        for (var dataType = 0; dataType < dataTypesCount; dataType++)
+                        for (var dataType = 0; dataType < config.dataTypesCount; dataType++)
                         {
 
                             // Если данный тип данных не находится в рассмотрении
@@ -415,7 +404,7 @@ namespace newAlgorithm
                                 tempA = SetTempAFromA2(dataType, batchIndex);
                                 shedule = new Shedule(tempA);
                                 //shedule.ConstructShedule();
-                                shedule.ConstructSheduleWithBuffer(Form1.buff, dataTypesCount);
+                                shedule.ConstructSheduleWithBuffer(Form1.buff, config.dataTypesCount);
                                 var fBuf = shedule.GetTime();
                                 s = ListUtils.MatrixIntToString(tempA, ", ", "", ";");
                                 file.Write(s + " " + fBuf);
@@ -446,7 +435,7 @@ namespace newAlgorithm
                         }
 
                         // Для каждого типа данных выполняем обработку
-                        for (int dataType = 0; dataType < dataTypesCount; dataType++)
+                        for (int dataType = 0; dataType < config.dataTypesCount; dataType++)
                         {
                             _a1[dataType] = ListUtils.MatrixIntDeepCopy(_a2[dataType]);
                             if (!_a1[dataType].Any() || !_a1[dataType][0].Any())
@@ -471,7 +460,7 @@ namespace newAlgorithm
         {
 
             // Для каждого типа данных выполняем обработку с конца
-            for (int dataType = dataTypesCount - 1; dataType >= 0; dataType--)
+            for (int dataType = config.dataTypesCount - 1; dataType >= 0; dataType--)
             {
                 for (int j = 0;j <_a2[dataType].Count; j++)
                 {
@@ -492,7 +481,7 @@ namespace newAlgorithm
             var tempA = ListUtils.MatrixIntDeepCopy(matrixA_Prime);
 
             // Для каждого типа данных выполняем обработку
-            for (var dataType = 0; dataType < dataTypesCount; dataType++)
+            for (var dataType = 0; dataType < config.dataTypesCount; dataType++)
             {
                 if (_n[dataType] >= 0)
                 {
@@ -501,7 +490,7 @@ namespace newAlgorithm
             }
             var shedule = new Shedule(tempA);
             //shedule.ConstructShedule();
-            shedule.ConstructSheduleWithBuffer(3, dataTypesCount);
+            shedule.ConstructSheduleWithBuffer(3, config.dataTypesCount);
 
             shedule.BuildMatrixRWithTime();
             var matrixRWithTime = shedule.ReturnMatrixRWithTime();
@@ -561,7 +550,7 @@ namespace newAlgorithm
                         _a1 = new List<List<List<int>>>();
 
                         // Для каждого типа данных выполняем обработку
-                        for (var dataType = 0; dataType < dataTypesCount; dataType++)
+                        for (var dataType = 0; dataType < config.dataTypesCount; dataType++)
                         {
                             _a1.Add(new List<List<int>>());
                             _a1[dataType].Add(new List<int>());
@@ -579,7 +568,7 @@ namespace newAlgorithm
                     string s;
 
                     // Для кадого типа данных выполняем обработку
-                    for (var dataType = 0; dataType < dataTypesCount; dataType++)
+                    for (var dataType = 0; dataType < config.dataTypesCount; dataType++)
                     {
                         _a2.Add(new List<List<int>>());
                         if (_i[dataType] <= 0) continue;
@@ -613,7 +602,7 @@ namespace newAlgorithm
                         _nTemp = new List<int>();
 
                         // Для каждого типа данных выполняем обработку
-                        for (int dataType = 0; dataType < dataTypesCount; dataType++)
+                        for (int dataType = 0; dataType < config.dataTypesCount; dataType++)
                         {
                             _nTemp.Add(0);
                             _n.Add(_a2[dataType].Count);
@@ -631,7 +620,7 @@ namespace newAlgorithm
                     }
                     
                     // Для каждого типа данных выполняем обработку
-                    for (int dataType = 0; dataType < dataTypesCount; dataType++)
+                    for (int dataType = 0; dataType < config.dataTypesCount; dataType++)
                     {
                         _a1[dataType] = ListUtils.MatrixIntDeepCopy(_a2[dataType]);
                         if (!_a1[dataType].Any() || !_a1[dataType][0].Any())
