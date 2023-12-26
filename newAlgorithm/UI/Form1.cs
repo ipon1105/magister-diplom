@@ -161,8 +161,18 @@ namespace newAlgorithm
             Shedule.changeoverTime = changeoverTime;
             Shedule.proccessingTime = proccessingTime;
 
-            // Создаём экземпляр класса первого уровня
-            var firstLevel = new FirstLevel(dataTypesCount, batchCountList, isFixedBatches);
+            // Создаём экземпляр конфигурационной структуры
+            Config config = new Config(
+                dataTypesCount,
+                deviceCount,
+                buffer,
+                (Matrix)(new Matrix(proccessingTime)),
+                Config.changeoverTimeConverter(changeoverTime),
+                isFixedBatches
+            );
+
+            // Формируем первый уровень
+            var firstLevel = new FirstLevel(config, batchCountList);
 
             // Выполняем генерацию данных для ввсех типов вторым алгоритмом
             firstLevel.GenetateSolutionForAllTypesSecondAlgorithm();
@@ -311,8 +321,19 @@ namespace newAlgorithm
                                 Shedule.changeoverTime = OldChangeoverTimeGenerator(_maxChangeoverTime, deviceCount, dataTypesCount);
                                 Shedule.proccessingTime = OldProccessingTimeGenerator(_maxProccessingTime, deviceCount, dataTypesCount);
 
+                                // Создаём экземпляр конфигурационной структуры
+                                Config config = new Config(
+                                    dataTypesCount,
+                                    deviceCount,
+                                    buffer,
+                                    (Matrix)(new Matrix(OldProccessingTimeGenerator(_maxProccessingTime, deviceCount, dataTypesCount))),
+                                    Config.changeoverTimeConverter(OldChangeoverTimeGenerator(_maxChangeoverTime, deviceCount, dataTypesCount)),
+                                    isFixedBatches
+                                );
 
-                                var firstLevel = new FirstLevel(dataTypesCount, batchCountList, isFixedBatches);
+                                // Формируем первый уровень
+                                var firstLevel = new FirstLevel(config, batchCountList);
+
                                 firstLevel.GenetateSolutionForAllTypes("outputFirstAlgorithm.txt");
                                 var oldSecondLevel = new OldSecondLevel(tz, countGroup, deviceCount);
 
@@ -443,6 +464,8 @@ namespace newAlgorithm
                                     Shedule.deviceCount = _deviceCount;
                                     Shedule.changeoverTime = OldChangeoverTimeGenerator(_maxChangeoverTime, _deviceCount, _dataTypesCount);
                                     Shedule.proccessingTime = OldProccessingTimeGenerator(_maxProccessingTime, _deviceCount, _dataTypesCount);
+                                    
+                                    
 
                                     // Создаём вектор длиной в количество типов данных наполненный нулями
                                     List<int> _batchCountList = CreateBatchCountList(0, _dataTypesCount);
@@ -456,7 +479,18 @@ namespace newAlgorithm
                                         }
                                         _batchCountList[dataType] = batchCount * n_kom_q;
                                     }
-                                    var firstLevel = new FirstLevel(_dataTypesCount, _batchCountList, isFixedBatches);
+                                    
+                                    // Создаём экземпляр конфигурационной структуры
+                                    Config config = new Config(
+                                        _dataTypesCount,
+                                        _deviceCount,
+                                        buffer,
+                                        (Matrix)(new Matrix(OldProccessingTimeGenerator(_maxProccessingTime, _deviceCount, _dataTypesCount))),
+                                        Config.changeoverTimeConverter(OldChangeoverTimeGenerator(_maxChangeoverTime, _deviceCount, _dataTypesCount)),
+                                        isFixedBatches
+                                    );
+
+                                    var firstLevel = new FirstLevel(config, _batchCountList);
                                     var result = firstLevel.GenetateSolutionForAllTypesSecondAlgorithm();
 
                                     //var gaa = new GAA(_countType, listCountButches, checkBox1.Checked, batchCount);
