@@ -3,6 +3,7 @@ using System.Linq;
 using System.Windows.Forms;
 using System.IO;
 using magisterDiplom.Utils;
+using magisterDiplom.Model;
 
 namespace newAlgorithm
 {
@@ -62,6 +63,19 @@ namespace newAlgorithm
             this.dataTypesCount = dataTypesCount;
             this.batchCountList = batchCountList;
             this.isFixedBatches = isFixedBatches;
+            _i = new List<int>(this.dataTypesCount);
+        }
+
+        /// <summary>
+        /// Конструктор с параметрами принимающий структуру конфигурации
+        /// </summary>
+        /// <param name="config">Структура конифгурации содержащая в себе информацию о конвейерной системе</param>
+        /// <param name="batchCountList">Вектор длиной dataTypesCount, каждый элемент которого - это количество элементов в партии</param>
+        public FirstLevel(Config config, List<int> batchCountList)
+        {
+            this.dataTypesCount = config.dataTypesCount;
+            this.isFixedBatches = config.isFixedBatches;
+            this.batchCountList = batchCountList;
             _i = new List<int>(this.dataTypesCount);
         }
 

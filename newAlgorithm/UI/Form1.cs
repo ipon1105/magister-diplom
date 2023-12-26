@@ -1,5 +1,7 @@
 ﻿using magisterDiplom;
+using magisterDiplom.Model;
 using magisterDiplom.Utils;
+using newAlgorithm.Model;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -185,8 +187,18 @@ namespace newAlgorithm
             Shedule.changeoverTime = changeoverTime;
             Shedule.proccessingTime = proccessingTime;
 
+            // Создаём экземпляр конфигурационной структуры
+            Config config = new Config(
+                dataTypesCount,
+                deviceCount,
+                buffer,
+                (Matrix) (new Matrix(proccessingTime)),
+                Config.changeoverTimeConverter(changeoverTime),
+                isFixedBatches
+            );
+
             // Формируем первый уровень
-            var firstLevel = new FirstLevel(dataTypesCount, batchCountList, isFixedBatches);
+            var firstLevel = new FirstLevel(config, batchCountList);
 
             // Генерируем решение и записываем его в файл
             firstLevel.GenetateSolutionForAllTypes("outputFirstAlgorithm.txt");

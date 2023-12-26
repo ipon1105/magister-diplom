@@ -1,5 +1,4 @@
 ﻿using newAlgorithm.Model;
-using System.Collections;
 using System.Collections.Generic;
 
 namespace magisterDiplom.Model
@@ -66,5 +65,23 @@ namespace magisterDiplom.Model
             this.isFixedBatches = isFixedBatches;
         }
 
+        /// <summary>
+        /// Данная функция выполняем преобразование данных из матричной 3-ёх мерной формы в словарь матриц
+        /// </summary>
+        /// <param name="changeoverTime">3-ёх мерная матрица</param>
+        /// <returns>Словарь соответствий приборов и матриц переналадок</returns>
+        public static Dictionary<int, Matrix> changeoverTimeConverter(List<List<List<int>>> changeoverTime)
+        {
+
+            // Создаём словарь матриц переналадки
+            Dictionary<int, Matrix> _changeoverTime = new Dictionary<int, Matrix>();
+
+            // Для каждого прибора выполняем переопределение данных в необходимую форму
+            for (int device = 0; device < changeoverTime.Count; device++)
+                _changeoverTime.Add(device, (Matrix)(new Matrix(changeoverTime[device])));
+
+            // Возвращаем словарь матриц переналадки
+            return _changeoverTime;
+        }
     }
 }
