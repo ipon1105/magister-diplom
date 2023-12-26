@@ -15,13 +15,6 @@ namespace newAlgorithm
         private readonly Config config;
 
         /// <summary>
-        /// Данная переменная определяет фиксированные ли партии.
-        /// В случае, если партии фиксированные, тоесть True, возможны единичные партии.
-        /// В случае, если партии не фиксированные, тоесть False, единичные партии невозможны.
-        /// </summary>
-        private readonly bool isFixedBatches;
-
-        /// <summary>
         /// Данная переменная определяет количество типов данных
         /// </summary>
         private readonly int dataTypesCount;
@@ -349,7 +342,7 @@ namespace newAlgorithm
                     _f1Buf = _f1;
                     file.Write(" +");
                 }
-                if (!isFixedBatches)
+                if (!config.isFixedBatches)
                 {
 
                     // До тех пор, поа не расмотрели все типы выполняем обработку
@@ -541,7 +534,7 @@ namespace newAlgorithm
                 _typeSolutionFlag = true;
 
                 // До тех пор пока в наличие есть оставшиеся типы и партии не фиксированные выполняем обработку
-                while (CheckType() && !isFixedBatches)
+                while (CheckType() && !config.isFixedBatches)
                 {
                     // Буферезируем текущее решение для построение нового на его основе
                     _ai = ListUtils.MatrixIntDeepCopy(matrixA_Prime);
