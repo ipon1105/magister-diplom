@@ -298,7 +298,7 @@ namespace newAlgorithm
             {
                 var shedule = new Shedule(tempM);
                 //shedule.ConstructShedule();
-                shedule.ConstructSheduleWithBuffer(Form1.buff, config.dataTypesCount);
+                shedule.ConstructSheduleWithBuffer(config.buffer, config.dataTypesCount);
                 var fBuf = shedule.GetTime();
                 string s = ListUtils.MatrixIntToString(tempM, ", ", "", ";");
                 file.Write(s + " " + fBuf);
@@ -325,7 +325,7 @@ namespace newAlgorithm
                 GenerateFixedBatchesSolution();
                 var shedule = new Shedule(matrixA_Prime);
                 //shedule.ConstructShedule();
-                shedule.ConstructSheduleWithBuffer(Form1.buff, config.dataTypesCount);
+                shedule.ConstructSheduleWithBuffer(config.buffer, config.dataTypesCount);
                 _f1 = shedule.GetTime();
 
                 MessageBox.Show(ListUtils.MatrixIntToString(matrixA_Prime, ", ", "", ";") + "Время обработки " + _f1);
@@ -339,7 +339,7 @@ namespace newAlgorithm
 
                 shedule = new Shedule(matrixA_Prime);
                 //shedule.ConstructShedule();
-                shedule.ConstructSheduleWithBuffer(Form1.buff, config.dataTypesCount);
+                shedule.ConstructSheduleWithBuffer(config.buffer, config.dataTypesCount);
                 _f1 = shedule.GetTime();
                 MessageBox.Show(ListUtils.MatrixIntToString(matrixA_Prime, ", ", "", ";") + " Время обработки " + _f1);
                 if (_f1 < _f1Buf)
@@ -404,7 +404,7 @@ namespace newAlgorithm
                                 tempA = SetTempAFromA2(dataType, batchIndex);
                                 shedule = new Shedule(tempA);
                                 //shedule.ConstructShedule();
-                                shedule.ConstructSheduleWithBuffer(Form1.buff, config.dataTypesCount);
+                                shedule.ConstructSheduleWithBuffer(config.buffer, config.dataTypesCount);
                                 var fBuf = shedule.GetTime();
                                 s = ListUtils.MatrixIntToString(tempA, ", ", "", ";");
                                 file.Write(s + " " + fBuf);
