@@ -12,6 +12,11 @@ namespace magisterDiplom.Model
     {
 
         /// <summary>
+        /// Данная переменная определяет являются ли партии фиксированными
+        /// </summary>
+        public readonly bool isFixedBatches;
+
+        /// <summary>
         /// Данная переменная определяет количество типов данных в конвейерной системе
         /// </summary>
         public readonly int dataTypesCount;
@@ -49,7 +54,8 @@ namespace magisterDiplom.Model
             int deviceCount,
             int buffer,
             Matrix proccessingTime,
-            Dictionary<int, Matrix> changeoverTime
+            Dictionary<int, Matrix> changeoverTime,
+            bool isFixedBatches
             )
         {
             this.dataTypesCount = dataTypesCount;
@@ -57,6 +63,7 @@ namespace magisterDiplom.Model
             this.buffer = buffer;
             this.proccessingTime = proccessingTime;
             this.changeoverTime = changeoverTime;
+            this.isFixedBatches = isFixedBatches;
         }
 
     }
