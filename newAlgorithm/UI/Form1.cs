@@ -251,6 +251,16 @@ namespace newAlgorithm
                                 Shedule.changeoverTime = OldChangeoverTimeGenerator(_maxChangeoverTime, deviceCount, dataTypesCount);
                                 Shedule.proccessingTime = OldProccessingTimeGenerator(_maxProccessingTime, deviceCount, dataTypesCount);
 
+                                // Создаём экземпляр конфигурационной структуры
+                                Config config = new Config(
+                                    dataTypesCount,
+                                    deviceCount,
+                                    buffer,
+                                    (Matrix)(new Matrix(OldProccessingTimeGenerator(_maxProccessingTime, deviceCount, dataTypesCount))),
+                                    Config.changeoverTimeConverter(OldChangeoverTimeGenerator(_maxChangeoverTime, deviceCount, dataTypesCount)),
+                                    isFixedBatches
+                                );
+
                                 // Создаём экземпляр класса GAA
                                 var gaa = new GAA(dataTypesCount, batchCountList, isFixedBatches, batchCount);
 
@@ -465,8 +475,16 @@ namespace newAlgorithm
                                     Shedule.changeoverTime = OldChangeoverTimeGenerator(_maxChangeoverTime, _deviceCount, _dataTypesCount);
                                     Shedule.proccessingTime = OldProccessingTimeGenerator(_maxProccessingTime, _deviceCount, _dataTypesCount);
                                     
+                                    // Создаём экземпляр конфигурационной структуры
+                                    Config config = new Config(
+                                        _dataTypesCount,
+                                        _deviceCount,
+                                        buffer,
+                                        (Matrix)(new Matrix(OldProccessingTimeGenerator(_maxProccessingTime, _deviceCount, _dataTypesCount))),
+                                        Config.changeoverTimeConverter(OldChangeoverTimeGenerator(_maxChangeoverTime, _deviceCount, _dataTypesCount)),
+                                        isFixedBatches
+                                    );
                                     
-
                                     // Создаём вектор длиной в количество типов данных наполненный нулями
                                     List<int> _batchCountList = CreateBatchCountList(0, _dataTypesCount);
 
@@ -479,16 +497,6 @@ namespace newAlgorithm
                                         }
                                         _batchCountList[dataType] = batchCount * n_kom_q;
                                     }
-                                    
-                                    // Создаём экземпляр конфигурационной структуры
-                                    Config config = new Config(
-                                        _dataTypesCount,
-                                        _deviceCount,
-                                        buffer,
-                                        (Matrix)(new Matrix(OldProccessingTimeGenerator(_maxProccessingTime, _deviceCount, _dataTypesCount))),
-                                        Config.changeoverTimeConverter(OldChangeoverTimeGenerator(_maxChangeoverTime, _deviceCount, _dataTypesCount)),
-                                        isFixedBatches
-                                    );
 
                                     var firstLevel = new FirstLevel(config, _batchCountList);
                                     var result = firstLevel.GenetateSolutionForAllTypesSecondAlgorithm();
@@ -564,6 +572,16 @@ namespace newAlgorithm
                                 Shedule.deviceCount = _deviceCount;
                                 Shedule.changeoverTime = OldChangeoverTimeGenerator(_maxChangeoverTime, _deviceCount, _dataTypesCount);
                                 Shedule.proccessingTime = OldProccessingTimeGenerator(_maxProccessingTime, _deviceCount, _dataTypesCount);
+
+                                // Создаём экземпляр конфигурационной структуры
+                                Config config = new Config(
+                                    _dataTypesCount,
+                                    _deviceCount,
+                                    buffer,
+                                    (Matrix)(new Matrix(OldProccessingTimeGenerator(_maxProccessingTime, _deviceCount, _dataTypesCount))),
+                                    Config.changeoverTimeConverter(OldChangeoverTimeGenerator(_maxChangeoverTime, _deviceCount, _dataTypesCount)),
+                                    isFixedBatches
+                                );
 
                                 // Инициализируем вектор длиной _dataTypesCount, каждый элемент которого будет равен _batchCount
                                 List<int> batchCountList = CreateBatchCountList(_batchCount, _dataTypesCount);
@@ -691,6 +709,16 @@ namespace newAlgorithm
                                             Shedule.changeoverTime = OldChangeoverTimeGenerator(_maxChangeoverTime, _deviceCount, _dataTypesCount);
                                             Shedule.proccessingTime = OldProccessingTimeGenerator(_maxProccessingTime, _deviceCount, _dataTypesCount);
 
+                                            // Создаём экземпляр конфигурационной структуры
+                                            Config config = new Config(
+                                                _dataTypesCount,
+                                                _deviceCount,
+                                                buffer,
+                                                (Matrix)(new Matrix(OldProccessingTimeGenerator(_maxProccessingTime, _deviceCount, _dataTypesCount))),
+                                                Config.changeoverTimeConverter(OldChangeoverTimeGenerator(_maxChangeoverTime, _deviceCount, _dataTypesCount)),
+                                                isFixedBatches
+                                            );
+
                                             // Создаём вектор длиной dataTypesCount из 0
                                             var batchCountList = CreateBatchCountList(0, _dataTypesCount);
 
@@ -704,7 +732,7 @@ namespace newAlgorithm
                                             }
 
                                             var gaa = new GAA(_dataTypesCount, batchCountList, isFixedBatches, batchCount);
-
+                                            
                                             var result = gaa.calcSetsFitnessList(checkBox_deadline_on.Checked, generationCount, xromossomiSize);
 
                                             file.WriteLine(result);
