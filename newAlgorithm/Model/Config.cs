@@ -9,6 +9,10 @@ namespace magisterDiplom.Model
     /// </summary>
     public struct Config
     {
+        /// <summary>
+        /// Данная переменная устанавливаем режим отладки для всей программы
+        /// </summary>
+        public readonly static bool isDebug = true;
 
         /// <summary>
         /// Данная переменная определяет являются ли партии фиксированными
