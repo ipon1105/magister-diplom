@@ -775,5 +775,132 @@ namespace newAlgorithm
                 }
             }
         }
+
+        public void build()
+        {
+
+            // Создаём временную матрицу R
+            Matrix R = new Matrix(new List<List<int>>
+                {
+                new List<int> { 2, 0 },
+                new List<int> { 0, 2 }
+                });
+
+            // Создаём временную матрицу P
+            Matrix P = new Matrix(new List<List<int>>
+                {
+                new List<int> { 1, 0 },
+                new List<int> { 0, 1 }
+                });
+
+            // Данная функция возвращает время наладки
+            int settingTime(int _device)
+            {
+                // Получаем матрицу переналадки для deivce прибора
+                Matrix changeover = config.changeoverTime[_device];
+
+                // Инициализируем время наладки
+                int time = 0;
+
+                // Высчитываем время наладки
+                for (int dataType = 0; dataType < config.dataTypesCount; dataType++)
+                    time += changeover[dataType, dataType] * P[dataType, 0];
+
+                // Возвращаем время наладки
+                return time;
+            }
+
+            // Данная функция возвращает время выполнения
+            int proccessingTime(int _device, int _batchIndex)
+            {
+                // Получаем матрицу выполнения
+                Matrix proccessing = config.proccessingTime;
+
+                // Инициализируем время выполнения
+                int time = 0;
+
+                // Высчитываем время выполнения
+                for (int dataType = 0; dataType < config.dataTypesCount; dataType++)
+                    time += proccessing[_device, dataType] * P[dataType, _batchIndex];
+
+                // Возвращаем время выполнения
+                return time;
+            }
+            
+            // Данная функция возвращает время выполнения всех заданий в пакете
+            int batch_proccessingTime(int _device, int _batchIndex)
+            {
+                // Получаем матрицу выполнения
+                Matrix proccessing = config.proccessingTime;
+
+                // Инициализируем время выполнения
+                int time = 0;
+
+                // Высчитываем время выполнения
+                for (int f = 0; f < _batchIndex; f++)
+                    for (int dataType = 0; dataType < config.dataTypesCount; dataType++)
+                        time += proccessing[_device, dataType] * R[dataType, f];
+
+                // Возвращаем время выполнения
+                return time;
+            }
+
+            // Данная функция возвращает время ПТО
+            int preM_proccessingTime(int device, int _batchIndex)
+            {
+
+                // Инициализируем время ПТО
+                int time = 0;
+
+                // Высчитываем время ПТО
+                for (int batchIndex = 0; batchIndex < _batchIndex; batchIndex++)
+                    time += vectorD[device] * matrixY[device, batchIndex];
+
+                // Возвращаем время ПТО
+                return time;
+            }
+
+            // Данная функция возвращает время переналадки на приборе _device
+            int changeoverTime(int _device, int _batchIndex)
+            {
+                // Получаем матрицу переналадки для _deivce прибора
+                Matrix changeover = config.changeoverTime[_device];
+
+                // Инициализируем время переналадки
+                int time = 0;
+
+                // Высчитываем время переналадки
+                for (int batchIndex = 0; batchIndex < _batchIndex - 1; batchIndex++)
+                    time += changeover[batchIndex, batchIndex + 1];
+
+                // Возвращаем время переналадки
+                return time;
+            }
+
+            // Данная функция высчитывает момент начала времени выполнения
+            // q-ого задания в 1 пакете на 1 приборе 
+            int t1(int job)
+            {
+                return settingTime(0) + job * proccessingTime(0, 0);
+            }
+
+            // Данная функция высчитывает момент начала времени выполнения
+            // q-ого задания в j(batchIndex) пакете на 1 приборе 
+            int t2(int _batchIndex)
+            {
+                int time = 0;
+                time += settingTime(0);
+                time += batch_proccessingTime(0, _batchIndex);
+                time += changeoverTime(0, _batchIndex);
+                time += preM_proccessingTime(0, _batchIndex);
+                return time;
+            }
+
+            int t3(int _batchIndex, int job)
+            {
+                return t2(_batchIndex) + job * proccessingTime(0, _batchIndex); 
+            }
+
+        }
     }
 }
