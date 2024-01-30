@@ -49,6 +49,12 @@ namespace magisterDiplom.Model
         public readonly Matrix proccessingTime;
 
         /// <summary>
+        /// Данная переменная содержим в себе список из времён вермени выполнения ПТО для соответсвующего прибора.
+        /// preMaintenanceTimes = [deviceCount]
+        /// </summary>
+        public readonly Vector preMaintenanceTimes;
+
+        /// <summary>
         /// Конструктор конфигурации конвейерной системы. Содержит в себе всю входную
         /// информацию небходимую для выполнения локально-оптимальных вычислений
         /// </summary>
@@ -58,6 +64,7 @@ namespace magisterDiplom.Model
             int buffer,
             Matrix proccessingTime,
             Dictionary<int, Matrix> changeoverTime,
+            Vector preMaintenanceTimes,
             bool isFixedBatches
             )
         {
@@ -66,6 +73,7 @@ namespace magisterDiplom.Model
             this.buffer = buffer;
             this.proccessingTime = proccessingTime;
             this.changeoverTime = changeoverTime;
+            this.preMaintenanceTimes = preMaintenanceTimes;
             this.isFixedBatches = isFixedBatches;
         }
 

@@ -19,7 +19,7 @@ namespace GlobalTest.FirstLevel
         {
             
             // Создаём экземпляр конфигурационной структуры
-            Config config = new Config( 3, 4, 3, null, null, false );
+            Config config = new Config( 3, 4, 3, null, null, null, false );
 
             var firstLevel = new newAlgorithm.FirstLevel(config, new List<int> { 12, 12, 12 });
             var output = new List<List<int>> { new List<int> { 10, 2 }, new List<int> { 10, 2 }, new List<int> { 10, 2 } };
@@ -34,7 +34,7 @@ namespace GlobalTest.FirstLevel
         public void GenerateFixedBatchesSolutionTest()
         {
 
-            Config config = new Config(3, 4, 3, null, null, true);
+            Config config = new Config(3, 4, 3, null, null, null, true);
             var firstLevel = new newAlgorithm.FirstLevel(config, new List<int> { 12, 12, 12 });
             var output = new List<List<int>> { new List<int> { 12 }, new List<int> { 12 }, new List<int> { 12 } };
             firstLevel.GenerateFixedBatchesSolution();

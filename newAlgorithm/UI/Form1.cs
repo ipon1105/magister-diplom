@@ -168,6 +168,7 @@ namespace newAlgorithm
                 buffer,
                 (Matrix)(new Matrix(proccessingTime)),
                 Config.changeoverTimeConverter(changeoverTime),
+                new Vector(preMaintenanceTimes),
                 isFixedBatches
             );
 
@@ -204,6 +205,7 @@ namespace newAlgorithm
                 buffer,
                 (Matrix) (new Matrix(proccessingTime)),
                 Config.changeoverTimeConverter(changeoverTime),
+                new Vector(preMaintenanceTimes),
                 isFixedBatches
             );
 
@@ -258,6 +260,7 @@ namespace newAlgorithm
                                     buffer,
                                     (Matrix)(new Matrix(OldProccessingTimeGenerator(_maxProccessingTime, deviceCount, dataTypesCount))),
                                     Config.changeoverTimeConverter(OldChangeoverTimeGenerator(_maxChangeoverTime, deviceCount, dataTypesCount)),
+                                    new Vector(preMaintenanceTimes),
                                     isFixedBatches
                                 );
 
@@ -338,6 +341,7 @@ namespace newAlgorithm
                                     buffer,
                                     (Matrix)(new Matrix(OldProccessingTimeGenerator(_maxProccessingTime, deviceCount, dataTypesCount))),
                                     Config.changeoverTimeConverter(OldChangeoverTimeGenerator(_maxChangeoverTime, deviceCount, dataTypesCount)),
+                                    new Vector(preMaintenanceTimes),
                                     isFixedBatches
                                 );
 
@@ -482,6 +486,7 @@ namespace newAlgorithm
                                         buffer,
                                         (Matrix)(new Matrix(OldProccessingTimeGenerator(_maxProccessingTime, _deviceCount, _dataTypesCount))),
                                         Config.changeoverTimeConverter(OldChangeoverTimeGenerator(_maxChangeoverTime, _deviceCount, _dataTypesCount)),
+                                        new Vector(preMaintenanceTimes),
                                         isFixedBatches
                                     );
                                     
@@ -580,7 +585,7 @@ namespace newAlgorithm
                                     buffer,
                                     (Matrix)(new Matrix(OldProccessingTimeGenerator(_maxProccessingTime, _deviceCount, _dataTypesCount))),
                                     Config.changeoverTimeConverter(OldChangeoverTimeGenerator(_maxChangeoverTime, _deviceCount, _dataTypesCount)),
-                                    isFixedBatches
+                                    new Vector(preMaintenanceTimes), isFixedBatches
                                 );
 
                                 // Инициализируем вектор длиной _dataTypesCount, каждый элемент которого будет равен _batchCount
@@ -716,6 +721,7 @@ namespace newAlgorithm
                                                 buffer,
                                                 (Matrix)(new Matrix(OldProccessingTimeGenerator(_maxProccessingTime, _deviceCount, _dataTypesCount))),
                                                 Config.changeoverTimeConverter(OldChangeoverTimeGenerator(_maxChangeoverTime, _deviceCount, _dataTypesCount)),
+                                                new Vector(preMaintenanceTimes),
                                                 isFixedBatches
                                             );
 
