@@ -136,6 +136,41 @@ namespace GlobalTest.Utils
         }
 
         [TestMethod]
+        public void MatrixIntDeepCopy_2()
+        {
+
+            List<List<int>> input = new List<List<int>> {
+                new List<int> { 1, 2 },
+                new List<int> { 3, 4, 5 }
+            };
+            List<List<int>> output = ListUtils.MatrixIntDeepCopy(input);
+
+            // Проверяем результат копирования
+            Assert.AreEqual(output[0][0], input[0][0]);
+            Assert.AreEqual(output[0][1], input[0][1]);
+            Assert.AreEqual(output[1][0], input[1][0]);
+            Assert.AreEqual(output[1][1], input[1][1]);
+            Assert.AreEqual(output[1][2], input[1][2]);
+
+            // Изменяем исходный вектор и выполняем проверку
+            input[0][0] = 0;
+            input[1][1] = 0;
+            Assert.AreNotEqual(output[0][0], input[0][0]);
+            Assert.AreEqual(output[0][1], input[0][1]);
+            Assert.AreEqual(output[1][0], input[1][0]);
+            Assert.AreNotEqual(output[1][1], input[1][1]);
+            Assert.AreEqual(output[1][2], input[1][2]);
+
+            // Изменяем исходный вектор и выполняем проверку
+            input[1][2] = 0;
+            Assert.AreNotEqual(output[0][0], input[0][0]);
+            Assert.AreEqual(output[0][1], input[0][1]);
+            Assert.AreEqual(output[1][0], input[1][0]);
+            Assert.AreNotEqual(output[1][1], input[1][1]);
+            Assert.AreNotEqual(output[1][2], input[1][2]);
+        }
+
+        [TestMethod]
         public void MatrixIntRowSwapTest()
         {
 
