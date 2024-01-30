@@ -698,209 +698,216 @@ namespace newAlgorithm
     /// </summary>
     public class PreM
     {
-
         /// <summary>
-        /// Данная переменная содержит в себе информацию о конфигурации системе
+        /// Данная функция выполняет построение матрицы начала времени выполнения заданий.
         /// </summary>
-        private Config config;
+        /// <param name="config">Структура описывающая конфигурацию по
+        /// которой будет выполняться построение расписания
+        /// </param>
+        /// <param name="schedule">Последовательность ПЗ. 
+        /// Каждый ПЗ содержит в себе информацию о количестве заданий и типе задания.
+        /// </param>
+        /// <param name="matrixY">Матрица порядка выполнения ПТО.
+        /// Y[deviceCount x maxBatchCount]</param>
+        /// <returns>
+        /// Словарь соответствий прибора к матрице начала времени выполнения
+        /// заданий в пакетах. [device]:[batchIndex x job]
+        /// </returns>
+        public static Dictionary<int, List<List<int>>> Build(
+            Config config,
+            List<magisterDiplom.Model.Batch> schedule,
+            List<List<int>> matrixY
+        ) {
 
-        /// <summary>
-        /// Данная переменная определяем максимальное количество партий в последовательности pi_l, так же известное, как n_p
-        /// </summary>
-        private int maxBatchesPositions;
+            // Объявляем словарь соответствий
+            Dictionary<int, List<List<int>>> matrixT = new Dictionary<int, List<List<int>>>();
 
-        /// <summary>
-        /// Матрица Y - матрица порядка реализации ПТО l приборов в j позиции.
-        /// Матрица Y - состоит из 0 и 1. Если Y[l, j]=1, то ПТО выполняется на приборе l после пакета j, иначе 0.
-        /// Матрица Y = [deviceCount x maxBatchesPositions] = [L x n_p].
-        /// </summary>
-        private Matrix matrixY;
+            // Объявляем индекс ПЗ
+            int batchIndex = 0;
 
-        /// <summary>
-        /// Матрица T - матрица моментов начала реализации ПТО на l приборе в позиции j
-        /// Матрица T - [deviceCount x maxBatchesPositions] = [L x n_p].
-        /// Значение T[l, j] != 0, когда реализация ПТО на приборе l следуюет за пакетом заданий в j-ои позиции, тоесть Y[l,j] != 0.
-        /// Значение T[l, j] == 0, когда Y[l, j] == 0.
-        /// </summary>
-        private Matrix matrixT;
+            // Объявляем индекс прибора
+            int device = 0;
 
-        /// <summary>
-        /// Вектор D - вектор времени выполнения ПТО на соответсвующем приборе
-        /// Вектор D - [deviceCount]
-        /// Значение D[l] есть время выполнения ПТО на приборе l.
-        /// </summary>
-        private Vector vectorD;
+            // Объявляем индекс задания
+            int job = 0;
 
-        /// <summary>
-        /// Конструктор возвращающий экземпляр класса PreM
-        /// </summary>
-        /// <param name="config">Структура файла конфигурации</param>
-        /// <param name="vectorD">Вектор времени выполнения ПТО</param>
-        /// <param name="maxBatchesPositions">Максимальное количество позиций для пакетов</param>
-        public PreM(Config config, Vector vectorD, int maxBatchesPositions)
-        {
-            // Инициализируем конфигурацию системы
-            this.config = config;
+            // Инициалиизруем матрицу заданий в пакете
+            List<List<int>> times = new List<List<int>>();
+            for (batchIndex = 0; batchIndex < schedule.Count(); batchIndex++)
+                times.Add(ListUtils.InitVectorInt(schedule[batchIndex].Size));
 
-            // Инициализируем матрицы Y и T
-            this.matrixY = new Matrix(ListUtils.InitMatrixInt(config.deviceCount, maxBatchesPositions));
-            this.matrixT = new Matrix(ListUtils.InitMatrixInt(config.deviceCount, maxBatchesPositions));
+            // Инициализируем словарь соответствий
+            for (device = 0; device < config.deviceCount; device++)
+                matrixT.Add(device, ListUtils.MatrixIntDeepCopy(times));
 
-            // Инициализируем вектор D
-            this.vectorD = vectorD;
+            // Выводим отладачную информацию
+            if (Config.isDebug) {
+
+                // Выводим информацию о всей матрице T
+                Console.WriteLine("Before calculation");
+                for (device = 0; device < config.deviceCount; device++)
+                    Console.WriteLine($"device:{device}" + Environment.NewLine + ListUtils.MatrixIntToString(matrixT[device]));
         }
 
-        public void BuildMatrixT(
-            Matrix proccesingTime,
-            Dictionary<int, Matrix> startTimes
-            )
+            // Выполняем обработку для первого прибора
         {
 
-            int res = 0;
+                // Инициализируем индекс первого прибора
+                device = 0;
 
-            for (int device = 0; device < config.deviceCount; device++)
-            {
-                for (int batchIndex = 0; batchIndex < maxBatchesPositions; batchIndex++)
+                // Инициализируем индекс первого ПЗ
+                batchIndex = 0;
+
+                // Инициализируем индекс задания
+                job = 0;
+
+                // Устанавливаем момент начала выполнения 1 задания в 1 пакете на 1 приборе, как наладку
+                matrixT[device][batchIndex][job] = config.changeoverTime[device][schedule[batchIndex].Type, schedule[batchIndex].Type];
+
+                // Пробегаемся по всем заданиям пакета в первой позиции
+                for (job = 1; job < schedule[batchIndex].Size; job++)
+
+                    // Вычисляем момент начала выполнения задания job
+                    matrixT[device][batchIndex][job] =
+
+                        // Момент начала времени выполнения предыдущего задания
+                        matrixT[device][batchIndex][job - 1] +
+
+                        // Время выполнения задания с текущим типом
+                        config.proccessingTime[device, schedule[batchIndex].Type];
+
+                // Пробегаемся по всем позициям пакетов cо второго пакета
+                for (batchIndex = 1; batchIndex < schedule.Count(); batchIndex++)
                 {
 
-                    // Если Y[l,j] = 0, то T[l,j] = 0
-                    if (matrixY[device, batchIndex] == 0)
-                    {
-                        matrixT[device, batchIndex] = 0;
-                        continue;
-                    }
+                    // Момент начала времени выполнения 1 задания в пакете на позиции batchIndex
+                    matrixT[device][batchIndex][0] =
 
-                    // Если Y[l,j] != 0, то T[l,j] = Время начала + Время выполнения
-                    matrixT[device, batchIndex] = startTimes[device][batchIndex, startTimes[device].columnCount - 1] + 0 ;
+                        // Момент начала выполнения последнего задания в предыдущем пакете
+                        matrixT[device][batchIndex - 1].Last() +
+
+                        // Время выполнения задания с предыдущим типом данных
+                        config.proccessingTime[device, schedule[batchIndex - 1].Type] +
+
+                        // Время переналадки с предыдущего типа на текущий
+                        config.changeoverTime[device][schedule[batchIndex - 1].Type, schedule[batchIndex].Type] + 
+
+                        // Время выполнения ПТО
+                        config.preMaintenanceTimes[0] * matrixY[device][batchIndex - 1];
+
+                    // Пробегаемся по всем заданиям пакета в позиции batchIndex
+                    for (job = 1; job < schedule[batchIndex].Size; job++)
+
+                        // Вычисляем момент начала времени выполнения задания job в позиции batchIndex на 1 приборе
+                        matrixT[device][batchIndex][job] =
+
+                            // Момент начала времени выполнения предыдущего задания
+                            matrixT[device][batchIndex][job - 1] +
+
+                            // Время выполнения задания с текущим типом
+                            config.proccessingTime[device, schedule[batchIndex].Type];
+
                 }
             }
-        }
 
-        public void build()
-        {
-
-            // Создаём временную матрицу R
-            Matrix R = new Matrix(new List<List<int>>
-                {
-                new List<int> { 2, 0 },
-                new List<int> { 0, 2 }
-                });
-
-            // Создаём временную матрицу P
-            Matrix P = new Matrix(new List<List<int>>
-                {
-                new List<int> { 1, 0 },
-                new List<int> { 0, 1 }
-                });
-
-            // Данная функция возвращает время наладки
-            int settingTime(int _device)
+            // Пробегаемся по всем приборам со второго
+            for (device = 1; device < config.deviceCount; device++)
             {
-                // Получаем матрицу переналадки для deivce прибора
-                Matrix changeover = config.changeoverTime[_device];
 
-                // Инициализируем время наладки
-                int time = 0;
+                // Инициализируем индекс первого ПЗ
+                batchIndex = 0;
 
-                // Высчитываем время наладки
-                for (int dataType = 0; dataType < config.dataTypesCount; dataType++)
-                    time += changeover[dataType, dataType] * P[dataType, 0];
+                // Инициализируем индекс задания
+                job = 0;
 
-                // Возвращаем время наладки
-                return time;
-            }
+                // Устанавливаем момент начала выполнения 1 задания в 1 пакете на приборе device, как
+                // Максимум, между временем наладки прибора на выполнения ПЗ с типом jobType
+                // и временем окончания выполнения 1 задания в 1 пакете на приборе device-1
+                matrixT[device][batchIndex][job] = Math.Max(
+                    config.changeoverTime[device][schedule[batchIndex].Type, schedule[batchIndex].Type],
+                    matrixT[device - 1][batchIndex][job] + config.proccessingTime[device-1, schedule[batchIndex].Type]
+                );
 
-            // Данная функция возвращает время выполнения
-            int proccessingTime(int _device, int _batchIndex)
-            {
-                // Получаем матрицу выполнения
-                Matrix proccessing = config.proccessingTime;
+                for (job = 1; job < schedule[batchIndex].Size; job++)
+                    matrixT[device][batchIndex][job] = Math.Max(
 
-                // Инициализируем время выполнения
-                int time = 0;
+                        // Момент начала времени выполнения предыдущего задания
+                        matrixT[device][batchIndex][job - 1] +
 
-                // Высчитываем время выполнения
-                for (int dataType = 0; dataType < config.dataTypesCount; dataType++)
-                    time += proccessing[_device, dataType] * P[dataType, _batchIndex];
+                        // Время выполнения предыдущего задания
+                        config.proccessingTime[device, schedule[batchIndex].Type],
 
-                // Возвращаем время выполнения
-                return time;
-            }
+                        // Момент начала времени выполнения задания на предыдущем приборе
+                        matrixT[device - 1][batchIndex][job] +
+
+                        // Время выполнения задания на предыдущем приборе
+                        config.proccessingTime[device - 1, schedule[batchIndex].Type]
+                    );
             
-            // Данная функция возвращает время выполнения всех заданий в пакете
-            int batch_proccessingTime(int _device, int _batchIndex)
-            {
-                // Получаем матрицу выполнения
-                Matrix proccessing = config.proccessingTime;
-
-                // Инициализируем время выполнения
-                int time = 0;
-
-                // Высчитываем время выполнения
-                for (int f = 0; f < _batchIndex; f++)
-                    for (int dataType = 0; dataType < config.dataTypesCount; dataType++)
-                        time += proccessing[_device, dataType] * R[dataType, f];
-
-                // Возвращаем время выполнения
-                return time;
-            }
-
-            // Данная функция возвращает время ПТО
-            int preM_proccessingTime(int device, int _batchIndex)
+                // Пробегаемся по всем возможным позициям пакетов
+                for (batchIndex = 1; batchIndex < schedule.Count(); batchIndex++)
             {
 
-                // Инициализируем время ПТО
-                int time = 0;
+                    // Инициализируем индекс задания
+                    job = 0;
 
-                // Высчитываем время ПТО
-                for (int batchIndex = 0; batchIndex < _batchIndex; batchIndex++)
-                    time += vectorD[device] * matrixY[device, batchIndex];
+                    // Устанавливаем момент начала выполнения 1 задания в пакете batchIndex на приборе device,
+                    // как Максимум, между временем окончания выполнения последнего задания в предыдущем пакете
+                    // вместе с переналадкой и ПТО
+                    // и временем окончания выполнения 1 задания в batchIndex пакете на приборе device-1
+                    matrixT[device][batchIndex][job] = Math.Max(
 
-                // Возвращаем время ПТО
-                return time;
-            }
+                        // Момент начала времени выполнения последнего задания в предыдущем ПЗ
+                        matrixT[device][batchIndex - 1].Last() +
 
-            // Данная функция возвращает время переналадки на приборе _device
-            int changeoverTime(int _device, int _batchIndex)
+                        // Время выполнения задания с предыдущим типом
+                        config.proccessingTime[device, schedule[batchIndex - 1].Type] +
+
+                        // Время переналадки с предыдущего типа на текущий
+                        config.changeoverTime[device][schedule[batchIndex - 1].Type, schedule[batchIndex].Type] +
+
+                        // Время выполнения ПТО
+                        config.preMaintenanceTimes[device] * matrixY[device][batchIndex - 1],
+
+                        // Момент начала времени выполнения 1 задания в ПЗ batchIndex 
+                        matrixT[device - 1][batchIndex][job] +
+
+                        // Время выполнения данного задания
+                        config.proccessingTime[device - 1, schedule[batchIndex].Type]);
+
+                    // Пробегаемся по всем заданиям пакета в позиции batchIndex
+                    for (job = 1; job < schedule[batchIndex].Size; job++)
             {
-                // Получаем матрицу переналадки для _deivce прибора
-                Matrix changeover = config.changeoverTime[_device];
+                        matrixT[device][batchIndex][job] = Math.Max(
 
-                // Инициализируем время переналадки
-                int time = 0;
+                            // Момент начала времени выполнения предыдущего задания
+                            matrixT[device][batchIndex][job - 1] +
 
-                // Высчитываем время переналадки
-                for (int batchIndex = 0; batchIndex < _batchIndex - 1; batchIndex++)
-                    time += changeover[batchIndex, batchIndex + 1];
+                            // Время выполнения предыдущего задания
+                            config.proccessingTime[device, schedule[batchIndex].Type],
 
-                // Возвращаем время переналадки
-                return time;
+                            // Момент начала времени выполнения задания на предыдущем приборе
+                            matrixT[device - 1][batchIndex][job] +
+
+                            // Время выполнения задания на предыдущем приборе
+                            config.proccessingTime[device - 1, schedule[batchIndex].Type]
+                        );
+                    }
+            }
             }
 
-            // Данная функция высчитывает момент начала времени выполнения
-            // q-ого задания в 1 пакете на 1 приборе 
-            int t1(int job)
+            // Выводим отладачную информацию
+            if (Config.isDebug)
             {
-                return settingTime(0) + job * proccessingTime(0, 0);
+
+                // Выводим информацию о всей матрице T
+                Console.WriteLine("After calculation");
+                for (device = 0; device < config.deviceCount; device++)
+                    Console.WriteLine($"device:{device}" + Environment.NewLine + ListUtils.MatrixIntToString(matrixT[device]));
             }
 
-            // Данная функция высчитывает момент начала времени выполнения
-            // q-ого задания в j(batchIndex) пакете на 1 приборе 
-            int t2(int _batchIndex)
-            {
-                int time = 0;
-                time += settingTime(0);
-                time += batch_proccessingTime(0, _batchIndex);
-                time += changeoverTime(0, _batchIndex);
-                time += preM_proccessingTime(0, _batchIndex);
-                return time;
-            }
-
-            int t3(int _batchIndex, int job)
-            {
-                return t2(_batchIndex) + job * proccessingTime(0, _batchIndex); 
-            }
-
+            // Возвращаем матрицу
+            return matrixT;
         }
     }
 }
