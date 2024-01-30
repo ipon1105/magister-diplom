@@ -37,8 +37,8 @@ namespace magisterDiplom.Model
         /// <summary>
         /// Данная функция выполняет обработку пакета и возрващает время необходимое на его обработку
         /// </summary>
-        /// <param name="proccessingTime"></param>
-        /// <returns></returns>
+        /// <param name="proccessingTime">Время выполнения задания с текущем типом</param>
+        /// <returns>Время выполнения всех заданий в пакете</returns>
         public int GetTime(int proccessingTime)
         {
             return Size * proccessingTime;
