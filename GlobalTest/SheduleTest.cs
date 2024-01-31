@@ -508,6 +508,8 @@ namespace GlobalTest
                 new magisterDiplom.Model.Batch(1, 2),
                 new magisterDiplom.Model.Batch(0, 3),
             };
+
+            // Выполняем вызов функции построения расписания
             matrixT = PreM.Build(
                 config,
                 schedule,
