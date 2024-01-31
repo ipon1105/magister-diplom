@@ -664,5 +664,104 @@ namespace GlobalTest
                 }
             }
         }
+
+        [TestMethod]
+        public void CorrectScheduleBuild()
+        {
+
+            // Формируем входные данные
+            #region Init input
+
+            /*
+            // dataTypesCount:
+            // 2
+            // 
+            // deviceCount:
+            // 2
+            // 
+            // buffer:
+            // 999
+            // 
+            // proccessingTime:
+            // +---+---+
+            // | 1 | 2 |
+            // +---+---+
+            // | 3 | 4 |
+            // +---+---+
+            //
+            // changeoverTime:
+            // +---+---+---+
+            // |   | 1 | 2 |
+            // + 1 +---+---+
+            // |   | 3 | 4 |
+            // +---+---+---+
+            // |   | 4 | 2 |
+            // + 2 +---+---+
+            // |   | 3 | 1 |
+            // +---+---+---+
+            //
+            // preMaintenanceTimes
+            // +---+---+
+            // | 3 | 1 |
+            // +---+---+
+            //
+            // isFixedBatches:
+            // false
+            */
+
+            // Объявляем матрицу переналадки
+            Dictionary<int, Matrix> changeoverTime = new Dictionary<int, Matrix>();
+
+            // Создаём матрицу переналадки для 1 прибора
+            Matrix changeoverTime_1 = new Matrix(new List<List<int>>
+                {
+                    new List<int> { 1, 2 },
+                    new List<int> { 3, 4 },
+                });
+
+            // Создаём матрицу переналадки для 2 прибора
+            Matrix changeoverTime_2 = new Matrix(new List<List<int>>
+                {
+                    new List<int> { 4, 2 },
+                    new List<int> { 3, 1 },
+                });
+
+            // Добавляем матрицы переналадки в changeoverTime
+            changeoverTime.Add(0, changeoverTime_1);
+            changeoverTime.Add(1, changeoverTime_2);
+
+            // Создаём матрицу времени выполнения
+            Matrix proccessingTime = new Matrix(new List<List<int>>
+                {
+                    new List<int> { 1, 2 },
+                    new List<int> { 3, 4 },
+                });
+
+            // Формируем конфигурационный файл
+            Config config = new Config(
+                2, // int dataTypesCount,
+                2, // int deviceCount,
+                999, // int buffer,
+                proccessingTime, // Matrix proccessingTime,
+                changeoverTime,// Dictionary<int, Matrix> changeoverTime,
+                new Vector(new List<int> { 3, 1 }),
+                false// bool isFixedBatches
+            );
+
+            // Объявляем и инициализируем последовательность ПЗ
+            List<List<int>> matrixA = new List<List<int>>
+            {
+                new List<int>{3},
+                new List<int>{2},
+            };
+
+            #endregion
+
+            // Выполняем вызов построения корректного расписания
+            List<Batch> schedule = CorrectSchedule.Build(config, matrixA);
+            Dictionary<int, List<List<int>>> matrixT = PreM.Build(config, schedule, null);
+            int time = matrixT[config.deviceCount - 1].Last().Last() + config.proccessingTime[config.deviceCount - 1, schedule.Last().Type];
+            Assert.AreEqual(23, time);
+        }
     }
 }
