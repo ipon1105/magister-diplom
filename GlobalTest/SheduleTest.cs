@@ -501,6 +501,44 @@ namespace GlobalTest
                         Assert.AreEqual(_matrixT[device][batchIndex][job], matrixT[device][batchIndex][job]);
                 }
             }
+
+            // Инициализируем последовательность ПЗ
+            schedule = new List<magisterDiplom.Model.Batch>
+            {
+                new magisterDiplom.Model.Batch(1, 2),
+                new magisterDiplom.Model.Batch(0, 3),
+            };
+            matrixT = PreM.Build(
+                config,
+                schedule,
+                Y
+            );
+
+            // Выполняем проверку на соответствие количества приборов в входной и выходной матрице
+            Assert.IsTrue(matrixT.Count == _matrixT.Count);
+
+            // Для каждого прибора выполняем проверку
+            for (int device = 0; device < config.deviceCount; device++)
+            {
+
+                // Выполняем проверку на соответствие количества ПЗ в входной и выходной матрице
+                Assert.IsTrue(_matrixT[device].Count == matrixT[device].Count);
+
+                // Для каждого ПЗ выполняем проверку
+                for (int batchIndex = 0; batchIndex < matrixT[device].Count; batchIndex++)
+                {
+
+                    // Выполняем проверку на соответствие количества заданий в входной и выходной матрице
+                    Assert.IsTrue(_matrixT[device][batchIndex].Count == matrixT[device][batchIndex].Count);
+
+                    // Для каждого задания выполняем проверку
+                    for (int job = 0; job < matrixT[device][batchIndex].Count; job++)
+
+                        // Выполняем проверку на равнозначность моментов начала времени
+                        // выполнения заданийв входной и выходной матрице
+                        Assert.AreEqual(_matrixT[device][batchIndex][job], matrixT[device][batchIndex][job]);
+                }
+            }
         }
 
         [TestMethod]
