@@ -700,6 +700,7 @@ namespace newAlgorithm
     {
 
         private static readonly bool isDebugBuild = true;
+        private static readonly bool isDebugOptimization = true;
 
         /// <summary>
         /// Данная функция выполняет локальную оптимизацию составов ПЗ
@@ -769,14 +770,15 @@ namespace newAlgorithm
                 Console.WriteLine("\t\t+---------------------+");
                 Console.WriteLine("\t\t|       matrixA       |");
                 Console.WriteLine("\t\t+---------------------+");
+
                 for (int _dataType = 0; _dataType < config.dataTypesCount; _dataType++)
                 {
-                    Console.Write("\t\t{0, -2}\t\t|", _dataType);
+                    Console.Write("\t\t|{0,-2}|", _dataType);
                     for (int _batchIndex = 0; _batchIndex < matrixA[_dataType].Count; _batchIndex++)
-                        Console.Write("\t{0, -2}|", matrixA[_dataType][_batchIndex]);
+                        Console.Write("{0, -2}|", matrixA[_dataType][_batchIndex]);
                     Console.Write(Environment.NewLine);
                 }
-                Console.WriteLine(Environment.NewLine);
+                Console.Write(Environment.NewLine);
             }
 
             // Объявляем тип данных
@@ -819,13 +821,14 @@ namespace newAlgorithm
                         int batchIndex = 0;
 
                         // Добавляем ПЗ в расписание
-                        Console.WriteLine("Add Batch({0, -2}, {1, -2})", schedule.Last().Type, schedule.Last().Size);
+                        Console.WriteLine("Add:\t[{0}:{1, -2}]", schedule.Last().Type, schedule.Last().Size);
+                        Console.Write(Environment.NewLine);
 
                         // Выводим всё расписание
-                        Console.Write("Before optimization schedule: ");
-                        for (; batchIndex < schedule.Count - 1; batchIndex++)
-                            Console.Write("({0, -2}, {1, -2}), ", schedule[batchIndex].Type, schedule[batchIndex].Size);
-                        Console.WriteLine("({0, -2}, {1, -2}).", schedule[batchIndex].Type, schedule[batchIndex].Size);
+                        Console.WriteLine("Before:\t");
+                        for (; batchIndex < schedule.Count; batchIndex++)
+                            Console.WriteLine("\t\t[{0}:{1, -2}]", schedule[batchIndex].Type, schedule[batchIndex].Size);
+                        Console.Write(Environment.NewLine);
                     }
 
                     // Выполняем локальную оптимизацию составов ПЗ
@@ -839,10 +842,10 @@ namespace newAlgorithm
                         int batchIndex = 0;
 
                         // Выводим всё расписание
-                        Console.Write("After optimization schedule: ");
-                        for (; batchIndex < schedule.Count - 1; batchIndex++)
-                            Console.Write("({0, -2}, {1, -2}), ", schedule[batchIndex].Type, schedule[batchIndex].Size);
-                        Console.WriteLine("({0, -2}, {1, -2}).", schedule[batchIndex].Type, schedule[batchIndex].Size);
+                        Console.WriteLine("After:\t");
+                        for (; batchIndex < schedule.Count; batchIndex++)
+                            Console.WriteLine("\t\t[{0}:{1, -2}]", schedule[batchIndex].Type, schedule[batchIndex].Size);
+                        Console.Write(Environment.NewLine);
                     }
                 }
 
