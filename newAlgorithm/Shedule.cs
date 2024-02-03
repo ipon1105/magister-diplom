@@ -699,12 +699,20 @@ namespace newAlgorithm
     public class CorrectSchedule
     {
 
+        /// <summary>
+        /// Данная переменная определяет будет ли выводиться отладачная информация для функции Build
+        /// </summary>
         private static readonly bool isDebugBuild = true;
+
+        /// <summary>
+        /// Данная переменная определяет будет ли выводиться отладачная информация для функции Optimization
+        /// </summary>
         private static readonly bool isDebugOptimization = true;
 
         /// <summary>
         /// Данная функция выполняет локальную оптимизацию составов ПЗ
         /// </summary>
+        /// <param name="config">Конфигурационная структура содержит информацию о конфигурации системы</param>
         /// <param name="schedule">Последовательность ПЗ. Данная переменная представляет
         /// множество ПЗ для последующих перестановок.</param>
         /// <param name="swapCount">Количество перестановок.</param>
@@ -766,6 +774,11 @@ namespace newAlgorithm
                 Console.WriteLine("Start\t|   CorrectSchedule   |");
                 Console.WriteLine("\t\t+---------------------+");
                 Console.WriteLine("Input:\t");
+
+                Console.WriteLine("\t\t+---------------------+");
+                Console.WriteLine("\t\t|       config        |");
+                Console.WriteLine("\t\t+---------------------+");
+                Console.WriteLine(config.ToString("\t\t"));
 
                 Console.WriteLine("\t\t+---------------------+");
                 Console.WriteLine("\t\t|       matrixA       |");

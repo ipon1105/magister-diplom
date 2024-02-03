@@ -1,5 +1,8 @@
 ﻿using newAlgorithm.Model;
+using System;
 using System.Collections.Generic;
+using System.Diagnostics.Eventing.Reader;
+using System.Linq;
 
 namespace magisterDiplom.Model
 {
@@ -9,6 +12,7 @@ namespace magisterDiplom.Model
     /// </summary>
     public struct Config
     {
+
         /// <summary>
         /// Данная переменная устанавливаем режим отладки для всей программы
         /// </summary>
@@ -94,6 +98,66 @@ namespace magisterDiplom.Model
 
             // Возвращаем словарь матриц переналадки
             return _changeoverTime;
+        }
+
+        /// <summary>
+        /// Данная функция формируем выходную строку об конфигурационной структуре
+        /// </summary>
+        /// <param name="prefix">Префикс для формированного вывода</param>
+        /// <returns>Результирующая строка со всей необходимой информацией</returns>
+        public string ToString(string prefix = "\t")
+        {
+
+            // Результирующая информация
+            string res = "";
+
+            // Добавляем информацию о фиксированности пакетов
+            res += prefix + $"isFixedBatches: {this.isFixedBatches}" + Environment.NewLine;
+
+            // Добавляем информацию о количестве типов данных
+            res += prefix + $"dataTypesCount: {this.dataTypesCount}" + Environment.NewLine;
+
+            // Добавляем информацию о количестве приборов
+            res += prefix + $"deviceCount:    {this.deviceCount}" + Environment.NewLine;
+
+            // Добавляем информацию о размере буфера
+            res += prefix + $"buffer:         {this.buffer}" + Environment.NewLine;
+
+            // Выполняем формирование вывода времени переналадки
+            int _device = 0;
+            res += prefix + "preMaintenanceTimes: ";
+            for (_device = 0; _device < this.deviceCount - 1; _device++)
+                res += $"{this.preMaintenanceTimes[_device],-2}, ";
+            res += $"{this.preMaintenanceTimes[_device]};" + Environment.NewLine;
+
+            // Выполняем формирование вывода времени выполнения
+            res += prefix + "proccessingTime:" + Environment.NewLine;
+            for (int device = 0; device < this.deviceCount; device++)
+            {
+                int dataType = 0;
+                res += prefix + prefix + $"Device {device}: " + prefix;
+                for (dataType = 0; dataType < this.dataTypesCount - 1; dataType++)
+                    res += $"{this.proccessingTime[device, dataType],-2}, ";
+                res += $"{this.proccessingTime[device, dataType]};" + Environment.NewLine;
+            }
+            res += prefix + "changeoverTime:" + Environment.NewLine;
+
+            // Выполняем формирование вывода времени переналадки
+            for (int device = 0; device < this.deviceCount; device++)
+            {
+                res += prefix + prefix + $"Device {device}: " + Environment.NewLine;
+                for (int dataTypeRow = 0; dataTypeRow < this.dataTypesCount; dataTypeRow++)
+                {
+                    int dataTypeCol = 0;
+                    res += prefix + prefix + prefix + $"Type {dataTypeRow}: " + prefix;
+                    for (dataTypeCol = 0; dataTypeCol < this.dataTypesCount - 1; dataTypeCol++)
+                        res += $"{this.changeoverTime[device][dataTypeRow, dataTypeCol],-2}, ";
+                    res += $"{this.changeoverTime[device][dataTypeRow, dataTypeCol]};" + Environment.NewLine;
+                }
+            }
+
+            // Возвращяем результат
+            return res;
         }
     }
 }
