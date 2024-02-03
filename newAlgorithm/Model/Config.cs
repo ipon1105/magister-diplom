@@ -72,6 +72,55 @@ namespace magisterDiplom.Model
             bool isFixedBatches
             )
         {
+
+            // Вектор ПТО равен null
+            if (preMaintenanceTimes == null)
+                throw new ArgumentNullException("The PreM vector is null.");
+
+            // Размер вектора ПТО не совпадает с количеством приборов
+            if (preMaintenanceTimes.getCount() != deviceCount)
+                throw new ArgumentException("The number of items in the list preMaintenanceTimes does not match the deviceCount.");
+
+            // Матрица времени выполнения равна null
+            if (proccessingTime == null)
+                throw new ArgumentNullException("The proccessingTime matrix is null.");
+
+            // Размер матрицы времени выполнения не совпадает с количеством приборов
+            if (proccessingTime.rowCount != deviceCount)
+                throw new ArgumentException("The number of items in the list proccessingTime does not match the deviceCount.");
+
+            // Выполняем проверку исключений для матрицы времени выполнения
+            for (int device = 0; device < proccessingTime.rowCount; device++)
+            {
+
+                // Размер матрицы времени выполнения не совпадает с количеством типов
+                if (proccessingTime.GetVectorSize(device) != dataTypesCount)
+                    throw new ArgumentException("The number of items in the list proccessingTime does not match the dataTypesCount.");
+            }
+
+            // Словарь соответствий времени переналадки равен null
+            if (changeoverTime == null)
+                throw new ArgumentNullException("The changeoverTime matrix is null.");
+
+            // Размер словаря переналадки не совпадает с количеством приборов
+            if (changeoverTime.Count != deviceCount)
+                throw new ArgumentException("The number of items in the Dictionary changeoverTime does not match the deviceCount.");
+
+            // Выполняем проверку для каждого прибора
+            for (int device = 0; device < changeoverTime.Count; device++)
+            {
+
+                // Размер матрицы по словарю переналадки не совпадает с количеством типов
+                if (changeoverTime[device].rowCount != dataTypesCount)
+                    throw new ArgumentException("The number of items in the Dictionary changeoverTime does not match the dataTypesCount.");
+
+                // Размер вектора матрицы по словарю переналадки не совпадает с количеством типов
+                for (int dataType = 0; dataType < changeoverTime[device].rowCount; dataType++)
+                    if (changeoverTime[device].GetVectorSize(dataType) != dataTypesCount)
+                        throw new ArgumentException("The number of items in the Dictionary changeoverTime does not match the dataTypesCount.");
+            }
+
+            // Выполняем инициализацию 
             this.dataTypesCount = dataTypesCount;
             this.deviceCount = deviceCount;
             this.buffer = buffer;

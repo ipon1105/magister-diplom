@@ -43,6 +43,16 @@ namespace newAlgorithm.Model
             //         throw new Exception();
         }
 
+        /// <summary>
+        /// Данная функция выполняем размер вектора по индексу
+        /// </summary>
+        /// <param name="index">Индекс получения строки элементов</param>
+        /// <returns>Размер вектора по индексу</returns>
+        public int GetVectorSize(int index)
+        {
+            return matrix[index].Count;
+        }
+
         public int GetItem(int i, int j)
         {
             try
