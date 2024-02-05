@@ -21,7 +21,12 @@ namespace newAlgorithm
         private List<List<int>> A2;//Матрица составов партий требований фиксированного типа
         private List<List<int>> A;//Матрица составов партий требований на k шаге
         private List<List<int>> ABuf;//Буферизированная матрица составов партий требований
-        private int countType;//количество типов
+
+        /// <summary>
+        /// Данная переменная описывает количество типов данных обрабатываемых в конвейерной системе
+        /// </summary>
+        private int dataTypesCount;
+
         private List<int> countClaims;//Начальное количество требований для каждого типа данных
         private BatchTypeClaims test;
         private int i;//идентификатор текущего изменяемого типа
@@ -42,13 +47,13 @@ namespace newAlgorithm
          */
         public OldFirstLevel(int count_type, List<int> count_claims)
         {
-            this.countType = count_type;
+            this.dataTypesCount = count_type;
             this.countClaims = count_claims;
-            this.mi = new List<int>(this.countType);
-            this.np1i = new List<int>(this.countType);
-            this.np2i = new List<int>(this.countType);
-            this.I = new List<int>(this.countType);
-            this.Ii = new List<int>(this.countType);
+            this.mi = new List<int>(this.dataTypesCount);
+            this.np1i = new List<int>(this.dataTypesCount);
+            this.np2i = new List<int>(this.dataTypesCount);
+            this.I = new List<int>(this.dataTypesCount);
+            this.Ii = new List<int>(this.dataTypesCount);
         }
 
         /*
@@ -78,7 +83,7 @@ namespace newAlgorithm
             int claim = 2;
             this.A = new List<List<int>>();
             this.A.Add(new List<int>());
-            for (int i = 1; i <= this.countType; i++)
+            for (int i = 1; i <= this.dataTypesCount; i++)
             {
                 this.I.Add(1);
                 this.Ii.Add(1);
@@ -90,7 +95,7 @@ namespace newAlgorithm
                 this.A[i].Add(this.countClaims[i - 1] - claim);
                 this.A[i].Add(claim);
             }
-            for (int i = 1; i <= this.countType; i++)
+            for (int i = 1; i <= this.dataTypesCount; i++)
             {
                 if (this.A[i][1] < 2 || this.A[i][1] < this.A[i][2])
                 {
@@ -176,21 +181,25 @@ namespace newAlgorithm
             return true;
         }
 
-        /*
-         * Функция проверки наличия оставшихся в рассмотрении типов
-         * 
-         */
+        /// <summary>
+        /// Данная функция выполняет проверку наличия оставшихся в рассмотрении типов переденного списка
+        /// </summary>
+        /// <param name="type">Список на проверку</param>
+        /// <returns>false, если типы остались, иначе true</returns>
         private bool CheckType(List<int> type)
         {
-            int count = 0;
-            for (int j = 0; j < this.countType; j++)
-            {
-                if (type[j] != 0)
-                    count++;
-            }
-            if (count == 0)
-                return true;
-            return false;
+
+            // Выполняем обработку для каждого типа
+            for (int dataType = 0; dataType < this.dataTypesCount; dataType++)
+
+                // Если в списке остались типы на рассмотрении
+                if (type[dataType] != 0)
+
+                    // Возвращаем false
+                    return false;
+            
+            // Возвращаем true
+            return true;
         }
 
         /*
@@ -223,7 +232,7 @@ namespace newAlgorithm
                 {
                     this.solutionFlag = false;
                     //1 - Копируем I в Ii
-                    for (int j = 0; j < this.countType; j++)
+                    for (int j = 0; j < this.dataTypesCount; j++)
                     {
                         this.Ii[j] = this.I[j];
                     }
