@@ -710,6 +710,11 @@ namespace newAlgorithm
         private static readonly bool isDebugOptimization = true;
 
         /// <summary>
+        /// Данная переменная определяет будет ли выводиться отладачная информация для функции GetDowntimeFrom
+        /// </summary>
+        private static readonly bool isDebugGetDowntimeFrom = true;
+
+        /// <summary>
         /// Данная функция выполняет локальную оптимизацию составов ПЗ
         /// </summary>
         /// <param name="config">Конфигурационная структура содержит информацию о конфигурации системы</param>
@@ -895,7 +900,7 @@ namespace newAlgorithm
         /// <param name="config">Структура описывающая конфигурацию по
         /// которой будет выполняться построение расписания
         /// </param>
-        /// <param name="proccessingTime">Словарь соответсвий приборов к
+        /// <param name="matrixT">Словарь соответсвий приборов к
         /// матрицам моментов начала времени выполнений
         /// </param>
         /// <param name="schedule">Последовательность ПЗ. Данная переменная представляет
@@ -904,11 +909,166 @@ namespace newAlgorithm
         /// <returns>Makespan или время выполнения всех заданий в системе</returns>
         public static int GetMakespanFrom(
             Config config,
-            Dictionary<int, List<List<int>>> proccessingTime,
+            Dictionary<int, List<List<int>>> matrixT,
             List<magisterDiplom.Model.Batch> schedule
             )
         {
-            return proccessingTime[config.deviceCount - 1].Last().Last() + config.proccessingTime[config.deviceCount - 1, schedule.Last().Type];
+            return matrixT[config.deviceCount - 1].Last().Last() + config.proccessingTime[config.deviceCount - 1, schedule.Last().Type];
+        }
+
+        /// <summary>
+        /// Данная функция выполняет подсчёт простоев для переданного расписания и матрицы моментов начала времени выполнения
+        /// </summary>
+        /// <param name="config">Структура описывающая конфигурацию по
+        /// которой будет выполняться построение расписания
+        /// </param>
+        /// <param name="matrixT">Словарь соответсвий приборов к
+        /// матрицам моментов начала времени выполнений
+        /// </param>
+        /// <param name="schedule">Последовательность ПЗ. Данная переменная представляет
+        /// множество ПЗ.
+        /// </param>
+        /// <returns>Время простоя</returns>
+        public static int GetDowntimeFrom(
+            Config config,
+            Dictionary<int, List<List<int>>> matrixT,
+            List<magisterDiplom.Model.Batch> schedule
+            )
+        {
+
+            // Выводим отладачную информацию
+            if (Config.isDebug && CorrectSchedule.isDebugGetDowntimeFrom)
+                Console.WriteLine($"Start: GetDowntimeFrom;");
+            
+            // Объявляем и инициализируем простои
+            int downtime = 0;
+
+            // Для каждого прибора выполняем обработку
+            for (int device = 0; device < config.deviceCount; device++)
+            {
+
+                // Подсчитываем простои связанные с наладкой
+                downtime += matrixT[device][0][0];
+
+                // Выводим отладачную информацию
+                if (Config.isDebug && CorrectSchedule.isDebugGetDowntimeFrom)
+                    Console.WriteLine($"\tdevice:{device}; downtime+{matrixT[device][0][0]}={downtime}");
+
+                // TODO: Для первого прибора не будет простоев между заданиями. Вынести рассчёт для первого прибора в отдельный блок
+                // Для кажого задания пакета на первой позиции
+                for (int job = 1; job < matrixT[device][0].Count(); job++)
+                {
+
+                    // Подсчитываем простои между заданиями
+                    downtime +=
+                        
+                        // Момент начала времени выполнения текущего задания
+                        matrixT[device][0][job] -
+
+                        // Момент начала времени выполнения предыдущего задания
+                        (matrixT[device][0][job - 1] +
+
+                        // Время выполнения предыдущего задания
+                        config.proccessingTime[device, schedule[0].Type]);
+
+                    // Выводим отладачную информацию
+                    if (Config.isDebug && CorrectSchedule.isDebugGetDowntimeFrom) {
+
+                        // Время простоя
+                        int time =
+
+                            // Момент начала времени выполнения текущего задания
+                            matrixT[device][0][job] -
+
+                            // Момент начала времени выполнения предыдущего задания
+                            (matrixT[device][0][job - 1] +
+
+                            // Время выполнения предыдущего задания
+                            config.proccessingTime[device, schedule[0].Type]);
+
+                        Console.WriteLine($"\t  job:{job,-2}; downtime+{time}={downtime}");
+                    }
+                }
+
+                // Для каждого пакета со второго выполняем обработку
+                for (int batchIndex = 1; batchIndex < matrixT[device].Count(); batchIndex++)
+                {
+
+                    // Подсчитываем простои между пакетами
+                    downtime +=
+
+                        // Момент начала времени выполнения первого задания текущего пакет
+                        matrixT[device][batchIndex][0] -
+
+                        // Момент начала времени выполнения последнего задания на предыдущем пакете
+                        (matrixT[device][batchIndex - 1].Last() +
+
+                        // Время выполнения задания в предыдущем пакете
+                        config.proccessingTime[device, schedule[batchIndex-1].Type]);
+
+                    // Выводим отладачную информацию
+                    if (Config.isDebug && CorrectSchedule.isDebugGetDowntimeFrom)
+                    {
+
+                        // Время простоя
+                        int time =
+
+                            // Момент начала времени выполнения первого задания текущего пакет
+                            matrixT[device][batchIndex][0] -
+
+                            // Момент начала времени выполнения последнего задания на предыдущем пакете
+                            (matrixT[device][batchIndex - 1].Last() +
+
+                            // Время выполнения задания в предыдущем пакете
+                            config.proccessingTime[device, schedule[batchIndex - 1].Type]);
+
+                        Console.WriteLine($"\t  batchIndex:{batchIndex,-2}; downtime+{time}={downtime}");
+                    }
+
+                    // Для кажого задания пакета на первой позиции
+                    for (int job = 1; job < matrixT[device][batchIndex].Count(); job++)
+                    {
+
+                        // Подсчитываем простои между заданиями
+                        downtime +=
+
+                            // Момент начала времени выполнения текущего задания
+                            matrixT[device][batchIndex][job] -
+
+                            // Момент начала времени выполнения предыдущего задания
+                            (matrixT[device][batchIndex][job - 1] +
+
+                            // Время выполнения предыдущего задания
+                            config.proccessingTime[device, schedule[batchIndex].Type]);
+
+                        // Выводим отладачную информацию
+                        if (Config.isDebug && CorrectSchedule.isDebugGetDowntimeFrom)
+                        {
+
+                            // Время простоя
+                            int time =
+
+                                // Момент начала времени выполнения текущего задания
+                                matrixT[device][batchIndex][job] -
+
+                                // Момент начала времени выполнения предыдущего задания
+                                (matrixT[device][batchIndex][job - 1] +
+
+                                // Время выполнения предыдущего задания
+                                config.proccessingTime[device, schedule[batchIndex].Type]);
+
+                            Console.WriteLine($"\t    job:{job, -2}; downtime+{time}={downtime}");
+                        }
+                    }
+                }
+            }
+
+            // Выводим отладачную информацию
+            if (Config.isDebug && CorrectSchedule.isDebugGetDowntimeFrom)
+                Console.WriteLine("Stop: GetDowntimeFrom");
+
+            // Возвращаем результат
+            return downtime;
         }
     }
 
