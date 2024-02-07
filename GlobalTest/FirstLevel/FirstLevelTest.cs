@@ -17,9 +17,111 @@ namespace GlobalTest.FirstLevel
         [TestMethod]
         public void GenerateStartSolutionTest()
         {
-            
-            // Создаём экземпляр конфигурационной структуры
-            Config config = new Config( 3, 4, 3, null, null, null, false );
+
+            // Формируем входные данные
+            #region Init input
+
+            /*
+            // dataTypesCount:
+            // 3
+            // 
+            // deviceCount:
+            // 3
+            // 
+            // buffer:
+            // 3
+            // 
+            // proccessingTime:
+            // +---+---+---+
+            // | 1 | 2 | 5 |
+            // +---+---+---+
+            // | 3 | 4 | 5 |
+            // +---+---+---+
+            // | 3 | 4 | 5 |
+            // +---+---+---+
+            //
+            // changeoverTime:
+            // +---+---+---+---+
+            // |   | 1 | 2 | 5 |
+            // +   +---+---+---+
+            // | 1 | 3 | 4 | 5 |
+            // +   +---+---+---+
+            // |   | 3 | 4 | 5 |
+            // +---+---+---+---+
+            // |   | 4 | 2 | 5 |
+            // +   +---+---+---+
+            // | 2 | 3 | 1 | 5 |
+            // +   +---+---+---+
+            // |   | 3 | 4 | 5 |
+            // +---+---+---+---+
+            // |   | 4 | 2 | 5 |
+            // +   +---+---+---+
+            // | 3 | 3 | 1 | 5 |
+            // +   +---+---+---+
+            // |   | 3 | 4 | 5 |
+            // +---+---+---+---+
+            //
+            // preMaintenanceTimes
+            // +---+---+---+
+            // | 3 | 1 | 5 |
+            // +---+---+---+
+            //
+            // isFixedBatches:
+            // false
+            */
+
+            // Объявляем матрицу переналадки
+            Dictionary<int, Matrix> changeoverTime = new Dictionary<int, Matrix>();
+
+            // Создаём матрицу переналадки для 1 прибора
+            Matrix changeoverTime_1 = new Matrix(new List<List<int>>
+                {
+                    new List<int> { 1, 2, 5 },
+                    new List<int> { 3, 4, 5 },
+                    new List<int> { 3, 4, 5 },
+                });
+
+            // Создаём матрицу переналадки для 2 прибора
+            Matrix changeoverTime_2 = new Matrix(new List<List<int>>
+                {
+                    new List<int> { 4, 2, 5 },
+                    new List<int> { 3, 1, 5 },
+                    new List<int> { 3, 4, 5 },
+                });
+
+            // Создаём матрицу переналадки для 3 прибора
+            Matrix changeoverTime_3 = new Matrix(new List<List<int>>
+                {
+                    new List<int> { 4, 2, 5 },
+                    new List<int> { 3, 1, 5 },
+                    new List<int> { 3, 4, 5 },
+                });
+
+            // Добавляем матрицы переналадки в changeoverTime
+            changeoverTime.Add(0, changeoverTime_1);
+            changeoverTime.Add(1, changeoverTime_2);
+            changeoverTime.Add(2, changeoverTime_3);
+
+            // Создаём матрицу времени выполнения
+            Matrix proccessingTime = new Matrix(new List<List<int>>
+                {
+                    new List<int> { 1, 2, 5 },
+                    new List<int> { 3, 4, 5 },
+                    new List<int> { 3, 4, 5 },
+                });
+
+            // Формируем конфигурационный файл
+            Config config = new Config(
+                3, // int dataTypesCount,
+                3, // int deviceCount,
+                3, // int buffer,
+                proccessingTime, // Matrix proccessingTime,
+                changeoverTime,// Dictionary<int, Matrix> changeoverTime,
+                new Vector(new List<int> { 3, 1, 5 }),
+                false// bool isFixedBatches
+            );
+
+            #endregion
 
             var firstLevel = new newAlgorithm.FirstLevel(config, new List<int> { 12, 12, 12 });
             var output = new List<List<int>> { new List<int> { 10, 2 }, new List<int> { 10, 2 }, new List<int> { 10, 2 } };
@@ -34,7 +136,111 @@ namespace GlobalTest.FirstLevel
         public void GenerateFixedBatchesSolutionTest()
         {
 
-            Config config = new Config(3, 4, 3, null, null, null, true);
+            // Формируем входные данные
+            #region Init input
+
+            /*
+            // dataTypesCount:
+            // 3
+            // 
+            // deviceCount:
+            // 3
+            // 
+            // buffer:
+            // 3
+            // 
+            // proccessingTime:
+            // +---+---+---+
+            // | 1 | 2 | 5 |
+            // +---+---+---+
+            // | 3 | 4 | 5 |
+            // +---+---+---+
+            // | 3 | 4 | 5 |
+            // +---+---+---+
+            //
+            // changeoverTime:
+            // +---+---+---+---+
+            // |   | 1 | 2 | 5 |
+            // +   +---+---+---+
+            // | 1 | 3 | 4 | 5 |
+            // +   +---+---+---+
+            // |   | 3 | 4 | 5 |
+            // +---+---+---+---+
+            // |   | 4 | 2 | 5 |
+            // +   +---+---+---+
+            // | 2 | 3 | 1 | 5 |
+            // +   +---+---+---+
+            // |   | 3 | 4 | 5 |
+            // +---+---+---+---+
+            // |   | 4 | 2 | 5 |
+            // +   +---+---+---+
+            // | 3 | 3 | 1 | 5 |
+            // +   +---+---+---+
+            // |   | 3 | 4 | 5 |
+            // +---+---+---+---+
+            //
+            // preMaintenanceTimes
+            // +---+---+---+
+            // | 3 | 1 | 5 |
+            // +---+---+---+
+            //
+            // isFixedBatches:
+            // false
+            */
+
+            // Объявляем матрицу переналадки
+            Dictionary<int, Matrix> changeoverTime = new Dictionary<int, Matrix>();
+
+            // Создаём матрицу переналадки для 1 прибора
+            Matrix changeoverTime_1 = new Matrix(new List<List<int>>
+                {
+                    new List<int> { 1, 2, 5 },
+                    new List<int> { 3, 4, 5 },
+                    new List<int> { 3, 4, 5 },
+                });
+
+            // Создаём матрицу переналадки для 2 прибора
+            Matrix changeoverTime_2 = new Matrix(new List<List<int>>
+                {
+                    new List<int> { 4, 2, 5 },
+                    new List<int> { 3, 1, 5 },
+                    new List<int> { 3, 4, 5 },
+                });
+
+            // Создаём матрицу переналадки для 3 прибора
+            Matrix changeoverTime_3 = new Matrix(new List<List<int>>
+                {
+                    new List<int> { 4, 2, 5 },
+                    new List<int> { 3, 1, 5 },
+                    new List<int> { 3, 4, 5 },
+                });
+
+            // Добавляем матрицы переналадки в changeoverTime
+            changeoverTime.Add(0, changeoverTime_1);
+            changeoverTime.Add(1, changeoverTime_2);
+            changeoverTime.Add(2, changeoverTime_3);
+
+            // Создаём матрицу времени выполнения
+            Matrix proccessingTime = new Matrix(new List<List<int>>
+                {
+                    new List<int> { 1, 2, 5 },
+                    new List<int> { 3, 4, 5 },
+                    new List<int> { 3, 4, 5 },
+                });
+
+            // Формируем конфигурационный файл
+            Config config = new Config(
+                3, // int dataTypesCount,
+                3, // int deviceCount,
+                3, // int buffer,
+                proccessingTime, // Matrix proccessingTime,
+                changeoverTime,// Dictionary<int, Matrix> changeoverTime,
+                new Vector(new List<int> { 3, 1, 5 }),
+                false// bool isFixedBatches
+            );
+
+            #endregion
+
             var firstLevel = new newAlgorithm.FirstLevel(config, new List<int> { 12, 12, 12 });
             var output = new List<List<int>> { new List<int> { 12 }, new List<int> { 12 }, new List<int> { 12 } };
             firstLevel.GenerateFixedBatchesSolution();
@@ -44,22 +250,5 @@ namespace GlobalTest.FirstLevel
                     Assert.AreEqual(output[dataType][batch], firstLevel.matrixA_Prime[dataType][batch]);
         }
 
-        /*
-        [TestMethod]
-        public void NewDataTest()
-        {
-            var firstLevel = new newAlgorithm.FirstLevel(2, new List<int> { 12, 12, 12 }, false);
-            var input = new List<List<int>> { new List<int> { 10, 2 }, new List<int> { 10, 2 } };
-            var output = new List<List<int>> { new List<int> { 9, 3 }, new List<int> { 10, 2 } };
-            
-            firstLevel._a1 = input;
-            var result = firstLevel.NewData(0);
-
-            for (int dataType = 0; dataType < output.Count; dataType++)
-                for (int batch = 0; batch < output[dataType].Count; batch++)
-                    Assert.AreEqual(output[dataType][batch], result[dataType][batch]);
-
-        }
-        */
     }
 }
