@@ -729,9 +729,16 @@ namespace newAlgorithm
             // Объявляем лучшее расписание
             List<magisterDiplom.Model.Batch> bestSchedule = new List<magisterDiplom.Model.Batch>(schedule);
 
-            // Объявляем и инициализируем временной критерий, как момент времени оконания
+            // Объявляем переменную для соответствий приборов к матрицам начала времени выполнения
+            Dictionary<int, List<List<int>>> matrixT = PreM.Build(config, schedule, null);
+
+            // Объявляем и инициализируем временной критерий, как момент времени окончания
             // выполнения последнего задания в последнем пакете на последнем приборе
-            int bestTime = PreM.Build(config, schedule, null)[config.deviceCount - 1].Last().Last() + config.proccessingTime[config.deviceCount - 1, schedule.Last().Type];
+            int bestTime = CorrectSchedule.GetMakespanFrom(config, matrixT, schedule);
+
+            // Объявляем и инициализируем новый временной критерий, как момент времени окончания
+            // выполнения последнего задания в последнем пакете на последнем приборе
+            int newTime = 0;
 
             // Выполняем заявленное количество перестановок, заявленно количество раз
             for (int batchIndex = schedule.Count - 1; batchIndex >= 1 && swapIndex < swapCount; batchIndex--, swapIndex++)
@@ -744,17 +751,21 @@ namespace newAlgorithm
 
                 // Для каждой перестановки выполняем просчёт матрицы
                 // начала времени выполнения задания на приборах
-                Dictionary<int, List<List<int>>> matrixT = PreM.Build(config, schedule, null);
+                matrixT = PreM.Build(config, schedule, null);
+
+                // Высчитываем новый критерий makespan
+                newTime = CorrectSchedule.GetMakespanFrom(config, matrixT, schedule);
 
                 // Если лучшее время хуже (больше) чем время после перестановки
-                if (matrixT[config.deviceCount - 1].Last().Last() + config.proccessingTime[config.deviceCount - 1, schedule.Last().Type] <= bestTime)
+                if (newTime <= bestTime)
                 {
 
+                    // TODO: Избавиться от копирования списка в пользу использования индекса наилучшей позиции
                     // Переопределяем лучшее расписание
                     bestSchedule = new List<magisterDiplom.Model.Batch>(schedule);
 
                     // Переопределяем лучшее время для лучшего расписания
-                    bestTime = matrixT[config.deviceCount - 1].Last().Last() + config.proccessingTime[config.deviceCount - 1, schedule.Last().Type];
+                    bestTime = newTime;
                 }
             }
 
@@ -878,6 +889,27 @@ namespace newAlgorithm
             return schedule;
         }
 
+        /// <summary>
+        /// Данная функция возвращает критерий оптимизации makespan определяющий время выполнения всех заданий в конвейерной системе
+        /// </summary>
+        /// <param name="config">Структура описывающая конфигурацию по
+        /// которой будет выполняться построение расписания
+        /// </param>
+        /// <param name="proccessingTime">Словарь соответсвий приборов к
+        /// матрицам моментов начала времени выполнений
+        /// </param>
+        /// <param name="schedule">Последовательность ПЗ. Данная переменная представляет
+        /// множество ПЗ.
+        /// </param>
+        /// <returns>Makespan или время выполнения всех заданий в системе</returns>
+        public static int GetMakespanFrom(
+            Config config,
+            Dictionary<int, List<List<int>>> proccessingTime,
+            List<magisterDiplom.Model.Batch> schedule
+            )
+        {
+            return proccessingTime[config.deviceCount - 1].Last().Last() + config.proccessingTime[config.deviceCount - 1, schedule.Last().Type];
+        }
     }
 
     /// <summary>
