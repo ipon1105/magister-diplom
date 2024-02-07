@@ -1070,6 +1070,38 @@ namespace newAlgorithm
             // Возвращаем результат
             return downtime;
         }
+
+        /// <summary>
+        /// Данная функция выполняет подсчёт полезности для переданного расписания и матрицы моментов начала времени выполнения
+        /// Полезность - есть время, которое приборы тратят на обработку ПЗ, без учёта ПТО, наладки и переналадки.
+        /// Полезность высчитывается, как время выполнения всех заданий минус время простоя
+        /// </summary>
+        /// <param name="config">Структура описывающая конфигурацию по
+        /// которой будет выполняться построение расписания
+        /// </param>
+        /// <param name="matrixT">Словарь соответсвий приборов к
+        /// матрицам моментов начала времени выполнений
+        /// </param>
+        /// <param name="schedule">Последовательность ПЗ. Данная переменная представляет
+        /// множество ПЗ.
+        /// </param>
+        /// <returns>Время полезности</returns>
+        public static int GetUtilityFrom(
+            Config config,
+            Dictionary<int, List<List<int>>> matrixT,
+            List<magisterDiplom.Model.Batch> schedule
+            )
+        {
+
+            // Возвращяем полезность
+            return
+
+                // Подсчитываем время выполнения всех заданий
+                GetMakespanFrom(config, matrixT, schedule) -
+                
+                // Время простоя
+                GetDowntimeFrom(config, matrixT, schedule);
+        }
     }
 
     /// <summary>
