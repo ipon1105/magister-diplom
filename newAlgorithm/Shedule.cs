@@ -1102,6 +1102,58 @@ namespace newAlgorithm
                 // Время простоя
                 GetDowntimeFrom(config, matrixT, schedule);
         }
+
+
+        /// <summary>
+        /// Данная функция выполняет подсчёт полезности и суммы интервалов времени между ПТО для переданного расписания и матрицы моментов начала времени выполнения
+        /// Полезность - есть время, которое приборы тратят на обработку ПЗ, без учёта ПТО, наладки и переналадки.
+        /// Полезность высчитывается, как время выполнения всех заданий минус время простоя
+        /// </summary>
+        /// <param name="config">Структура описывающая конфигурацию по
+        /// которой будет выполняться построение расписания
+        /// </param>
+        /// <param name="matrixT">Словарь соответсвий приборов к
+        /// матрицам моментов начала времени выполнений
+        /// </param>
+        /// <param name="schedule">Последовательность ПЗ. Данная переменная представляет множество ПЗ. </param>
+        /// <param name="matrixTPreM">Матрица моментов окончания времени выполнения ПТО для каждого пакета. [device x batchIndex]</param>
+        /// <returns>Время полезности и ПТО</returns>
+        public static int GetPreMUtilityFrom(
+            Config config,
+            Dictionary<int, List<List<int>>> matrixT,
+            List<magisterDiplom.Model.Batch> schedule,
+            List<List<int>> matrixTPreM
+        ) {
+
+            // Объявляем и инициализируем сумму интервалов времени между ПТО
+            int sumPreMIntervals = 0;
+
+            // Для каждого прибора выполняем обработку
+            for (int device = 0; device < config.deviceCount; device++) {
+
+                // Проверяем вектор матрицы на пустоту
+                if (matrixTPreM[device].Count() == 0)
+                    continue;
+
+                // Выполняем подсчёт суммы интервалов времени на первом пакете ПТО
+                sumPreMIntervals += matrixTPreM[device][0];
+
+                // Для каждого пакета выполняем обработку
+                for (int batchIndex = 1; batchIndex < matrixT[device].Count(); batchIndex++)
+
+                    // Выполняем подсчёт суммы интервалов времени между ПТО разных пакетов
+                    sumPreMIntervals += matrixTPreM[device][batchIndex] - matrixTPreM[device][batchIndex - 1];
+    }
+
+            // Возвращяем полезность и ПТО
+            return
+
+                // Получаем полезность
+                GetUtilityFrom(config, matrixT, schedule) +
+
+                // Получаем ПТО
+                sumPreMIntervals;
+        }
     }
 
     /// <summary>
@@ -1342,5 +1394,63 @@ namespace newAlgorithm
             // Возвращаем матрицу
             return matrixT;
         }
+
+        /// <summary>
+        /// Данная функция выполняет построение матрицы моментов окончания времени выполнения ПТО.
+        /// </summary>
+        /// <param name="config">Структура описывающая конфигурацию по
+        /// которой будет выполняться построение расписания
+        /// </param>
+        /// <param name="schedule">Последовательность ПЗ. 
+        /// Каждый ПЗ содержит в себе информацию о количестве заданий и типе задания.
+        /// </param>
+        /// <param name="matrixT">Словарь соответствий прибора к матрице начала времени выполнения
+        /// заданий в пакетах. [device]:[batchIndex x job]
+        /// </param>
+        /// <param name="matrixY">Матрица порядка выполнения ПТО.
+        /// Y[deviceCount x maxBatchCount]</param>
+        /// <returns>
+        /// Матрица моментов окончания времени выполнения ПТО для каждого пакета. [device x batchIndex]
+        /// </returns>
+        public static List<List<int>> BuildMatrixTPreM(
+            Config config,
+            List<magisterDiplom.Model.Batch> schedule,
+            Dictionary<int, List<List<int>>> matrixT,
+            List<List<int>> matrixY
+        ) {
+
+            // Объявляем матрицу моментов окончания реализации ПТО
+            List<List<int>> matrixTPreM = new List<List<int>>(config.deviceCount);
+
+            // Для каждого прибора выполням обработку
+            for (int device = 0; device < config.deviceCount; device++) {
+
+                // Инициализируем ПТО для прибора
+                matrixTPreM.Add(new List<int>());
+
+                // Для каждого прибора в расписании выполняем обработку
+                for (int batchIndex = 0; batchIndex < schedule.Count; batchIndex++)
+
+                    // Если для текущей позиции есть ПТО
+                    if (matrixY[device][batchIndex] == 1)
+
+                        // Момент окончания времени выполнения ПТО на позиции batchIndex
+                        matrixTPreM[device].Add(
+
+                            // Момент начала времени выполнения последнего задания в пакете batchIndex на приборе device
+                            matrixT[device][batchIndex].Last() +
+
+                            // Время выполнения задания с типов пакета на позиции batchIndex
+                            config.proccessingTime[device, schedule[batchIndex].Type] +
+
+                            // Время выполнения ПТО
+                            config.preMaintenanceTimes[device]
+                        );
+            }
+
+            // Возвращяем результат
+            return matrixTPreM;
+        }
+
     }
 }
