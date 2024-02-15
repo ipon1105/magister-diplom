@@ -1161,6 +1161,7 @@ namespace newAlgorithm
     /// </summary>
     public class PreM
     {
+
         /// <summary>
         /// Данная функция выполняет построение матрицы начала времени выполнения заданий.
         /// </summary>
@@ -1410,9 +1411,9 @@ namespace newAlgorithm
         /// <param name="matrixY">Матрица порядка выполнения ПТО.
         /// Y[deviceCount x maxBatchCount]</param>
         /// <returns>
-        /// Матрица моментов окончания времени выполнения ПТО для каждого пакета. [device x batchIndex]
+        /// Матрица моментов окончания времени выполнения ПТО для каждого пакета. [device x size]
         /// </returns>
-        public static List<List<int>> BuildMatrixTPreM(
+        public static List<List<PreMSet>> BuildMatrixTPreM(
             Config config,
             List<magisterDiplom.Model.Batch> schedule,
             Dictionary<int, List<List<int>>> matrixT,
@@ -1420,13 +1421,13 @@ namespace newAlgorithm
         ) {
 
             // Объявляем матрицу моментов окончания реализации ПТО
-            List<List<int>> matrixTPreM = new List<List<int>>(config.deviceCount);
+            List<List<PreMSet>> matrixTPreM = new List<List<PreMSet>>(config.deviceCount);
 
             // Для каждого прибора выполням обработку
             for (int device = 0; device < config.deviceCount; device++) {
 
                 // Инициализируем ПТО для прибора
-                matrixTPreM.Add(new List<int>());
+                matrixTPreM.Add(new List<PreMSet>());
 
                 // Для каждого прибора в расписании выполняем обработку
                 for (int batchIndex = 0; batchIndex < schedule.Count; batchIndex++)
@@ -1437,6 +1438,12 @@ namespace newAlgorithm
                         // Момент окончания времени выполнения ПТО на позиции batchIndex
                         matrixTPreM[device].Add(
 
+                            // Добавляем структуры данных
+                            new PreMSet(
+
+                                // Индекс ПЗ после которого будет выполняться ПТО
+                                batchIndex,
+                                
                             // Момент начала времени выполнения последнего задания в пакете batchIndex на приборе device
                             matrixT[device][batchIndex].Last() +
 
@@ -1445,6 +1452,9 @@ namespace newAlgorithm
 
                             // Время выполнения ПТО
                             config.preMaintenanceTimes[device]
+                            )
+
+                            
                         );
             }
 
@@ -1452,5 +1462,163 @@ namespace newAlgorithm
             return matrixTPreM;
         }
 
+        /// <summary>
+        /// Данная функция возврабщает надёжность, которая определяет вероятность находится ли некий прибор в работоспособном состоянии.
+        /// Данная функция не учитывает перерывы в работе прибора связанные с:
+        ///     1. Неготовностью к выполнению заданий, входящих в пакеты;
+        ///     2. Переналадкой приборов.
+        /// </summary>
+        /// <param name="failureRates">Данный список определяет интенсивность отказов для приборов соответсвенно: [deviceCount]</param>
+        /// <param name="restoringDevice">Данный список определяет востановление прибора соответсвенно: [deviceCount]</param>
+        /// <param name="t">
+        /// Когда t = 0, прибор расценивается, "как новый".
+        /// После окончания ПТО, прибора находится в состоянии, "как новый".
+        /// </param>
+        /// <param name="device">Индекс прибора для расчёта вероятности его работоспособности</param>
+        /// <returns>Вероятность работоспособности прибора по индексу device</returns>
+        public static double ReliabilityCalc(
+            List<int> failureRates,
+            List<int> restoringDevice,
+            int t, int device
+        ) {
+            // deviceTime = tl = общее время пребывания l-ого прибора в активном состоянии, после 
+            //     окончания последней реализации ПТО этого прибора в момент времени (tl^p (tl^p >= 0))
+            // TODO: Заменить failureRates и restoringDevice на доступ через config.
+            double reliability =
+                failureRates[device] / (restoringDevice[device] + failureRates[device]) +
+                restoringDevice[device] / (restoringDevice[device] + failureRates[device]) *
+                Math.Exp(-1 * (restoringDevice[device] + failureRates[device]) * t);
+
+            return reliability;
+        }
+
+        /// <summary>
+        /// Данная фукнция выполняет возврат последнего индекса ПЗ,
+        /// после которого выполняется ПТО с моментов окончания времени выполнения moment
+        /// </summary>
+        /// <param name="matrixTPreM">
+        /// Матрица моментов окончания времени выполнения ПТО для каждого пакета. [device x batchIndex]</param>
+        /// <param name="device">Индекс прибора по которому будет выполняться выборка</param>
+        /// <param name="moment">Левый диапазон выборки</param>
+        /// <returns>Индекс после которого будет выполняться последнее ПТО в диапазоне</returns>
+        public static int GetBatchIndex(
+            List<List<PreMSet>> matrixTPreM,
+            int device,
+            int moment
+        ) {
+
+            // Если список пустой
+            if (matrixTPreM[device].Count == 0)
+
+                // Вернём индекс начальный индекс ПЗ
+                return -1;
+
+            // Если в списке первый элемент не удовлетворяет условию
+            if (matrixTPreM[device][0].TimePreM >= moment)
+
+                // Вернём индекс начальный индекс ПЗ
+                return -1;
+
+            // Объявляем индекс
+            int index = 1;
+
+            // Для каждой ПТО выполняем обработку
+            for (; index < matrixTPreM[device].Count; index++)
+
+                // Если момент окончания ПТО в позиции index не удовлетворяет условиям
+                if (matrixTPreM[device][index].TimePreM >= moment)
+
+                    // Возвращяем индекс ПЗ после которого выполнится последнее ПТО
+                    return matrixTPreM[device][index - 1].BatchIndex;
+
+            // Индекс ПЗ после которог выполниться ПТО, последний в списке
+            return matrixTPreM[device][index - 1].BatchIndex;
+        }
+
+        /// <summary>
+        /// Данная функция выполняет подсчёт информационных полей, для каждого прибора,
+        /// таких что находятся на заданном интервале времени
+        /// </summary>
+        /// <param name="config">Конфигурационная структура</param>
+        /// <param name="schedule">Расписания ПЗ [batchIndex]</param>
+        /// <param name="matrixT">Матрица моментов начала времени выполнения задания [device]:[batchIndex][jobCount]</param>
+        /// <param name="matrixTPreM">Матрица структур состоящая из индексов ПЗ за которыми следует ПТО и моментов времени окончания данного ПТО</param>
+        /// <param name="endPreMTime">Крайний момент времени окончания ПТО</param>
+        /// <returns>Список информационных структур</returns>
+        public static List<PreMInfo> BuildVectorPreMInfo(
+            Config config,
+            List<magisterDiplom.Model.Batch> schedule,
+            Dictionary<int, List<List<int>>> matrixT,
+            List<List<PreMSet>> matrixTPreM,
+            int endPreMTime
+        ) {
+
+            // Формируем список активностей приборов
+            List<PreMInfo> info = new List<PreMInfo> (config.deviceCount);
+            
+            // Для каждого прибора выполняем подсчёт времени активности
+            for (int device = 0; device < config.deviceCount; device++) {
+
+                // Определяем начальный индекс
+                int startIndex = PreM.GetBatchIndex(matrixTPreM, device, endPreMTime) + 1;
+
+                // Определяем индекс ПЗ
+                int batchIndex = startIndex;
+
+                // Определяем количество ПЗ
+                int batchCount = 0;
+
+                // Определяем количество заданий
+                int jobCount   = 0;
+
+                // Для каждого пакет выполняем обработку
+                for (; batchIndex < schedule.Count; batchIndex++) {
+
+                    // Если первое задани в ПЗ удовлетворяет условию
+                    if (matrixT[device][batchIndex][0] >= endPreMTime)
+
+                        // Прекращаем обарботку
+                        break;
+
+                    // Увеличиваем количество ПЗ
+                    batchCount++;
+                }
+
+                // Если количество ПЗ равно 0
+                if (batchCount == 0)
+                {
+
+                    // Добавляем информацию
+                    info.Add( new magisterDiplom.Model.PreMInfo( 0, 0 ) );
+
+                    // Пропускаем обработку
+                    continue;
+                }
+
+                // Для каждого задания в последнем пакете выполняем обработку
+                for (int job = 0; job < schedule[startIndex + batchCount - 1].Size; job++) {
+                
+                    // Если некоторое задание в последенем ПЗ не удовлетворяет условию
+                    if (matrixT[device][startIndex + batchCount - 1][job] >= endPreMTime)
+
+                        // Прекращаем обарботку
+                        break;
+
+                    // Увеличиваем количество заданий
+                    jobCount++;
+                }
+
+                // Добавляем информацию
+                info.Add(
+                    new magisterDiplom.Model.PreMInfo(
+                        batchCount,
+                        schedule[startIndex + batchCount - 1].Size - jobCount
+                    )
+                );
+            }
+
+            // Возвращяем результат
+            return info;
+        }
     }
 }
