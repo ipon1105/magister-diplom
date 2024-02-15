@@ -118,6 +118,8 @@ namespace GlobalTest.FirstLevel
                 proccessingTime, // Matrix proccessingTime,
                 changeoverTime,// Dictionary<int, Matrix> changeoverTime,
                 new Vector(new List<int> { 3, 1, 5 }),
+                new Vector(new List<int> { 3, 1, 5 }),
+                new Vector(new List<int> { 3, 1, 5 }),
                 false// bool isFixedBatches
             );
 
@@ -235,6 +237,8 @@ namespace GlobalTest.FirstLevel
                 3, // int buffer,
                 proccessingTime, // Matrix proccessingTime,
                 changeoverTime,// Dictionary<int, Matrix> changeoverTime,
+                new Vector(new List<int> { 3, 1, 5 }),
+                new Vector(new List<int> { 3, 1, 5 }),
                 new Vector(new List<int> { 3, 1, 5 }),
                 false// bool isFixedBatches
             );

@@ -59,6 +59,8 @@ namespace GlobalTest.Model
                 proccessingTime, // Matrix proccessingTime,
                 changeoverTime,// Dictionary<int, Matrix> changeoverTime,
                 new Vector(new List<int> { 3, 1 }),
+                new Vector(new List<int> { 3, 1 }),
+                new Vector(new List<int> { 3, 1 }),
                 false// bool isFixedBatches
             );
 
@@ -71,6 +73,8 @@ namespace GlobalTest.Model
                 "\tdeviceCount:    2"+              Environment.NewLine +
                 "\tbuffer:         999" +           Environment.NewLine +
                 "\tpreMaintenanceTimes: 3 , 1;" +   Environment.NewLine +
+                "\trestoringDevice: 3 , 1;" +        Environment.NewLine +
+                "\tfailureRates: 3 , 1;" +           Environment.NewLine +
                 "\tproccessingTime:" +              Environment.NewLine +
                 "\t\tDevice 0: \t1 , 2;" +          Environment.NewLine +
                 "\t\tDevice 1: \t3 , 4;" +          Environment.NewLine +
@@ -133,6 +137,8 @@ namespace GlobalTest.Model
                 proccessingTime, // Matrix proccessingTime,
                 changeoverTime,// Dictionary<int, Matrix> changeoverTime,
                 null,
+                new Vector(new List<int> { 3, 1 }),
+                new Vector(new List<int> { 3, 1 }),
                 false// bool isFixedBatches
             );
         }
@@ -183,6 +189,217 @@ namespace GlobalTest.Model
                 proccessingTime, // Matrix proccessingTime,
                 changeoverTime,// Dictionary<int, Matrix> changeoverTime,
                 new Vector(new List<int> { 1, 2, 3 }),
+                new Vector(new List<int> { 1, 2 }),
+                new Vector(new List<int> { 1, 2 }),
+                false// bool isFixedBatches
+            );
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void InitConfig_RestoringDevice_ArgumentNullException()
+        {
+
+            // Формируем входные данные
+            #region Input
+
+            // Объявляем матрицу переналадки
+            Dictionary<int, Matrix> changeoverTime = new Dictionary<int, Matrix>();
+
+            // Создаём матрицу переналадки для 1 прибора
+            Matrix changeoverTime_1 = new Matrix(new List<List<int>>
+                {
+                    new List<int> { 1, 2 },
+                    new List<int> { 3, 4 },
+                });
+
+            // Создаём матрицу переналадки для 2 прибора
+            Matrix changeoverTime_2 = new Matrix(new List<List<int>>
+                {
+                    new List<int> { 4, 2 },
+                    new List<int> { 3, 1 },
+                });
+
+            // Добавляем матрицы переналадки в changeoverTime
+            changeoverTime.Add(0, changeoverTime_1);
+            changeoverTime.Add(1, changeoverTime_2);
+
+            // Создаём матрицу времени выполнения
+            Matrix proccessingTime = new Matrix(new List<List<int>>
+                {
+                    new List<int> { 1, 2 },
+                    new List<int> { 3, 4 },
+                });
+
+            #endregion
+
+            // Формируем конфигурационный файл
+            Config config = new Config(
+                2, // int dataTypesCount,
+                2, // int deviceCount,
+                999, // int buffer,
+                proccessingTime, // Matrix proccessingTime,
+                changeoverTime,// Dictionary<int, Matrix> changeoverTime,
+                new Vector(new List<int> { 3, 1 }),
+                new Vector(new List<int> { 3, 1 }),
+                null,
+                false// bool isFixedBatches
+            );
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentException))]
+        public void InitConfig_RestoringDevice_ArgumentException()
+        {
+
+            // Формируем входные данные
+            #region Input
+
+            // Объявляем матрицу переналадки
+            Dictionary<int, Matrix> changeoverTime = new Dictionary<int, Matrix>();
+
+            // Создаём матрицу переналадки для 1 прибора
+            Matrix changeoverTime_1 = new Matrix(new List<List<int>>
+                {
+                    new List<int> { 1, 2 },
+                    new List<int> { 3, 4 },
+                });
+
+            // Создаём матрицу переналадки для 2 прибора
+            Matrix changeoverTime_2 = new Matrix(new List<List<int>>
+                {
+                    new List<int> { 4, 2 },
+                    new List<int> { 3, 1 },
+                });
+
+            // Добавляем матрицы переналадки в changeoverTime
+            changeoverTime.Add(0, changeoverTime_1);
+            changeoverTime.Add(1, changeoverTime_2);
+
+            // Создаём матрицу времени выполнения
+            Matrix proccessingTime = new Matrix(new List<List<int>>
+                {
+                    new List<int> { 1, 2 },
+                    new List<int> { 3, 4 },
+                });
+
+            #endregion
+
+            // Формируем конфигурационный файл
+            Config config = new Config(
+                3, // int dataTypesCount,
+                2, // int deviceCount,
+                999, // int buffer,
+                proccessingTime, // Matrix proccessingTime,
+                changeoverTime,// Dictionary<int, Matrix> changeoverTime,
+                new Vector(new List<int> { 1, 2 }),
+                new Vector(new List<int> { 1, 2 }),
+                new Vector(new List<int> { 1, 2, 3 }),
+                false// bool isFixedBatches
+            );
+        }
+
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void InitConfig_FailureRates_ArgumentNullException()
+        {
+
+            // Формируем входные данные
+            #region Input
+
+            // Объявляем матрицу переналадки
+            Dictionary<int, Matrix> changeoverTime = new Dictionary<int, Matrix>();
+
+            // Создаём матрицу переналадки для 1 прибора
+            Matrix changeoverTime_1 = new Matrix(new List<List<int>>
+                {
+                    new List<int> { 1, 2 },
+                    new List<int> { 3, 4 },
+                });
+
+            // Создаём матрицу переналадки для 2 прибора
+            Matrix changeoverTime_2 = new Matrix(new List<List<int>>
+                {
+                    new List<int> { 4, 2 },
+                    new List<int> { 3, 1 },
+                });
+
+            // Добавляем матрицы переналадки в changeoverTime
+            changeoverTime.Add(0, changeoverTime_1);
+            changeoverTime.Add(1, changeoverTime_2);
+
+            // Создаём матрицу времени выполнения
+            Matrix proccessingTime = new Matrix(new List<List<int>>
+                {
+                    new List<int> { 1, 2 },
+                    new List<int> { 3, 4 },
+                });
+
+            #endregion
+
+            // Формируем конфигурационный файл
+            Config config = new Config(
+                2, // int dataTypesCount,
+                2, // int deviceCount,
+                999, // int buffer,
+                proccessingTime, // Matrix proccessingTime,
+                changeoverTime,// Dictionary<int, Matrix> changeoverTime,
+                new Vector(new List<int> { 3, 1 }),
+                null,
+                new Vector(new List<int> { 3, 1 }),
+                false// bool isFixedBatches
+            );
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentException))]
+        public void InitConfig_FailureRates_ArgumentException()
+        {
+
+            // Формируем входные данные
+            #region Input
+
+            // Объявляем матрицу переналадки
+            Dictionary<int, Matrix> changeoverTime = new Dictionary<int, Matrix>();
+
+            // Создаём матрицу переналадки для 1 прибора
+            Matrix changeoverTime_1 = new Matrix(new List<List<int>>
+                {
+                    new List<int> { 1, 2 },
+                    new List<int> { 3, 4 },
+                });
+
+            // Создаём матрицу переналадки для 2 прибора
+            Matrix changeoverTime_2 = new Matrix(new List<List<int>>
+                {
+                    new List<int> { 4, 2 },
+                    new List<int> { 3, 1 },
+                });
+
+            // Добавляем матрицы переналадки в changeoverTime
+            changeoverTime.Add(0, changeoverTime_1);
+            changeoverTime.Add(1, changeoverTime_2);
+
+            // Создаём матрицу времени выполнения
+            Matrix proccessingTime = new Matrix(new List<List<int>>
+                {
+                    new List<int> { 1, 2 },
+                    new List<int> { 3, 4 },
+                });
+
+            #endregion
+
+            // Формируем конфигурационный файл
+            Config config = new Config(
+                3, // int dataTypesCount,
+                2, // int deviceCount,
+                999, // int buffer,
+                proccessingTime, // Matrix proccessingTime,
+                changeoverTime,// Dictionary<int, Matrix> changeoverTime,
+                new Vector(new List<int> { 1, 2 }),
+                new Vector(new List<int> { 1, 2, 3 }),
+                new Vector(new List<int> { 1, 2 }),
                 false// bool isFixedBatches
             );
         }
@@ -233,6 +450,8 @@ namespace GlobalTest.Model
                 null, // Matrix proccessingTime,
                 changeoverTime,// Dictionary<int, Matrix> changeoverTime,
                 new Vector(new List<int> { 1, 2 }),
+                new Vector(new List<int> { 3, 1 }),
+                new Vector(new List<int> { 3, 1 }),
                 false// bool isFixedBatches
             );
         }
@@ -282,6 +501,8 @@ namespace GlobalTest.Model
                 999, // int buffer,
                 proccessingTime, // Matrix proccessingTime,
                 changeoverTime,// Dictionary<int, Matrix> changeoverTime,
+                new Vector(new List<int> { 1, 2, 4 }),
+                new Vector(new List<int> { 1, 2, 4 }),
                 new Vector(new List<int> { 1, 2, 4 }),
                 false// bool isFixedBatches
             );
@@ -333,6 +554,8 @@ namespace GlobalTest.Model
                 proccessingTime, // Matrix proccessingTime,
                 changeoverTime,// Dictionary<int, Matrix> changeoverTime,
                 new Vector(new List<int> { 1, 2 }),
+                new Vector(new List<int> { 1, 2 }),
+                new Vector(new List<int> { 1, 2 }),
                 false// bool isFixedBatches
             );
         }
@@ -383,6 +606,8 @@ namespace GlobalTest.Model
                 proccessingTime, // Matrix proccessingTime,
                 changeoverTime,// Dictionary<int, Matrix> changeoverTime,
                 new Vector(new List<int> { 1, 2 }),
+                new Vector(new List<int> { 1, 2 }),
+                new Vector(new List<int> { 1, 2 }),
                 false// bool isFixedBatches
             );
         }
@@ -432,6 +657,8 @@ namespace GlobalTest.Model
                 999, // int buffer,
                 proccessingTime, // Matrix proccessingTime,
                 null,// Dictionary<int, Matrix> changeoverTime,
+                new Vector(new List<int> { 1, 2 }),
+                new Vector(new List<int> { 1, 2 }),
                 new Vector(new List<int> { 1, 2 }),
                 false// bool isFixedBatches
             );
@@ -484,6 +711,8 @@ namespace GlobalTest.Model
                 proccessingTime, // Matrix proccessingTime,
                 changeoverTime,// Dictionary<int, Matrix> changeoverTime,
                 new Vector(new List<int> { 1, 2 }),
+                new Vector(new List<int> { 1, 2 }),
+                new Vector(new List<int> { 1, 2 }),
                 false// bool isFixedBatches
             );
         }
@@ -535,6 +764,8 @@ namespace GlobalTest.Model
                 proccessingTime, // Matrix proccessingTime,
                 changeoverTime,// Dictionary<int, Matrix> changeoverTime,
                 new Vector(new List<int> { 1, 2 }),
+                new Vector(new List<int> { 1, 2 }),
+                new Vector(new List<int> { 1, 2 }),
                 false// bool isFixedBatches
             );
         }
@@ -584,6 +815,8 @@ namespace GlobalTest.Model
                 999, // int buffer,
                 proccessingTime, // Matrix proccessingTime,
                 changeoverTime,// Dictionary<int, Matrix> changeoverTime,
+                new Vector(new List<int> { 1, 2 }),
+                new Vector(new List<int> { 1, 2 }),
                 new Vector(new List<int> { 1, 2 }),
                 false// bool isFixedBatches
             );

@@ -59,6 +59,16 @@ namespace magisterDiplom.Model
         public readonly Vector preMaintenanceTimes;
 
         /// <summary>
+        /// Данный список определяет интенсивность отказов для приборов соответсвенно: [deviceCount]
+        /// </summary>
+        public readonly Vector failureRates;
+
+        /// <summary>
+        /// Данный список определяет востановление прибора соответсвенно: [deviceCount]
+        /// </summary>
+        public readonly Vector restoringDevice;
+
+        /// <summary>
         /// Конструктор конфигурации конвейерной системы. Содержит в себе всю входную
         /// информацию небходимую для выполнения локально-оптимальных вычислений
         /// </summary>
@@ -69,6 +79,8 @@ namespace magisterDiplom.Model
             Matrix proccessingTime,
             Dictionary<int, Matrix> changeoverTime,
             Vector preMaintenanceTimes,
+            Vector failureRates,
+            Vector restoringDevice,
             bool isFixedBatches
             )
         {
@@ -76,6 +88,22 @@ namespace magisterDiplom.Model
             // Вектор ПТО равен null
             if (preMaintenanceTimes == null)
                 throw new ArgumentNullException("The PreM vector is null.");
+
+            // Вектор отказов равен null
+            if (failureRates == null)
+                throw new ArgumentNullException("The failureRates vector is null.");
+
+            // Вектор отказов равен null
+            if (failureRates.getCount() != deviceCount)
+                throw new ArgumentException("The number of items in the list failureRates does not match the deviceCount.");
+
+            // Вектор востановления равен null
+            if (restoringDevice == null)
+                throw new ArgumentNullException("The restoringDevice vector is null.");
+
+            // Вектор отказов равен null
+            if (restoringDevice.getCount() != deviceCount)
+                throw new ArgumentException("The number of items in the list restoringDevice does not match the deviceCount.");
 
             // Размер вектора ПТО не совпадает с количеством приборов
             if (preMaintenanceTimes.getCount() != deviceCount)
@@ -120,7 +148,7 @@ namespace magisterDiplom.Model
                         throw new ArgumentException("The number of items in the Dictionary changeoverTime does not match the dataTypesCount.");
             }
 
-            // Выполняем инициализацию 
+            // Выполняем инициализацию
             this.dataTypesCount = dataTypesCount;
             this.deviceCount = deviceCount;
             this.buffer = buffer;
@@ -128,6 +156,8 @@ namespace magisterDiplom.Model
             this.changeoverTime = changeoverTime;
             this.preMaintenanceTimes = preMaintenanceTimes;
             this.isFixedBatches = isFixedBatches;
+            this.restoringDevice = restoringDevice;
+            this.failureRates = failureRates;
         }
 
         /// <summary>
@@ -179,6 +209,20 @@ namespace magisterDiplom.Model
                 res += $"{this.preMaintenanceTimes[_device],-2}, ";
             res += $"{this.preMaintenanceTimes[_device]};" + Environment.NewLine;
 
+            // Выполняем формирование вывода времени отказов приборов
+            _device = 0;
+            res += prefix + "restoringDevice: ";
+            for (_device = 0; _device < this.deviceCount - 1; _device++)
+                res += $"{this.restoringDevice[_device],-2}, ";
+            res += $"{this.restoringDevice[_device]};" + Environment.NewLine;
+
+            // Выполняем формирование вывода времени востановления приборов
+            _device = 0;
+            res += prefix + "failureRates: ";
+            for (_device = 0; _device < this.deviceCount - 1; _device++)
+                res += $"{this.failureRates[_device],-2}, ";
+            res += $"{this.failureRates[_device]};" + Environment.NewLine;
+            
             // Выполняем формирование вывода времени выполнения
             res += prefix + "proccessingTime:" + Environment.NewLine;
             for (int device = 0; device < this.deviceCount; device++)

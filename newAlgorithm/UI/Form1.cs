@@ -101,6 +101,16 @@ namespace newAlgorithm
         /// </summary>
         List<int> preMaintenanceTimes;
 
+        /// <summary>
+        /// Данный список определяет интенсивность отказов для приборов соответсвенно: [deviceCount]
+        /// </summary>
+        List<int> failureRates;
+
+        /// <summary>
+        /// Данный список определяет востановление прибора соответсвенно: [deviceCount]
+        /// </summary>
+        List<int> restoringDevice;
+
         // TODO: разобраться со статическими типами данных
         public static int buff;
         public static bool direct;
@@ -169,6 +179,8 @@ namespace newAlgorithm
                 (Matrix)(new Matrix(proccessingTime)),
                 Config.changeoverTimeConverter(changeoverTime),
                 new Vector(preMaintenanceTimes),
+                new Vector(failureRates),
+                new Vector(restoringDevice),
                 isFixedBatches
             );
 
@@ -206,6 +218,8 @@ namespace newAlgorithm
                 (Matrix) (new Matrix(proccessingTime)),
                 Config.changeoverTimeConverter(changeoverTime),
                 new Vector(preMaintenanceTimes),
+                new Vector(failureRates),
+                new Vector(restoringDevice),
                 isFixedBatches
             );
 
@@ -261,6 +275,8 @@ namespace newAlgorithm
                                     (Matrix)(new Matrix(OldProccessingTimeGenerator(_maxProccessingTime, deviceCount, dataTypesCount))),
                                     Config.changeoverTimeConverter(OldChangeoverTimeGenerator(_maxChangeoverTime, deviceCount, dataTypesCount)),
                                     new Vector(preMaintenanceTimes),
+                                    new Vector(failureRates),
+                                    new Vector(restoringDevice),
                                     isFixedBatches
                                 );
 
@@ -342,6 +358,8 @@ namespace newAlgorithm
                                     (Matrix)(new Matrix(OldProccessingTimeGenerator(_maxProccessingTime, deviceCount, dataTypesCount))),
                                     Config.changeoverTimeConverter(OldChangeoverTimeGenerator(_maxChangeoverTime, deviceCount, dataTypesCount)),
                                     new Vector(preMaintenanceTimes),
+                                    new Vector(failureRates),
+                                    new Vector(restoringDevice),
                                     isFixedBatches
                                 );
 
@@ -487,6 +505,8 @@ namespace newAlgorithm
                                         (Matrix)(new Matrix(OldProccessingTimeGenerator(_maxProccessingTime, _deviceCount, _dataTypesCount))),
                                         Config.changeoverTimeConverter(OldChangeoverTimeGenerator(_maxChangeoverTime, _deviceCount, _dataTypesCount)),
                                         new Vector(preMaintenanceTimes),
+                                        new Vector(failureRates),
+                                        new Vector(restoringDevice),
                                         isFixedBatches
                                     );
                                     
@@ -585,7 +605,10 @@ namespace newAlgorithm
                                     buffer,
                                     (Matrix)(new Matrix(OldProccessingTimeGenerator(_maxProccessingTime, _deviceCount, _dataTypesCount))),
                                     Config.changeoverTimeConverter(OldChangeoverTimeGenerator(_maxChangeoverTime, _deviceCount, _dataTypesCount)),
-                                    new Vector(preMaintenanceTimes), isFixedBatches
+                                    new Vector(preMaintenanceTimes),
+                                    new Vector(failureRates),
+                                    new Vector(restoringDevice),
+                                    isFixedBatches
                                 );
 
                                 // Инициализируем вектор длиной _dataTypesCount, каждый элемент которого будет равен _batchCount
@@ -722,6 +745,8 @@ namespace newAlgorithm
                                                 (Matrix)(new Matrix(OldProccessingTimeGenerator(_maxProccessingTime, _deviceCount, _dataTypesCount))),
                                                 Config.changeoverTimeConverter(OldChangeoverTimeGenerator(_maxChangeoverTime, _deviceCount, _dataTypesCount)),
                                                 new Vector(preMaintenanceTimes),
+                                                new Vector(failureRates),
+                                                new Vector(restoringDevice),
                                                 isFixedBatches
                                             );
 
@@ -1012,6 +1037,8 @@ namespace newAlgorithm
 
             // Устанавливаем заголовок столбца
             dataGridView_pre_maintenance.Columns[0].HeaderCell.Value = "Time";
+            dataGridView_preM_failureRates.Columns[0].HeaderCell.Value = "Time";
+            dataGridView_preM_restoringDevice.Columns[0].HeaderCell.Value = "Time";
 
             // Для каждого устройства
             for (int device = 0; device < deviceCount; device++)
@@ -1019,7 +1046,12 @@ namespace newAlgorithm
 
                 // Устанавливаем заголовок строки
                 dataGridView_pre_maintenance.Rows[device].HeaderCell.Value = string.Format("Device {0}", device);
+                dataGridView_preM_failureRates.Rows[device].HeaderCell.Value = string.Format("Device {0}", device);
+                dataGridView_preM_restoringDevice.Rows[device].HeaderCell.Value = string.Format("Device {0}", device);
+
                 dataGridView_pre_maintenance.Rows[device].Cells[0].Value = (device % 2 == 0) ? randomValue : _randomValue;
+                dataGridView_preM_failureRates.Rows[device].Cells[0].Value = (device % 2 == 0) ? randomValue : _randomValue;
+                dataGridView_preM_restoringDevice.Rows[device].Cells[0].Value = (device % 2 == 0) ? randomValue : _randomValue;
             }
 
             GetTime();
@@ -1305,6 +1337,8 @@ namespace newAlgorithm
             changeoverTime = new List<List<List<int>>>();
             proccessingTime = new List<List<int>>();
             preMaintenanceTimes = new List<int>();
+            failureRates = new List<int>();
+            restoringDevice = new List<int>();
 
             // Выполняем инициализацию графических таблиц
             InitDataGridView();
@@ -1328,7 +1362,9 @@ namespace newAlgorithm
         private void InitTables()
         {
             // Инициализируем вектор времени ПТО
-            preMaintenanceTimes = ListUtils.InitVectorInt(deviceCount, 0);
+            preMaintenanceTimes  = ListUtils.InitVectorInt(deviceCount, 0);
+            failureRates         = ListUtils.InitVectorInt(deviceCount, 0);
+            restoringDevice      = ListUtils.InitVectorInt(deviceCount, 0);
 
             // Для каждого прибора выполняем обработку
             for (var device = 0; device < deviceCount; device++)
@@ -1366,6 +1402,10 @@ namespace newAlgorithm
             dataGridView_changeover_time.Columns.Clear();
             dataGridView_pre_maintenance.Rows.Clear();
             dataGridView_pre_maintenance.Columns.Clear();
+            dataGridView_preM_failureRates.Rows.Clear();
+            dataGridView_preM_failureRates.Columns.Clear();
+            dataGridView_preM_restoringDevice.Rows.Clear();
+            dataGridView_preM_restoringDevice.Columns.Clear();
 
             // Определяем новую структуру
             dataGridView_proccessing_time.RowCount = deviceCount;
@@ -1376,6 +1416,10 @@ namespace newAlgorithm
             // Определяем новую таблицу времени ПТО
             dataGridView_pre_maintenance.RowCount = deviceCount;
             dataGridView_pre_maintenance.ColumnCount = 1;
+            dataGridView_preM_failureRates.RowCount = deviceCount;
+            dataGridView_preM_failureRates.ColumnCount = 1;
+            dataGridView_preM_restoringDevice.RowCount = deviceCount;
+            dataGridView_preM_restoringDevice.ColumnCount = 1;
         }
 
         /// <summary>
@@ -1390,6 +1434,8 @@ namespace newAlgorithm
 
                 // Считываем данные во внутрнние таблицы
                 preMaintenanceTimes[device] = Convert.ToInt32(dataGridView_pre_maintenance.Rows[device].Cells[0].Value);
+                failureRates[device] = Convert.ToInt32(dataGridView_preM_failureRates.Rows[device].Cells[0].Value);
+                restoringDevice[device] = Convert.ToInt32(dataGridView_preM_restoringDevice.Rows[device].Cells[0].Value);
 
                 // Для каждого типа данных выполняем считывание
                 for (int row_dataType = 0; row_dataType < dataTypesCount; row_dataType++)
@@ -1402,7 +1448,6 @@ namespace newAlgorithm
                     for (var col_dataType = 0; col_dataType < dataTypesCount; col_dataType++)
 
                         // Считываем данные во внутрнние таблицы
-                        // TODO: ИСПРАВИТЬ БАГ при вызове (разного количества приборов и типов) 3 приборов и 5 типов
                         changeoverTime[device][row_dataType][col_dataType] = Convert.ToInt32(dataGridView_changeover_time.Rows[row_dataType + device * dataTypesCount].Cells[col_dataType].Value);
                 }
             }

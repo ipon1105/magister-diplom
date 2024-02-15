@@ -98,6 +98,8 @@ namespace GlobalTest
                 proccessingTime, // Matrix proccessingTime,
                 changeoverTime,// Dictionary<int, Matrix> changeoverTime,
                 new Vector(new List<int> { 3, 1 }),
+                new Vector(new List<int> { 3, 1 }),
+                new Vector(new List<int> { 3, 1 }),
                 false// bool isFixedBatches
             );
 
@@ -198,6 +200,8 @@ namespace GlobalTest
                 999, // int buffer,
                 proccessingTime, // Matrix proccessingTime,
                 changeoverTime,// Dictionary<int, Matrix> changeoverTime,
+                new Vector(new List<int> { 3, 1 }),
+                new Vector(new List<int> { 3, 1 }),
                 new Vector(new List<int> { 3, 1 }),
                 false// bool isFixedBatches
             );
@@ -361,6 +365,8 @@ namespace GlobalTest
                 proccessingTime, // Matrix proccessingTime,
                 changeoverTime,// Dictionary<int, Matrix> changeoverTime,
                 new Vector(new List<int> { 3, 1 }),
+                new Vector(new List<int> { 3, 1 }),
+                new Vector(new List<int> { 3, 1 }),
                 false// bool isFixedBatches
             );
 
@@ -523,6 +529,8 @@ namespace GlobalTest
                 proccessingTime, // Matrix proccessingTime,
                 changeoverTime,// Dictionary<int, Matrix> changeoverTime,
                 new Vector(new List<int> { 3, 1 }),
+                new Vector(new List<int> { 3, 1 }),
+                new Vector(new List<int> { 3, 1 }),
                 false// bool isFixedBatches
             );
 
@@ -684,6 +692,8 @@ namespace GlobalTest
                 999, // int buffer,
                 proccessingTime, // Matrix proccessingTime,
                 changeoverTime,// Dictionary<int, Matrix> changeoverTime,
+                new Vector(new List<int> { 3, 1 }),
+                new Vector(new List<int> { 3, 1 }),
                 new Vector(new List<int> { 3, 1 }),
                 false// bool isFixedBatches
             );
@@ -851,6 +861,8 @@ namespace GlobalTest
                 proccessingTime, // Matrix proccessingTime,
                 changeoverTime,// Dictionary<int, Matrix> changeoverTime,
                 new Vector(new List<int> { 3, 1 }),
+                new Vector(new List<int> { 3, 1 }),
+                new Vector(new List<int> { 3, 1 }),
                 false// bool isFixedBatches
             );
 
@@ -984,6 +996,8 @@ namespace GlobalTest
                 999, // int buffer,
                 proccessingTime, // Matrix proccessingTime,
                 changeoverTime,// Dictionary<int, Matrix> changeoverTime,
+                new Vector(new List<int> { 3, 1 }),
+                new Vector(new List<int> { 3, 1 }),
                 new Vector(new List<int> { 3, 1 }),
                 false// bool isFixedBatches
             );
@@ -1119,6 +1133,8 @@ namespace GlobalTest
                 proccessingTime, // Matrix proccessingTime,
                 changeoverTime,// Dictionary<int, Matrix> changeoverTime,
                 new Vector(new List<int> { 3, 1 }),
+                new Vector(new List<int> { 3, 1 }),
+                new Vector(new List<int> { 3, 1 }),
                 false// bool isFixedBatches
             );
 
@@ -1253,6 +1269,8 @@ namespace GlobalTest
                 999, // int buffer,
                 proccessingTime, // Matrix proccessingTime,
                 changeoverTime,// Dictionary<int, Matrix> changeoverTime,
+                new Vector(new List<int> { 3, 1 }),
+                new Vector(new List<int> { 3, 1 }),
                 new Vector(new List<int> { 3, 1 }),
                 false// bool isFixedBatches
             );
@@ -1392,6 +1410,8 @@ namespace GlobalTest
                 proccessingTime, // Matrix proccessingTime,
                 changeoverTime,// Dictionary<int, Matrix> changeoverTime,
                 new Vector(new List<int> { 3, 1 }),
+                new Vector(new List<int> { 3, 1 }),
+                new Vector(new List<int> { 3, 1 }),
                 false// bool isFixedBatches
             );
 
@@ -1525,6 +1545,8 @@ namespace GlobalTest
                 999, // int buffer,
                 proccessingTime, // Matrix proccessingTime,
                 changeoverTime,// Dictionary<int, Matrix> changeoverTime,
+                new Vector(new List<int> { 3, 1 }),
+                new Vector(new List<int> { 3, 1 }),
                 new Vector(new List<int> { 3, 1 }),
                 false// bool isFixedBatches
             );
@@ -1660,6 +1682,8 @@ namespace GlobalTest
                 proccessingTime, // Matrix proccessingTime,
                 changeoverTime,// Dictionary<int, Matrix> changeoverTime,
                 new Vector(new List<int> { 3, 1 }),
+                new Vector(new List<int> { 3, 1 }),
+                new Vector(new List<int> { 3, 1 }),
                 false// bool isFixedBatches
             );
 
@@ -1794,6 +1818,8 @@ namespace GlobalTest
                 999, // int buffer,
                 proccessingTime, // Matrix proccessingTime,
                 changeoverTime,// Dictionary<int, Matrix> changeoverTime,
+                new Vector(new List<int> { 3, 1 }),
+                new Vector(new List<int> { 3, 1 }),
                 new Vector(new List<int> { 3, 1 }),
                 false// bool isFixedBatches
             );
@@ -1957,6 +1983,8 @@ namespace GlobalTest
                 proccessingTime, // Matrix proccessingTime,
                 changeoverTime,// Dictionary<int, Matrix> changeoverTime,
                 new Vector(new List<int> { 1, 1, 1 }),
+                new Vector(new List<int> { 1, 1, 1 }),
+                new Vector(new List<int> { 1, 1, 1 }),
                 false// bool isFixedBatches
             );
 
@@ -2112,6 +2140,8 @@ namespace GlobalTest
                 999, // int buffer,
                 proccessingTime, // Matrix proccessingTime,
                 changeoverTime,// Dictionary<int, Matrix> changeoverTime,
+                new Vector(new List<int> { 1, 1, 1 }),
+                new Vector(new List<int> { 1, 1, 1 }),
                 new Vector(new List<int> { 1, 1, 1 }),
                 false// bool isFixedBatches
             );
@@ -2272,6 +2302,8 @@ namespace GlobalTest
                 proccessingTime, // Matrix proccessingTime,
                 changeoverTime,// Dictionary<int, Matrix> changeoverTime,
                 new Vector(new List<int> { 1, 1, 1 }),
+                new Vector(new List<int> { 1, 1, 1 }),
+                new Vector(new List<int> { 1, 1, 1 }),
                 false// bool isFixedBatches
             );
 
@@ -2431,6 +2463,8 @@ namespace GlobalTest
                 999, // int buffer,
                 proccessingTime, // Matrix proccessingTime,
                 changeoverTime,// Dictionary<int, Matrix> changeoverTime,
+                new Vector(new List<int> { 1, 1, 1 }),
+                new Vector(new List<int> { 1, 1, 1 }),
                 new Vector(new List<int> { 1, 1, 1 }),
                 false// bool isFixedBatches
             );
@@ -2594,6 +2628,8 @@ namespace GlobalTest
                 999, // int buffer,
                 proccessingTime, // Matrix proccessingTime,
                 changeoverTime,// Dictionary<int, Matrix> changeoverTime,
+                new Vector(new List<int> { 1, 1, 1 }),
+                new Vector(new List<int> { 1, 1, 1 }),
                 new Vector(new List<int> { 1, 1, 1 }),
                 false// bool isFixedBatches
             );
@@ -2759,6 +2795,8 @@ namespace GlobalTest
                 999, // int buffer,
                 proccessingTime, // Matrix proccessingTime,
                 changeoverTime,// Dictionary<int, Matrix> changeoverTime,
+                new Vector(new List<int> { 1, 1, 1 }),
+                new Vector(new List<int> { 1, 1, 1 }),
                 new Vector(new List<int> { 1, 1, 1 }),
                 false// bool isFixedBatches
             );
@@ -2933,6 +2971,8 @@ namespace GlobalTest
                 proccessingTime, // Matrix proccessingTime,
                 changeoverTime,// Dictionary<int, Matrix> changeoverTime,
                 new Vector(new List<int> { 1, 1, 1 }),
+                new Vector(new List<int> { 1, 1, 1 }),
+                new Vector(new List<int> { 1, 1, 1 }),
                 false// bool isFixedBatches
             );
 
@@ -3087,6 +3127,8 @@ namespace GlobalTest
                 999, // int buffer,
                 proccessingTime, // Matrix proccessingTime,
                 changeoverTime,// Dictionary<int, Matrix> changeoverTime,
+                new Vector(new List<int> { 1, 1, 1 }),
+                new Vector(new List<int> { 1, 1, 1 }),
                 new Vector(new List<int> { 1, 1, 1 }),
                 false// bool isFixedBatches
             );
@@ -3249,6 +3291,8 @@ namespace GlobalTest
                 proccessingTime, // Matrix proccessingTime,
                 changeoverTime,// Dictionary<int, Matrix> changeoverTime,
                 new Vector(new List<int> { 1, 1, 1 }),
+                new Vector(new List<int> { 1, 1, 1 }),
+                new Vector(new List<int> { 1, 1, 1 }),
                 false// bool isFixedBatches
             );
 
@@ -3409,6 +3453,8 @@ namespace GlobalTest
                 999, // int buffer,
                 proccessingTime, // Matrix proccessingTime,
                 changeoverTime,// Dictionary<int, Matrix> changeoverTime,
+                new Vector(new List<int> { 1, 1, 1 }),
+                new Vector(new List<int> { 1, 1, 1 }),
                 new Vector(new List<int> { 1, 1, 1 }),
                 false// bool isFixedBatches
             );
@@ -3573,6 +3619,8 @@ namespace GlobalTest
                 999, // int buffer,
                 proccessingTime, // Matrix proccessingTime,
                 changeoverTime,// Dictionary<int, Matrix> changeoverTime,
+                new Vector(new List<int> { 1, 1, 1 }),
+                new Vector(new List<int> { 1, 1, 1 }),
                 new Vector(new List<int> { 1, 1, 1 }),
                 false// bool isFixedBatches
             );
@@ -3740,6 +3788,8 @@ namespace GlobalTest
                 999, // int buffer,
                 proccessingTime, // Matrix proccessingTime,
                 changeoverTime,// Dictionary<int, Matrix> changeoverTime,
+                new Vector(new List<int> { 1, 1, 1 }),
+                new Vector(new List<int> { 1, 1, 1 }),
                 new Vector(new List<int> { 1, 1, 1 }),
                 false// bool isFixedBatches
             );
@@ -3921,6 +3971,8 @@ namespace GlobalTest
                 999, // int buffer,
                 proccessingTime, // Matrix proccessingTime,
                 changeoverTime,// Dictionary<int, Matrix> changeoverTime,
+                new Vector(new List<int> { 1, 1, 1 }),
+                new Vector(new List<int> { 1, 1, 1 }),
                 new Vector(new List<int> { 1, 1, 1 }),
                 false// bool isFixedBatches
             );
@@ -4127,6 +4179,8 @@ namespace GlobalTest
                 999, // int buffer,
                 proccessingTime, // Matrix proccessingTime,
                 changeoverTime,// Dictionary<int, Matrix> changeoverTime,
+                new Vector(new List<int> { 1, 1, 1 }),
+                new Vector(new List<int> { 1, 1, 1 }),
                 new Vector(new List<int> { 1, 1, 1 }),
                 false// bool isFixedBatches
             );
@@ -4353,6 +4407,8 @@ namespace GlobalTest
                 999, // int buffer,
                 proccessingTime, // Matrix proccessingTime,
                 changeoverTime,// Dictionary<int, Matrix> changeoverTime,
+                new Vector(new List<int> { 1, 1 }),
+                new Vector(new List<int> { 1, 1 }),
                 new Vector(new List<int> { 1, 1 }),
                 false// bool isFixedBatches
             );
