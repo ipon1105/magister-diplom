@@ -1499,12 +1499,12 @@ namespace newAlgorithm
         /// <param name="matrixTPreM">
         /// Матрица моментов окончания времени выполнения ПТО для каждого пакета. [device x batchIndex]</param>
         /// <param name="device">Индекс прибора по которому будет выполняться выборка</param>
-        /// <param name="moment">Левый диапазон выборки</param>
+        /// <param name="endPreMTime">Крайний момент времени окончания ПТО</param>
         /// <returns>Индекс после которого будет выполняться последнее ПТО в диапазоне</returns>
         public static int GetBatchIndex(
             List<List<PreMSet>> matrixTPreM,
             int device,
-            int moment
+            int endPreMTime
         ) {
 
             // Если список пустой
@@ -1514,7 +1514,7 @@ namespace newAlgorithm
                 return -1;
 
             // Если в списке первый элемент не удовлетворяет условию
-            if (matrixTPreM[device][0].TimePreM >= moment)
+            if (matrixTPreM[device][0].TimePreM >= endPreMTime)
 
                 // Вернём индекс начальный индекс ПЗ
                 return -1;
@@ -1526,7 +1526,7 @@ namespace newAlgorithm
             for (; index < matrixTPreM[device].Count; index++)
 
                 // Если момент окончания ПТО в позиции index не удовлетворяет условиям
-                if (matrixTPreM[device][index].TimePreM >= moment)
+                if (matrixTPreM[device][index].TimePreM >= endPreMTime)
 
                     // Возвращяем индекс ПЗ после которого выполнится последнее ПТО
                     return matrixTPreM[device][index - 1].BatchIndex;
