@@ -1,12 +1,14 @@
 ﻿using magisterDiplom.Model;
 using magisterDiplom.Utils;
+using Microsoft.Office.Interop.Excel;
 using newAlgorithm.Model;
 using newAlgorithm.Service;
 using System;
 using System.Collections.Generic;
 using System.Data.Common;
-using System.Diagnostics.PerformanceData;
+using System.Drawing.Printing;
 using System.Linq;
+using System.Reflection;
 
 namespace newAlgorithm
 {
@@ -33,6 +35,11 @@ namespace newAlgorithm
         /// TODO: Переопределить трёхмерный матрица, как словарь с двумерными матрицами
         /// </summary>
         public static List<List<List<int>>> changeoverTime;
+
+        /// <summary>
+        /// Данная переменная представляет из себя структуру конфигурационного файла
+        /// </summary>
+        public static Config config;
 
         /// <summary>
         /// Матрица количества данных i-ых типов в партиях,
@@ -111,16 +118,127 @@ namespace newAlgorithm
         }
 
         /// <summary>
-        /// Данная функция инициализируем матрицу R с помощью переданной в неё матрицы A
+        /// Данная функция выполняет корректное построение матрицы R на основе матрицы A
         /// </summary>
-        /// <param name="matrixA">Матрица составов партий - матрица A </param>
-        private void InitMatrixR(IReadOnlyList<List<int>> matrixA)
+        /// <param name="matrixA">Матрица входных данных A</param>
+        private void CorrectInitMatrixR(List<List<int>> matrixA)
         {
-
             // Отчищаем существующие матрицы R, если они есть
             if (matrixR != null)
                 matrixR.Clear();
 
+            // Выводим матрицу A
+            if (Config.isDebug)
+                Console.WriteLine(ListUtils.MatrixIntToString(matrixA, "\t"));
+
+            // Максимальное количество партий, которые можно составить из матрицы A
+            int maxBatchesCount = 0;
+
+            // Максимальное количество партий для одного типа данных
+            int maxBatchCount = 0;
+
+            // Выполняем обработку
+            for (int dataType = 0; dataType < matrixA.Count; dataType++)
+            {
+                // Определяем максимальное количество партий для данного типа (dataType)
+                // и добавляем это количество к переменной maxBatchesCount
+                maxBatchesCount += matrixA[dataType].Count;
+
+                // Определяем максимальное количество партий для данного типа (dataType)
+                maxBatchCount = Math.Max(maxBatchCount, matrixA[dataType].Count);
+            }
+
+            // Инициализируем матрицу R
+            // Создаём матрицу из 0, как [maxBatchesPositions x dataTypesCount] = [n_p x n]
+            matrixR = ListUtils.InitMatrixInt(maxBatchesCount, matrixA.Count, 0);
+
+            // Инициализируем матрицу P
+            List<List<int>> matrixP = new List<List<int>>();
+            for (int dataType = 0; dataType < matrixA.Count; dataType++)
+                matrixP.Add(ListUtils.InitVectorInt(maxBatchesCount, 0));
+
+            // Объявляем списки I и I'
+            List<int> I = new List<int>();
+            List<int> I_prime = new List<int>();
+
+            // Объявляем переменную для инициализации I и I'
+            int matrixACol = 0; int batchProc = 0;
+
+            // Выполняем обработку
+            while (matrixACol < maxBatchCount)
+            {
+                // 1. Инициализировать множество I, I' типов заданий, пакеты которых размещаются в последовательностях pi_l(l=1,L):I=I'={1,2,...,N}
+                for (int dataType = 0;dataType < matrixA.Count; dataType++)
+                {
+
+                    // Проверяем необходимость выполнять обработку
+                    if (matrixACol >= matrixA[dataType].Count)
+                        continue;
+
+                    // Добавляем типы данных для обработки
+                    I.Add(dataType);
+                    I_prime.Add(dataType);
+                }
+
+                // Выводим информацию о множестве I
+                if (Config.isDebug)
+                    Console.WriteLine(ListUtils.VectorIntToString(I, "\n\t", "I:\t", "\n"));
+
+                // Пробегаемся по каждому типу из множества I для формирования матрицы R
+                foreach (var dataType in I)
+                {
+                    // Добавляем новый элемент в матрицу R
+                    matrixR[batchProc][dataType] = matrixA[dataType][matrixACol];
+
+                    // Выводим информацию о матрице R
+                    if (Config.isDebug) {
+                        Console.WriteLine("Матрица R до оптимизации расписания:");
+                        Console.WriteLine(ListUtils.MatrixIntToString(matrixR, "\t"));
+                    }
+
+                    // Подсчитываем оптимальное расписание
+                    ConstructShedule(batchProc++);
+
+                    // Выводим информацию о матрице R и время 
+                    if (Config.isDebug)
+                    {
+                        Console.WriteLine("Матрица R после оптимизации расписания:");
+                        Console.WriteLine(ListUtils.MatrixIntToString(matrixR, "\t"));
+                        Console.WriteLine(this.timeOfLastScheduleExecution);
+                    }
+                }
+
+                /*
+                // 2. Инициализировать номер ПЗ (i-ого) типа, размещаемого в (j=1)-й позиции в последовательностях pi_l (l=1,L)
+                int batch = 0;
+
+                // 2. Инициализировать элементы p11, r11 матриц P и R значениями соответсвующими размещаемому в pi_l (l=1,L) ПЗ (i=1)-ого типа
+                matrixR[0][0] = matrixA[0][0];
+                matrixP[0][0] = 1;
+
+                // 2. Инициализировать номер j текущей позиции пакета и номер j_max позиции pi_l (l=1,L), в которую добавляется пакет
+                int j = 0;
+                int j_max = 0;
+
+                // 3. Инициализировать элементы yl1 (l=1,L) матрицы Y
+                */
+                matrixACol++;
+                I.Clear();
+            }
+
+        }
+
+        /// <summary>
+        /// Данная функция инициализируем матрицу R с помощью переданной в неё матрицы A
+        /// </summary>
+        /// <param name="matrixA">Матрица составов партий - матрица A </param>
+        private void InitMatrixR(List<List<int>> matrixA)
+        {
+
+            // Вызываем функцию корректной инициализации матрицы
+            CorrectInitMatrixR(matrixA);
+
+            /*
             // Подсчитываем количество элементов в каждой строке (sum(mi))
             // batchesList представляет из себя множество партий с одним типом
             // например, скажем для типа 1, это может быть [10, 2]. Тогда 
@@ -154,7 +272,7 @@ namespace newAlgorithm
 
                         // Выполяем присвоение
                         matrixR[batchIndex++][dataType] = matrixA[dataType][batchSize];
-            
+            */
         }
 
         /// <summary>
@@ -209,7 +327,7 @@ namespace newAlgorithm
         /// <summary>
         /// Данная функция выполняет инициализацию startProcessing и stopProcessing в зависимости от матрицы matrixR
         /// </summary>
-        private void CalculateShedule()
+        private void CalculateShedule(int batchProc = -1)
         {
 
             // Проверка на инициализацию словаря
@@ -230,7 +348,7 @@ namespace newAlgorithm
                 List<List<int>> stopProccessingMatrix = new List<List<int>>();
 
                 // Для каждой возможной позиции выполняем обработку
-                for (var batchIndex = 0; batchIndex < matrixR.Count; batchIndex++)//количество партий
+                for (var batchIndex = 0; batchIndex < ((batchProc == -1) ? matrixR.Count : batchProc + 1); batchIndex++)//количество партий
                 {
 
                     // Получаем количество заданий в позиции batchIndex
@@ -257,7 +375,7 @@ namespace newAlgorithm
             {
 
                 // Для каждой возможной позиции выполняем обработку
-                for (var batchIndex = 0; batchIndex < matrixR.Count; batchIndex++)
+                for (var batchIndex = 0; batchIndex < ((batchProc == -1) ? matrixR.Count : batchProc + 1); batchIndex++)
                 {
 
                     // Получаем индекс ненулевого элемента в строке
@@ -307,7 +425,7 @@ namespace newAlgorithm
         /// </summary>
         /// <param name="bufferSize">Размер буфера</param>
         /// <param name="dataTypesCount">Количество типов данных</param>
-        private void CalculateSheduleWithBufer(int bufferSize, int dataTypesCount)
+        private void CalculateSheduleWithBufer(int bufferSize, int dataTypesCount, int batchProc = -1)
         {
 
             // Инициализируем матрицу времени выполнения заданий
@@ -317,7 +435,7 @@ namespace newAlgorithm
             RMatrix rMatrix = new RMatrix(dataTypesCount);
 
             // Для каждого позиции в последовательности выполняем перебор
-            for (int batchIndex = 0; batchIndex < matrixR.Count; batchIndex++)
+            for (int batchIndex = 0; batchIndex < ((batchProc == -1) ? matrixR.Count : batchProc + 1); batchIndex++)
             {
                 int _dataType = ReturnRDataType(batchIndex);
                 rMatrix.AddNode(_dataType + 1, matrixR[batchIndex][_dataType]);
@@ -327,7 +445,7 @@ namespace newAlgorithm
             List<List<int>> pMatr = ListUtils.InitMatrixInt(matrixR[0].Count, matrixR.Count, 0);
 
             // Для каждой позиции в последовательности выполняем перебор
-            for (int batchIndex = 0; batchIndex < matrixR.Count; batchIndex++)
+            for (int batchIndex = 0; batchIndex < ((batchProc == -1) ? matrixR.Count : batchProc + 1); batchIndex++)
             
                 // Для каждого типа данных выполняем перебор
                 for (int _dataType = 0; _dataType < matrixR[batchIndex].Count; _dataType++)
@@ -397,7 +515,7 @@ namespace newAlgorithm
         /// <summary>
         /// Выполняем построения расписания, что подразумевает поиск наилучшего времени выполнения всех пакетов заданий в разных позициях
         /// </summary>
-        public void ConstructShedule(int swapCount = 0)
+        public void ConstructShedule(int batchProc = -1, int swapCount = 0)
         {
 
             // Если значение количество перестановок != 0,
@@ -405,7 +523,15 @@ namespace newAlgorithm
             bool swapping = (swapCount != 0);
 
             // Высчитываем временные критерии
-            CalculateShedule();
+            CalculateShedule(batchProc);
+
+            // Выводим информацию о матрице R
+            if (Config.isDebug)
+            {
+                Console.WriteLine("Матрица R во время оптимизации {0} расписания:", batchProc);
+                Console.WriteLine(ListUtils.MatrixIntToString(matrixR, "\t"));
+                Console.WriteLine(this.timeOfLastScheduleExecution);
+            }
 
             // Выполняем копирование матрицы R
             var bestMatrixR = ListUtils.MatrixIntDeepCopy(matrixR);
@@ -414,7 +540,7 @@ namespace newAlgorithm
             var bestTime = timeOfLastScheduleExecution;
 
             // Определяем индекс последнего элемента для перестановок
-            int swapIndex = matrixR.Count - 1;
+            int swapIndex = (batchProc == -1) ? matrixR.Count - 1 : batchProc;
 
             // До тех пор, пока не выполнили все перестановки
             while(swapIndex - 1 >= 0)
@@ -430,7 +556,15 @@ namespace newAlgorithm
                 ListUtils.MatrixIntRowSwap(matrixR, swapIndex, swapIndex - 1);
 
                 // Для новой матрицы выполняем высчитывание временных критерией
-                CalculateShedule();
+                CalculateShedule(batchProc);
+
+                // Выводим информацию о матрице R
+                if (Config.isDebug)
+                {
+                    Console.WriteLine("Матрица R во время оптимизации {0} расписания:", batchProc);
+                    Console.WriteLine(ListUtils.MatrixIntToString(matrixR, "\t"));
+                    Console.WriteLine("КРИТЕРИЙ: {0}", this.timeOfLastScheduleExecution);
+                }
 
                 // Если высчитаное время хуже наилучшего
                 if (timeOfLastScheduleExecution > bestTime)
@@ -462,8 +596,13 @@ namespace newAlgorithm
         /// </summary>
         /// <param name="bufferSize">Размер буфера</param>
         /// <param name="dataTypesCount">Количество типов данных</param>
+        /// <param name="batchProc">Ограничение вычисления расписания по количеству позиций.
+        /// Данная переменная определяет сколько пакетов матрицы P и R будут использованы
+        /// для вычисления оптимального расписания. По умолчанию batchProc = -1, означает, 
+        /// для вычисления оптимального расписания будут использоваться все пакеты матриц P и R.
+        /// </param>
         /// <returns></returns>
-        public void ConstructSheduleWithBuffer(int bufferSize, int dataTypesCount, int swapCount = 0)
+        public void ConstructSheduleWithBuffer(int bufferSize, int dataTypesCount, int batchProc = -1, int swapCount = 0)
         {
 
             // Если значение количество перестановок != 0,
@@ -471,7 +610,7 @@ namespace newAlgorithm
             bool swapping = (swapCount != 0);
 
             // Высчитываем временные критерии
-            CalculateSheduleWithBufer(bufferSize, dataTypesCount);
+            CalculateSheduleWithBufer(bufferSize, dataTypesCount, batchProc);
 
             // Выполняем копирование матрицы R и 
             // Сохраняем лучший результат времени выполнения последнего задания
@@ -479,7 +618,7 @@ namespace newAlgorithm
             var bestTime = timeOfLastScheduleExecution;
 
             // Определяем индекс последнего элемента для перестановок
-            int swapIndex = matrixR.Count - 1;
+            int swapIndex = (batchProc == -1) ? matrixR.Count - 1 : batchProc;
 
             // До тех пор, пока не выполнили все перестановки
             while (swapIndex - 1 >= 0)
@@ -495,7 +634,7 @@ namespace newAlgorithm
                 ListUtils.MatrixIntRowSwap(matrixR, swapIndex, swapIndex - 1);
 
                 // Для новой матрицы выполняем высчитывание временных критерией
-                CalculateSheduleWithBufer(bufferSize, dataTypesCount);
+                CalculateSheduleWithBufer(bufferSize, dataTypesCount, batchProc);
 
                 // Если высчитаное время хуже наилучшего
                 if (bestTime <= timeOfLastScheduleExecution)
@@ -1143,7 +1282,7 @@ namespace newAlgorithm
 
                     // Выполняем подсчёт суммы интервалов времени между ПТО разных пакетов
                     sumPreMIntervals += matrixTPreM[device][batchIndex] - matrixTPreM[device][batchIndex - 1];
-    }
+            }
 
             // Возвращяем полезность и ПТО
             return
@@ -1221,10 +1360,10 @@ namespace newAlgorithm
                 Console.WriteLine("Before calculation");
                 for (device = 0; device < config.deviceCount; device++)
                     Console.WriteLine($"device:{device}" + Environment.NewLine + ListUtils.MatrixIntToString(matrixT[device]));
-        }
+            }
 
             // Выполняем обработку для первого прибора
-        {
+            {
 
                 // Инициализируем индекс первого прибора
                 device = 0;
@@ -1328,10 +1467,10 @@ namespace newAlgorithm
                         // Время выполнения текущего задания на предыдущем приборе
                         config.proccessingTime[device - 1, schedule[batchIndex].Type]
                     );
-            
+
                 // Пробегаемся по всем возможным позициям пакетов
                 for (batchIndex = 1; batchIndex < schedule.Count(); batchIndex++)
-            {
+                {
 
                     // Инициализируем индекс задания
                     job = 0;
@@ -1379,7 +1518,7 @@ namespace newAlgorithm
                             // Время выполнения задания на предыдущем приборе
                             config.proccessingTime[device - 1, schedule[batchIndex].Type]
                         );
-                    }
+                }
             }
 
             // Выводим отладачную информацию
@@ -1437,21 +1576,21 @@ namespace newAlgorithm
 
                         // Момент окончания времени выполнения ПТО на позиции batchIndex
                         matrixTPreM[device].Add(
-
+                            
                             // Добавляем структуры данных
                             new PreMSet(
 
                                 // Индекс ПЗ после которого будет выполняться ПТО
                                 batchIndex,
                                 
-                            // Момент начала времени выполнения последнего задания в пакете batchIndex на приборе device
-                            matrixT[device][batchIndex].Last() +
+                                // Момент начала времени выполнения последнего задания в пакете batchIndex на приборе device
+                                matrixT[device][batchIndex].Last() +
 
-                            // Время выполнения задания с типов пакета на позиции batchIndex
-                            config.proccessingTime[device, schedule[batchIndex].Type] +
+                                // Время выполнения задания с типов пакета на позиции batchIndex
+                                config.proccessingTime[device, schedule[batchIndex].Type] +
 
-                            // Время выполнения ПТО
-                            config.preMaintenanceTimes[device]
+                                // Время выполнения ПТО
+                                config.preMaintenanceTimes[device]
                             )
 
                             
