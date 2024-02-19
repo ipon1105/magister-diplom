@@ -1462,6 +1462,35 @@ namespace newAlgorithm
             return matrixTPreM;
         }
 
+        public static double GetReliability(
+            Config config,
+            List<magisterDiplom.Model.Batch> schedule,
+            Dictionary<int, List<List<int>>> matrixT,
+            List<List<PreMSet>> matrixTPreM,
+            int t
+        ) {
+
+            // Объявляем надёжность
+            double reliability = 0;
+
+            // Получаем вектор PreMInfo
+            List<PreMInfo> list = BuildVectorPreMInfo(config, schedule, matrixT, matrixTPreM, t);
+
+            // Для каждого прибора подсчитываем надёжность
+            for (int device = 0; device < config.deviceCount; device++) {
+
+                // Выполняем подсчёт активности для текущего прибора
+                // TODO: Добавить подсчёт активности
+                int time = 0;
+            
+                // Выполняем расчёт надёжности
+                reliability *= ReliabilityCalc(config, t, device);
+            }
+
+            // Возвращяем надёжность
+            return reliability;
+        }
+
         /// <summary>
         /// Данная функция возврабщает надёжность, которая определяет вероятность находится ли некий прибор в работоспособном состоянии.
         /// Данная функция не учитывает перерывы в работе прибора связанные с:
@@ -1477,18 +1506,18 @@ namespace newAlgorithm
         /// <param name="device">Индекс прибора для расчёта вероятности его работоспособности</param>
         /// <returns>Вероятность работоспособности прибора по индексу device</returns>
         public static double ReliabilityCalc(
-            List<int> failureRates,
-            List<int> restoringDevice,
+            Config config,
             int t, int device
         ) {
             // deviceTime = tl = общее время пребывания l-ого прибора в активном состоянии, после 
             //     окончания последней реализации ПТО этого прибора в момент времени (tl^p (tl^p >= 0))
             // TODO: Заменить failureRates и restoringDevice на доступ через config.
             double reliability =
-                failureRates[device] / (restoringDevice[device] + failureRates[device]) +
-                restoringDevice[device] / (restoringDevice[device] + failureRates[device]) *
-                Math.Exp(-1 * (restoringDevice[device] + failureRates[device]) * t);
+                config.failureRates[device] / (config.restoringDevice[device] + config.failureRates[device]) +
+                config.restoringDevice[device] / (config.restoringDevice[device] + config.failureRates[device]) *
+                Math.Exp(-1 * (config.restoringDevice[device] + config.failureRates[device]) * t);
 
+            // Возвращяем результат
             return reliability;
         }
 
