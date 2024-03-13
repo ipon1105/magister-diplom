@@ -4890,5 +4890,185 @@ namespace GlobalTest
         }
 
         #endregion
+
+        [TestMethod]
+        public void test()
+        {
+
+            // Формируем входные данные
+            #region Input
+
+            /*
+            // dataTypesCount:
+            // 4
+            // 
+            // deviceCount:
+            // 3
+            // 
+            // buffer:
+            // 999
+            // 
+            // proccessingTime:
+            // +---+---+---+---+
+            // | 1 | 1 | 1 | 1 |
+            // +---+---+---+---+
+            // | 1 | 1 | 1 | 1 |
+            // +---+---+---+---+
+            // | 1 | 1 | 1 | 1 |
+            // +---+---+---+---+
+            // | 1 | 1 | 1 | 1 |
+            // +---+---+---+---+
+            //
+            // changeoverTime:
+            // +---+---+---+---+---+
+            // |   | 1 | 1 | 1 | 1 |
+            // +   +---+---+---+---+
+            // |   | 1 | 1 | 1 | 1 |
+            // + 1 +---+---+---+---+
+            // |   | 1 | 1 | 1 | 1 |
+            // +   +---+---+---+---+
+            // |   | 1 | 1 | 1 | 1 |
+            // +---+---+---+---+---+
+            // |   | 1 | 1 | 1 | 1 |
+            // +   +---+---+---+---+
+            // |   | 1 | 1 | 1 | 1 |
+            // + 2 +---+---+---+---+
+            // |   | 1 | 1 | 1 | 1 |
+            // +   +---+---+---+---+
+            // |   | 1 | 1 | 1 | 1 |
+            // +---+---+---+---+---+
+            // |   | 1 | 1 | 1 | 1 |
+            // +   +---+---+---+---+
+            // |   | 1 | 1 | 1 | 1 |
+            // + 3 +---+---+---+---+
+            // |   | 1 | 1 | 1 | 1 |
+            // +   +---+---+---+---+
+            // |   | 1 | 1 | 1 | 1 |
+            // +---+---+---+---+---+
+            //
+            // preMaintenanceTimes
+            // +---+---+---+
+            // | 1 | 1 | 1 |
+            // +---+---+---+
+            //
+            // isFixedBatches:
+            // false
+            */
+
+            // Объявляем матрицу переналадки
+            Dictionary<int, Matrix> changeoverTime = new Dictionary<int, Matrix>();
+
+            // Создаём матрицу переналадки для 1 прибора
+            Matrix changeoverTime_1 = new Matrix(new List<List<int>>
+                {
+                    new List<int> { 1, 1, 1, 1 },
+                    new List<int> { 1, 1, 1, 1 },
+                    new List<int> { 1, 1, 1, 1 },
+                    new List<int> { 1, 1, 1, 1 },
+                });
+
+            // Создаём матрицу переналадки для 2 прибора
+            Matrix changeoverTime_2 = new Matrix(new List<List<int>>
+                {
+                    new List<int> { 1, 1, 1, 1 },
+                    new List<int> { 1, 1, 1, 1 },
+                    new List<int> { 1, 1, 1, 1 },
+                    new List<int> { 1, 1, 1, 1 },
+                });
+
+            // Создаём матрицу переналадки для 2 прибора
+            Matrix changeoverTime_3 = new Matrix(new List<List<int>>
+                {
+                    new List<int> { 1, 1, 1, 1 },
+                    new List<int> { 1, 1, 1, 1 },
+                    new List<int> { 1, 1, 1, 1 },
+                    new List<int> { 1, 1, 1, 1 },
+                });
+
+            // Добавляем матрицы переналадки в changeoverTime
+            changeoverTime.Add(0, changeoverTime_1);
+            changeoverTime.Add(1, changeoverTime_2);
+            changeoverTime.Add(2, changeoverTime_3);
+
+            // Создаём матрицу времени выполнения
+            Matrix proccessingTime = new Matrix(new List<List<int>>
+                {
+                    new List<int> { 1, 1, 1, 1 },
+                    new List<int> { 1, 1, 1, 1 },
+                    new List<int> { 1, 1, 1, 1 },
+                });
+
+            // Формируем конфигурационный файл
+            Config config = new Config(
+                4, // int dataTypesCount,
+                3, // int deviceCount,
+                999, // int buffer,
+                proccessingTime, // Matrix proccessingTime,
+                changeoverTime,// Dictionary<int, Matrix> changeoverTime,
+                new Vector(new List<int> { 1, 1, 1 }),
+                new Vector(new List<int> { 1, 1, 1 }),
+                new Vector(new List<int> { 1, 1, 1 }),
+                false// bool isFixedBatches
+            );
+
+            // Объявляем и инициализируем последовательность ПЗ
+            List<magisterDiplom.Model.Batch> schedule = new List<magisterDiplom.Model.Batch>
+            {
+                new magisterDiplom.Model.Batch(0, 3),
+                new magisterDiplom.Model.Batch(1, 3),
+                new magisterDiplom.Model.Batch(2, 3),
+                new magisterDiplom.Model.Batch(3, 3),
+            };
+
+            // Создаём позиционную матрицу Y
+            List<List<int>> Y = new List<List<int>>
+            {
+                new List<int> { 1, 1, 0, 0 },
+                new List<int> { 0, 1, 0, 1 },
+                new List<int> { 1, 0, 1, 0 },
+            };
+
+            // Объявляем выходную матрицу T
+            Dictionary<int, List<List<int>>> _matrixT = PreM.Build(config, schedule, Y);
+
+            // Формируем матрицу PreM
+            List<List<PreMSet>> matrixTPreM = PreM.BuildMatrixTPreM(config, schedule, _matrixT, Y);
+
+            #endregion
+
+            /*
+            //   +--+--+--+--+
+            //   |1 |1 |  |  |
+            //   +--+--+--+--+
+            //   |  |1 |  |1 |
+            //   +--+--+--+--+
+            //   |1 |  |1 |  |
+            //   +--+--+--+--+
+            */
+
+            /*
+            //   0  1  2  3  4  5  6  7  8  9  10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28
+            //   |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |
+            //   +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+            // d1|  |A |A |A |**|  |B |B |B |**|  |C |C |C |  |D |D |D |  |  |  |  |  |  |  |  |  |  |  |
+            //   +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+            // d2|  |  |A |A |A |  |  |B |B |B |**|  |C |C |C |  |D |D |D |**|  |  |  |  |  |  |  |  |  |
+            //   +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+            // d3|  |  |  |A |A |A |**|  |B |B |B |  |  |C |C |C |**|  |D |D |D |  |  |  |  |  |  |  |  |
+            //   +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+            */
+
+            /*
+            //   +--+--+
+            // d1|5 |10|
+            //   +--+--+
+            // d2|11|20|
+            //   +--+--+
+            // d3|7 |17|
+            //   +--+--+
+            */
+
+            Console.WriteLine(PreM.GetReliability(config, schedule, _matrixT, matrixTPreM, 6));
+        }
     }
 }

@@ -1163,6 +1163,11 @@ namespace newAlgorithm
     {
 
         /// <summary>
+        /// Данная переменная помогает в отладке функции Buildы
+        /// </summary>
+        public const bool isDebugBuild = false;
+
+        /// <summary>
         /// Данная функция выполняет построение матрицы начала времени выполнения заданий.
         /// </summary>
         /// <param name="config">Структура описывающая конфигурацию по
@@ -1215,7 +1220,7 @@ namespace newAlgorithm
                 matrixT.Add(device, ListUtils.MatrixIntDeepCopy(times));
 
             // Выводим отладачную информацию
-            if (Config.isDebug) {
+            if (Config.isDebug && isDebugBuild) {
 
                 // Выводим информацию о всей матрице T
                 Console.WriteLine("Before calculation");
@@ -1383,7 +1388,7 @@ namespace newAlgorithm
             }
 
             // Выводим отладачную информацию
-            if (Config.isDebug)
+            if (Config.isDebug && isDebugBuild)
             {
 
                 // Выводим информацию о всей матрице T
@@ -1516,9 +1521,9 @@ namespace newAlgorithm
 
             // Выполняем расчёт и возврат доступности
             return
-                config.failureRates[device] / (config.restoringDevice[device] + config.failureRates[device]) +
-                config.restoringDevice[device] / (config.restoringDevice[device] + config.failureRates[device]) *
-                Math.Exp(-1 * (config.restoringDevice[device] + config.failureRates[device]) * t);
+                (double)config.failureRates[device] / (double)(config.restoringDevice[device] + config.failureRates[device]) +
+                (double)config.restoringDevice[device] / (double)(config.restoringDevice[device] + config.failureRates[device]) *
+                (double)Math.Exp(-1 * (double)(config.restoringDevice[device] + config.failureRates[device]) * (double)t);
         }
 
         /// <summary>
