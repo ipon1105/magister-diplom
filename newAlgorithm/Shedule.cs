@@ -1513,16 +1513,12 @@ namespace newAlgorithm
             Config config,
             int t, int device
         ) {
-            // deviceTime = tl = общее время пребывания l-ого прибора в активном состоянии, после 
-            //     окончания последней реализации ПТО этого прибора в момент времени (tl^p (tl^p >= 0))
-            // TODO: Заменить failureRates и restoringDevice на доступ через config.
-            double reliability =
+
+            // Выполняем расчёт и возврат доступности
+            return
                 config.failureRates[device] / (config.restoringDevice[device] + config.failureRates[device]) +
                 config.restoringDevice[device] / (config.restoringDevice[device] + config.failureRates[device]) *
                 Math.Exp(-1 * (config.restoringDevice[device] + config.failureRates[device]) * t);
-
-            // Возвращяем результат
-            return reliability;
         }
 
         /// <summary>
