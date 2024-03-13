@@ -1543,22 +1543,35 @@ namespace newAlgorithm
                 return -1;
 
             // Если в списке первый элемент не удовлетворяет условию
-            if (matrixTPreM[device][0].TimePreM >= endPreMTime)
+            if (matrixTPreM[device][0].TimePreM > endPreMTime)
 
                 // Вернём индекс начальный индекс ПЗ
                 return -1;
+
+            // Если в списке первый элемент не удовлетворяет условию
+            if (matrixTPreM[device][0].TimePreM == endPreMTime)
+
+                // Вернём индекс начальный индекс ПЗ
+                return matrixTPreM[device][0].BatchIndex;
 
             // Объявляем индекс
             int index = 1;
 
             // Для каждой ПТО выполняем обработку
-            for (; index < matrixTPreM[device].Count; index++)
+            for (; index < matrixTPreM[device].Count; index++) {
 
                 // Если момент окончания ПТО в позиции index не удовлетворяет условиям
-                if (matrixTPreM[device][index].TimePreM >= endPreMTime)
+                if (matrixTPreM[device][index].TimePreM > endPreMTime)
 
                     // Возвращяем индекс ПЗ после которого выполнится последнее ПТО
                     return matrixTPreM[device][index - 1].BatchIndex;
+
+                // Если момент окончания ПТО в позиции index не удовлетворяет условиям
+                if (matrixTPreM[device][index].TimePreM == endPreMTime)
+
+                    // Возвращяем индекс ПЗ после которого выполнится последнее ПТО
+                    return matrixTPreM[device][index].BatchIndex;
+            }
 
             // Индекс ПЗ после которог выполниться ПТО, последний в списке
             return matrixTPreM[device][index - 1].BatchIndex;
@@ -1644,6 +1657,99 @@ namespace newAlgorithm
                         schedule[startIndex + batchCount - 1].Size - jobCount
                     )
                 );
+            }
+
+            // Возвращяем результат
+            return info;
+        }
+
+        /// <summary>
+        /// Данная функция выполняет подсчёт активностей приборов после последнего ПТО
+        /// </summary>
+        /// <param name="config">Конфигурационная структура</param>
+        /// <param name="schedule">Расписания ПЗ [batchIndex]</param>
+        /// <param name="matrixT">Матрица моментов начала времени выполнения задания [device]:[batchIndex][jobCount]</param>
+        /// <param name="matrixTPreM">Матрица структур состоящая из индексов ПЗ за которыми следует ПТО и моментов времени окончания данного ПТО</param>
+        /// <param name="endPreMTime">Крайний момент времени окончания ПТО</param>
+        /// <returns>Список времён активностей</returns>
+        public static List<int> BuildActivityTimesVector(
+            Config config,
+            List<magisterDiplom.Model.Batch> schedule,
+            Dictionary<int, List<List<int>>> matrixT,
+            List<List<PreMSet>> matrixTPreM,
+            int endPreMTime
+        )
+        {
+
+            // Формируем список активностей приборов
+            List<int> info = new List<int>(config.deviceCount);
+
+            // Для каждого прибора выполняем подсчёт времени активности
+            for (int device = 0; device < config.deviceCount; device++)
+            {
+
+                // Определяем начальный индекс
+                int startIndex = PreM.GetBatchIndex(matrixTPreM, device, endPreMTime) + 1;
+
+                // Определяем индекс ПЗ
+                int batchIndex = startIndex;
+
+                // Определяем количество ПЗ
+                int batchCount = 0;
+
+                // Определяем количество заданий
+                int jobCount = 0;
+
+                // Определяем время активности
+                int time = 0;
+
+                // Для каждого пакет выполняем обработку
+                for (; batchIndex < schedule.Count; batchIndex++)
+                {
+
+                    // Если первое задани в ПЗ удовлетворяет условию
+                    if (matrixT[device][batchIndex][0] >= endPreMTime)
+
+                        // Прекращаем обарботку
+                        break;
+
+                    // Увеличиваем количество ПЗ
+                    batchCount++;
+
+                    // Увеличиваем активность
+                    time += schedule[batchIndex].Size * config.proccessingTime[device, batchIndex];
+                }
+
+                // Если количество ПЗ равно 0
+                if (batchCount == 0)
+                {
+
+                    // Добавляем информацию
+                    info.Add(0);
+
+                    // Пропускаем обработку
+                    continue;
+                }
+
+                // Для каждого задания в последнем пакете выполняем обработку
+                for (int job = 0; job < schedule[startIndex + batchCount - 1].Size; job++)
+                {
+
+                    // Если некоторое задание в последенем ПЗ не удовлетворяет условию
+                    if (matrixT[device][startIndex + batchCount - 1][job] >= endPreMTime)
+
+                        // Прекращаем обарботку
+                        break;
+
+                    // Увеличиваем количество заданий
+                    jobCount++;
+                }
+
+                // Уменьшаем время
+                time -= (schedule[startIndex + batchCount - 1].Size - jobCount) * config.proccessingTime[device, startIndex + batchCount - 1];
+
+                // Добавляем информацию
+                info.Add(time);
             }
 
             // Возвращяем результат
