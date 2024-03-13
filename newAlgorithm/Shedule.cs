@@ -1462,6 +1462,15 @@ namespace newAlgorithm
             return matrixTPreM;
         }
 
+        /// <summary>
+        /// Данная функция подсчитывает доступность для всех приборов
+        /// </summary>
+        /// <param name="config">Конфигурационная структура</param>
+        /// <param name="schedule">Расписания ПЗ [batchIndex]</param>
+        /// <param name="matrixT">Матрица моментов начала времени выполнения задания [device]:[batchIndex][jobCount]</param>
+        /// <param name="matrixTPreM">Матрица структур состоящая из индексов ПЗ за которыми следует ПТО и моментов времени окончания данного ПТО</param>
+        /// <param name="t">Крайний момент времени окончания ПТО</param>
+        /// <returns>Доступность для всех приборов</returns>
         public static double GetReliability(
             Config config,
             List<magisterDiplom.Model.Batch> schedule,
@@ -1471,21 +1480,16 @@ namespace newAlgorithm
         ) {
 
             // Объявляем надёжность
-            double reliability = 0;
+            double reliability = 1;
 
             // Получаем вектор PreMInfo
-            List<PreMInfo> list = BuildVectorPreMInfo(config, schedule, matrixT, matrixTPreM, t);
+            List<int> list = BuildActivityTimesVector(config, schedule, matrixT, matrixTPreM, t);
 
             // Для каждого прибора подсчитываем надёжность
-            for (int device = 0; device < config.deviceCount; device++) {
-
-                // Выполняем подсчёт активности для текущего прибора
-                // TODO: Добавить подсчёт активности
-                int time = 0;
+            for (int device = 0; device < config.deviceCount; device++)
             
                 // Выполняем расчёт надёжности
-                reliability *= ReliabilityCalc(config, t, device);
-            }
+                reliability *= ReliabilityCalc(config, list[device], device);
 
             // Возвращяем надёжность
             return reliability;
