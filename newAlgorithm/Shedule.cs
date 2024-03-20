@@ -1494,7 +1494,7 @@ namespace newAlgorithm
             for (int device = 0; device < config.deviceCount; device++)
             
                 // Выполняем расчёт надёжности
-                reliability *= ReliabilityCalc(config, list[device], device);
+                reliability *= (list[device] == 0) ? 1 : ReliabilityCalc(config, list[device], device);
 
             // Возвращяем надёжность
             return reliability;
