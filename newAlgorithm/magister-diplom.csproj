@@ -55,12 +55,17 @@
   <ItemGroup>
     <Compile Include="BatchTypeClaims.cs" />
     <Compile Include="CalculationService.cs" />
+    <Compile Include="Fabric\Builders\SimplePreMScheduleBuilder.cs" />
+    <Compile Include="Fabric\PreMSchedule.cs" />
+    <Compile Include="Fabric\SimplePreMSchedule.cs" />
     <Compile Include="FirstLevel.cs" />
     <Compile Include="Model\Batch.cs" />
     <Compile Include="Model\Config.cs" />
     <Compile Include="Model\PreMInfo.cs" />
     <Compile Include="Model\PreMSet.cs" />
     <Compile Include="Model\Vector.cs" />
+    <Compile Include="Fabric\Schedule.cs" />
+    <Compile Include="Fabric\Builders\ScheduleBuilder.cs" />
     <Compile Include="UI\Form1.cs">
       <SubType>Form</SubType>
     </Compile>

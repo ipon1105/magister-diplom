@@ -57,14 +57,14 @@ namespace magisterDiplom.Model
         /// preMaintenanceTimes = [deviceCount]
         /// </summary>
         public readonly Vector preMaintenanceTimes;
-
+         
         /// <summary>
-        /// Данный список определяет интенсивность отказов для приборов соответсвенно: [deviceCount]
+        /// Данный список определяет интенсивность отказов для приборов соответсвенно: [deviceCount]. Определяется, как количество отказов в единицу времени
         /// </summary>
         public readonly Vector failureRates;
 
         /// <summary>
-        /// Данный список определяет востановление прибора соответсвенно: [deviceCount]
+        /// Данный список определяет интенсивность востановление прибора соответсвенно: [deviceCount]
         /// </summary>
         public readonly Vector restoringDevice;
 

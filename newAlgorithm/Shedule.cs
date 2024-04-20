@@ -725,6 +725,7 @@ namespace newAlgorithm
         private static List<magisterDiplom.Model.Batch> Optimization(
             Config config,
             List<magisterDiplom.Model.Batch> schedule,
+            List<List<int>> matrixY,
             int swapCount = 999999
         ) {
 
@@ -756,7 +757,10 @@ namespace newAlgorithm
 
                 // Для каждой перестановки выполняем просчёт матрицы
                 // начала времени выполнения задания на приборах
-                matrixT = PreM.Build(config, schedule, null);
+                matrixT = PreM.Build(config, schedule, matrixY);
+
+                // Выполним проверку условии 18
+                // PreM.GetReliability(config, schedule, PreM.BuildMatrixTPreM(config, schedule, ))
 
                 // Высчитываем новый критерий makespan
                 newTime = CorrectSchedule.GetMakespanFrom(config, matrixT, schedule);
@@ -862,6 +866,132 @@ namespace newAlgorithm
 
                     // Выполняем локальную оптимизацию составов ПЗ
                     schedule = Optimization(config, schedule);
+
+                    // Выводим отладачную информацию
+                    if (Config.isDebug && CorrectSchedule.isDebugBuild)
+                    {
+
+                        // Объявляем индекс ПЗ в расписании
+                        int batchIndex = 0;
+
+                        // Выводим всё расписание
+                        Console.WriteLine("After:\t");
+                        for (; batchIndex < schedule.Count; batchIndex++)
+                            Console.WriteLine("\t\t[{0}:{1, -2}]", schedule[batchIndex].Type, schedule[batchIndex].Size);
+                        Console.Write(Environment.NewLine);
+                    }
+                }
+
+                // Увеличиваем индекс пакета
+                batch++;
+            }
+
+            // Выводим отладачную информацию
+            if (Config.isDebug && CorrectSchedule.isDebugBuild)
+            {
+                Console.WriteLine("      +---------------------+");
+                Console.WriteLine("Stop  |   CorrectSchedule   |");
+                Console.WriteLine("      +---------------------+");
+            }
+
+            // Вызвращаем локально оптимизированное распиание составов ПЗ
+            return schedule;
+        }
+
+
+
+        public static List<magisterDiplom.Model.Batch> BuildWithY(
+            Config config,
+            List<List<int>> matrixA
+        )
+        {
+            List<List<int>> matrixY = new List<List<int>>();
+
+            // Выводим отладачную информацию
+            if (Config.isDebug && CorrectSchedule.isDebugBuild)
+            {
+                Console.WriteLine("\t\t+---------------------+");
+                Console.WriteLine("Start\t|   CorrectSchedule   |");
+                Console.WriteLine("\t\t+---------------------+");
+                Console.WriteLine("Input:\t");
+
+                Console.WriteLine("\t\t+---------------------+");
+                Console.WriteLine("\t\t|       config        |");
+                Console.WriteLine("\t\t+---------------------+");
+                Console.WriteLine(config.ToString("\t\t"));
+
+                Console.WriteLine("\t\t+---------------------+");
+                Console.WriteLine("\t\t|       matrixA       |");
+                Console.WriteLine("\t\t+---------------------+");
+
+                for (int _dataType = 0; _dataType < config.dataTypesCount; _dataType++)
+                {
+                    Console.Write("\t\t|{0,-2}|", _dataType);
+                    for (int _batchIndex = 0; _batchIndex < matrixA[_dataType].Count; _batchIndex++)
+                        Console.Write("{0, -2}|", matrixA[_dataType][_batchIndex]);
+                    Console.Write(Environment.NewLine);
+                }
+                Console.Write(Environment.NewLine);
+            }
+
+            // Объявляем тип данных
+            int dataType;
+
+            // Объявляем ПЗ
+            int batch = 0;
+
+            // Объявляем максимальное количество пакетов
+            int maxBatchCount = 0;
+
+            // Инициализируем максимальное количество пакетов
+            for (dataType = 0; dataType < config.dataTypesCount; dataType++)
+                maxBatchCount = Math.Max(maxBatchCount, matrixA[dataType].Count);
+
+            // Объявляем список данных состоящий из ПЗ
+            List<magisterDiplom.Model.Batch> schedule = new List<magisterDiplom.Model.Batch>(maxBatchCount);
+
+            for (dataType = 0; dataType < config.dataTypesCount; dataType++)
+
+                // Инициализируем данные
+                matrixY.Add(new List<int> { 1 });
+
+            // Выполняем обработку
+            while (batch < maxBatchCount)
+            {
+
+                // Выполняем обработку для каждого типа данных
+                for (dataType = 0; dataType < config.dataTypesCount; dataType++)
+                {
+
+                    // Если индекс пакета превышает максимальный размер пакетов для типа данных dataType
+                    if (batch >= matrixA[dataType].Count)
+
+                        // Продолжаем обработку для следующего типа данных
+                        continue;
+
+                    // Добавляем ПЗ в расписание 
+                    schedule.Add(new magisterDiplom.Model.Batch(dataType, matrixA[dataType][batch]));
+
+                    // Выводим отладачную информацию
+                    if (Config.isDebug && CorrectSchedule.isDebugBuild)
+                    {
+
+                        // Объявляем индекс ПЗ в расписании
+                        int batchIndex = 0;
+
+                        // Добавляем ПЗ в расписание
+                        Console.WriteLine("Add:\t[{0}:{1, -2}]", schedule.Last().Type, schedule.Last().Size);
+                        Console.Write(Environment.NewLine);
+
+                        // Выводим всё расписание
+                        Console.WriteLine("Before:\t");
+                        for (; batchIndex < schedule.Count; batchIndex++)
+                            Console.WriteLine("\t\t[{0}:{1, -2}]", schedule[batchIndex].Type, schedule[batchIndex].Size);
+                        Console.Write(Environment.NewLine);
+                    }
+
+                    // Выполняем локальную оптимизацию составов ПЗ
+                    schedule = Optimization(config, schedule, matrixY);
 
                     // Выводим отладачную информацию
                     if (Config.isDebug && CorrectSchedule.isDebugBuild)
@@ -1155,7 +1285,7 @@ namespace newAlgorithm
                 sumPreMIntervals;
         }
     }
-
+    
     /// <summary>
     /// Класс PreM (Preliminary maintenance) предоставляет функции для работы с предварительным обслуживанием приборов
     /// </summary>
