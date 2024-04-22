@@ -1,11 +1,8 @@
 ﻿using magisterDiplom.Model;
 using magisterDiplom.Utils;
-using newAlgorithm;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace magisterDiplom.Fabric
 {
@@ -75,6 +72,200 @@ namespace magisterDiplom.Fabric
 
 
         /// <summary>
+        /// Вернёт индекс ПЗ за которым следует последнее ПТО
+        /// </summary>
+        /// <param name="device">Индекс прибора</param>
+        /// <returns>Индекс ПЗ за которым следует последнее ПТО или -1</returns>
+        private int GetLastPreMPos(int device)
+        {
+
+            // Выполняем обход по всем ПЗ
+            for (int batchIndex = this.matrixY[device].Count() - 1; batchIndex >= 0; batchIndex--)
+
+                // Если в текущей позиции существует ПТО
+                if (this.matrixY[device][batchIndex] != 0)
+
+                    // Возвращяем индекс данной позиции
+                    return batchIndex;
+
+            // Вернём -1
+            return -1;
+        }
+
+        /// <summary>
+        /// Выполняем сдвиг для матрицы ПТО приборов
+        /// </summary>
+        /// <param name="beta">Нижний уровень нажёности</param>
+        private void ShiftMatrixY(double beta)
+        {
+
+            // Объявляем лучшую матрицу порядка ПТО приборов
+            List<List<int>> bestMatrixY = new List<List<int>>(this.matrixY);
+
+            // Объявляем критерий текущего лучшего расписания
+            int f2;
+
+            // Объявляем критерий f2 для текущего расписания со сдвигом
+            int new_f2;
+
+            // Объявляем индекс ПЗ за которым следует последнее ПТО
+            int last_prem_batch_index;
+
+            // Объявляем индекс последнего ПЗ для текущего расписания
+            int last_batch_index;
+
+            // Выполняем обработку в цикле
+            do {
+
+                // Обнуляем критерий f2 для текущего расписания
+                f2 = 0;
+
+                // Для каждого прибора выполняем обработку
+                for (int device = 0; device < config.deviceCount; device++)
+                {
+
+                    // Определяем индекс ПЗ за которым следует последнее ПТО
+                    last_prem_batch_index = this.GetLastPreMPos(device); // j*
+
+                    // Определяем индекс последнего ПЗ для текущего расписания
+                    last_batch_index = this.matrixY[device].Count() - 1; // j^max
+
+                    // Проверяем на необходимость проведения операций перестановки
+                    if (last_prem_batch_index == last_batch_index)
+
+                        // Пропускаем итерацию для текущего прибора
+                        continue;
+
+                    // Выполняем сдвиг ПТО на следующую позицию
+                    this.matrixY[device][last_prem_batch_index] = 0;
+                    this.matrixY[device][last_prem_batch_index + 1] = 1;
+
+                    // Вычисляем матрицу моментов начала времени выполнения заданий
+                    this.CalcStartProcessing();
+
+                    // Вычисляем матрицу моментов окончания времени выполнения ПТО
+                    this.CalcMatrixTPM();
+
+                    // Если текущее решение не удовлетворяет условию надёжности
+                    if (!this.IsSolutionAcceptable(beta))
+                    {
+
+                        // Выполняем обратный сдвиг ПТО
+                        this.matrixY[device][last_prem_batch_index] = 1;
+                        this.matrixY[device][last_prem_batch_index + 1] = 0;
+
+                        // Пропускаем итерацию
+                        continue;
+                    }
+                    
+                    // Вычисляем критерий f2 для текущего расписания со сдвигом
+                    new_f2 = this.GetPreMUtility();
+
+                    // Если текущее расписания лучше предыдущего
+                    if (new_f2 > f2)
+                    {
+
+                        // Запоминаем новый лучший критерий f2
+                        f2 = new_f2;
+
+                        // TODO: Убрать копирование в пользу оптимизации в виде индекса прибора
+                        // Запоминаем новое лучшее расписание
+                        bestMatrixY.Clear();
+                        bestMatrixY = new List<List<int>>(this.matrixY);
+                    }
+
+                    // Выполняем обратный сдвиг ПТО
+                    this.matrixY[device][last_prem_batch_index] = 1;
+                    this.matrixY[device][last_prem_batch_index + 1] = 0;
+                }
+
+                // Если улучшений позиций ПТО не было найдено
+                if (f2 == 0)
+
+                    // Прекращаем обработку
+                    break;
+
+                // Если в ходе обработки были найдены лучшии позиции ПТО
+                // Выполняем их переопределение
+                this.matrixY.Clear();
+                this.matrixY = new List<List<int>>(bestMatrixY);
+
+                // Продолжаем улучшения
+            } while (true);
+            
+            // Для каждого прибора выполняем дополнение для матрицы ПТО 1
+            for (int device = 0; device < this.config.deviceCount; device++)
+            {
+
+                // Определяем индекс ПЗ за которым следует последнее ПТО
+                last_prem_batch_index = this.GetLastPreMPos(device); // j*
+
+                // Определяем индекс последнего ПЗ для текущего расписания
+                last_batch_index = this.matrixY[device].Count() - 1; // j^max
+
+                // Если матрица Y не оканчивается 1
+                if (last_prem_batch_index < last_batch_index)
+
+                    // Изменяем индекс последнего ПТО нп 1
+                    this.matrixY[device][last_batch_index] = 1;
+            }
+        }
+
+        /// <summary>
+        /// Данная функция выполняет локальную оптимизацию составов ПЗ
+        /// </summary>
+        /// <param name="swapCount">Количество перестановок</param>
+        private void SearchByPosition(int swapCount = 999999)
+        {
+
+            // Объявляем лучшее расписание
+            List<Model.Batch> bestSchedule = new List<Model.Batch>(schedule);
+
+            // Вычисляем матрицу моментов времени начала выполнения заданий
+            this.CalcStartProcessing();
+
+            // Получаем f1 критерий - момента времени окончания последнего задания
+            int bestTime = this.GetMakespan();
+
+            // Объявляем новый f1 критерий - момента времени окончания последнего задания
+            int newTime = 0;
+
+            // Выполняем заявленное количество перестановок, заявленно количество раз
+            for (int batchIndex = schedule.Count - 1; batchIndex >= 1 && swapCount > 0; batchIndex--, swapCount--)
+            {
+
+                // Выполняем перестановку
+                Model.Batch batch = schedule[batchIndex];
+                schedule[batchIndex] = schedule[batchIndex - 1];
+                schedule[batchIndex - 1] = batch;
+
+                // Вычисляем матрицу моментов времени начала выполнения заданий
+                this.CalcStartProcessing();
+
+                // Высчитываем новый критерий makespan
+                newTime = this.GetMakespan();
+
+                // Выполним проверку условии 18
+                // PreM.GetReliability(config, schedule, PreM.BuildMatrixTPreM(config, schedule, ))
+
+                // Если новое время лучше, то выполняем переопределение
+                if (newTime < bestTime)
+                {
+
+                    // TODO: Избавиться от копирования списка в пользу использования индекса наилучшей позиции
+                    // Переопределяем лучшее расписание
+                    bestSchedule = new List<magisterDiplom.Model.Batch>(schedule);
+
+                    // Переопределяем лучшее время для лучшего расписания
+                    bestTime = newTime;
+                }
+            }
+
+            // Выполняем переопределение наилучшего раысписания составов ПЗ
+            this.schedule = bestSchedule;
+        }
+
+        /// <summary>
         /// Функция проверяет допустимость решения
         /// </summary>
         /// <param name="beta">Нижний уровень надёжности</param>
@@ -110,18 +301,6 @@ namespace magisterDiplom.Fabric
             
             // Все ограничения выпоняются, вернуть true
             return true;
-        }
-
-        private void test()
-        {
-            this.matrixY.Clear();
-            this.matrixY = new List<List<int>>();
-            List<int> I, _I;
-
-            // ПУНКТ 3
-            for (int device = 0; device < config.deviceCount; device++)
-                matrixY.Add(new List<int> { 1 });
-
         }
 
         /// <summary>
