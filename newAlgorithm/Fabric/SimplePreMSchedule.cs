@@ -73,31 +73,42 @@ namespace magisterDiplom.Fabric
             }
         }
 
-        private bool func_1()
+
+        /// <summary>
+        /// Функция проверяет допустимость решения
+        /// </summary>
+        /// <param name="beta">Нижний уровень надёжности</param>
+        /// <returns>true - если текущее решение допустимо. Иначе False</returns>
+        private bool IsSolutionAcceptable(double beta)
         {
 
+            // Для каджого прибора выполняем обработку
             for (int device = 0; device < config.deviceCount; device++)
-            {
+            
+                // Для каждого ПЗ в расписании выполняем обработку
                 for (int batch = 0; batch < this.schedule.Count; batch++)
-                {
+
+                    // Если для данной позиции существует ПТО
                     if (this.matrixY[device][batch] != 0)
                     {
-                        int time = this.startProcessing[device][batch].Last() +
+
+                        // Вычисляем момент времени окончания ПТО на текущем приборе в текущей позиции
+                        int time =
+
+                            // Момент времени начала выполнения последнего задания на текущем приборе в текущей позиции
+                            this.startProcessing[device][batch].Last() +
+
+                            // Время выполнения задания на текущем приборе в текущей позиции 
                             this.config.proccessingTime[device, this.schedule[batch].Type];
 
-                        // TODO: ВЫЧИСЛИТЬ N_P и N_PQ для момента времени time
-                        // TODO: ВЫЧИСЛИТЬ T_l ПО ФОРМУЛЕ 21
+                        // Проверяем ограничение надёжности
+                        if (!IsConstraint_CalcSysReliability(time, beta))
 
-                        //-------------------------
-                        // TODO: ВЫЧИСЛИТЬ P_0^l(time?) ПО ФОРМУЛАМ 17 И 22.
-                        // TODO: ВЫЧИСЛИТЬ P_sys^l(time?) ПО ФОРМУЛЕ 18
-
-                        // TODO: ЕСЛИ P_sys^l(time?) < B TO return false;
-                        if (IsConstraint_CalcSysReliability(time, 0))
+                            // Если ограничение не выполняется, вернуть false
                             return false;
                     }
-                }
-            }
+            
+            // Все ограничения выпоняются, вернуть true
             return true;
         }
 
