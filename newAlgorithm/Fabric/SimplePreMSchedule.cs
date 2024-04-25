@@ -13,64 +13,6 @@ namespace magisterDiplom.Fabric
     public class SimplePreMSchedule : PreMSchedule
     {
 
-        List<List<int>> T_P;
-        List<List<int>> T_PM;
-
-        private void BUILD_T_PM()
-        {
-            T_PM.Clear();
-            T_PM = new List<List<int>>();
-
-            for (int device = 0; device < config.deviceCount; device++)
-            {
-                T_PM.Add(new List<int>());
-                for (int batch = 0; batch < schedule.Count; batch++)
-                {
-
-                    // Добавляем н
-                    T_PM[device].Add(
-                        (
-                            this.startProcessing[device][batch].Last() +
-                            this.config.proccessingTime[device, schedule[batch].Type] +
-                            this.config.preMaintenanceTimes[device]
-                        ) * this.matrixY[device][batch]
-                    );
-                }
-            }
-        }
-
-        /// <summary>
-        /// Вычисляет значения матрицы моментов времени окончания ПТО приборов
-        /// </summary>
-        private void BUILD_T_P()
-        {
-            T_P.Clear();
-            T_P = new List<List<int>>();
-
-            int device;
-            int batch;
-
-            for (device = 0; device < config.deviceCount; device++)
-            {
-                T_P.Add(new List<int>());
-                for (batch = 0; batch < this.schedule.Count; batch++)
-                
-                    if (this.matrixY[device][batch] != 0)
-                        T_P[device].Add(
-
-                            // Момент начала времени выполнения последнего задания в ПЗ
-                            this.startProcessing[device][batch].Last() +
-
-                            // Время выполнения последнего задания в ПЗ на текущей позиции
-                            config.proccessingTime[device, schedule[batch].Type] +
-
-                            // Время выполнения ПТО для текущего прибора
-                            config.preMaintenanceTimes[device]
-                         );
-            }
-        }
-
-
         /// <summary>
         /// Вернёт индекс ПЗ за которым следует последнее ПТО
         /// </summary>
@@ -215,20 +157,41 @@ namespace magisterDiplom.Fabric
         /// Данная функция выполняет локальную оптимизацию составов ПЗ
         /// </summary>
         /// <param name="swapCount">Количество перестановок</param>
-        private void SearchByPosition(int swapCount = 999999)
+        /// <param name="beta">Нижний порог надёжности</param>
+        /// <returns>true, если была найдено перестановка удовлетворяющая условию надёжности. Иначе false</returns>
+        private bool SearchByPosition(double beta, int swapCount = 999999)
         {
 
+            // Флаг перестановки выполняющей условию надёжности
+            bool isFind = false;
+
             // Объявляем лучшее расписание
-            List<Model.Batch> bestSchedule = new List<Model.Batch>(schedule);
+            List<Model.Batch> bestSchedule = new List<Model.Batch>(this.schedule);
+            
+            // Объявляем значение наилучшего критерия f1
+            int bestTime = 2000000000;
+
+            // Объявляем значение текущего критерия f1
+            int newTime;
 
             // Вычисляем матрицу моментов времени начала выполнения заданий
             this.CalcStartProcessing();
 
-            // Получаем f1 критерий - момента времени окончания последнего задания
-            int bestTime = this.GetMakespan();
+            // Вычисляем матрицу моментов окончания ПТО приборов
+            this.CalcMatrixTPM();
 
-            // Объявляем новый f1 критерий - момента времени окончания последнего задания
-            int newTime = 0;
+            // Проверяем допустимость текущего решения
+            if (IsSolutionAcceptable(beta)) {
+
+                // Устанавливаем флаг перестановки выполняющей условию надёжности
+                isFind = true;
+
+                // Получаем f1 критерий - момента времени окончания последнего задания
+                bestTime = this.GetMakespan();
+
+                // Устанавливаем лучшее расписание
+                bestSchedule = new List<Model.Batch>(this.schedule);
+            }
 
             // Выполняем заявленное количество перестановок, заявленно количество раз
             for (int batchIndex = schedule.Count - 1; batchIndex >= 1 && swapCount > 0; batchIndex--, swapCount--)
@@ -242,27 +205,38 @@ namespace magisterDiplom.Fabric
                 // Вычисляем матрицу моментов времени начала выполнения заданий
                 this.CalcStartProcessing();
 
-                // Высчитываем новый критерий makespan
-                newTime = this.GetMakespan();
+                // Вычисляем матрицу моментов окончания времени ПТО приборов
+                this.CalcMatrixTPM();
 
-                // Выполним проверку условии 18
-                // PreM.GetReliability(config, schedule, PreM.BuildMatrixTPreM(config, schedule, ))
-
-                // Если новое время лучше, то выполняем переопределение
-                if (newTime < bestTime)
+                // Проверяем допустимость текущего решения
+                if (IsSolutionAcceptable(beta))
                 {
 
-                    // TODO: Избавиться от копирования списка в пользу использования индекса наилучшей позиции
-                    // Переопределяем лучшее расписание
-                    bestSchedule = new List<magisterDiplom.Model.Batch>(schedule);
+                    // Устанавливаем флаг перестановки выполняющей условию надёжности
+                    isFind = true;
 
-                    // Переопределяем лучшее время для лучшего расписания
-                    bestTime = newTime;
+                    // Высчитываем новый критерий makespan
+                    newTime = this.GetMakespan();
+
+                    // Если новое время лучше, то выполняем переопределение
+                    if (newTime < bestTime)
+                    {
+
+                        // TODO: Избавиться от копирования списка в пользу использования индекса наилучшей позиции
+                        // Переопределяем лучшее расписание
+                        bestSchedule = new List<magisterDiplom.Model.Batch>(schedule);
+
+                        // Переопределяем лучшее время для лучшего расписания
+                        bestTime = newTime;
+                    }
                 }
             }
 
             // Выполняем переопределение наилучшего раысписания составов ПЗ
             this.schedule = bestSchedule;
+
+            // Возвращяем результат
+            return isFind;
         }
 
         /// <summary>
@@ -314,13 +288,21 @@ namespace magisterDiplom.Fabric
         /// Выполняет построение расписания
         /// </summary>
         /// <param name="matrixA">Матрица составов пакетов заданий</param>
-        public void Build(List<List<int>> matrixA)
+        public void Build(List<List<int>> matrixA, double beta = 0.0)
         {
             this.schedule.Clear();
             this.matrixY.Clear();
 
             // Объявляем тип данных
             int dataType;
+
+            // Объявляем максимальное количество пакетов
+            int maxBatchCount = 0;
+
+            // Инициализируем максимальное количество пакетов
+            for (dataType = 0; dataType < config.dataTypesCount; dataType++)
+                maxBatchCount = Math.Max(maxBatchCount, matrixA[dataType].Count);
+
 
             // П.1 Инициализируем множества I и I_
             List<int> I = new List<int>(capacity: this.config.dataTypesCount);
@@ -341,7 +323,7 @@ namespace magisterDiplom.Fabric
                         _dataType = dataType;
                     }
 
-            
+
             // П.2 Объявляем ПЗ
             int batch = 0;
 
@@ -350,18 +332,18 @@ namespace magisterDiplom.Fabric
 
             // П.3 Инициализируем матрицу Y
             this.matrixY = new List<List<int>>(capacity: this.config.deviceCount);
-            for (int device = 0; device < this.config.deviceCount; device++)
+            for (int device = 0; device < this.config.deviceCount; device++) {
+                this.matrixY[device] = new List<int>(capacity: maxBatchCount);
                 this.matrixY[device].Add(1);
+            }
 
             // П.3 Инициализируем критерий f2
             double f2_opt_criteria = 0;
 
-            // Объявляем максимальное количество пакетов
-            int maxBatchCount = 0;
-
-            // Инициализируем максимальное количество пакетов
+            // Сортируем матрицу A
             for (dataType = 0; dataType < config.dataTypesCount; dataType++)
-                maxBatchCount = Math.Max(maxBatchCount, matrixA[dataType].Count);
+                matrixA[dataType].Sort();
+
 
             // Выполняем обработку
             while (batch < maxBatchCount)
@@ -379,14 +361,31 @@ namespace magisterDiplom.Fabric
 
                     // Добавляем ПЗ в расписание 
                     schedule.Add(new magisterDiplom.Model.Batch(dataType, matrixA[dataType][batch]));
+                    for (int device = 0; device < config.deviceCount; device++)
+                        this.matrixY[device].Add(0);
 
-                    // Выполняем локальную оптимизацию составов ПЗ
-                    // schedule = Optimization(config, schedule);
+                    // Если не было найдено расписания удовлетворяющему условию надёжности
+                    if (!this.SearchByPosition(beta))
+                    
+                        // TODO: Вернуть что?
+                        return;
+
+                    // Выполняем оптимизацию для позиций ПТО приборов
+                    this.ShiftMatrixY(beta);
+
+                    // Проверяем условие надёжности
+                    if (!this.IsSolutionAcceptable(beta))
+
+                        // TODO: Вернуть что?
+                        return;
                 }
 
                 // Увеличиваем индекс пакета
                 batch++;
             }
+
+            // TODO: Вернуть что?
+            return;
         }
 
         /// <summary>
