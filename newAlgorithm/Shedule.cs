@@ -722,7 +722,7 @@ namespace newAlgorithm
         /// множество ПЗ для последующих перестановок.</param>
         /// <param name="swapCount">Количество перестановок.</param>
         /// <returns>Наилучший порядок ПЗ</returns>
-        private static List<magisterDiplom.Model.Batch> Optimization(
+        public static List<magisterDiplom.Model.Batch> Optimization(
             Config config,
             List<magisterDiplom.Model.Batch> schedule,
             List<List<int>> matrixY,
@@ -865,7 +865,7 @@ namespace newAlgorithm
                     }
 
                     // Выполняем локальную оптимизацию составов ПЗ
-                    schedule = Optimization(config, schedule);
+                    schedule = CorrectSchedule.Optimization(config, schedule, null);
 
                     // Выводим отладачную информацию
                     if (Config.isDebug && CorrectSchedule.isDebugBuild)

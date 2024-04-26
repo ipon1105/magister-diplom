@@ -298,7 +298,7 @@ namespace magisterDiplom.Fabric
 
             // Объявляем максимальное количество пакетов
             int maxBatchCount = 0;
-
+            
             // Объявляем ПЗ
             int batch = 0;
             calcMaxBatchCount();
@@ -325,11 +325,11 @@ namespace magisterDiplom.Fabric
             }
 
             while (m.Any())
-                    {
+            {
                 int myDataType = m.Aggregate((l, r) => l.Value > r.Value ? l : r).Key;
                 dataTypes.Add(myDataType);
                 m.Remove(myDataType);
-                    }
+            }
 
             // Сортируем матрицу A
             for (dataType = 0; dataType < this.config.dataTypesCount; dataType++)
