@@ -181,7 +181,7 @@ namespace magisterDiplom.Fabric
             this.CalcMatrixTPM();
 
             // Проверяем допустимость текущего решения
-            if (IsSolutionAcceptable(beta)) {
+            if (this.IsSolutionAcceptable(beta)) {
 
                 // Устанавливаем флаг перестановки выполняющей условию надёжности
                 isFind = true;
@@ -190,17 +190,17 @@ namespace magisterDiplom.Fabric
                 bestTime = this.GetMakespan();
 
                 // Устанавливаем лучшее расписание
-                bestSchedule = new List<Model.Batch>(this.schedule);
+                bestSchedule = new List<Batch>(this.schedule);
             }
 
             // Выполняем заявленное количество перестановок, заявленно количество раз
-            for (int batchIndex = schedule.Count - 1; batchIndex >= 1 && swapCount > 0; batchIndex--, swapCount--)
+            for (int batchIndex = schedule.Count - 1; batchIndex > 0 && swapCount > 0; batchIndex--, swapCount--)
             {
 
                 // Выполняем перестановку
-                Model.Batch batch = schedule[batchIndex];
-                schedule[batchIndex] = schedule[batchIndex - 1];
-                schedule[batchIndex - 1] = batch;
+                Batch batch = this.schedule[batchIndex];
+                this.schedule[batchIndex] = this.schedule[batchIndex - 1];
+                this.schedule[batchIndex - 1] = batch;
 
                 // Вычисляем матрицу моментов времени начала выполнения заданий
                 this.CalcStartProcessing();
@@ -209,7 +209,7 @@ namespace magisterDiplom.Fabric
                 this.CalcMatrixTPM();
 
                 // Проверяем допустимость текущего решения
-                if (IsSolutionAcceptable(beta))
+                if (this.IsSolutionAcceptable(beta))
                 {
 
                     // Устанавливаем флаг перестановки выполняющей условию надёжности
@@ -224,7 +224,7 @@ namespace magisterDiplom.Fabric
 
                         // TODO: Избавиться от копирования списка в пользу использования индекса наилучшей позиции
                         // Переопределяем лучшее расписание
-                        bestSchedule = new List<magisterDiplom.Model.Batch>(schedule);
+                        bestSchedule = new List<Batch>(schedule);
 
                         // Переопределяем лучшее время для лучшего расписания
                         bestTime = newTime;
@@ -288,7 +288,7 @@ namespace magisterDiplom.Fabric
         /// Выполняет построение расписания
         /// </summary>
         /// <param name="matrixA">Матрица составов пакетов заданий</param>
-        public void Build(List<List<int>> matrixA, double beta = 0.0)
+        public double Build(List<List<int>> matrixA, double beta = 0.0)
         {
             this.schedule.Clear();
             this.matrixY.Clear();
@@ -299,58 +299,93 @@ namespace magisterDiplom.Fabric
             // Объявляем максимальное количество пакетов
             int maxBatchCount = 0;
 
-            // Инициализируем максимальное количество пакетов
-            for (dataType = 0; dataType < config.dataTypesCount; dataType++)
-                maxBatchCount = Math.Max(maxBatchCount, matrixA[dataType].Count);
+            // Объявляем ПЗ
+            int batch = 0;
+            calcMaxBatchCount();
 
+            // Вернёт максимальное количество пакетов среди всех типов данных
+            void calcMaxBatchCount()
+            {
+                // Выполняем обработку по типам
+                for (dataType = 0; dataType < this.config.dataTypesCount; dataType++)
 
-            // П.1 Инициализируем множества I и I_
-            List<int> I = new List<int>(capacity: this.config.dataTypesCount);
-            List<int> I_ = new List<int>(capacity: this.config.dataTypesCount);
-            for (dataType = 0; dataType < this.config.dataTypesCount; dataType++) {
-                I.Add(dataType); I_.Add(dataType);
+                    // Выполняем поиск максимального количество пакетов
+                    maxBatchCount = Math.Max(maxBatchCount, matrixA[dataType].Count);
             }
 
-            // П.2 Определяем тип заданий
-            int _dataType = -1;
-            double maxValue = -1;
-            double tmpValue = -1;
-            for (dataType = 0; dataType < this.config.dataTypesCount; dataType++)
-                for (int device = 0; device < this.config.deviceCount - 1; device++)
-                    if (maxValue < (tmpValue = (double)(this.config.proccessingTime[device, dataType] / this.config.proccessingTime[device + 1, dataType])))
+            Dictionary<int, double> m = new Dictionary<int, double>(capacity: this.config.dataTypesCount);
+            List<int> dataTypes = new List<int>(capacity: this.config.dataTypesCount);
+            for (dataType = 0; dataType < this.config.dataTypesCount; dataType++) {
+                double sum = 0;
+                for (int device = 1; device < this.config.deviceCount; device++)
+                    sum += 
+                        (double) this.config.proccessingTime[device, dataType] /
+                        (double) this.config.proccessingTime[device - 1, dataType];
+                m.Add(dataType, sum);
+            }
+
+            while (m.Any())
                     {
-                        maxValue = tmpValue;
-                        _dataType = dataType;
+                int myDataType = m.Aggregate((l, r) => l.Value > r.Value ? l : r).Key;
+                dataTypes.Add(myDataType);
+                m.Remove(myDataType);
                     }
 
+            // Сортируем матрицу A
+            for (dataType = 0; dataType < this.config.dataTypesCount; dataType++)
+                matrixA[dataType].Sort();
 
-            // П.2 Объявляем ПЗ
-            int batch = 0;
+            batch = 0;
+            dataType = 0;
 
             // П.2 Добавляем 
-            this.schedule.Add(new Model.Batch(_dataType, matrixA[_dataType][batch]));
+            this.schedule.Add(new Batch(dataTypes[dataType], matrixA[dataTypes[dataType]][batch]));
+            dataType++;
 
             // П.3 Инициализируем матрицу Y
             this.matrixY = new List<List<int>>(capacity: this.config.deviceCount);
-            for (int device = 0; device < this.config.deviceCount; device++) {
+            for (int device = 0; device < this.config.deviceCount; device++)
+            {
                 this.matrixY[device] = new List<int>(capacity: maxBatchCount);
                 this.matrixY[device].Add(1);
             }
 
-            // П.3 Инициализируем критерий f2
-            double f2_opt_criteria = 0;
+            // Для каждого типа данных выполняем обрабоку
+            for (; dataType < this.config.dataTypesCount; dataType++)
+            {
 
-            // Сортируем матрицу A
-            for (dataType = 0; dataType < config.dataTypesCount; dataType++)
-                matrixA[dataType].Sort();
+                // Добавляем ПЗ в расписание 
+                this.schedule.Add(new Batch(dataTypes[dataType], matrixA[dataTypes[dataType]][batch]));
+                for (int device = 0; device < this.config.deviceCount; device++)
+                    this.matrixY[device].Add(0);
 
+                // Если не было найдено расписания удовлетворяющему условию надёжности
+                if (!this.SearchByPosition(beta, 5))
+
+                    // Возвращяем 0, как флаг неудачи
+                    return 0.0;
+
+                // Выполняем оптимизацию для позиций ПТО приборов
+                this.ShiftMatrixY(beta);
+
+                // Проверяем условие надёжности
+                // TODO: СПОРНО (НЕВОЗМОЖНОАЯ СИТУАЦИЯ) - ПОДСЧИТАТЬ КОЛИЧЕСТВО ВЫЗОВОВ 
+                if (!this.IsSolutionAcceptable(beta))
+                {
+                    // Возвращяем 0, как флаг неудачи
+                    return 0.0;
+                }
+            }
+
+            // Увеличиваем индекс вставляемого пакета задания
+            batch++;
 
             // Выполняем обработку
             while (batch < maxBatchCount)
             {
 
                 // Выполняем обработку для каждого типа данных
-                for (dataType = 0; dataType < config.dataTypesCount; dataType++)
+                for (dataType = 0; dataType < this.config.dataTypesCount; dataType++)
                 {
 
                     // Если индекс пакета превышает максимальный размер пакетов для типа данных dataType
@@ -360,32 +395,33 @@ namespace magisterDiplom.Fabric
                         continue;
 
                     // Добавляем ПЗ в расписание 
-                    schedule.Add(new magisterDiplom.Model.Batch(dataType, matrixA[dataType][batch]));
-                    for (int device = 0; device < config.deviceCount; device++)
+                    this.schedule.Add(new Batch(dataTypes[dataType], matrixA[dataTypes[dataType]][batch]));
+                    for (int device = 0; device < this.config.deviceCount; device++)
                         this.matrixY[device].Add(0);
 
                     // Если не было найдено расписания удовлетворяющему условию надёжности
-                    if (!this.SearchByPosition(beta))
+                    if (!this.SearchByPosition(beta, 5))
                     
-                        // TODO: Вернуть что?
-                        return;
+                        // Возвращяем 0, как флаг неудачи
+                        return 0.0;
 
-                    // Выполняем оптимизацию для позиций ПТО приборов
+                    // Выполняем оптимизацию для позиций ПТО приборов (ШАГ 15)
                     this.ShiftMatrixY(beta);
 
                     // Проверяем условие надёжности
-                    if (!this.IsSolutionAcceptable(beta))
-
-                        // TODO: Вернуть что?
-                        return;
+                    // TODO: СПОРНО (НЕВОЗМОЖНОАЯ СИТУАЦИЯ) - ПОДСЧИТАТЬ КОЛИЧЕСТВО ВЫЗОВОВ 
+                    if (!this.IsSolutionAcceptable(beta)) { 
+                        // Возвращяем 0, как флаг неудачи
+                        return 0.0;
+                    }
                 }
 
                 // Увеличиваем индекс пакета
                 batch++;
             }
 
-            // TODO: Вернуть что?
-            return;
+            
+            return this.GetPreMUtility();
         }
 
         /// <summary>
