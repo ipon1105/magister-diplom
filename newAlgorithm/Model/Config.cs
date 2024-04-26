@@ -252,5 +252,67 @@ namespace magisterDiplom.Model
             // Возвращяем результат
             return res;
         }
+
+        /// <summary>
+        /// Вернёт объект данной структуры для отладки.
+        /// dataTypesCount = 3
+        /// deviceCount = 2
+        /// buffer = 5
+        /// proccessingTime =
+        ///     [2, 2, 1]
+        ///     [1, 3, 3]
+        /// changeoverTime =
+        ///     1:
+        ///         [1, 1, 1]
+        ///         [1, 1, 1]
+        ///         [1, 1, 1]
+        ///     2:
+        ///         [2, 2, 2]
+        ///         [2, 2, 2]
+        ///         [2, 2, 2]
+        /// preMaintenanceTimes = [2, 3]
+        /// failureRates = [7, 5]
+        /// restoringDevice = [11, 12]
+        /// isFixedBatches = false
+        /// </summary>
+        /// <returns>Объект структуры</returns>
+        public static Config GetDebugConfig_1()
+        {
+            return new Config(
+                3,
+                2,
+                5,
+                new Matrix(new List<List<int>>()
+                {
+                    new List<int> { 2, 2, 1 },
+                    new List<int> { 1, 3, 3 },
+                }),
+                new Dictionary<int, Matrix>
+                {
+                    {
+                        0,
+                        new Matrix(new List<List<int>>()
+                        {
+                            new List<int>{1, 1, 1},
+                            new List<int>{1, 1, 1},
+                            new List<int>{1, 1, 1},
+                        })
+                    },
+                    {
+                        1,
+                        new Matrix(new List<List<int>>()
+                        {
+                            new List<int>{2, 2, 2},
+                            new List<int>{2, 2, 2},
+                            new List<int>{2, 2, 2},
+                        })
+                    },
+                },
+                new Vector(new List<int> { 2, 3 }),
+                new Vector(new List<int> { 7, 5 }),
+                new Vector(new List<int> { 11, 12 }),
+                false
+            );
+        }
     }
 }
