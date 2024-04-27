@@ -3,6 +3,7 @@ using magisterDiplom.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Xml.XPath;
 
 namespace magisterDiplom.Fabric
 {
@@ -12,6 +13,54 @@ namespace magisterDiplom.Fabric
     /// </summary>
     public class SimplePreMSchedule : PreMSchedule
     {
+        bool IsDebug_ShiftMatrixY = true;
+        private void PrintMatrixY()
+        {
+            Console.WriteLine("MatrixY:");
+            for (int device = 0; device < this.config.deviceCount; device++) { 
+                for (int dataType = 0; dataType < this.matrixY[device].Count(); dataType++)
+                    Console.Write($"{matrixY[device][dataType]} ");
+                Console.Write(Environment.NewLine);
+            }
+        }
+
+        private void PrintSchedule() {
+
+            Console.WriteLine(Environment.NewLine);
+
+            List<List<int>> mP = GetMatrixP();
+            List<List<int>> mR = GetMatrixR();
+
+            Console.WriteLine("[P,R]:");
+
+            // Для каждой строки
+            for (int dataType = 0; dataType < this.config.dataTypesCount; dataType++) {
+
+                // Выводим разделитель
+                for (int j = 0; j < mP[dataType].Count + mR[dataType].Count; j++)
+                    Console.Write($"+--");
+                Console.WriteLine("+");
+
+                // Для каждого столбца
+                for (int batch = 0; batch < mP[dataType].Count; batch++)
+
+                    // Вывод
+                    Console.Write($"|{mP[dataType][batch],-2}");
+
+                for (int batch = 0; batch < mR[dataType].Count; batch++)
+
+                    // Вывод
+                    Console.Write($"|{mR[dataType][batch],-2}");
+                    
+                Console.WriteLine("|");
+            }
+
+            // Выводим разделитель
+            for (int j = 0; j < mP[0].Count + mR[0].Count; j++)
+                Console.Write($"+--");
+            Console.WriteLine("+");
+
+        }
 
         /// <summary>
         /// Вернёт индекс ПЗ за которым следует последнее ПТО
@@ -41,8 +90,11 @@ namespace magisterDiplom.Fabric
         private void ShiftMatrixY(double beta)
         {
 
-            // Объявляем лучшую матрицу порядка ПТО приборов
-            List<List<int>> bestMatrixY = new List<List<int>>(this.matrixY);
+            if (IsDebug)
+                Console.WriteLine("ShiftMatrixY start: Улучшаем позиции ПТО.");
+
+            // Объявляем индекс прибора
+            int bestDevice = -1;
 
             // Объявляем критерий текущего лучшего расписания
             int f2;
@@ -62,9 +114,15 @@ namespace magisterDiplom.Fabric
                 // Обнуляем критерий f2 для текущего расписания
                 f2 = 0;
 
+                if (IsDebug && IsDebug_ShiftMatrixY) {
+                    Console.WriteLine("Новая итерация сдвига:");
+                    PrintMatrixY();
+                }
+
                 // Для каждого прибора выполняем обработку
                 for (int device = 0; device < config.deviceCount; device++)
                 {
+                    
 
                     // Определяем индекс ПЗ за которым следует последнее ПТО
                     last_prem_batch_index = this.GetLastPreMPos(device); // j*
@@ -72,15 +130,27 @@ namespace magisterDiplom.Fabric
                     // Определяем индекс последнего ПЗ для текущего расписания
                     last_batch_index = this.matrixY[device].Count() - 1; // j^max
 
+                    if (IsDebug && IsDebug_ShiftMatrixY) {
+                        Console.WriteLine($"Выполняем сдвиг для прибора: {device}");
+                        Console.WriteLine($"j*={last_prem_batch_index}; j^max={last_batch_index}");
+                    }
+
                     // Проверяем на необходимость проведения операций перестановки
-                    if (last_prem_batch_index == last_batch_index)
+                    if (last_prem_batch_index == last_batch_index) {
+                        if (IsDebug && IsDebug_ShiftMatrixY)
+                            Console.WriteLine($"Пропускаем сдвиг для прибора: {device}");
 
                         // Пропускаем итерацию для текущего прибора
                         continue;
+                    }
 
                     // Выполняем сдвиг ПТО на следующую позицию
                     this.matrixY[device][last_prem_batch_index] = 0;
                     this.matrixY[device][last_prem_batch_index + 1] = 1;
+
+                    if (IsDebug && IsDebug_ShiftMatrixY) {
+                        PrintMatrixY();
+                    }
 
                     // Вычисляем матрицу моментов начала времени выполнения заданий
                     this.CalcStartProcessing();
@@ -91,7 +161,9 @@ namespace magisterDiplom.Fabric
                     // Если текущее решение не удовлетворяет условию надёжности
                     if (!this.IsSolutionAcceptable(beta))
                     {
-
+                        if (IsDebug && IsDebug_ShiftMatrixY)
+                            Console.WriteLine("РЕШЕНИЕ НЕ ДОПУСТИМО");
+                        
                         // Выполняем обратный сдвиг ПТО
                         this.matrixY[device][last_prem_batch_index] = 1;
                         this.matrixY[device][last_prem_batch_index + 1] = 0;
@@ -99,9 +171,11 @@ namespace magisterDiplom.Fabric
                         // Пропускаем итерацию
                         continue;
                     }
-                    
+
                     // Вычисляем критерий f2 для текущего расписания со сдвигом
                     new_f2 = this.GetPreMUtility();
+                    if (IsDebug && IsDebug_ShiftMatrixY)
+                        Console.WriteLine($"РЕШЕНИЕ ДОПУСТИМО. f2={f2};new_f2={new_f2}");
 
                     // Если текущее расписания лучше предыдущего
                     if (new_f2 > f2)
@@ -110,10 +184,8 @@ namespace magisterDiplom.Fabric
                         // Запоминаем новый лучший критерий f2
                         f2 = new_f2;
 
-                        // TODO: Убрать копирование в пользу оптимизации в виде индекса прибора
-                        // Запоминаем новое лучшее расписание
-                        bestMatrixY.Clear();
-                        bestMatrixY = new List<List<int>>(this.matrixY);
+                        // Переопределяем индекс прибора
+                        bestDevice = device;
                     }
 
                     // Выполняем обратный сдвиг ПТО
@@ -121,23 +193,49 @@ namespace magisterDiplom.Fabric
                     this.matrixY[device][last_prem_batch_index + 1] = 0;
                 }
 
+                if (IsDebug && IsDebug_ShiftMatrixY)
+                    Console.WriteLine($"{Environment.NewLine}f2={f2}");
+
                 // Если улучшений позиций ПТО не было найдено
                 if (f2 == 0)
+                {
+                    if (IsDebug && IsDebug_ShiftMatrixY)
+                        Console.WriteLine("Улучшений не было найдено");
 
                     // Прекращаем обработку
                     break;
+                }
 
-                // Если в ходе обработки были найдены лучшии позиции ПТО
+                if (IsDebug && IsDebug_ShiftMatrixY)
+                    Console.WriteLine("Было найдено улучшение.");
+
+                // Определяем индекс ПЗ за которым следует последнее ПТО
+                last_prem_batch_index = this.GetLastPreMPos(bestDevice); // j*
+
                 // Выполняем их переопределение
-                this.matrixY.Clear();
-                this.matrixY = new List<List<int>>(bestMatrixY);
+                this.matrixY[bestDevice][last_prem_batch_index] = 0;
+                this.matrixY[bestDevice][last_prem_batch_index + 1] = 1;
+
+                if (IsDebug && IsDebug_ShiftMatrixY) {
+                    Console.WriteLine("Новое решение:");
+                    PrintMatrixY();
+                }
 
                 // Продолжаем улучшения
             } while (true);
-            
+
+            if (IsDebug && IsDebug_ShiftMatrixY)
+            {
+                Console.WriteLine("Было найдено решение с помощью сдвигов.");
+                Console.WriteLine("Выполняется заполнение позиций ПТО не найденных с помощью сдвигов.");
+            }
+
             // Для каждого прибора выполняем дополнение для матрицы ПТО 1
             for (int device = 0; device < this.config.deviceCount; device++)
             {
+                if (IsDebug && IsDebug_ShiftMatrixY) {
+                    Console.Write($"Для прибора: {device};");
+                }
 
                 // Определяем индекс ПЗ за которым следует последнее ПТО
                 last_prem_batch_index = this.GetLastPreMPos(device); // j*
@@ -146,11 +244,20 @@ namespace magisterDiplom.Fabric
                 last_batch_index = this.matrixY[device].Count() - 1; // j^max
 
                 // Если матрица Y не оканчивается 1
-                if (last_prem_batch_index < last_batch_index)
+                if (last_prem_batch_index < last_batch_index) {
+
+                    if (IsDebug && IsDebug_ShiftMatrixY)
+                        Console.WriteLine($"ПТО добавляется.");
 
                     // Изменяем индекс последнего ПТО нп 1
                     this.matrixY[device][last_batch_index] = 1;
+                }
+                else if (IsDebug && IsDebug_ShiftMatrixY)
+                    Console.WriteLine($"ПТО не добавляется.");
             }
+
+            if (IsDebug && IsDebug_ShiftMatrixY)
+                Console.WriteLine("ShiftMatrixY stop.");
         }
 
         /// <summary>
@@ -280,8 +387,18 @@ namespace magisterDiplom.Fabric
         /// <summary>
         /// Конструктор выполняющий создание экземпляра данного класса 
         /// </summary>
-        SimplePreMSchedule(Config config) {
+        public SimplePreMSchedule(Config config) {
             this.config = config;
+
+            // Если флаг оталдки установлен
+            if (IsDebug) {
+
+                // Выводим информацию о переданной конфигурационной структуре
+                Console.WriteLine(config.ToString());
+            }
+
+            startProcessing = new Dictionary<int, List<List<int>>>();
+            matrixTPM = new List<List<PreMSet>>();
         }
 
         /// <summary>
@@ -290,8 +407,18 @@ namespace magisterDiplom.Fabric
         /// <param name="matrixA">Матрица составов пакетов заданий</param>
         public double Build(List<List<int>> matrixA, double beta = 0.0)
         {
-            this.schedule.Clear();
-            this.matrixY.Clear();
+
+            // Если флаг оталдки установлен
+            if (IsDebug)
+            {
+                Console.WriteLine("matrixA:");
+                for (int _dataType = 0; _dataType < matrixA.Count(); _dataType++) {
+                    Console.Write($"\t{_dataType}: ");
+                    for (int _batchIndex = 0; _batchIndex < matrixA[_dataType].Count(); _batchIndex++)
+                        Console.Write($"{matrixA[_dataType][_batchIndex]} ");
+                    Console.Write(Environment.NewLine);
+                }
+            }
 
             // Объявляем тип данных
             int dataType;
@@ -301,7 +428,15 @@ namespace magisterDiplom.Fabric
             
             // Объявляем ПЗ
             int batch = 0;
+
+            // Вычисляем максимальное количество пакетов среди всех типов данных
             calcMaxBatchCount();
+
+            // Если флаг оталдки установлен
+            if (IsDebug)
+
+                // Выводим максимальное количество пакетов среди всех типов данных
+                Console.WriteLine($"maxBatchCount: {maxBatchCount}");
 
             // Вернёт максимальное количество пакетов среди всех типов данных
             void calcMaxBatchCount()
@@ -324,40 +459,95 @@ namespace magisterDiplom.Fabric
                 m.Add(dataType, sum);
             }
 
+            // Если флаг оталдки установлен
+            if (IsDebug)
+
+                // Выводим информацию
+                Console.WriteLine("dataTypes:");
+
             while (m.Any())
             {
                 int myDataType = m.Aggregate((l, r) => l.Value > r.Value ? l : r).Key;
+
+                // Если флаг оталдки установлен
+                if (IsDebug)
+
+                    // Выводим информацию
+                    Console.WriteLine($"\t{myDataType}: {m[myDataType]}");
+
                 dataTypes.Add(myDataType);
                 m.Remove(myDataType);
+            }
+
+
+            // Если флаг оталдки установлен
+            if (IsDebug) {
+
+                // Выводим информацию
+                Console.WriteLine("dataTypes:");
+
+                // Для каждого типа
+                for (int _dataType = 0; _dataType < this.config.dataTypesCount; _dataType++)
+
+                    // Выводим информацию
+                    Console.WriteLine($"\t{_dataType}: {dataTypes[_dataType]}");
             }
 
             // Сортируем матрицу A
             for (dataType = 0; dataType < this.config.dataTypesCount; dataType++)
                 matrixA[dataType].Sort();
 
+            // Если флаг оталдки установлен
+            if (IsDebug)
+            {
+                Console.WriteLine("matrixA':");
+                for (int _dataType = 0; _dataType < matrixA.Count(); _dataType++)
+                {
+                    Console.Write($"\t{_dataType}: ");
+                    for (int _batchIndex = 0; _batchIndex < matrixA[_dataType].Count(); _batchIndex++)
+                        Console.Write($"{matrixA[_dataType][_batchIndex]} ");
+                    Console.Write(Environment.NewLine);
+                }
+            }
+
             batch = 0;
             dataType = 0;
 
             // П.2 Добавляем 
-            this.schedule.Add(new Batch(dataTypes[dataType], matrixA[dataTypes[dataType]][batch]));
+            this.schedule = new List<Batch>();
+            this.schedule.Add(new Batch(
+                dataTypes[dataType],
+                matrixA[dataTypes[dataType]][batch]
+            ));
             dataType++;
+
+            if (IsDebug)
+                PrintSchedule();
 
             // П.3 Инициализируем матрицу Y
             this.matrixY = new List<List<int>>(capacity: this.config.deviceCount);
-            for (int device = 0; device < this.config.deviceCount; device++)
-            {
-                this.matrixY[device] = new List<int>(capacity: maxBatchCount);
+            for (int device = 0; device < this.config.deviceCount; device++) {
+                this.matrixY.Add(new List<int>());
                 this.matrixY[device].Add(1);
             }
+            if (IsDebug)
+            {
+                PrintMatrixY();
+            }
 
+            Console.WriteLine("HERE1");
             // Для каждого типа данных выполняем обрабоку
             for (; dataType < this.config.dataTypesCount; dataType++)
             {
-
+                
                 // Добавляем ПЗ в расписание 
                 this.schedule.Add(new Batch(dataTypes[dataType], matrixA[dataTypes[dataType]][batch]));
                 for (int device = 0; device < this.config.deviceCount; device++)
                     this.matrixY[device].Add(0);
+
+                if (IsDebug) {
+                    Console.WriteLine("Enter:");
+                }
 
                 // Если не было найдено расписания удовлетворяющему условию надёжности
                 if (!this.SearchByPosition(beta, 5))
@@ -367,7 +557,8 @@ namespace magisterDiplom.Fabric
 
                 // Выполняем оптимизацию для позиций ПТО приборов
                 this.ShiftMatrixY(beta);
-
+                
+                return 0.0;
                 // Проверяем условие надёжности
                 // TODO: СПОРНО (НЕВОЗМОЖНОАЯ СИТУАЦИЯ) - ПОДСЧИТАТЬ КОЛИЧЕСТВО ВЫЗОВОВ 
                 if (!this.IsSolutionAcceptable(beta))
@@ -376,7 +567,7 @@ namespace magisterDiplom.Fabric
                     return 0.0;
                 }
             }
-
+            Console.WriteLine("HERE2");
             // Увеличиваем индекс вставляемого пакета задания
             batch++;
 
@@ -429,6 +620,7 @@ namespace magisterDiplom.Fabric
         /// </summary>
         public void CalcMatrixTPM()
         {
+            matrixTPM.Clear();
 
             // Для каждого прибора выполням обработку
             for (int device = 0; device < config.deviceCount; device++)
@@ -1220,19 +1412,16 @@ namespace magisterDiplom.Fabric
             List<List<int>> res = new List<List<int>>(config.dataTypesCount);
 
             // Инициализируем матрицу
-            for (int dataType = 0; dataType < config.dataTypesCount; dataType++)
+            for (int dataType = 0; dataType < this.config.dataTypesCount; dataType++)
 
                 // Инициализируем строку матрицы нулями
-                res.Add(ListUtils.InitVectorInt(schedule.Count));
+                res.Add(ListUtils.InitVectorInt(this.schedule.Count));
 
-            // Заполняем результирующую матрицу
-            for (int dataType = 0; dataType < config.dataTypesCount; dataType++)
+            // Для каждого элемента матрицы schedule
+            for (int batchIndex = 0; batchIndex < this.schedule.Count; batchIndex++)
 
-                // Для каждого элемента матрицы schedule
-                for (int batchIndex = 0; batchIndex < schedule.Count; batchIndex++)
-
-                    // Заполняем элементы матрицы количества заданий в пакетах
-                    res[dataType][batchIndex] = 1;
+                // Заполняем элементы матрицы количества заданий в пакетах
+                res[this.schedule[batchIndex].Type][batchIndex] = 1;
 
             // Возвращяем результат
             return res;
@@ -1242,7 +1431,7 @@ namespace magisterDiplom.Fabric
         {
             
             // Объявляем матрицу
-            List<List<int>> res = new List<List<int>>(config.dataTypesCount);
+            List<List<int>> res = new List<List<int>>(this.config.dataTypesCount);
 
             // Инициализируем матрицу
             for (int dataType = 0; dataType < config.dataTypesCount; dataType++)
@@ -1250,14 +1439,11 @@ namespace magisterDiplom.Fabric
                 // Инициализируем строку матрицы нулями
                 res.Add(ListUtils.InitVectorInt(schedule.Count));
 
-            // Заполняем результирующую матрицу
-            for (int dataType = 0; dataType < config.dataTypesCount; dataType++)
-            
-                // Для каждого элемента матрицы schedule
-                for (int batchIndex = 0; batchIndex < schedule.Count; batchIndex++)
+            // Для каждого элемента матрицы schedule
+            for (int batchIndex = 0; batchIndex < this.schedule.Count; batchIndex++)
 
-                    // Заполняем элементы матрицы количества заданий в пакетах
-                    res[dataType][batchIndex] = schedule[batchIndex].Size;
+                // Заполняем элементы матрицы количества заданий в пакетах
+                res[this.schedule[batchIndex].Type][batchIndex] = this.schedule[batchIndex].Size;
 
             // Возвращяем результат
             return res;

@@ -11,6 +11,12 @@ namespace magisterDiplom
     {
 
         /// <summary>
+        /// Флаг отладки. Если установлен, то в процессе выполнения
+        /// будет выводиться отладачная информация в стандартный поток вывода
+        /// </summary>
+        protected const bool IsDebug = true;
+
+        /// <summary>
         /// Конфигурационная структура содержащая информацию о конвейерной системе
         /// </summary>
         protected Config config;
