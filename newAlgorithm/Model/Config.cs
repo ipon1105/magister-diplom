@@ -61,17 +61,12 @@ namespace magisterDiplom.Model
         /// <summary>
         /// Данный список определяет интенсивность отказов для приборов соответсвенно: [deviceCount]. Определяется, как количество отказов в единицу времени
         /// </summary>
-        public readonly Vector failureRates;
+        public readonly List<double> failureRates;
 
         /// <summary>
         /// Данный список определяет интенсивность востановление прибора соответсвенно: [deviceCount]
         /// </summary>
-        public readonly Vector restoringDevice;
-
-        /// <summary>
-        /// Конструктор конфигурации конвейерной системы. Содержит в себе всю входную
-        /// информацию небходимую для выполнения локально-оптимальных вычислений
-        /// </summary>
+        public readonly List<double> restoringDevice;
         public Config(
             int dataTypesCount,
             int deviceCount,
@@ -84,7 +79,6 @@ namespace magisterDiplom.Model
             bool isFixedBatches
             )
         {
-
             // Вектор ПТО равен null
             if (preMaintenanceTimes == null)
                 throw new ArgumentNullException("The PreM vector is null.");
@@ -103,6 +97,107 @@ namespace magisterDiplom.Model
 
             // Вектор отказов равен null
             if (restoringDevice.getCount() != deviceCount)
+                throw new ArgumentException("The number of items in the list restoringDevice does not match the deviceCount.");
+
+            // Размер вектора ПТО не совпадает с количеством приборов
+            if (preMaintenanceTimes.getCount() != deviceCount)
+                throw new ArgumentException("The number of items in the list preMaintenanceTimes does not match the deviceCount.");
+
+            // Матрица времени выполнения равна null
+            if (proccessingTime == null)
+                throw new ArgumentNullException("The proccessingTime matrix is null.");
+
+            // Размер матрицы времени выполнения не совпадает с количеством приборов
+            if (proccessingTime.rowCount != deviceCount)
+                throw new ArgumentException("The number of items in the list proccessingTime does not match the deviceCount.");
+
+            // Выполняем проверку исключений для матрицы времени выполнения
+            for (int device = 0; device < proccessingTime.rowCount; device++)
+            {
+
+                // Размер матрицы времени выполнения не совпадает с количеством типов
+                if (proccessingTime.GetVectorSize(device) != dataTypesCount)
+                    throw new ArgumentException("The number of items in the list proccessingTime does not match the dataTypesCount.");
+            }
+
+            // Словарь соответствий времени переналадки равен null
+            if (changeoverTime == null)
+                throw new ArgumentNullException("The changeoverTime matrix is null.");
+
+            // Размер словаря переналадки не совпадает с количеством приборов
+            if (changeoverTime.Count != deviceCount)
+                throw new ArgumentException("The number of items in the Dictionary changeoverTime does not match the deviceCount.");
+
+            // Выполняем проверку для каждого прибора
+            for (int device = 0; device < changeoverTime.Count; device++)
+            {
+
+                // Размер матрицы по словарю переналадки не совпадает с количеством типов
+                if (changeoverTime[device].rowCount != dataTypesCount)
+                    throw new ArgumentException("The number of items in the Dictionary changeoverTime does not match the dataTypesCount.");
+
+                // Размер вектора матрицы по словарю переналадки не совпадает с количеством типов
+                for (int dataType = 0; dataType < changeoverTime[device].rowCount; dataType++)
+                    if (changeoverTime[device].GetVectorSize(dataType) != dataTypesCount)
+                        throw new ArgumentException("The number of items in the Dictionary changeoverTime does not match the dataTypesCount.");
+            }
+            List<double> fr = new List<double>(deviceCount);
+            List<double> rd = new List<double>(deviceCount);
+
+            // Преобразуем данные
+            for (int device = 0; device < deviceCount; device++)
+            {
+                fr.Add(1 / (double)failureRates[device]);
+                rd.Add(1 / (double)restoringDevice[device]);
+            }
+
+            // Выполняем инициализацию
+            this.dataTypesCount = dataTypesCount;
+            this.deviceCount = deviceCount;
+            this.buffer = buffer;
+            this.proccessingTime = proccessingTime;
+            this.changeoverTime = changeoverTime;
+            this.preMaintenanceTimes = preMaintenanceTimes;
+            this.isFixedBatches = isFixedBatches;
+            this.restoringDevice = rd;
+            this.failureRates = fr;
+        }
+
+        /// <summary>
+        /// Конструктор конфигурации конвейерной системы. Содержит в себе всю входную
+        /// информацию небходимую для выполнения локально-оптимальных вычислений
+        /// </summary>
+        public Config(
+            int dataTypesCount,
+            int deviceCount,
+            int buffer,
+            Matrix proccessingTime,
+            Dictionary<int, Matrix> changeoverTime,
+            Vector preMaintenanceTimes,
+            List<double> failureRates,
+            List<double> restoringDevice,
+            bool isFixedBatches
+            )
+        {
+
+            // Вектор ПТО равен null
+            if (preMaintenanceTimes == null)
+                throw new ArgumentNullException("The PreM vector is null.");
+
+            // Вектор отказов равен null
+            if (failureRates == null)
+                throw new ArgumentNullException("The failureRates vector is null.");
+
+            // Вектор отказов равен null
+            if (failureRates.Count() != deviceCount)
+                throw new ArgumentException("The number of items in the list failureRates does not match the deviceCount.");
+
+            // Вектор востановления равен null
+            if (restoringDevice == null)
+                throw new ArgumentNullException("The restoringDevice vector is null.");
+
+            // Вектор отказов равен null
+            if (restoringDevice.Count() != deviceCount)
                 throw new ArgumentException("The number of items in the list restoringDevice does not match the deviceCount.");
 
             // Размер вектора ПТО не совпадает с количеством приборов
@@ -263,8 +358,8 @@ namespace magisterDiplom.Model
         ///     1: [[1, 1, 1], [1, 1, 1], [1, 1, 1]]; 
         ///     2: [[2, 2, 2], [2, 2, 2], [2, 2, 2]];
         /// preMaintenanceTimes = [2, 3];
-        /// failureRates = [7, 5];
-        /// restoringDevice = [11, 12];
+        /// failureRates = [7, 7];
+        /// restoringDevice = [11, 15];
         /// isFixedBatches = false;
         /// </summary>
         /// <returns>Объект структуры</returns>
@@ -301,8 +396,57 @@ namespace magisterDiplom.Model
                     },
                 },
                 new Vector(new List<int> { 2, 3 }),
-                new Vector(new List<int> { 7, 5 }),
-                new Vector(new List<int> { 11, 12 }),
+                new List<double> { 7, 7 },
+                new List<double> { 11, 15 },
+                false
+            );
+        }
+
+        public static Config GetDebugConfig_2()
+        {
+            return new Config(
+                3,
+                3,
+                5,
+                new Matrix(new List<List<int>>()
+                {
+                    new List<int> { 2, 2, 1 },
+                    new List<int> { 1, 3, 2 },
+                    new List<int> { 1, 2, 3 },
+                }),
+                new Dictionary<int, Matrix>
+                {
+                    {
+                        0,
+                        new Matrix(new List<List<int>>()
+                        {
+                            new List<int>{1, 2, 3},
+                            new List<int>{1, 2, 3},
+                            new List<int>{1, 2, 3},
+                        })
+                    },
+                    {
+                        1,
+                        new Matrix(new List<List<int>>()
+                        {
+                            new List<int>{1, 2, 3},
+                            new List<int>{1, 2, 3},
+                            new List<int>{1, 2, 3},
+                        })
+                    },
+                    {
+                        2,
+                        new Matrix(new List<List<int>>()
+                        {
+                            new List<int>{1, 2, 3},
+                            new List<int>{1, 2, 3},
+                            new List<int>{1, 2, 3},
+                        })
+                    },
+                },
+                new Vector(new List<int> { 2, 3, 4 }),
+                new List<double> { 0.3, 0.3, 0.3 },
+                new List<double> { 0.002, 0.003 ,0.001 },
                 false
             );
         }

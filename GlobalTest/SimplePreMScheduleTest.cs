@@ -19,7 +19,7 @@ namespace GlobalTest
         {
 
             // Создаём структуру конфигурации
-            Config config = Config.GetDebugConfig_1();
+            Config config = Config.GetDebugConfig_2();
 
             // Создаём объект класса расписания
             magisterDiplom.Fabric.SimplePreMSchedule schedule = new magisterDiplom.Fabric.SimplePreMSchedule(config);
@@ -27,10 +27,10 @@ namespace GlobalTest
             // Выполняем вызов функции Build
             schedule.Build(matrixA: new List<List<int>>
             {
-                new List<int>{ 8, 4 },
-                new List<int>{ 8, 4 },
-                new List<int>{ 8, 4 },
-            });
+                new List<int>{ 4, 4, 2 },
+                new List<int>{ 4, 4, 2 },
+                new List<int>{ 4, 4, 2 },
+            }, 0.99);
         }
 
     }

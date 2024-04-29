@@ -14,6 +14,9 @@ namespace magisterDiplom.Fabric
     public class SimplePreMSchedule : PreMSchedule
     {
         bool IsDebug_ShiftMatrixY = true;
+        bool IsDebug_SearchByPosition = true;
+        bool IsDebug_IsSolutionAcceptable = true;
+        bool IsDebug_CalcSysReliability = true;
         private void PrintMatrixY()
         {
             Console.WriteLine("MatrixY:");
@@ -87,7 +90,7 @@ namespace magisterDiplom.Fabric
         /// Выполняем сдвиг для матрицы ПТО приборов
         /// </summary>
         /// <param name="beta">Нижний уровень нажёности</param>
-        private void ShiftMatrixY(double beta)
+        private void ShiftMatrixY(double beta) 
         {
 
             if (IsDebug)
@@ -175,7 +178,7 @@ namespace magisterDiplom.Fabric
                     // Вычисляем критерий f2 для текущего расписания со сдвигом
                     new_f2 = this.GetPreMUtility();
                     if (IsDebug && IsDebug_ShiftMatrixY)
-                        Console.WriteLine($"РЕШЕНИЕ ДОПУСТИМО. f2={f2};new_f2={new_f2}");
+                        Console.WriteLine($"РЕШЕНИЕ ДОПУСТИМО. G(f2)={f2};new_f2={new_f2}");
 
                     // Если текущее расписания лучше предыдущего
                     if (new_f2 > f2)
@@ -269,16 +272,22 @@ namespace magisterDiplom.Fabric
         private bool SearchByPosition(double beta, int swapCount = 999999)
         {
 
+            if (IsDebug)
+            {
+                Console.WriteLine("SearchByPosition start: Изменяем позиции пакета заданий");
+                Console.WriteLine($"beta:{beta}; swapCount:{swapCount}");
+            }
+
             // Флаг перестановки выполняющей условию надёжности
             bool isFind = false;
 
             // Объявляем лучшее расписание
             List<Model.Batch> bestSchedule = new List<Model.Batch>(this.schedule);
             
-            // Объявляем значение наилучшего критерия f1
+            // Объявляем значение наилучшего критерия f2
             int bestTime = 2000000000;
 
-            // Объявляем значение текущего критерия f1
+            // Объявляем значение текущего критерия f2
             int newTime;
 
             // Вычисляем матрицу моментов времени начала выполнения заданий
@@ -287,17 +296,32 @@ namespace magisterDiplom.Fabric
             // Вычисляем матрицу моментов окончания ПТО приборов
             this.CalcMatrixTPM();
 
+            if (IsDebug && IsDebug_SearchByPosition)
+            {
+                Console.WriteLine("Начальное расписание:");
+                PrintSchedule();
+            }
+
             // Проверяем допустимость текущего решения
             if (this.IsSolutionAcceptable(beta)) {
 
                 // Устанавливаем флаг перестановки выполняющей условию надёжности
                 isFind = true;
 
-                // Получаем f1 критерий - момента времени окончания последнего задания
-                bestTime = this.GetMakespan();
+                // Получаем f2 критерий - момента времени окончания последнего задания
+                bestTime = this.GetPreMUtility();
 
                 // Устанавливаем лучшее расписание
                 bestSchedule = new List<Batch>(this.schedule);
+
+                if (IsDebug && IsDebug_SearchByPosition)
+                {
+                    Console.WriteLine("Начальное расписание допустимо");
+                    Console.WriteLine($"f2 для текущего расписания:{bestTime}");
+                }
+            } else if (IsDebug && IsDebug_SearchByPosition)
+            {
+                Console.WriteLine("Начальное расписание не допустимо");
             }
 
             // Выполняем заявленное количество перестановок, заявленно количество раз
@@ -308,6 +332,12 @@ namespace magisterDiplom.Fabric
                 Batch batch = this.schedule[batchIndex];
                 this.schedule[batchIndex] = this.schedule[batchIndex - 1];
                 this.schedule[batchIndex - 1] = batch;
+
+                if (IsDebug && IsDebug_SearchByPosition)
+                {
+                    Console.WriteLine($"Выполняем перестановку {batchIndex} и {batchIndex - 1}");
+                    PrintSchedule();
+                }
 
                 // Вычисляем матрицу моментов времени начала выполнения заданий
                 this.CalcStartProcessing();
@@ -323,11 +353,22 @@ namespace magisterDiplom.Fabric
                     isFind = true;
 
                     // Высчитываем новый критерий makespan
-                    newTime = this.GetMakespan();
+                    newTime = this.GetPreMUtility();
+
+                    if (IsDebug && IsDebug_SearchByPosition)
+                    {
+                        Console.WriteLine("Текущее расписание допустимо");
+                        Console.WriteLine($"new_f2 для текущего расписания:{newTime}");
+                    }
 
                     // Если новое время лучше, то выполняем переопределение
-                    if (newTime < bestTime)
+                    if (newTime > bestTime)
                     {
+
+                        if (IsDebug && IsDebug_SearchByPosition)
+                        {
+                            Console.WriteLine($"Текущее расписание лучше предыдущего. ({newTime} > {bestTime}).");
+                        }
 
                         // TODO: Избавиться от копирования списка в пользу использования индекса наилучшей позиции
                         // Переопределяем лучшее расписание
@@ -337,10 +378,20 @@ namespace magisterDiplom.Fabric
                         bestTime = newTime;
                     }
                 }
+                else if (IsDebug && IsDebug_SearchByPosition)
+                {
+                    Console.WriteLine("Текущее расписание не допустимо");
+                }
             }
 
             // Выполняем переопределение наилучшего раысписания составов ПЗ
             this.schedule = bestSchedule;
+
+            if (IsDebug && IsDebug_SearchByPosition && isFind)
+            {
+                Console.WriteLine("Извлекаем лучшее расписание");
+                PrintSchedule();
+            }
 
             // Возвращяем результат
             return isFind;
@@ -354,6 +405,20 @@ namespace magisterDiplom.Fabric
         private bool IsSolutionAcceptable(double beta)
         {
 
+            if (IsDebug)
+            {
+                Console.WriteLine("IsSolutionAcceptable start: Проверяем допустимость решения");
+                Console.WriteLine($"beta:{beta}");
+                // Выводим отладачную информацию
+                if (Config.isDebug && IsDebug_IsSolutionAcceptable)
+                {
+
+                    // Выводим информацию о всей матрице T
+                    for (int _device = 0; _device < this.config.deviceCount; _device++)
+                        Console.WriteLine($"device:{_device}" + Environment.NewLine + ListUtils.MatrixIntToString(this.startProcessing[_device]));
+                }
+            }
+
             // Для каджого прибора выполняем обработку
             for (int device = 0; device < config.deviceCount; device++)
             
@@ -364,6 +429,8 @@ namespace magisterDiplom.Fabric
                     if (this.matrixY[device][batch] != 0)
                     {
 
+                        
+
                         // Вычисляем момент времени окончания ПТО на текущем приборе в текущей позиции
                         int time =
 
@@ -373,11 +440,27 @@ namespace magisterDiplom.Fabric
                             // Время выполнения задания на текущем приборе в текущей позиции 
                             this.config.proccessingTime[device, this.schedule[batch].Type];
 
+                        if (IsDebug && IsDebug_IsSolutionAcceptable)
+                        {
+                            Console.WriteLine($"Вычисляем надёжность для момента времени: {time}");
+                        }
+
                         // Проверяем ограничение надёжности
-                        if (!IsConstraint_CalcSysReliability(time, beta))
+                        if (!IsConstraint_CalcSysReliability(time, beta)) {
+
+                            if (IsDebug && IsDebug_IsSolutionAcceptable)
+                            {
+                                Console.WriteLine($"Ограничение не выполняется");
+                            }
 
                             // Если ограничение не выполняется, вернуть false
                             return false;
+                        }
+
+                        if (IsDebug && IsDebug_IsSolutionAcceptable)
+                        {
+                            Console.WriteLine($"Ограничение выполняется");
+                        }
                     }
             
             // Все ограничения выпоняются, вернуть true
@@ -405,7 +488,7 @@ namespace magisterDiplom.Fabric
         /// Выполняет построение расписания
         /// </summary>
         /// <param name="matrixA">Матрица составов пакетов заданий</param>
-        public double Build(List<List<int>> matrixA, double beta = 0.0)
+        public double Build(List<List<int>> matrixA, double beta = 0.9)
         {
 
             // Если флаг оталдки установлен
@@ -558,7 +641,6 @@ namespace magisterDiplom.Fabric
                 // Выполняем оптимизацию для позиций ПТО приборов
                 this.ShiftMatrixY(beta);
                 
-                return 0.0;
                 // Проверяем условие надёжности
                 // TODO: СПОРНО (НЕВОЗМОЖНОАЯ СИТУАЦИЯ) - ПОДСЧИТАТЬ КОЛИЧЕСТВО ВЫЗОВОВ 
                 if (!this.IsSolutionAcceptable(beta))
@@ -1041,13 +1123,21 @@ namespace magisterDiplom.Fabric
         /// <returns>Сумма полезности и интервалов между ПТО</returns>
         public int GetPreMUtility()
         {
-
+            if (IsDebug)
+            {
+                Console.WriteLine("GetPreMUtility");
+            }
             // Объявляем значение критерия на нижнем уровне
             int sum = 0;
 
             // Для каждого прибора выполняем обработку
             for (int device = 0; device < config.deviceCount; device++)
             {
+
+                if (IsDebug)
+                {
+                    Console.WriteLine($"device:{device}; 1: {this.startProcessing[device].Last().Last()}");
+                }
 
                 // Добавляем момент времени окончания всех заданий на приборе
                 sum +=
@@ -1058,17 +1148,29 @@ namespace magisterDiplom.Fabric
                     // Время выполнения последнего заданий в последенем пакете
                     this.config.proccessingTime[device, this.schedule.Last().Type];
 
+                if (IsDebug)
+                {
+                    Console.WriteLine($"device:{device}; 2: {this.GetDowntimeByDevice(device)}");
+                }
+
                 // Вычитаем простои
                 sum -= this.GetDowntimeByDevice(device);
 
-                // Выполняем подсчёт суммы интервалов времени на первом пакете ПТО
-                sum += matrixTPM[device].First().TimePreM;
+                int intervals = 0;
+                intervals += matrixTPM[device].First().TimePreM;
 
                 // Для каждого пакета выполняем обработку
                 for (int batchIndex = 1; batchIndex < matrixTPM[device].Count(); batchIndex++)
 
                     // Добавляем интервалы времени между ПТО разных пакетов
-                    sum += matrixTPM[device][batchIndex].TimePreM - matrixTPM[device][batchIndex - 1].TimePreM;
+                    intervals += matrixTPM[device][batchIndex].TimePreM - matrixTPM[device][batchIndex - 1].TimePreM;
+                if (IsDebug)
+                {
+                    Console.WriteLine($"device:{device}; 3: {intervals}");
+                }
+                // Выполняем подсчёт суммы интервалов времени на первом пакете ПТО
+                sum += intervals;
+
             }
 
             // Возвращяем критерий
@@ -1184,7 +1286,12 @@ namespace magisterDiplom.Fabric
         /// <returns>Доступность для всех приборов</returns>
         public double CalcSysReliability(int time)
         {
-
+            if (IsDebug)
+            {
+                Console.WriteLine("CalcSysReliability start: Проверяем системную допустимость");
+                Console.WriteLine($"time:{time}");
+            }
+            
             // Объявляем надёжность
             double reliability = 1;
 
@@ -1196,6 +1303,16 @@ namespace magisterDiplom.Fabric
 
                 // Вычисляем время активности
                 activity_time = this.GetActivityTimeByDevice(device, time);
+
+                if (IsDebug && IsDebug_CalcSysReliability)
+                {
+                    Console.WriteLine($"Вычисляем время активности для прибора: {device}. time = {activity_time}");
+
+                    if (activity_time == 0)
+                        Console.WriteLine("Прибор как новый, пропускаем умножение");
+                    else
+                        Console.WriteLine($"Надёжность прибора: {device} = {this.CalcReliabilityByDevice(activity_time, device)}");
+                }
 
                 // Если прибор не был активным
                 if (activity_time == 0)
@@ -1266,7 +1383,10 @@ namespace magisterDiplom.Fabric
         /// <returns>true, если ограничение выполняется. Иначе false</returns>
         public bool IsConstraint_CalcSysReliability(int time, double beta)
         {
-            return (this.CalcSysReliability(time) >= beta);
+            double sysTime = this.CalcSysReliability(time);
+            if (IsDebug)
+                Console.WriteLine($"Системная надёжность: {sysTime}");
+            return (sysTime >= beta);
         }
 
         // ВЫРАЖЕНИЕ 19 ИЗБЫТОЧНО
