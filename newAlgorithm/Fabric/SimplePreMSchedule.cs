@@ -16,7 +16,7 @@ namespace magisterDiplom.Fabric
     {
         bool IsDebug_ShiftMatrixY = true;
         bool IsDebug_SearchByPosition = true;
-        bool IsDebug_CalcSysReliability = false;
+        bool IsDebug_CalcSysReliability = true;
         bool IsDebug_GetPreMUtility = false;
         private void PrintMatrixY()
         {
@@ -232,15 +232,15 @@ namespace magisterDiplom.Fabric
                 f2 = 0;
 
                 if (IsDebug && IsDebug_ShiftMatrixY) {
-                    Console.WriteLine("Новая итерация сдвига:");
+                    Console.WriteLine("Новая итерация сдвигов");
                     PrintMatrixY();
+                    Console.WriteLine($"f2 для текущего расписания {this.GetPreMUtility()}");
                 }
 
                 // Для каждого прибора выполняем обработку
                 for (int device = 0; device < config.deviceCount; device++)
                 {
                     
-
                     // Определяем индекс ПЗ за которым следует последнее ПТО
                     last_prem_batch_index = this.GetLastPreMPos(device); // j*
 
@@ -248,8 +248,7 @@ namespace magisterDiplom.Fabric
                     last_batch_index = this.matrixY[device].Count() - 1; // j^max
 
                     if (IsDebug && IsDebug_ShiftMatrixY) {
-                        Console.WriteLine($"Выполняем сдвиг для прибора: {device}");
-                        Console.WriteLine($"j*={last_prem_batch_index}; j^max={last_batch_index}");
+                        Console.WriteLine($"Выполняем сдвиг для прибора {device} j*={last_prem_batch_index}; j^max={last_batch_index}");
                     }
 
                     // Проверяем на необходимость проведения операций перестановки
@@ -374,7 +373,11 @@ namespace magisterDiplom.Fabric
             }
 
             if (IsDebug && IsDebug_ShiftMatrixY)
+            {
+                PrintMatrixY();
+                PrintStartProcessing();
                 Console.WriteLine("ShiftMatrixY stop.");
+            }
         }
 
         /// <summary>
@@ -541,6 +544,8 @@ namespace magisterDiplom.Fabric
 
                             // Время выполнения задания на текущем приборе в текущей позиции 
                             this.config.proccessingTime[device, this.schedule[batch].Type];
+
+                        CalcMatrixTPM();
 
                         // Проверяем ограничение надёжности
                         if (!IsConstraint_CalcSysReliability(time, beta)) {
@@ -713,7 +718,6 @@ namespace magisterDiplom.Fabric
                 PrintMatrixY();
             }
 
-            Console.WriteLine("HERE1");
             // Для каждого типа данных выполняем обрабоку
             for (; dataType < this.config.dataTypesCount; dataType++)
             {
@@ -725,7 +729,6 @@ namespace magisterDiplom.Fabric
 
                 if (IsDebug) {
                     PrintStartProcessing();
-                    Console.WriteLine("Enter:");
                 }
 
                 // Если не было найдено расписания удовлетворяющему условию надёжности
@@ -741,11 +744,12 @@ namespace magisterDiplom.Fabric
                 // TODO: СПОРНО (НЕВОЗМОЖНОАЯ СИТУАЦИЯ) - ПОДСЧИТАТЬ КОЛИЧЕСТВО ВЫЗОВОВ 
                 if (!this.IsSolutionAcceptable(beta))
                 {
+                    Console.WriteLine("Тот самый случай");
                     // Возвращяем 0, как флаг неудачи
                     return 0.0;
                 }
             }
-            Console.WriteLine("HERE2");
+
             // Увеличиваем индекс вставляемого пакета задания
             batch++;
 
@@ -779,7 +783,9 @@ namespace magisterDiplom.Fabric
 
                     // Проверяем условие надёжности
                     // TODO: СПОРНО (НЕВОЗМОЖНОАЯ СИТУАЦИЯ) - ПОДСЧИТАТЬ КОЛИЧЕСТВО ВЫЗОВОВ 
-                    if (!this.IsSolutionAcceptable(beta)) { 
+                    if (!this.IsSolutionAcceptable(beta))
+                    {
+                        Console.WriteLine("Тот самый случай");
                         // Возвращяем 0, как флаг неудачи
                         return 0.0;
                     }
@@ -1263,7 +1269,7 @@ namespace magisterDiplom.Fabric
                     intervals += matrixTPM[device][batchIndex].TimePreM - matrixTPM[device][batchIndex - 1].TimePreM;
 
                 // Выводим отладочную информацию
-                if (IsDebug)
+                if (IsDebug && IsDebug_GetPreMUtility)
                     Console.WriteLine($"\tИнтервалы времени между ПТО { intervals }");
                 
                 // Выполняем подсчёт суммы интервалов времени на первом пакете ПТО
@@ -1319,7 +1325,7 @@ namespace magisterDiplom.Fabric
         /// <returns>Время активности</returns>
         private int GetActivityTimeByDevice(int device, int time)
         {
-
+            
             // Определяем начальный индекс
             int batchIndex = GetBatchIndex(device, time) + 1;
 
@@ -1551,24 +1557,26 @@ namespace magisterDiplom.Fabric
         /// <returns>Индекс ПЗ после которого будет выполняться последнее ПТО</returns>
         private int GetBatchIndex(int device, int time)
         {
-
             // Если список пустой
             if (matrixTPM[device].Count == 0)
 
                 // Вернём индекс начальный индекс ПЗ
                 return -1;
-
+            
+            Console.WriteLine($"\t{matrixTPM[device][0].TimePreM - this.config.preMaintenanceTimes[device]}:{matrixTPM[device][0].TimePreM}");
+            
             // Если в списке первый элемент не удовлетворяет условию
-            if (matrixTPM[device][0].TimePreM > time)
+            // TODO: Баг, определяет пакет по окончанию ПТО, когда необходимо по началу ПТО.
+            if (matrixTPM[device][0].TimePreM - this.config.preMaintenanceTimes[device] > time)
 
                 // Вернём индекс начальный индекс ПЗ
                 return -1;
 
             // Если в списке первый элемент не удовлетворяет условию
-            if (matrixTPM[device][0].TimePreM == time)
+            if (matrixTPM[device][0].TimePreM - this.config.preMaintenanceTimes[device] == time)
 
                 // Вернём индекс начальный индекс ПЗ
-                return matrixTPM[device][0].BatchIndex;
+                return -1;
 
             // Объявляем индекс
             int index = 1;
@@ -1578,16 +1586,16 @@ namespace magisterDiplom.Fabric
             {
 
                 // Если момент окончания ПТО в позиции index не удовлетворяет условиям
-                if (matrixTPM[device][index].TimePreM > time)
+                if (matrixTPM[device][index].TimePreM - this.config.preMaintenanceTimes[device] > time)
 
                     // Возвращяем индекс ПЗ после которого выполнится последнее ПТО
                     return matrixTPM[device][index - 1].BatchIndex;
 
                 // Если момент окончания ПТО в позиции index не удовлетворяет условиям
-                if (matrixTPM[device][index].TimePreM == time)
+                if (matrixTPM[device][index].TimePreM - this.config.preMaintenanceTimes[device] == time)
 
                     // Возвращяем индекс ПЗ после которого выполнится последнее ПТО
-                    return matrixTPM[device][index].BatchIndex;
+                    return matrixTPM[device][index - 1].BatchIndex;
             }
 
             // Индекс ПЗ после которог выполниться ПТО, последний в списке
