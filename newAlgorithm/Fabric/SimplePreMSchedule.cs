@@ -2,6 +2,7 @@
 using magisterDiplom.Utils;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.Eventing.Reader;
 using System.Linq;
 using System.Xml.XPath;
 
@@ -15,21 +16,29 @@ namespace magisterDiplom.Fabric
     {
         bool IsDebug_ShiftMatrixY = true;
         bool IsDebug_SearchByPosition = true;
-        bool IsDebug_IsSolutionAcceptable = true;
-        bool IsDebug_CalcSysReliability = true;
+        bool IsDebug_CalcSysReliability = false;
+        bool IsDebug_GetPreMUtility = false;
         private void PrintMatrixY()
         {
             Console.WriteLine("MatrixY:");
-            for (int device = 0; device < this.config.deviceCount; device++) { 
+            for (int device = 0; device < this.config.deviceCount; device++) {
+
+                // Выводим разделитель
+                for (int j = 0; j < this.matrixY[device].Count; j++)
+                    Console.Write($"+--");
+                Console.WriteLine("+");
+
                 for (int dataType = 0; dataType < this.matrixY[device].Count(); dataType++)
-                    Console.Write($"{matrixY[device][dataType]} ");
-                Console.Write(Environment.NewLine);
+                    Console.Write($"|{matrixY[device][dataType],-2}");
+                Console.WriteLine("|");
             }
+            // Выводим разделитель
+            for (int j = 0; j < this.matrixY[0].Count; j++)
+                Console.Write($"+--");
+            Console.WriteLine("+");
         }
 
         private void PrintSchedule() {
-
-            Console.WriteLine(Environment.NewLine);
 
             List<List<int>> mP = GetMatrixP();
             List<List<int>> mR = GetMatrixR();
@@ -40,29 +49,134 @@ namespace magisterDiplom.Fabric
             for (int dataType = 0; dataType < this.config.dataTypesCount; dataType++) {
 
                 // Выводим разделитель
-                for (int j = 0; j < mP[dataType].Count + mR[dataType].Count; j++)
+                for (int j = 0; j < mP[dataType].Count; j++)
+                    Console.Write($"+--");
+                Console.Write("+   ");
+
+                // Выводим разделитель
+                for (int j = 0; j < mR[dataType].Count; j++)
                     Console.Write($"+--");
                 Console.WriteLine("+");
 
-                // Для каждого столбца
+                // Выводим элементы матрицы P
                 for (int batch = 0; batch < mP[dataType].Count; batch++)
-
-                    // Вывод
                     Console.Write($"|{mP[dataType][batch],-2}");
+                Console.Write("|   ");
 
+                // Выводим элементы матрицы R
                 for (int batch = 0; batch < mR[dataType].Count; batch++)
-
-                    // Вывод
                     Console.Write($"|{mR[dataType][batch],-2}");
-                    
                 Console.WriteLine("|");
             }
 
             // Выводим разделитель
-            for (int j = 0; j < mP[0].Count + mR[0].Count; j++)
+            for (int j = 0; j < mP[0].Count; j++)
+                Console.Write($"+--");
+            Console.Write("+   ");
+
+            // Выводим разделитель
+            for (int j = 0; j < mR[0].Count; j++)
                 Console.Write($"+--");
             Console.WriteLine("+");
+        }
 
+        private void PrintStartProcessing()
+        {
+            Console.WriteLine("Матрица моментов начала времени выполнения заданий и ПТО.");
+            CalcStartProcessing();
+            if (this.startProcessing.Count == 0)
+                return;
+
+            // Объявляем максимальное время
+            int times = 0;
+
+            // Вычисляем максимальное время
+            for (int device = 0; device < this.config.deviceCount; device++)
+                times = Math.Max(times, this.startProcessing[device].Last().Last() + this.config.proccessingTime[device, this.schedule.Last().Type]);
+
+            int mm = 0;
+            for (int device = 0; device < this.config.deviceCount; device++)
+                mm = Math.Max(mm, this.config.preMaintenanceTimes[device]);
+            times += mm;
+
+            // Выводим разделитель
+            {
+                for (int j = 0; j < times; j++)
+                    Console.Write($"{j,-4}");
+                Console.WriteLine();
+            }
+
+            bool flag = false;
+            int batchIndexFlag = -1;
+
+            // Для каждого прибора
+            for (int device = 0; device < this.config.deviceCount; device++)
+            {
+
+                // Выводим разделитель
+                {
+                    Console.Write("+");
+                    for (int i = 0; i < times; i++)
+                        Console.Write("---+");
+                    Console.WriteLine();
+                }
+
+                // Для каждого временного отделителя
+                for (int time = 0; time < times; time++)
+                {
+
+                    // Для каждого пакета заданий
+                    for (int batchIndex = 0; batchIndex < this.startProcessing[device].Count(); batchIndex++) { 
+
+                        // Для каждого задания
+                        for (int job = 0; job < this.startProcessing[device][batchIndex].Count(); job++)
+
+                            // Если момент начала времени выполнения равен текущему
+                            if (this.startProcessing[device][batchIndex][job] == time)
+                            {
+
+                                // Выводим k заданий
+                                for (int k = 0; k < this.config.proccessingTime[device, this.schedule[batchIndex].Type]; k++)
+                                    Console.Write($"|{this.schedule[batchIndex].Type}:{this.config.proccessingTime[device, this.schedule[batchIndex].Type]}");
+                                
+                                if (this.startProcessing[device][batchIndex][job] == this.startProcessing[device][batchIndex].Last()) {
+                                    batchIndexFlag = batchIndex;
+                                    flag = true;
+                                }
+                                
+                                // Увеличиваем время
+                                time += this.config.proccessingTime[device, this.schedule[batchIndex].Type];
+                            }
+
+
+                        if (batchIndexFlag >= 0 && this.matrixY[device][batchIndexFlag] == 1 && flag)
+                        {
+                            flag = false;
+                            for (int k = 0; k < this.config.preMaintenanceTimes[device]; k++)
+                                Console.Write($"|***");
+                            time += this.config.preMaintenanceTimes[device];
+                        }
+                    }
+                    
+                    // Если время возможно
+                    if (time < times)
+
+                        // Отрисовывем пробел
+                        Console.Write($"|{' ',-3}");
+                }
+
+                // Переводим курсор
+                Console.WriteLine("|");
+            }
+
+            // Выводим разделитель
+            {
+                Console.Write("+");
+                for (int i = 0; i < times; i++)
+                    Console.Write("---+");
+                Console.WriteLine();
+            }
+            Console.WriteLine();
         }
 
         /// <summary>
@@ -272,11 +386,9 @@ namespace magisterDiplom.Fabric
         private bool SearchByPosition(double beta, int swapCount = 999999)
         {
 
+            // Выводим отладачную информацию
             if (IsDebug)
-            {
-                Console.WriteLine("SearchByPosition start: Изменяем позиции пакета заданий");
-                Console.WriteLine($"beta:{beta}; swapCount:{swapCount}");
-            }
+                Console.WriteLine($"SearchByPosition start: Изменяем позиции пакета заданий. beta:{beta}; swapCount:{swapCount}");
 
             // Флаг перестановки выполняющей условию надёжности
             bool isFind = false;
@@ -296,10 +408,11 @@ namespace magisterDiplom.Fabric
             // Вычисляем матрицу моментов окончания ПТО приборов
             this.CalcMatrixTPM();
 
+            // Выводим отладачную информацию
             if (IsDebug && IsDebug_SearchByPosition)
             {
                 Console.WriteLine("Начальное расписание:");
-                PrintSchedule();
+                PrintSchedule(); PrintStartProcessing();
             }
 
             // Проверяем допустимость текущего решения
@@ -387,6 +500,7 @@ namespace magisterDiplom.Fabric
             // Выполняем переопределение наилучшего раысписания составов ПЗ
             this.schedule = bestSchedule;
 
+            // Выводим отладачную информацию
             if (IsDebug && IsDebug_SearchByPosition && isFind)
             {
                 Console.WriteLine("Извлекаем лучшее расписание");
@@ -405,20 +519,10 @@ namespace magisterDiplom.Fabric
         private bool IsSolutionAcceptable(double beta)
         {
 
+            // Выводим отладачную информацию
             if (IsDebug)
-            {
-                Console.WriteLine("IsSolutionAcceptable start: Проверяем допустимость решения");
-                Console.WriteLine($"beta:{beta}");
-                // Выводим отладачную информацию
-                if (Config.isDebug && IsDebug_IsSolutionAcceptable)
-                {
-
-                    // Выводим информацию о всей матрице T
-                    for (int _device = 0; _device < this.config.deviceCount; _device++)
-                        Console.WriteLine($"device:{_device}" + Environment.NewLine + ListUtils.MatrixIntToString(this.startProcessing[_device]));
-                }
-            }
-
+                Console.WriteLine($"IsSolutionAcceptable start: Проверяем допустимость решения. beta:{beta}");
+                
             // Для каджого прибора выполняем обработку
             for (int device = 0; device < config.deviceCount; device++)
             
@@ -429,8 +533,6 @@ namespace magisterDiplom.Fabric
                     if (this.matrixY[device][batch] != 0)
                     {
 
-                        
-
                         // Вычисляем момент времени окончания ПТО на текущем приборе в текущей позиции
                         int time =
 
@@ -440,27 +542,20 @@ namespace magisterDiplom.Fabric
                             // Время выполнения задания на текущем приборе в текущей позиции 
                             this.config.proccessingTime[device, this.schedule[batch].Type];
 
-                        if (IsDebug && IsDebug_IsSolutionAcceptable)
-                        {
-                            Console.WriteLine($"Вычисляем надёжность для момента времени: {time}");
-                        }
-
                         // Проверяем ограничение надёжности
                         if (!IsConstraint_CalcSysReliability(time, beta)) {
 
-                            if (IsDebug && IsDebug_IsSolutionAcceptable)
-                            {
-                                Console.WriteLine($"Ограничение не выполняется");
-                            }
+                            // Выводим отладачную информацию
+                            if (IsDebug && IsDebug_CalcSysReliability)
+                                Console.WriteLine($"Ограничение не выполняется{Environment.NewLine}");
 
                             // Если ограничение не выполняется, вернуть false
                             return false;
                         }
 
-                        if (IsDebug && IsDebug_IsSolutionAcceptable)
-                        {
-                            Console.WriteLine($"Ограничение выполняется");
-                        }
+                        // Выводим отладачную информацию
+                        if (IsDebug && IsDebug_CalcSysReliability)
+                            Console.WriteLine($"Ограничение выполняется{Environment.NewLine}");
                     }
             
             // Все ограничения выпоняются, вернуть true
@@ -629,6 +724,7 @@ namespace magisterDiplom.Fabric
                     this.matrixY[device].Add(0);
 
                 if (IsDebug) {
+                    PrintStartProcessing();
                     Console.WriteLine("Enter:");
                 }
 
@@ -1123,10 +1219,11 @@ namespace magisterDiplom.Fabric
         /// <returns>Сумма полезности и интервалов между ПТО</returns>
         public int GetPreMUtility()
         {
+
+            // Выводим отладочную информацию
             if (IsDebug)
-            {
-                Console.WriteLine("GetPreMUtility");
-            }
+                Console.WriteLine("GetPreMUtility start: Вычисляем сумму полезности и итервалов между ПТО");
+            
             // Объявляем значение критерия на нижнем уровне
             int sum = 0;
 
@@ -1134,9 +1231,10 @@ namespace magisterDiplom.Fabric
             for (int device = 0; device < config.deviceCount; device++)
             {
 
-                if (IsDebug)
-                {
-                    Console.WriteLine($"device:{device}; 1: {this.startProcessing[device].Last().Last()}");
+                // Выводим отладочную информацию
+                if (IsDebug && IsDebug_GetPreMUtility) {
+                    Console.WriteLine($"device:{device}");
+                    Console.WriteLine($"\tМомент окончания последнего задания { this.startProcessing[device].Last().Last() + this.config.proccessingTime[device, this.schedule.Last().Type] }");
                 }
 
                 // Добавляем момент времени окончания всех заданий на приборе
@@ -1148,10 +1246,9 @@ namespace magisterDiplom.Fabric
                     // Время выполнения последнего заданий в последенем пакете
                     this.config.proccessingTime[device, this.schedule.Last().Type];
 
-                if (IsDebug)
-                {
-                    Console.WriteLine($"device:{device}; 2: {this.GetDowntimeByDevice(device)}");
-                }
+                // Выводим отладочную информацию
+                if (IsDebug && IsDebug_GetPreMUtility)
+                    Console.WriteLine($"\tПростои для данного прибора с учётом ПТО { this.GetDowntimeByDevice(device) }");
 
                 // Вычитаем простои
                 sum -= this.GetDowntimeByDevice(device);
@@ -1164,14 +1261,18 @@ namespace magisterDiplom.Fabric
 
                     // Добавляем интервалы времени между ПТО разных пакетов
                     intervals += matrixTPM[device][batchIndex].TimePreM - matrixTPM[device][batchIndex - 1].TimePreM;
+
+                // Выводим отладочную информацию
                 if (IsDebug)
-                {
-                    Console.WriteLine($"device:{device}; 3: {intervals}");
-                }
+                    Console.WriteLine($"\tИнтервалы времени между ПТО { intervals }");
+                
                 // Выполняем подсчёт суммы интервалов времени на первом пакете ПТО
                 sum += intervals;
-
             }
+
+            // Выводим отладочную информацию
+            if (IsDebug && IsDebug_GetPreMUtility)
+                Console.WriteLine($"Критерий f2 {sum}{Environment.NewLine}");
 
             // Возвращяем критерий
             return sum;
@@ -1209,6 +1310,59 @@ namespace magisterDiplom.Fabric
             return CalcReliabilityByDevice(activity_time - prem_time, device);
         }
 
+        // Выражение 12
+        /// <summary>
+        /// Функция вернёт время активности прибора от предыдущего ПТО
+        /// </summary>
+        /// <param name="device">Индекс прибора для которого расчитывается время активности</param>
+        /// <param name="time">Крайний момент времени</param>
+        /// <returns>Время активности</returns>
+        private int GetActivityTimeByDevice(int device, int time)
+        {
+
+            // Определяем начальный индекс
+            int batchIndex = GetBatchIndex(device, time) + 1;
+
+            // Определяем время активности
+            int activityTime = 0;
+
+            // Для каждого пакет выполняем обработку
+            for (; batchIndex < schedule.Count; batchIndex++)
+
+                // Для каждого задания выполняем обработку
+                for (int job = 0; job < startProcessing[device][batchIndex].Count; job++)
+                {
+
+                    // Если момент начала времени выполнения выходит за границу
+                    if (startProcessing[device][batchIndex][job] >= time)
+
+                        // Вернём время активности
+                        return activityTime;
+
+                    // Высчитываем время выполнения
+                    int proc_time = this.config.proccessingTime[device, this.schedule[batchIndex].Type];
+
+                    // Высчитываем момент начала времени выполнения
+                    int start_time = this.startProcessing[device][batchIndex][job];
+
+                    // Если момент окончания задания выходит за указанные границы
+                    if (start_time + proc_time > time)
+                    {
+                        // Увеличиваем время активности до прибора
+                        activityTime += time - start_time;
+
+                        // Возвращяем время активности
+                        return activityTime;
+                    }
+
+                    // Увеличиваем время активности прибора
+                    activityTime += proc_time;
+                }
+
+            // Возвращяем время активности
+            return activityTime;
+        }
+
         // ВЫРАЖЕНИЕ 12
         /// <summary>
         /// Возвращяет время активности для конкретного прибора
@@ -1216,69 +1370,74 @@ namespace magisterDiplom.Fabric
         /// <param name="device">Прибор для которого расчитывается время активности</param>
         /// <param name="time">Крайний момент времени</param>
         /// <returns>Время активности</returns>
-        private int GetActivityTimeByDevice(int device, int time)
-        {
-
-            // Определяем начальный индекс
-            int startIndex = GetBatchIndex(device, time) + 1;
-            
-            // Определяем индекс ПЗ
-            int batchIndex = startIndex;
-            
-            // Определяем количество ПЗ
-            int batchCount = 0;
-            
-            // Определяем количество заданий
-            int jobCount = 0;
-            
-            // Определяем время активности
-            int activityTime = 0;
-            
-            // Для каждого пакет выполняем обработку
-            for (; batchIndex < schedule.Count; batchIndex++)
-            {
-            
-                // Если первое задани в ПЗ удовлетворяет условию
-                if (startProcessing[device][batchIndex][0] >= time)
-            
-                    // Прекращаем обарботку
-                    break;
-            
-                // Увеличиваем количество ПЗ
-                batchCount++;
-            
-                // Увеличиваем активность
-                activityTime += schedule[batchIndex].Size * config.proccessingTime[device, batchIndex];
-            }
-            
-            // Если количество ПЗ равно 0
-            if (batchCount == 0)
-            
-                // Добавляем информацию
-                return 0;
-            
-            // Для каждого задания в последнем пакете выполняем обработку
-            for (int job = 0; job < schedule[startIndex + batchCount - 1].Size; job++)
-            {
-            
-                // Если некоторое задание в последенем ПЗ не удовлетворяет условию
-                if (startProcessing[device][startIndex + batchCount - 1][job] >= time)
-            
-                    // Прекращаем обарботку
-                    break;
-            
-                // Увеличиваем количество заданий
-                jobCount++;
-            }
-            
-            // Уменьшаем время
-            activityTime -= (schedule[startIndex + batchCount - 1].Size - jobCount) * config.proccessingTime[device, startIndex + batchCount - 1];
-
-            // Добавляем информацию
-            return activityTime;
-        }
+        // private int GetActivityTimeByDevice(int device, int time)
+        // {
+        // 
+        //     // Определяем начальный индекс
+        //     int startIndex = GetBatchIndex(device, time) + 1;
+        //     if (IsDebug)
+        //     {
+        //         Console.WriteLine($"device:{device}; startIndex:{startIndex}");
+        //     }
+        // 
+        //     // Определяем индекс ПЗ
+        //     int batchIndex = startIndex;
+        //     
+        //     // Определяем количество ПЗ
+        //     int batchCount = 0;
+        //     
+        //     // Определяем количество заданий
+        //     int jobCount = 0;
+        //     
+        //     // Определяем время активности
+        //     int activityTime = 0;
+        //     
+        //     // Для каждого пакет выполняем обработку
+        //     for (; batchIndex < schedule.Count; batchIndex++)
+        //     {
+        //     
+        //         // Если первое задани в ПЗ удовлетворяет условию
+        //         if (startProcessing[device][batchIndex][0] >= time)
+        //     
+        //             // Прекращаем обарботку
+        //             break;
+        //     
+        //         // Увеличиваем количество ПЗ
+        //         batchCount++;
+        //     
+        //         // Увеличиваем активность
+        //         activityTime += schedule[batchIndex].Size * config.proccessingTime[device, batchIndex];
+        //     }
+        //     
+        //     // Если количество ПЗ равно 0
+        //     if (batchCount == 0)
+        //     
+        //         // Добавляем информацию
+        //         return 0;
+        //     
+        //     // Для каждого задания в последнем пакете выполняем обработку
+        //     for (int job = 0; job < schedule[startIndex + batchCount - 1].Size; job++)
+        //     {
+        //     
+        //         // Если некоторое задание в последенем ПЗ не удовлетворяет условию
+        //         if (startProcessing[device][startIndex + batchCount - 1][job] >= time)
+        //     
+        //             // Прекращаем обарботку
+        //             break;
+        //     
+        //         // Увеличиваем количество заданий
+        //         jobCount++;
+        //     }
+        //     
+        //     // Уменьшаем время
+        //     activityTime -= (schedule[startIndex + batchCount - 1].Size - jobCount) * config.proccessingTime[device, startIndex + batchCount - 1];
+        // 
+        //     // Добавляем информацию
+        //     return activityTime;
+        // }
 
         // ВЫРАЖЕНИЕ 13
+        
         /// <summary>
         /// Возвращяет доступность для всех приборов для указанного момента времени
         /// </summary>
@@ -1286,11 +1445,9 @@ namespace magisterDiplom.Fabric
         /// <returns>Доступность для всех приборов</returns>
         public double CalcSysReliability(int time)
         {
-            if (IsDebug)
-            {
-                Console.WriteLine("CalcSysReliability start: Проверяем системную допустимость");
-                Console.WriteLine($"time:{time}");
-            }
+            if (IsDebug && IsDebug_CalcSysReliability)
+            
+                Console.WriteLine($"Вычисляем системную надёжность для момента времени {time}");
             
             // Объявляем надёжность
             double reliability = 1;
@@ -1305,15 +1462,9 @@ namespace magisterDiplom.Fabric
                 activity_time = this.GetActivityTimeByDevice(device, time);
 
                 if (IsDebug && IsDebug_CalcSysReliability)
-                {
-                    Console.WriteLine($"Вычисляем время активности для прибора: {device}. time = {activity_time}");
 
-                    if (activity_time == 0)
-                        Console.WriteLine("Прибор как новый, пропускаем умножение");
-                    else
-                        Console.WriteLine($"Надёжность прибора: {device} = {this.CalcReliabilityByDevice(activity_time, device)}");
-                }
-
+                    Console.WriteLine($"\tДля прибора {device} время активности {activity_time} и надёжность {this.CalcReliabilityByDevice(activity_time, device):0.000}");
+                
                 // Если прибор не был активным
                 if (activity_time == 0)
 
@@ -1384,8 +1535,8 @@ namespace magisterDiplom.Fabric
         public bool IsConstraint_CalcSysReliability(int time, double beta)
         {
             double sysTime = this.CalcSysReliability(time);
-            if (IsDebug)
-                Console.WriteLine($"Системная надёжность: {sysTime}");
+            if (IsDebug && IsDebug_CalcSysReliability)
+                Console.WriteLine($"Системная надёжность {sysTime:0.000} >= {beta:0.000}?");
             return (sysTime >= beta);
         }
 
