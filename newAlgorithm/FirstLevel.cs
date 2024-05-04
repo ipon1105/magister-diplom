@@ -903,54 +903,54 @@ namespace newAlgorithm
         /// </summary>
         /// <param name="m">входной лист</param>
         /// <returns>лист в виде строки</returns>
-        private static string PrintList(List<int> m)
-        {
-            var result = "";
-            foreach (var t in m)
-            {
-                result += t + ", ";
-            }
-            return result;
-        }
+        // private static string PrintList(List<int> m)
+        // {
+        //     var result = "";
+        //     foreach (var t in m)
+        //     {
+        //         result += t + ", ";
+        //     }
+        //     return result;
+        // }
 
         /// <summary>
         /// Проверка на достижение максимально возможного решения по составам типов
         /// </summary>
         /// <param name="inMatrix">Матрица текущих составов</param>
-        private void CheckSolution(IReadOnlyList<List<int>> inMatrix)
-        {
-            for (var i = 0; i < inMatrix.Count; i++)
-            {
-                var elem = inMatrix[i][0];
-
-
-                if (elem != 2)
-                    continue;
-
-                var count = 1;
-                for (var j = 1; j < inMatrix[i].Count; j++)
-                {
-                    if (inMatrix[i][j] == elem)
-                    {
-                        count++;
-                    }
-                }
-                if (count == inMatrix[i].Count)
-                {
-                    _i[i] = 0;
-                }
-            }
-        }
+        // private void CheckSolution(IReadOnlyList<List<int>> inMatrix)
+        // {
+        //     for (var i = 0; i < inMatrix.Count; i++)
+        //     {
+        //         var elem = inMatrix[i][0];
+        // 
+        // 
+        //         if (elem != 2)
+        //             continue;
+        // 
+        //         var count = 1;
+        //         for (var j = 1; j < inMatrix[i].Count; j++)
+        //         {
+        //             if (inMatrix[i][j] == elem)
+        //             {
+        //                 count++;
+        //             }
+        //         }
+        //         if (count == inMatrix[i].Count)
+        //         {
+        //             _i[i] = 0;
+        //         }
+        //     }
+        // }
 
         /// <summary>
         /// Функция вычисления f1 критерия
         /// </summary>
         /// <param name="inMatrix">Матрица А на текущем шаге</param>
         /// <returns>Значение критериия</returns>
-        public int GetCriterion(List<List<int>> inMatrix)
-        {
-            return inMatrix.SelectMany(t => t).Sum();
-        }
+        // public int GetCriterion(List<List<int>> inMatrix)
+        // {
+        //     return inMatrix.SelectMany(t => t).Sum();
+        // }
 
         #endregion
     }
