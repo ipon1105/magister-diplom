@@ -182,47 +182,104 @@ namespace magisterDiplom.Fabric
             Console.WriteLine("+");
         }
 
-        private void PrintStartProcessing()
+        /// <summary>
+        /// Функция выполняет вывод матрицы моментов начала времени выполнения заданий и ПТО
+        /// </summary>
+        /// <param name="prefix">Префикс перед выводом матрицы</param>
+        private void PrintStartProcessing(String prefix = "")
         {
-            Console.WriteLine("Матрица моментов начала времени выполнения заданий и ПТО.");
-            CalcStartProcessing();
-            CalcMatrixTPM();
+
+            // Выводим информационное сообщение
+            Console.WriteLine($"{prefix}Матрица моментов начала времени выполнения заданий и ПТО.");
+
+            // Если матрица начала моментов времени выполнения заданий пуста
             if (this.startProcessing.Count == 0)
+            {
+
+                // Выводим информационное сообщение
+                Console.WriteLine($"{prefix}Не существует.");
+
+                // Заканчиваем вывод
                 return;
+            }
 
             // Объявляем максимальное время
             int times = 0;
 
-            // Вычисляем максимальное время
-            for (int device = 0; device < this.config.deviceCount; device++)
-                times = Math.Max(times, this.startProcessing[device].Last().Last() + this.config.proccessingTime[device, this.schedule.Last().Type]);
+            // Объявляем количество цифр для числа под типы
+            int typeSize;
 
-            int mm = 0;
-            for (int device = 0; device < this.config.deviceCount; device++)
-                mm = Math.Max(mm, this.config.preMaintenanceTimes[device]);
-            times += mm;
+            // Объявляем количество цифр для числа время выполнения
+            int procSize = 0;
+
+            // Объявляем общее количество символов для вывода отрезка равной единице времени
+            int genSize;
+            
+            // Объявляем индекс прибора
+            int device = 0;
+
+            // Объявляем индекс типа данных
+            int dataType = 0;
+
+            // Объявляем размер наибольшего ПТО
+            int premTime = 0;
+
+            // Расчитываем количество цифр для числа под типы
+            typeSize = (int)Math.Log10(this.config.dataTypesCount) + 1;
+
+            // Расчитываем количество цифр для числа время выполнения
+            procSize = 0;
+            for (device = 0; device < this.config.deviceCount; device++)
+                for (dataType = 0; dataType < this.config.dataTypesCount; dataType++)
+                    procSize = Math.Max(procSize, this.config.proccessingTime[device, dataType]);
+            procSize = (int)Math.Log10(procSize) + 1;
+
+            // Расчитываем общее количество символов для вывода отрезка равной единице времени
+            genSize = typeSize + 1 + procSize;
+
+            // Вычисляем максимальное время
+            {
+
+                // Вычисляем время для выполнения всех заданий
+                times = this.GetMakespan();
+
+                // Вычисляем максимальный разделитель
+                genSize = Math.Max(genSize, (int)Math.Log10(times) + 1);
+
+                // Вычисляем размер наибольшего ПТО
+                for (device = 0; device < this.config.deviceCount; device++)
+                    premTime = Math.Max(premTime, this.config.preMaintenanceTimes[device]);
+                times += premTime;
+            }
 
             // Выводим разделитель
             {
-                for (int j = 0; j < times; j++)
-                    Console.Write($"{j,-4}");
+                Console.Write($"{prefix}{0}");
+                Console.Write(new String(' ', genSize));
+                for (int j = 1; j < times + 1; j++)
+                {
+                    Console.Write($"{j}");
+                    Console.Write(new String(' ', (genSize - ((int)Math.Log10(j)))));
+                }
                 Console.WriteLine();
             }
 
-            bool flag = false;
-            int batchIndexFlag = -1;
-
             // Для каждого прибора
-            for (int device = 0; device < this.config.deviceCount; device++)
+            for (device = 0; device < this.config.deviceCount; device++)
             {
 
                 // Выводим разделитель
                 {
-                    Console.Write("+");
+                    Console.Write($"{prefix}+");
                     for (int i = 0; i < times; i++)
-                        Console.Write("---+");
+                    {
+                        Console.Write(new String('-', genSize));
+                    Console.Write("+");
+                    }
                     Console.WriteLine();
                 }
+
+                Console.Write($"{prefix}");
 
                 // Для каждого временного отделителя
                 for (int time = 0; time < times; time++)
@@ -238,34 +295,39 @@ namespace magisterDiplom.Fabric
                             if (this.startProcessing[device][batchIndex][job] == time)
                             {
 
-                                // Выводим k заданий
-                                for (int k = 0; k < this.config.proccessingTime[device, this.schedule[batchIndex].Type]; k++)
+                                // Выводим t заданий
+                                for (int t = 0; t < this.config.proccessingTime[device, this.schedule[batchIndex].Type]; t++) {
+                                    int unspaces = (int)Math.Log10(this.schedule[batchIndex].Type) + 1;
+                                    unspaces += (int)Math.Log10(this.config.proccessingTime[device, this.schedule[batchIndex].Type]) + 1;
                                     Console.Write($"|{this.schedule[batchIndex].Type}:{this.config.proccessingTime[device, this.schedule[batchIndex].Type]}");
+                                    Console.Write(new String(' ', genSize - (unspaces + 1)));
+                                }
+                                // Если текущий момент времени последний и в данной позиции есть ПТО
+                                if (this.startProcessing[device][batchIndex][job] == this.startProcessing[device][batchIndex].Last() && this.matrixY[device][batchIndex] == 1)
+                                {
                                 
-                                if (this.startProcessing[device][batchIndex][job] == this.startProcessing[device][batchIndex].Last()) {
-                                    batchIndexFlag = batchIndex;
-                                    flag = true;
+                                    // Выводим t раз ПТО
+                                    for (int t = 0; t < this.config.preMaintenanceTimes[device]; t++) { 
+                                        Console.Write($"|");
+                                        Console.Write(new String('*', genSize));
                                 }
                                 
                                 // Увеличиваем время
-                                time += this.config.proccessingTime[device, this.schedule[batchIndex].Type];
+                                    time += this.config.preMaintenanceTimes[device];
                             }
 
-
-                        if (batchIndexFlag >= 0 && this.matrixY[device][batchIndexFlag] == 1 && flag)
-                        {
-                            flag = false;
-                            for (int k = 0; k < this.config.preMaintenanceTimes[device]; k++)
-                                Console.Write($"|***");
-                            time += this.config.preMaintenanceTimes[device];
+                                // Увеличиваем время
+                                time += this.config.proccessingTime[device, this.schedule[batchIndex].Type];
                         }
                     }
                     
                     // Если время возможно
-                    if (time < times)
+                    if (time < times) {
 
                         // Отрисовывем пробел
-                        Console.Write($"|{' ',-3}");
+                        Console.Write($"|");
+                        Console.Write(new String(' ', genSize));
+                    }
                 }
 
                 // Переводим курсор
@@ -274,12 +336,14 @@ namespace magisterDiplom.Fabric
 
             // Выводим разделитель
             {
-                Console.Write("+");
+                Console.Write($"{prefix}+");
                 for (int i = 0; i < times; i++)
-                    Console.Write("---+");
+                {
+                    Console.Write(new String('-', genSize));
+                Console.Write("+");
+                }
                 Console.WriteLine();
             }
-            Console.WriteLine();
         }
 
         /// <summary>
