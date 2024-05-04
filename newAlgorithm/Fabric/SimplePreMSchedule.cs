@@ -18,23 +18,62 @@ namespace magisterDiplom.Fabric
         bool IsDebug_SearchByPosition = true;
         bool IsDebug_CalcSysReliability = true;
         bool IsDebug_GetPreMUtility = true;
-        private void PrintMatrixY()
+        
+        /// <summary>
+        /// Выводим матриц порядка ПТО
+        /// </summary>
+        private void PrintMatrixY(String prefix = "")
         {
-            Console.WriteLine("MatrixY:");
-            for (int device = 0; device < this.config.deviceCount; device++) {
+
+            // Выводим информационное сообщение
+            Console.WriteLine($"{prefix}Матрица порядка ПТО [Y].");
+
+            // Объявляем количество пакетов
+            int batchCount;
+
+            // Если расписание пустое
+            if ((batchCount = this.schedule.Count()) == 0)
+            {
+
+                // Выводим информационное сообщение
+                Console.WriteLine($"{prefix}Не существует.");
+
+                // Прекращяем вывод
+                return;
+            }
+
+            // Объявляем индекс пакета
+            int batchIndex = 0;
+
+            // Объявляем индекс прибора
+            int device = 0;
+
+            // Для каждого прибора
+            for (device = 0; device < this.config.deviceCount; device++) {
+
+                // Выводим префикс
+                Console.Write($"{prefix}");
 
                 // Выводим разделитель
-                for (int j = 0; j < this.matrixY[device].Count; j++)
-                    Console.Write($"+--");
+                for (batchIndex = 0; batchIndex < batchCount; batchIndex++)
+                    Console.Write($"+-");
                 Console.WriteLine("+");
 
-                for (int dataType = 0; dataType < this.matrixY[device].Count(); dataType++)
-                    Console.Write($"|{matrixY[device][dataType],-2}");
+                // Выводим префикс
+                Console.Write($"{prefix}");
+
+                // Выводим данные
+                for (batchIndex = 0; batchIndex < this.matrixY[device].Count(); batchIndex++)
+                    Console.Write($"|{matrixY[device][batchIndex]}");
                 Console.WriteLine("|");
             }
+
+            // Выводим префикс
+            Console.Write($"{prefix}");
+
             // Выводим разделитель
-            for (int j = 0; j < this.matrixY[0].Count; j++)
-                Console.Write($"+--");
+            for (batchIndex = 0; batchIndex < batchCount; batchIndex++)
+                Console.Write($"+-");
             Console.WriteLine("+");
         }
 
