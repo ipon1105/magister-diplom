@@ -54,6 +54,9 @@ namespace magisterDiplom.Fabric
                 // Выводим префикс
                 Console.Write($"{prefix}");
 
+                // Выводим префикс
+                Console.Write($"{prefix}");
+
                 // Выводим разделитель
                 for (batchIndex = 0; batchIndex < batchCount; batchIndex++)
                     Console.Write($"+-");
@@ -71,51 +74,111 @@ namespace magisterDiplom.Fabric
             // Выводим префикс
             Console.Write($"{prefix}");
 
+            // Выводим префикс
+            Console.Write($"{prefix}");
+
             // Выводим разделитель
             for (batchIndex = 0; batchIndex < batchCount; batchIndex++)
                 Console.Write($"+-");
             Console.WriteLine("+");
         }
 
-        private void PrintSchedule() {
+        /// <summary>
+        /// Функция выполняет вывод матриц порядка и количества пакетов заданий
+        /// </summary>
+        /// <param name="prefix">Префикс перед выводом матриц</param>
+        private void PrintSchedule(String prefix = "") {
 
+            // Объявляем количество пакетов
+            int batchCount;
+
+            // Объявляем тип данных
+            int dataType = 0;
+
+            // Объявляем индекс пакета заданий
+            int batchIndex = 0;
+
+            // Объявляем количество цифр для максимального размера пакета заданий
+            int symbols = 0;
+
+            // Выводим информационное сообщение
+            Console.WriteLine($"{prefix}Матрица порядка и количества пакетов заданий [P,R].");
+            
+            // Если расписание пустое
+            if ((batchCount = this.schedule.Count()) == 0)
+            {
+
+                // Выводим информационное сообщение
+                Console.WriteLine($"{prefix}Не существует.");
+
+                // Прекращяем вывод
+                return;
+            }
+
+            // Вычисляем размер максимального пакет
+            for (batchIndex = 0; batchIndex < batchCount; batchIndex++)
+                symbols = Math.Max(symbols, this.schedule[batchIndex].Size);
+
+            // Вычисляем количество цифр для максимального размера пакета заданий
+            symbols = (int)Math.Log10(symbols) + 1;
+
+            // Получаем матрицы P и R
             List<List<int>> mP = GetMatrixP();
             List<List<int>> mR = GetMatrixR();
 
-            Console.WriteLine("[P,R]:");
-
             // Для каждой строки
-            for (int dataType = 0; dataType < this.config.dataTypesCount; dataType++) {
+            for (dataType = 0; dataType < this.config.dataTypesCount; dataType++) {
+
+                // Выводим префикс
+                Console.Write($"{prefix}");
 
                 // Выводим разделитель
-                for (int j = 0; j < mP[dataType].Count; j++)
-                    Console.Write($"+--");
+                for (batchIndex = 0; batchIndex < batchCount; batchIndex++)
+                    Console.Write($"+-");
                 Console.Write("+   ");
 
                 // Выводим разделитель
-                for (int j = 0; j < mR[dataType].Count; j++)
-                    Console.Write($"+--");
+                for (batchIndex = 0; batchIndex < batchCount; batchIndex++) { 
+                    Console.Write($"+");
+                    Console.Write(new String('-', symbols));
+                }
                 Console.WriteLine("+");
 
+                // Выводим префикс
+                Console.Write($"{prefix}");
+
                 // Выводим элементы матрицы P
-                for (int batch = 0; batch < mP[dataType].Count; batch++)
-                    Console.Write($"|{mP[dataType][batch],-2}");
+                for (batchIndex = 0; batchIndex < batchCount; batchIndex++) { 
+                    Console.Write($"|{mP[dataType][batchIndex]}");
+                }
                 Console.Write("|   ");
 
                 // Выводим элементы матрицы R
-                for (int batch = 0; batch < mR[dataType].Count; batch++)
-                    Console.Write($"|{mR[dataType][batch],-2}");
+                for (batchIndex = 0; batchIndex < batchCount; batchIndex++)
+                {
+
+                    Console.Write($"|{mR[dataType][batchIndex]}");
+                    if (mR[dataType][batchIndex] == 0)
+                        Console.Write(new String(' ', symbols - 1));
+                    else
+                        Console.Write(new String(' ', (symbols - (int) Math.Log10(mR[dataType][batchIndex]) - 1 ) ));
+                }
                 Console.WriteLine("|");
             }
 
+            // Выводим префикс
+            Console.Write($"{prefix}");
+
             // Выводим разделитель
-            for (int j = 0; j < mP[0].Count; j++)
-                Console.Write($"+--");
+            for (batchIndex = 0; batchIndex < batchCount; batchIndex++)
+                Console.Write($"+-");
             Console.Write("+   ");
 
             // Выводим разделитель
-            for (int j = 0; j < mR[0].Count; j++)
-                Console.Write($"+--");
+            for (batchIndex = 0; batchIndex < batchCount; batchIndex++) {
+                Console.Write($"+");
+                Console.Write(new String('-', symbols));
+            }
             Console.WriteLine("+");
         }
 
