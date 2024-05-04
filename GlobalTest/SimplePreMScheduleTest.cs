@@ -30,7 +30,7 @@ namespace GlobalTest
                 new List<int>{ 4, 4, 2 },
                 new List<int>{ 4, 4, 2 },
                 new List<int>{ 4, 4, 2 },
-            }, 0.99);
+            });
         }
 
     }

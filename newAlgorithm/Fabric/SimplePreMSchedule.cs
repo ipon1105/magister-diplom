@@ -43,10 +43,10 @@ namespace magisterDiplom.Fabric
             }
 
             // Объявляем индекс пакета
-            int batchIndex = 0;
+            int batchIndex;
 
             // Объявляем индекс прибора
-            int device = 0;
+            int device;
 
             // Для каждого прибора
             for (device = 0; device < this.config.deviceCount; device++) {
@@ -87,10 +87,10 @@ namespace magisterDiplom.Fabric
             int batchCount;
 
             // Объявляем тип данных
-            int dataType = 0;
+            int dataType;
 
             // Объявляем индекс пакета заданий
-            int batchIndex = 0;
+            int batchIndex;
 
             // Объявляем количество цифр для максимального размера пакета заданий
             int symbols = 0;
@@ -198,22 +198,22 @@ namespace magisterDiplom.Fabric
             }
 
             // Объявляем максимальное время
-            int times = 0;
+            int times;
 
             // Объявляем количество цифр для числа под типы
             int typeSize;
 
             // Объявляем количество цифр для числа время выполнения
-            int procSize = 0;
+            int procSize;
 
             // Объявляем общее количество символов для вывода отрезка равной единице времени
             int genSize;
             
             // Объявляем индекс прибора
-            int device = 0;
+            int device;
 
             // Объявляем индекс типа данных
-            int dataType = 0;
+            int dataType;
 
             // Объявляем размер наибольшего ПТО
             int premTime = 0;
@@ -762,18 +762,14 @@ namespace magisterDiplom.Fabric
             matrixTPM = new List<List<PreMSet>>();
         }
 
-        /// <summary>
-        /// Выполняет построение расписания
-        /// </summary>
-        /// <param name="matrixA">Матрица составов пакетов заданий</param>
-        public double Build(List<List<int>> matrixA, double beta = 0.9)
+        public override bool Build(List<List<int>> matrixA)
         {
-
             // Если флаг оталдки установлен
             if (IsDebug)
             {
                 Console.WriteLine("matrixA:");
-                for (int _dataType = 0; _dataType < matrixA.Count(); _dataType++) {
+                for (int _dataType = 0; _dataType < matrixA.Count(); _dataType++)
+                {
                     Console.Write($"\t{_dataType}: ");
                     for (int _batchIndex = 0; _batchIndex < matrixA[_dataType].Count(); _batchIndex++)
                         Console.Write($"{matrixA[_dataType][_batchIndex]} ");
@@ -781,12 +777,14 @@ namespace magisterDiplom.Fabric
                 }
             }
 
+            double beta = 0.99;
+
             // Объявляем тип данных
             int dataType;
 
             // Объявляем максимальное количество пакетов
             int maxBatchCount = 0;
-            
+
             // Объявляем ПЗ
             int batch = 0;
 
@@ -811,12 +809,13 @@ namespace magisterDiplom.Fabric
 
             Dictionary<int, double> m = new Dictionary<int, double>(capacity: this.config.dataTypesCount);
             List<int> dataTypes = new List<int>(capacity: this.config.dataTypesCount);
-            for (dataType = 0; dataType < this.config.dataTypesCount; dataType++) {
+            for (dataType = 0; dataType < this.config.dataTypesCount; dataType++)
+            {
                 double sum = 0;
                 for (int device = 1; device < this.config.deviceCount; device++)
-                    sum += 
-                        (double) this.config.proccessingTime[device, dataType] /
-                        (double) this.config.proccessingTime[device - 1, dataType];
+                    sum +=
+                        (double)this.config.proccessingTime[device, dataType] /
+                        (double)this.config.proccessingTime[device - 1, dataType];
                 m.Add(dataType, sum);
             }
 
@@ -842,7 +841,8 @@ namespace magisterDiplom.Fabric
 
 
             // Если флаг оталдки установлен
-            if (IsDebug) {
+            if (IsDebug)
+            {
 
                 // Выводим информацию
                 Console.WriteLine("dataTypes:");
@@ -887,7 +887,8 @@ namespace magisterDiplom.Fabric
 
             // П.3 Инициализируем матрицу Y
             this.matrixY = new List<List<int>>(capacity: this.config.deviceCount);
-            for (int device = 0; device < this.config.deviceCount; device++) {
+            for (int device = 0; device < this.config.deviceCount; device++)
+            {
                 this.matrixY.Add(new List<int>());
                 this.matrixY[device].Add(1);
             }
@@ -899,13 +900,14 @@ namespace magisterDiplom.Fabric
             // Для каждого типа данных выполняем обрабоку
             for (; dataType < this.config.dataTypesCount; dataType++)
             {
-                
+
                 // Добавляем ПЗ в расписание 
                 this.schedule.Add(new Batch(dataTypes[dataType], matrixA[dataTypes[dataType]][batch]));
                 for (int device = 0; device < this.config.deviceCount; device++)
                     this.matrixY[device].Add(0);
 
-                if (IsDebug) {
+                if (IsDebug)
+                {
                     PrintStartProcessing();
                 }
 
@@ -913,18 +915,18 @@ namespace magisterDiplom.Fabric
                 if (!this.SearchByPosition(beta, 5))
 
                     // Возвращяем 0, как флаг неудачи
-                    return 0.0;
+                    return false;
 
                 // Выполняем оптимизацию для позиций ПТО приборов
                 this.ShiftMatrixY(beta);
-                
+
                 // Проверяем условие надёжности
                 // TODO: СПОРНО (НЕВОЗМОЖНОАЯ СИТУАЦИЯ) - ПОДСЧИТАТЬ КОЛИЧЕСТВО ВЫЗОВОВ 
                 if (!this.IsSolutionAcceptable(beta))
                 {
                     Console.WriteLine("Тот самый случай");
                     // Возвращяем 0, как флаг неудачи
-                    return 0.0;
+                    return false;
                 }
             }
 
@@ -952,9 +954,9 @@ namespace magisterDiplom.Fabric
 
                     // Если не было найдено расписания удовлетворяющему условию надёжности
                     if (!this.SearchByPosition(beta, 5))
-                    
+
                         // Возвращяем 0, как флаг неудачи
-                        return 0.0;
+                        return false;
 
                     // Выполняем оптимизацию для позиций ПТО приборов (ШАГ 15)
                     this.ShiftMatrixY(beta);
@@ -965,7 +967,7 @@ namespace magisterDiplom.Fabric
                     {
                         Console.WriteLine("Тот самый случай");
                         // Возвращяем 0, как флаг неудачи
-                        return 0.0;
+                        return false;
                     }
                 }
 
@@ -973,8 +975,8 @@ namespace magisterDiplom.Fabric
                 batch++;
             }
 
-            
-            return this.GetPreMUtility();
+
+            return true;
         }
 
         /// <summary>
@@ -1027,13 +1029,13 @@ namespace magisterDiplom.Fabric
         {
 
             // Объявляем индекс ПЗ
-            int batchIndex = 0;
+            int batchIndex;
 
             // Объявляем индекс прибора
-            int device = 0;
+            int device;
 
             // Объявляем индекс задания
-            int job = 0;
+            int job;
 
             // Отчищаяем матрицу моментов начала времени выполнения заданий
             startProcessing.Clear();
@@ -1638,7 +1640,7 @@ namespace magisterDiplom.Fabric
             double reliability = 1;
 
             // Объявляем время активности
-            int activity_time = 0;
+            int activity_time;
 
             // Для каждого прибора подсчитываем надёжность
             for (int device = 0; device < config.deviceCount; device++) {
@@ -1829,10 +1831,10 @@ namespace magisterDiplom.Fabric
         {
 
             // Объявляем количество пакетов заданий
-            int cur_batchCountByType = 0;
+            int cur_batchCountByType;
 
             // Объявляем необходимое количество пакетов заданий 
-            int tar_batchCountByType = 0;
+            int tar_batchCountByType;
 
             // Выполняем обход по типам
             for (int dataType = 0; dataType < matrixA.Count; dataType++)

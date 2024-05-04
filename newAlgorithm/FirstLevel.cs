@@ -291,7 +291,7 @@ namespace newAlgorithm
             {
                 for (var variantOfSplitIndex = 0; variantOfSplitIndex < _a2[type].Count; variantOfSplitIndex++)
                 {
-                    List<List<int>> tempB = (tempM != null) ? tempB = ListUtils.MatrixIntDeepCopy(tempM) : tempB = new List<List<int>>();
+                    List<List<int>> tempB = (tempM != null) ? ListUtils.MatrixIntDeepCopy(tempM) : new List<List<int>>();
 
                     tempB.Add(tempMatrix[type][variantOfSplitIndex]);
                     CombinationType(file, tempMatrix, type + 1, tempB, ref solutionFlag);
@@ -337,7 +337,7 @@ namespace newAlgorithm
             }
             else
             {
-                if (schedule.Build(tempM) != 0.0)
+                if (schedule.Build(tempM))
                 {
 
                     var fBuf = schedule.GetMakespan();
@@ -413,7 +413,7 @@ namespace newAlgorithm
                             isBestSolution = false;
                         }
 
-                        var tempA = ListUtils.MatrixIntDeepCopy(_ai);
+                        List<List<int>> tempA; // var tempA = ListUtils.MatrixIntDeepCopy(_ai);
                         bestMatrixA = ListUtils.MatrixIntDeepCopy(_ai);
                         f1Optimal = f1Current;
 
@@ -514,7 +514,7 @@ namespace newAlgorithm
 
                     // TODO: Использовать объёкт своего класса
                     
-                    if (schedule.Build(primeMatrixA) == 0.0)
+                    if (schedule.Build(primeMatrixA))
                     {
 
                         // Получаем f1 критерий
@@ -523,7 +523,8 @@ namespace newAlgorithm
                         MessageBox.Show(ListUtils.MatrixIntToString(primeMatrixA, ", ", "", ";") + "Время обработки " + f1Current);
                         f1Optimal = f1Current;
                         file.WriteLine(f1Optimal);
-                        var maxA = ListUtils.MatrixIntDeepCopy(primeMatrixA);
+                        // TODO: ненужное присваивание
+                        // var maxA = ListUtils.MatrixIntDeepCopy(primeMatrixA);
                         isBestSolution = true;
                     }
                 }
@@ -532,7 +533,7 @@ namespace newAlgorithm
                 GenerateStartSolution();
 
                 // Вызываем расчёты
-                if (schedule.Build(primeMatrixA) == 0.0) { 
+                if (schedule.Build(primeMatrixA)) { 
                     
                     // Получаем f1
                     f1Current = schedule.GetMakespan();
@@ -585,7 +586,8 @@ namespace newAlgorithm
                             isBestSolution = false;
                         }
 
-                        var tempA = ListUtils.MatrixIntDeepCopy(_ai);
+                        // TODO: Ненужное присваивание
+                        List<List<int>> tempA; // var tempA = ListUtils.MatrixIntDeepCopy(_ai);
                         bestMatrixA = ListUtils.MatrixIntDeepCopy(_ai);
                         
                         // TODO: Спорный случай, всегда перезатираем лучшее решение из костыля
@@ -623,7 +625,7 @@ namespace newAlgorithm
                                 // TODO:
 
                                 // Если расписание построилось не успешно
-                                if (schedule.Build(tempA) == 0.0)
+                                if (schedule.Build(tempA))
 
                                     // Пропускаем обработку
                                     continue;
@@ -795,7 +797,7 @@ namespace newAlgorithm
                 var _f1 = time;
                 f1Optimal = _f1;
                 result[0] = f1Optimal;
-                var maxA = ListUtils.MatrixIntDeepCopy(primeMatrixA);
+                List<List<int>> maxA; // var maxA = ListUtils.MatrixIntDeepCopy(primeMatrixA);
                 isBestSolution = true;
 
                 // До тех пор пока в наличие есть оставшиеся типы и партии не фиксированные выполняем обработку

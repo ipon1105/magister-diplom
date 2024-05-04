@@ -298,21 +298,19 @@ namespace magisterDiplom.Model
             res += prefix + $"buffer:         {this.buffer}" + Environment.NewLine;
 
             // Выполняем формирование вывода времени переналадки
-            int _device = 0;
+            int _device;
             res += prefix + "preMaintenanceTimes: ";
             for (_device = 0; _device < this.deviceCount - 1; _device++)
                 res += $"{this.preMaintenanceTimes[_device],-2}, ";
             res += $"{this.preMaintenanceTimes[_device]};" + Environment.NewLine;
 
             // Выполняем формирование вывода времени отказов приборов
-            _device = 0;
             res += prefix + "restoringDevice: ";
             for (_device = 0; _device < this.deviceCount - 1; _device++)
                 res += $"{this.restoringDevice[_device],-2}, ";
             res += $"{this.restoringDevice[_device]};" + Environment.NewLine;
 
             // Выполняем формирование вывода времени востановления приборов
-            _device = 0;
             res += prefix + "failureRates: ";
             for (_device = 0; _device < this.deviceCount - 1; _device++)
                 res += $"{this.failureRates[_device],-2}, ";
@@ -322,7 +320,7 @@ namespace magisterDiplom.Model
             res += prefix + "proccessingTime:" + Environment.NewLine;
             for (int device = 0; device < this.deviceCount; device++)
             {
-                int dataType = 0;
+                int dataType;
                 res += prefix + prefix + $"Device {device}: " + prefix;
                 for (dataType = 0; dataType < this.dataTypesCount - 1; dataType++)
                     res += $"{this.proccessingTime[device, dataType],-2}, ";
@@ -336,7 +334,7 @@ namespace magisterDiplom.Model
                 res += prefix + prefix + $"Device {device}: " + Environment.NewLine;
                 for (int dataTypeRow = 0; dataTypeRow < this.dataTypesCount; dataTypeRow++)
                 {
-                    int dataTypeCol = 0;
+                    int dataTypeCol;
                     res += prefix + prefix + prefix + $"Type {dataTypeRow}: " + prefix;
                     for (dataTypeCol = 0; dataTypeCol < this.dataTypesCount - 1; dataTypeCol++)
                         res += $"{this.changeoverTime[device][dataTypeRow, dataTypeCol],-2}, ";

@@ -435,7 +435,7 @@ namespace newAlgorithm
                 n_kom_q = 2;
             }
             var rand = new Random((int)DateTime.Now.ToBinary());
-            var temp = 0;
+            int temp;
             var fileOut = new StreamWriter(file + "All_" + str + "_" + n_kom + "_" + n_kom_q + "_new.txt", true);
 
             timeSets = new List<List<int>>();

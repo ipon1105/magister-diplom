@@ -11,6 +11,16 @@ namespace magisterDiplom
     {
 
         /// <summary>
+        /// Показатель успешности построения расписания
+        /// </summary>
+        public const bool Successfully = true;
+
+        /// <summary>
+        /// Показатель успешности построения расписания
+        /// </summary>
+        public const bool Unsuccessfully = false;
+
+        /// <summary>
         /// Флаг отладки. Если установлен, то в процессе выполнения
         /// будет выводиться отладачная информация в стандартный поток вывода
         /// </summary>
@@ -30,6 +40,13 @@ namespace magisterDiplom
         /// Словарь соответсвий приборов и матриц моментов начала времени выполнения заданий
         /// </summary>
         protected Dictionary<int, List<List<int>>> startProcessing;
+
+        /// <summary>
+        /// Выполняем построения расписания
+        /// </summary>
+        /// <param name="matrixA">Матрица составов пакето заданий</param>
+        /// <returns>false, если расписание невозможно построить, иначе true</returns>
+        public abstract bool Build(List<List<int>> matrixA);
 
         /// <summary>
         /// Возвращяет матрицу количества заданий в пакетах
