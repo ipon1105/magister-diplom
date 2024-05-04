@@ -300,7 +300,7 @@ namespace newAlgorithm
         
         public void Algoritm_3()
         {
-            int buff=0;
+
             for (int k = 0; k < groups.Nz1.Count(); k++)
             {
                 for (int i = 0; i < Q.Nz1[0].Count(); i++)

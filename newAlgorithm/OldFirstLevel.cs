@@ -221,7 +221,7 @@ namespace newAlgorithm
             }*/
             //this.f1 = 20;
             this.f1Buf = this.f1;
-            int currentChangeType = 0;
+
             //Добавить вычисление значения критерия
             List<List<int>> MaxA = this.CopyMatrix(this.A);
             int maxF1 = this.f1;

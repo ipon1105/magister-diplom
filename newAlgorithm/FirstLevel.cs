@@ -39,7 +39,7 @@ namespace newAlgorithm
         /// Матрица составов партий требований на k шаге.
         /// matrixA_Prime[i][h], где i - это тип данных. h - это индекс партии, а значение по индексам это количество партий
         /// </summary>
-        public List<List<int>> primeMatrixA { get; private set; }
+        public List<List<int>> PrimeMatrixA { get; private set; }
         
         /// <summary>
         /// Данная переменная определяет вектор количества требований для каждого типа данных
@@ -79,7 +79,7 @@ namespace newAlgorithm
         public void GenerateFixedBatchesSolution()
         {
             // Инициализируем строки матрицы A
-            primeMatrixA = new List<List<int>>();
+            PrimeMatrixA = new List<List<int>>();
 
             // Для каждого типа данных выполняем обработку
             for (var dataType = 0; dataType < config.dataTypesCount; dataType++)
@@ -89,10 +89,10 @@ namespace newAlgorithm
                 _i.Add(1);
 
                 // Инициализируем столбцы матрицы A
-                primeMatrixA.Add(new List<int>());
+                PrimeMatrixA.Add(new List<int>());
 
                 // Для каждой строки матрицы A добавляем вектор количеств элементов в партии
-                primeMatrixA[dataType].Add(batchCountList[dataType]);
+                PrimeMatrixA[dataType].Add(batchCountList[dataType]);
             }
         }
 
@@ -107,11 +107,10 @@ namespace newAlgorithm
 
             // Выполяем отчистку вектора _i и матрицы _a
             _i.Clear();
-            if (primeMatrixA != null)
-                primeMatrixA.Clear();
+            PrimeMatrixA?.Clear();
 
             // Инициализируем матрицу A
-            primeMatrixA = new List<List<int>>();
+            PrimeMatrixA = new List<List<int>>();
             
             // Для каждого типа данных выполняем обработку
             for (var dataType = 0; dataType < config.dataTypesCount; dataType++)
@@ -121,19 +120,19 @@ namespace newAlgorithm
                 _i.Add(1);
 
                 // Для каждого типа создаём вектор с составом партий и формируем его, как [n_p - 2, 2]
-                primeMatrixA.Add(new List<int>());
-                primeMatrixA[dataType].Add(batchCountList[dataType] - minBatchSize);
-                primeMatrixA[dataType].Add(minBatchSize);
+                PrimeMatrixA.Add(new List<int>());
+                PrimeMatrixA[dataType].Add(batchCountList[dataType] - minBatchSize);
+                PrimeMatrixA[dataType].Add(minBatchSize);
             }
 
             // Для каждого типа данных выполняем проверку
             for (var dataType = 0; dataType < config.dataTypesCount; dataType++)
             
                 // Выполяем проверку на отсутсвие единичных партий
-                if (primeMatrixA[dataType][0] < 2 || primeMatrixA[dataType][0] < primeMatrixA[dataType][1])
+                if (PrimeMatrixA[dataType][0] < 2 || PrimeMatrixA[dataType][0] < PrimeMatrixA[dataType][1])
                 {
-                    primeMatrixA[dataType].Clear();
-                    primeMatrixA[dataType].Add(batchCountList[dataType]);
+                    PrimeMatrixA[dataType].Clear();
+                    PrimeMatrixA[dataType].Add(batchCountList[dataType]);
                     _i[dataType] = 0;
                 }
         }
@@ -165,7 +164,7 @@ namespace newAlgorithm
         /// <returns>матрица А с подставленным новым решением в соответствующий тип</returns>
         private List<List<int>> SetTempAFromA2(int dataType, int batchIndex)
         {
-            var result = ListUtils.MatrixIntDeepCopy(primeMatrixA);
+            var result = ListUtils.MatrixIntDeepCopy(PrimeMatrixA);
             if (batchIndex < _a2[dataType].Count)
                 result[dataType] = ListUtils.VectorIntDeepCopy(_a2[dataType][batchIndex]);
             return result;
@@ -192,7 +191,7 @@ namespace newAlgorithm
                             return false;
                         }
                         var countFind = inList.Where((t, k) => t == temp[i][k]).Count();
-                        return countFind == inList.Count ? true : false;
+                        return countFind == inList.Count;
                     });
                     if (lastIndexForDelete == i) continue;
                     temp.RemoveAt(lastIndexForDelete);
@@ -365,28 +364,28 @@ namespace newAlgorithm
             using (var file = new StreamWriter(fileName))
             {
                 GenerateFixedBatchesSolution();
-                var shedule = new Shedule(primeMatrixA);
+                var shedule = new Shedule(PrimeMatrixA);
                 //shedule.ConstructShedule();
                 shedule.ConstructSheduleWithBuffer(config.buffer, config.dataTypesCount);
                 f1Current = shedule.GetTime();
 
-                MessageBox.Show(ListUtils.MatrixIntToString(primeMatrixA, ", ", "", ";") + "Время обработки " + f1Current);
+                MessageBox.Show(ListUtils.MatrixIntToString(PrimeMatrixA, ", ", "", ";") + "Время обработки " + f1Current);
                 f1Optimal = f1Current;
                 file.WriteLine(f1Optimal);
-                var maxA = ListUtils.MatrixIntDeepCopy(primeMatrixA);
+                var maxA = ListUtils.MatrixIntDeepCopy(PrimeMatrixA);
                 isBestSolution = true;
 
                 // Генерируем начальное решение
                 GenerateStartSolution();
 
-                shedule = new Shedule(primeMatrixA);
+                shedule = new Shedule(PrimeMatrixA);
                 //shedule.ConstructShedule();
                 shedule.ConstructSheduleWithBuffer(config.buffer, config.dataTypesCount);
                 f1Current = shedule.GetTime();
-                MessageBox.Show(ListUtils.MatrixIntToString(primeMatrixA, ", ", "", ";") + " Время обработки " + f1Current);
+                MessageBox.Show(ListUtils.MatrixIntToString(PrimeMatrixA, ", ", "", ";") + " Время обработки " + f1Current);
                 if (f1Current < f1Optimal)
                 {
-                    bestMatrixA = ListUtils.MatrixIntDeepCopy(primeMatrixA);
+                    bestMatrixA = ListUtils.MatrixIntDeepCopy(PrimeMatrixA);
                     isBestSolution = true;
                     f1Optimal = f1Current;
                     file.Write(" +");
@@ -398,7 +397,7 @@ namespace newAlgorithm
                     while (CheckType())
                     {
                         // Буферезируем текущее решение для построение нового на его основе
-                        _ai = ListUtils.MatrixIntDeepCopy(primeMatrixA);
+                        _ai = ListUtils.MatrixIntDeepCopy(PrimeMatrixA);
                         if (isBestSolution)
                         {
                             _a1 = new List<List<List<int>>>();
@@ -408,7 +407,7 @@ namespace newAlgorithm
                             {
                                 _a1.Add(new List<List<int>>());
                                 _a1[dataType].Add(new List<int>());
-                                _a1[dataType][0] = ListUtils.VectorIntDeepCopy(primeMatrixA[dataType]);
+                                _a1[dataType][0] = ListUtils.VectorIntDeepCopy(PrimeMatrixA[dataType]);
                             }
                             isBestSolution = false;
                         }
@@ -470,7 +469,7 @@ namespace newAlgorithm
                         if (isBestSolution)
                         {
                             MessageBox.Show("Лучшее решение " + ListUtils.MatrixIntToString(bestMatrixA, ", ", "", ";") + " Время обработки " + f1Optimal);
-                            primeMatrixA = ListUtils.MatrixIntDeepCopy(bestMatrixA);
+                            PrimeMatrixA = ListUtils.MatrixIntDeepCopy(bestMatrixA);
                             f1Current = f1Optimal;
 
                             continue;
@@ -514,13 +513,13 @@ namespace newAlgorithm
 
                     // TODO: Использовать объёкт своего класса
                     
-                    if (schedule.Build(primeMatrixA))
+                    if (schedule.Build(PrimeMatrixA))
                     {
 
                         // Получаем f1 критерий
                         f1Current = schedule.GetMakespan();
 
-                        MessageBox.Show(ListUtils.MatrixIntToString(primeMatrixA, ", ", "", ";") + "Время обработки " + f1Current);
+                        MessageBox.Show(ListUtils.MatrixIntToString(PrimeMatrixA, ", ", "", ";") + "Время обработки " + f1Current);
                         f1Optimal = f1Current;
                         file.WriteLine(f1Optimal);
                         // TODO: ненужное присваивание
@@ -533,11 +532,11 @@ namespace newAlgorithm
                 GenerateStartSolution();
 
                 // Вызываем расчёты
-                if (schedule.Build(primeMatrixA)) { 
+                if (schedule.Build(PrimeMatrixA)) { 
                     
                     // Получаем f1
                     f1Current = schedule.GetMakespan();
-                    MessageBox.Show(ListUtils.MatrixIntToString(primeMatrixA, ", ", "", ";") + " Время обработки " + f1Current);
+                    MessageBox.Show(ListUtils.MatrixIntToString(PrimeMatrixA, ", ", "", ";") + " Время обработки " + f1Current);
                 }
 
                 // Если текущей критерий лучше оптимального
@@ -545,7 +544,7 @@ namespace newAlgorithm
                 {
 
                     // Копируем матрицу с лучшим решением
-                    bestMatrixA = ListUtils.MatrixIntDeepCopy(primeMatrixA);
+                    bestMatrixA = ListUtils.MatrixIntDeepCopy(PrimeMatrixA);
 
                     // Устанавливаем флаг лучшего решения
                     isBestSolution = true;
@@ -565,7 +564,7 @@ namespace newAlgorithm
                     while (CheckType())
                     {
                         // Буферезируем текущее решение для построение нового на его основе
-                        _ai = ListUtils.MatrixIntDeepCopy(primeMatrixA);
+                        _ai = ListUtils.MatrixIntDeepCopy(PrimeMatrixA);
 
                         // Если текущее решение лучше
                         if (isBestSolution)
@@ -579,7 +578,7 @@ namespace newAlgorithm
                             {
                                 _a1.Add(new List<List<int>>());
                                 _a1[dataType].Add(new List<int>());
-                                _a1[dataType][0] = ListUtils.VectorIntDeepCopy(primeMatrixA[dataType]);
+                                _a1[dataType][0] = ListUtils.VectorIntDeepCopy(PrimeMatrixA[dataType]);
                             }
 
                             // Сбрасываем флаг лучшего решения
@@ -675,7 +674,7 @@ namespace newAlgorithm
                             MessageBox.Show("Лучшее решение " + ListUtils.MatrixIntToString(bestMatrixA, ", ", "", ";") + " Время обработки " + f1Optimal);
 
                             // Запоминаем лучшее решение
-                            primeMatrixA = ListUtils.MatrixIntDeepCopy(bestMatrixA);
+                            PrimeMatrixA = ListUtils.MatrixIntDeepCopy(bestMatrixA);
 
                             // TODO: Проверить излишнее переопределение f1Current в f1Optimal
                             f1Current = f1Optimal;
@@ -716,7 +715,7 @@ namespace newAlgorithm
         /// <param name="_n">Матрица номеров решений из А2</param>
         /// <param name="f">Файл для записей логов</param>
         ///Менят здесь для _\*РУСЛАН*/_
-        private void GenerateCombination(int ind, List<int> _n)
+        private void GenerateCombination(List<int> _n)
         {
 
             // Для каждого типа данных выполняем обработку с конца
@@ -738,7 +737,7 @@ namespace newAlgorithm
         /// <param name="f">Файл для записей логов</param>
         private void GetSolution(List<int> _n)
         {
-            var tempA = ListUtils.MatrixIntDeepCopy(primeMatrixA);
+            var tempA = ListUtils.MatrixIntDeepCopy(PrimeMatrixA);
 
             // Для каждого типа данных выполняем обработку
             for (var dataType = 0; dataType < config.dataTypesCount; dataType++)
@@ -785,7 +784,7 @@ namespace newAlgorithm
                 GenerateStartSolution();
 
                 // Создаём экземпляр класса расписания с помощью матрицы Aprime
-                var shedule = new Shedule(primeMatrixA);
+                var shedule = new Shedule(PrimeMatrixA);
 
                 // Выполяем построение расписания
                 shedule.ConstructShedule();
@@ -804,7 +803,7 @@ namespace newAlgorithm
                 while (CheckType() && !config.isFixedBatches)
                 {
                     // Буферезируем текущее решение для построение нового на его основе
-                    _ai = ListUtils.MatrixIntDeepCopy(primeMatrixA);
+                    _ai = ListUtils.MatrixIntDeepCopy(PrimeMatrixA);
                     if (isBestSolution)
                     {
                         _a1 = new List<List<List<int>>>();
@@ -814,7 +813,7 @@ namespace newAlgorithm
                         {
                             _a1.Add(new List<List<int>>());
                             _a1[dataType].Add(new List<int>());
-                            _a1[dataType][0] = ListUtils.VectorIntDeepCopy(primeMatrixA[dataType]);
+                            _a1[dataType][0] = ListUtils.VectorIntDeepCopy(PrimeMatrixA[dataType]);
                         }
                         isBestSolution = false;
                     }
@@ -868,11 +867,11 @@ namespace newAlgorithm
                             _n.Add(_a2[dataType].Count);
                             if (_n[dataType] == 0) _n[dataType] = -1;
                         }
-                        GenerateCombination(0, _nTemp);
+                        GenerateCombination(_nTemp);
                     }
                     if (isBestSolution)
                     {
-                        primeMatrixA = ListUtils.MatrixIntDeepCopy(bestMatrixA);
+                        PrimeMatrixA = ListUtils.MatrixIntDeepCopy(bestMatrixA);
                         _f1 = f1Optimal;
 
                         // Продолжаем цикл

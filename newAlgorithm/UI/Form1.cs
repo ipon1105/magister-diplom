@@ -22,16 +22,6 @@ namespace newAlgorithm
         private SelectoinType selectoinType;
 
         /// <summary>
-        /// Данная переменная представляет из себя максимальное время переналадки приборов
-        /// </summary>
-        int maxChangeoverTime;
-
-        /// <summary>
-        /// Данная переменная представляет из себя максимальное время выполнения задания
-        /// </summary>
-        int maxProccessingTime;
-
-        /// <summary>
         /// Данная переменная определяет количество данных каждого типа
         /// </summary>
         int batchCount;
@@ -177,7 +167,7 @@ namespace newAlgorithm
                 deviceCount,
                 buffer,
                 (Matrix)(new Matrix(proccessingTime)),
-                Config.changeoverTimeConverter(changeoverTime),
+                Config.ChangeoverTimeConverter(changeoverTime),
                 new Vector(preMaintenanceTimes),
                 new Vector(failureRates),
                 new Vector(restoringDevice),
@@ -217,7 +207,7 @@ namespace newAlgorithm
                 deviceCount,
                 buffer,
                 (Matrix) (new Matrix(proccessingTime)),
-                Config.changeoverTimeConverter(changeoverTime),
+                Config.ChangeoverTimeConverter(changeoverTime),
                 new Vector(preMaintenanceTimes),
                 new Vector(failureRates),
                 new Vector(restoringDevice),
@@ -274,7 +264,7 @@ namespace newAlgorithm
                                     deviceCount,
                                     buffer,
                                     (Matrix)(new Matrix(OldProccessingTimeGenerator(_maxProccessingTime, deviceCount, dataTypesCount))),
-                                    Config.changeoverTimeConverter(OldChangeoverTimeGenerator(_maxChangeoverTime, deviceCount, dataTypesCount)),
+                                    Config.ChangeoverTimeConverter(OldChangeoverTimeGenerator(_maxChangeoverTime, deviceCount, dataTypesCount)),
                                     new Vector(preMaintenanceTimes),
                                     new Vector(failureRates),
                                     new Vector(restoringDevice),
@@ -292,10 +282,8 @@ namespace newAlgorithm
                                 //firstLevel.GenetateSolutionForAllTypes("outputFirstAlgorithm.txt");
                                 var oldSecondLevel = new OldSecondLevel(tz, countGroup, deviceCount);
 
-                                int criteria;
-                                int flCrit;
                                 var listInt = !isOptimization
-                                    ? oldSecondLevel.CalcFitnessList(sostav, out criteria, out flCrit)
+                                    ? oldSecondLevel.CalcFitnessList(sostav, out int criteria, out int flCrit)
                                     : oldSecondLevel.CalcOptimalFitnessList(sostav, out criteria, out flCrit);
 
                                 // Выводим информацию в файл
@@ -357,7 +345,7 @@ namespace newAlgorithm
                                     deviceCount,
                                     buffer,
                                     (Matrix)(new Matrix(OldProccessingTimeGenerator(_maxProccessingTime, deviceCount, dataTypesCount))),
-                                    Config.changeoverTimeConverter(OldChangeoverTimeGenerator(_maxChangeoverTime, deviceCount, dataTypesCount)),
+                                    Config.ChangeoverTimeConverter(OldChangeoverTimeGenerator(_maxChangeoverTime, deviceCount, dataTypesCount)),
                                     new Vector(preMaintenanceTimes),
                                     new Vector(failureRates),
                                     new Vector(restoringDevice),
@@ -370,11 +358,9 @@ namespace newAlgorithm
                                 firstLevel.GenetateSolutionForAllTypes("outputFirstAlgorithm.txt");
                                 var oldSecondLevel = new OldSecondLevel(tz, countGroup, deviceCount);
 
-                                int criteria;
-                                int flCrit;
                                 var listInt = !isOptimization
-                                    ? oldSecondLevel.CalcFitnessList(firstLevel.primeMatrixA, out criteria, out flCrit)
-                                    : oldSecondLevel.CalcOptimalFitnessList(firstLevel.primeMatrixA, out criteria, out flCrit);
+                                    ? oldSecondLevel.CalcFitnessList(firstLevel.PrimeMatrixA, out int criteria, out int flCrit)
+                                    : oldSecondLevel.CalcOptimalFitnessList(firstLevel.PrimeMatrixA, out criteria, out flCrit);
 
                                 // Выводим информацию в файл
                                 file.WriteLine($"Tz = {tz}");
@@ -422,14 +408,14 @@ namespace newAlgorithm
                 str = "first_task";
             }
 
-            var n_kom = 2;
-            var n_kom_q = 2;
+            int n_kom;
+            int n_kom_q;
             try
             {
                 n_kom = Convert.ToInt32(textBox1.Text);
                 n_kom_q = Convert.ToInt32(textBox2.Text);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 n_kom = 2;
                 n_kom_q = 2;
@@ -504,7 +490,7 @@ namespace newAlgorithm
                                         _deviceCount,
                                         buffer,
                                         (Matrix)(new Matrix(OldProccessingTimeGenerator(_maxProccessingTime, _deviceCount, _dataTypesCount))),
-                                        Config.changeoverTimeConverter(OldChangeoverTimeGenerator(_maxChangeoverTime, _deviceCount, _dataTypesCount)),
+                                        Config.ChangeoverTimeConverter(OldChangeoverTimeGenerator(_maxChangeoverTime, _deviceCount, _dataTypesCount)),
                                         new Vector(preMaintenanceTimes),
                                         new Vector(failureRates),
                                         new Vector(restoringDevice),
@@ -559,7 +545,7 @@ namespace newAlgorithm
             StreamWriter file_output_method_GAA = new StreamWriter("outputGAASimpleResult.txt", true);
 
             // Фиксируем начало обработки
-            file_output_method_GAA.WriteLine($"Дата и время запуска: {DateTime.Now.ToString("O")}\n{{");
+            file_output_method_GAA.WriteLine($"Дата и время запуска: {DateTime.Now:O}\n{{");
 
             // Формируем массив данных [8, 12, 16, 24, 32]
             int[] array = { 8, 12, 16, 24, 32 };
@@ -605,7 +591,7 @@ namespace newAlgorithm
                                     _deviceCount,
                                     buffer,
                                     (Matrix)(new Matrix(OldProccessingTimeGenerator(_maxProccessingTime, _deviceCount, _dataTypesCount))),
-                                    Config.changeoverTimeConverter(OldChangeoverTimeGenerator(_maxChangeoverTime, _deviceCount, _dataTypesCount)),
+                                    Config.ChangeoverTimeConverter(OldChangeoverTimeGenerator(_maxChangeoverTime, _deviceCount, _dataTypesCount)),
                                     new Vector(preMaintenanceTimes),
                                     new Vector(failureRates),
                                     new Vector(restoringDevice),
@@ -618,8 +604,7 @@ namespace newAlgorithm
                                 var gaa = new GAA(_dataTypesCount, batchCountList, isFixedBatches, _batchCount);
                                 gaa.SetXrom((int)numeric_xromossomi_size.Value);
                                 var countSourceKit = gaa.calcFitnessList();
-                                int s;
-                                var result = gaa.getSelectionPopulation(selectoinType, out s);
+                                var result = gaa.getSelectionPopulation(selectoinType, out int s);
 
                                 using (var file_outputGAA = new StreamWriter("outputGAA.txt", true))
                                 {
@@ -655,7 +640,7 @@ namespace newAlgorithm
             }
 
             // Фиксируем конец обработки
-            file_output_method_GAA.WriteLine($"}}\nДата и время завершения: {DateTime.Now.ToString("O")}");
+            file_output_method_GAA.WriteLine($"}}\nДата и время завершения: {DateTime.Now:O}");
             file_output_method_GAA.Close();
 
             MessageBox.Show("Данные успешно записаны", "Успешное завершение", MessageBoxButtons.OK);
@@ -744,7 +729,7 @@ namespace newAlgorithm
                                                 _deviceCount,
                                                 buffer,
                                                 (Matrix)(new Matrix(OldProccessingTimeGenerator(_maxProccessingTime, _deviceCount, _dataTypesCount))),
-                                                Config.changeoverTimeConverter(OldChangeoverTimeGenerator(_maxChangeoverTime, _deviceCount, _dataTypesCount)),
+                                                Config.ChangeoverTimeConverter(OldChangeoverTimeGenerator(_maxChangeoverTime, _deviceCount, _dataTypesCount)),
                                                 new Vector(preMaintenanceTimes),
                                                 new Vector(failureRates),
                                                 new Vector(restoringDevice),
@@ -791,21 +776,6 @@ namespace newAlgorithm
 
             // Выполняем перестроение матриц
             TablesRebuild();
-
-            var firstType = new List<int>();
-            var secondType = new List<int>();
-            var testTime = new List<int>();
-            testTime.Add(15);
-            testTime.Add(18);
-            firstType.Add(3);
-            firstType.Add(3);
-            firstType.Add(3);
-            secondType.Add(2);
-            secondType.Add(3);
-            secondType.Add(4);
-            var testType = new List<List<int>>();
-            testType.Add(firstType);
-            testType.Add(secondType);
         }
 
         #endregion
@@ -1101,7 +1071,7 @@ namespace newAlgorithm
         /// <param name="e"></param>
         private void Numeric_max_changeover_time_ValueChanged(object sender, EventArgs e)
         {
-            maxChangeoverTime = Convert.ToInt32(numeric_max_changeover_time.Value);
+            // maxChangeoverTime = Convert.ToInt32(numeric_max_changeover_time.Value);
         }
 
         /// <summary>
@@ -1111,7 +1081,7 @@ namespace newAlgorithm
         /// <param name="e"></param>
         private void Numeric_max_proccessing_time_ValueChanged(object sender, EventArgs e)
         {
-            maxProccessingTime = Convert.ToInt32(numeric_max_proccessing_time.Value);
+            // maxProccessingTime = Convert.ToInt32(numeric_max_proccessing_time.Value);
         }
 
         /// <summary>
@@ -1313,8 +1283,8 @@ namespace newAlgorithm
         private void InitializeForm()
         {
             // Инициализируем переменные с внешних компонентов
-            maxChangeoverTime = Convert.ToInt32(numeric_max_changeover_time.Value);
-            maxProccessingTime = Convert.ToInt32(numeric_max_proccessing_time.Value);
+            // maxChangeoverTime = Convert.ToInt32(numeric_max_changeover_time.Value);
+            // maxProccessingTime = Convert.ToInt32(numeric_max_proccessing_time.Value);
             dataTypesCount = Convert.ToInt32(numeric_data_types_count.Value);
             xromossomiSize = Convert.ToInt32(numeric_xromossomi_size.Value);
             deviceCount = Convert.ToInt32(numeric_device_count.Value);

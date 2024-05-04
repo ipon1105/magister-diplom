@@ -260,7 +260,7 @@ namespace magisterDiplom.Model
         /// </summary>
         /// <param name="changeoverTime">3-ёх мерная матрица</param>
         /// <returns>Словарь соответствий приборов и матриц переналадок</returns>
-        public static Dictionary<int, Matrix> changeoverTimeConverter(List<List<List<int>>> changeoverTime)
+        public static Dictionary<int, Matrix> ChangeoverTimeConverter(List<List<List<int>>> changeoverTime)
         {
 
             // Создаём словарь матриц переналадки

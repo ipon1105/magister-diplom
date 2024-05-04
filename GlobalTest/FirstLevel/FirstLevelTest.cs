@@ -131,7 +131,7 @@ namespace GlobalTest.FirstLevel
 
             for (int dataType = 0; dataType < output.Count; dataType++)
                 for (int batch = 0; batch < output[dataType].Count; batch++)
-                    Assert.AreEqual(output[dataType][batch], firstLevel.primeMatrixA[dataType][batch]);
+                    Assert.AreEqual(output[dataType][batch], firstLevel.PrimeMatrixA[dataType][batch]);
         }
 
         [TestMethod]
@@ -251,7 +251,7 @@ namespace GlobalTest.FirstLevel
 
             for (int dataType = 0; dataType < output.Count; dataType++)
                 for (int batch = 0; batch < output[dataType].Count; batch++)
-                    Assert.AreEqual(output[dataType][batch], firstLevel.primeMatrixA[dataType][batch]);
+                    Assert.AreEqual(output[dataType][batch], firstLevel.PrimeMatrixA[dataType][batch]);
         }
 
         
