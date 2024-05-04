@@ -127,7 +127,7 @@
             0,
             0,
             0});
-            this.numeric_data_types_count.ValueChanged += new System.EventHandler(this.numeric_data_types_count_ValueChanged);
+            this.numeric_data_types_count.ValueChanged += new System.EventHandler(this.Numeric_data_types_count_ValueChanged);
             // 
             // button1
             // 
@@ -137,7 +137,7 @@
             this.button1.TabIndex = 2;
             this.button1.Text = "Получить решение";
             this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
+            this.button1.Click += new System.EventHandler(this.Button1_Click);
             // 
             // label1
             // 
@@ -192,7 +192,7 @@
             this.button2.TabIndex = 11;
             this.button2.Text = "Формирование Гаа";
             this.button2.UseVisualStyleBackColor = true;
-            this.button2.Click += new System.EventHandler(this.button2_Click);
+            this.button2.Click += new System.EventHandler(this.Button2_Click);
             // 
             // tabControl
             // 
@@ -204,7 +204,7 @@
             this.tabControl.SelectedIndex = 0;
             this.tabControl.Size = new System.Drawing.Size(1424, 861);
             this.tabControl.TabIndex = 12;
-            this.tabControl.Selecting += new System.Windows.Forms.TabControlCancelEventHandler(this.tabControl_time_setup_Selecting);
+            this.tabControl.Selecting += new System.Windows.Forms.TabControlCancelEventHandler(this.TabControl_time_setup_Selecting);
             // 
             // tabPage1
             // 
@@ -266,7 +266,7 @@
             this.checkBox_visualization.TabIndex = 41;
             this.checkBox_visualization.Text = "Отображение в EXCEL";
             this.checkBox_visualization.UseVisualStyleBackColor = true;
-            this.checkBox_visualization.CheckedChanged += new System.EventHandler(this.checkBox_visualization_CheckedChanged);
+            this.checkBox_visualization.CheckedChanged += new System.EventHandler(this.CheckBox_visualization_CheckedChanged);
             // 
             // textBox2
             // 
@@ -286,7 +286,7 @@
             0,
             0,
             0});
-            this.numeric_generation_count.ValueChanged += new System.EventHandler(this.numeric_generation_count_ValueChanged);
+            this.numeric_generation_count.ValueChanged += new System.EventHandler(this.Numeric_generation_count_ValueChanged);
             // 
             // label10
             // 
@@ -320,7 +320,7 @@
             this.radioButton_TournamentSelection.TabStop = true;
             this.radioButton_TournamentSelection.Text = "Турнирная селекция ";
             this.radioButton_TournamentSelection.UseVisualStyleBackColor = true;
-            this.radioButton_TournamentSelection.CheckedChanged += new System.EventHandler(this.radioButton_TournamentSelection_change);
+            this.radioButton_TournamentSelection.CheckedChanged += new System.EventHandler(this.RadioButton_TournamentSelection_change);
             // 
             // radioButton_RouletteMethod
             // 
@@ -332,7 +332,7 @@
             this.radioButton_RouletteMethod.TabStop = true;
             this.radioButton_RouletteMethod.Text = "Метод рулетки";
             this.radioButton_RouletteMethod.UseVisualStyleBackColor = true;
-            this.radioButton_RouletteMethod.CheckedChanged += new System.EventHandler(this.radioButton_RouletteMethod_change);
+            this.radioButton_RouletteMethod.CheckedChanged += new System.EventHandler(this.RadioButton_RouletteMethod_change);
             // 
             // radioButton_SigmaClipping
             // 
@@ -344,7 +344,7 @@
             this.radioButton_SigmaClipping.TabStop = true;
             this.radioButton_SigmaClipping.Text = "Сигма отсечение(Пока не реализованно)";
             this.radioButton_SigmaClipping.UseVisualStyleBackColor = true;
-            this.radioButton_SigmaClipping.CheckedChanged += new System.EventHandler(this.radioButton_SigmaClipping_change);
+            this.radioButton_SigmaClipping.CheckedChanged += new System.EventHandler(this.RadioButton_SigmaClipping_change);
             // 
             // radioButton_UniformRanking
             // 
@@ -356,7 +356,7 @@
             this.radioButton_UniformRanking.TabStop = true;
             this.radioButton_UniformRanking.Text = "Равномерное ранжирование";
             this.radioButton_UniformRanking.UseVisualStyleBackColor = true;
-            this.radioButton_UniformRanking.CheckedChanged += new System.EventHandler(this.radioButton_UniformRanking_change);
+            this.radioButton_UniformRanking.CheckedChanged += new System.EventHandler(this.RadioButton_UniformRanking_change);
             // 
             // textBox1
             // 
@@ -386,7 +386,7 @@
             0,
             0,
             0});
-            this.numeric_device_count.ValueChanged += new System.EventHandler(this.numeric_device_count_ValueChanged);
+            this.numeric_device_count.ValueChanged += new System.EventHandler(this.Numeric_device_count_ValueChanged);
             // 
             // label9
             // 
@@ -418,7 +418,7 @@
             0,
             0,
             0});
-            this.numeric_max_proccessing_time.ValueChanged += new System.EventHandler(this.numeric_max_proccessing_time_ValueChanged);
+            this.numeric_max_proccessing_time.ValueChanged += new System.EventHandler(this.Numeric_max_proccessing_time_ValueChanged);
             // 
             // checkBox_optimization
             // 
@@ -430,7 +430,7 @@
             this.checkBox_optimization.TabIndex = 31;
             this.checkBox_optimization.Text = "Оптимизация";
             this.checkBox_optimization.UseVisualStyleBackColor = true;
-            this.checkBox_optimization.CheckedChanged += new System.EventHandler(this.checkBox_optimization_CheckedChanged);
+            this.checkBox_optimization.CheckedChanged += new System.EventHandler(this.CheckBox_optimization_CheckedChanged);
             // 
             // numeric_batch_count
             // 
@@ -443,7 +443,7 @@
             0,
             0,
             0});
-            this.numeric_batch_count.ValueChanged += new System.EventHandler(this.numeric_batch_count_ValueChanged);
+            this.numeric_batch_count.ValueChanged += new System.EventHandler(this.Numeric_batch_count_ValueChanged);
             // 
             // OldSecondLevelAll
             // 
@@ -478,7 +478,7 @@
             0,
             0,
             0});
-            this.numeric_max_changeover_time.ValueChanged += new System.EventHandler(this.numeric_max_changeover_time_ValueChanged);
+            this.numeric_max_changeover_time.ValueChanged += new System.EventHandler(this.Numeric_max_changeover_time_ValueChanged);
             // 
             // button5
             // 
@@ -488,7 +488,7 @@
             this.button5.TabIndex = 21;
             this.button5.Text = "прогон";
             this.button5.UseVisualStyleBackColor = true;
-            this.button5.Click += new System.EventHandler(this.button5_Click);
+            this.button5.Click += new System.EventHandler(this.Button5Click);
             // 
             // numeric_xromossomi_size
             // 
@@ -511,7 +511,7 @@
             0,
             0,
             0});
-            this.numeric_xromossomi_size.ValueChanged += new System.EventHandler(this.numericUpDown2_ValueChanged);
+            this.numeric_xromossomi_size.ValueChanged += new System.EventHandler(this.NumericUpDown2_ValueChanged);
             // 
             // label11
             // 
@@ -543,7 +543,7 @@
             0,
             0,
             0});
-            this.numeric_buffer.ValueChanged += new System.EventHandler(this.numeric_buffer_ValueChanged);
+            this.numeric_buffer.ValueChanged += new System.EventHandler(this.Numeric_buffer_ValueChanged);
             // 
             // checkBox_fixed_batches
             // 
@@ -554,7 +554,7 @@
             this.checkBox_fixed_batches.TabIndex = 12;
             this.checkBox_fixed_batches.Text = "Фиксированные партии";
             this.checkBox_fixed_batches.UseVisualStyleBackColor = true;
-            this.checkBox_fixed_batches.CheckedChanged += new System.EventHandler(this.checkBox_fixed_batches_CheckedChanged);
+            this.checkBox_fixed_batches.CheckedChanged += new System.EventHandler(this.CheckBox_fixed_batches_CheckedChanged);
             // 
             // setsBtn
             // 
@@ -564,7 +564,7 @@
             this.setsBtn.TabIndex = 22;
             this.setsBtn.Text = "Тест комплектов";
             this.setsBtn.UseVisualStyleBackColor = true;
-            this.setsBtn.Click += new System.EventHandler(this.setsBtn_Click);
+            this.setsBtn.Click += new System.EventHandler(this.SetsBtn_Click);
             // 
             // button4
             // 
@@ -574,7 +574,7 @@
             this.button4.TabIndex = 19;
             this.button4.Text = "Тестовый прогон";
             this.button4.UseVisualStyleBackColor = true;
-            this.button4.Click += new System.EventHandler(this.button4_Click);
+            this.button4.Click += new System.EventHandler(this.Button4_Click);
             // 
             // button3
             // 
@@ -584,7 +584,7 @@
             this.button3.TabIndex = 14;
             this.button3.Text = "Второй метод";
             this.button3.UseVisualStyleBackColor = true;
-            this.button3.Click += new System.EventHandler(this.button3_Click);
+            this.button3.Click += new System.EventHandler(this.Button3_Click);
             // 
             // tabPage2
             // 
@@ -720,7 +720,7 @@
             this.randomizeProcessingTime.TabIndex = 13;
             this.randomizeProcessingTime.Text = "Рандом времени обработки";
             this.randomizeProcessingTime.UseVisualStyleBackColor = true;
-            this.randomizeProcessingTime.Click += new System.EventHandler(this.randomizeProcessingTime_Click);
+            this.randomizeProcessingTime.Click += new System.EventHandler(this.RandomizeProcessingTime_Click);
             // 
             // randomizePreprocessingTime
             // 
@@ -731,7 +731,7 @@
             this.randomizePreprocessingTime.TabIndex = 21;
             this.randomizePreprocessingTime.Text = "Рандом времени";
             this.randomizePreprocessingTime.UseVisualStyleBackColor = true;
-            this.randomizePreprocessingTime.Click += new System.EventHandler(this.randomizeChangeoverTime_Click);
+            this.randomizePreprocessingTime.Click += new System.EventHandler(this.RandomizeChangeoverTime_Click);
             // 
             // copyPreprocessingTime
             // 
@@ -742,7 +742,7 @@
             this.copyPreprocessingTime.TabIndex = 21;
             this.copyPreprocessingTime.Text = "Копировать с первого";
             this.copyPreprocessingTime.UseVisualStyleBackColor = true;
-            this.copyPreprocessingTime.Click += new System.EventHandler(this.copyPreprocessingTime_Click);
+            this.copyPreprocessingTime.Click += new System.EventHandler(this.CopyPreprocessingTime_Click);
             // 
             // randomizePreMaintenances
             // 
@@ -753,7 +753,7 @@
             this.randomizePreMaintenances.TabIndex = 25;
             this.randomizePreMaintenances.Text = "Рандом времени";
             this.randomizePreMaintenances.UseVisualStyleBackColor = true;
-            this.randomizePreMaintenances.Click += new System.EventHandler(this.randomizePreMaintenanceTime_Click);
+            this.randomizePreMaintenances.Click += new System.EventHandler(this.RandomizePreMaintenanceTime_Click);
             // 
             // label12
             // 
@@ -819,7 +819,7 @@
             0,
             0,
             0});
-            this.numeric_random.ValueChanged += new System.EventHandler(this.numeric_random_ValueChanged);
+            this.numeric_random.ValueChanged += new System.EventHandler(this.Numeric_random_ValueChanged);
             // 
             // label7
             // 

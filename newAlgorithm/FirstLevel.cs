@@ -819,7 +819,7 @@ namespace newAlgorithm
                         isBestSolution = false;
                     }
 
-                    var tempA = ListUtils.MatrixIntDeepCopy(_ai);
+                    List<List<int>> tempA; // var tempA = ListUtils.MatrixIntDeepCopy(_ai);
                     bestMatrixA = ListUtils.MatrixIntDeepCopy(_ai);
                     f1Optimal = _f1;
 

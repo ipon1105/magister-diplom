@@ -14,10 +14,10 @@ namespace magisterDiplom.Fabric
     /// </summary>
     public class SimplePreMSchedule : PreMSchedule
     {
-        bool IsDebug_ShiftMatrixY = true;
-        bool IsDebug_SearchByPosition = true;
-        bool IsDebug_CalcSysReliability = true;
-        bool IsDebug_GetPreMUtility = true;
+        const bool IsDebug_ShiftMatrixY = true;
+        const bool IsDebug_SearchByPosition = true;
+        const bool IsDebug_CalcSysReliability = true;
+        const bool IsDebug_GetPreMUtility = true;
         
         /// <summary>
         /// Выводим матриц порядка ПТО
@@ -623,9 +623,11 @@ namespace magisterDiplom.Fabric
             {
 
                 // Выполняем перестановку
-                Batch batch = this.schedule[batchIndex];
-                this.schedule[batchIndex] = this.schedule[batchIndex - 1];
-                this.schedule[batchIndex - 1] = batch;
+                (this.schedule[batchIndex - 1], this.schedule[batchIndex]) = (this.schedule[batchIndex], this.schedule[batchIndex - 1]);
+
+                // Batch batch = this.schedule[batchIndex];
+                // this.schedule[batchIndex] = this.schedule[batchIndex - 1];
+                // this.schedule[batchIndex - 1] = batch;
 
                 if (IsDebug && IsDebug_SearchByPosition)
                 {
@@ -875,11 +877,10 @@ namespace magisterDiplom.Fabric
             dataType = 0;
 
             // П.2 Добавляем 
-            this.schedule = new List<Batch>();
-            this.schedule.Add(new Batch(
+            this.schedule = new List<Batch>() { new Batch(
                 dataTypes[dataType],
                 matrixA[dataTypes[dataType]][batch]
-            ));
+            )};
             dataType++;
 
             if (IsDebug)
@@ -1490,12 +1491,12 @@ namespace magisterDiplom.Fabric
         /// <param name="prem_time">Момент времени окончания последнего ПТО</param>
         /// <param name="device">Индекс прибора для которого расчитывается надёжность</param>
         /// <returns>Надёжность прибора по индексу device</returns>
-        private double CalcReliabilityByDevice(int activity_time, int prem_time, int device)
-        {
-
-            // Выполняем расчёт и возврат доступности по выражению 10
-            return CalcReliabilityByDevice(activity_time - prem_time, device);
-        }
+        // private double CalcReliabilityByDevice(int activity_time, int prem_time, int device)
+        // {
+        // 
+        //     // Выполняем расчёт и возврат доступности по выражению 10
+        //     return CalcReliabilityByDevice(activity_time - prem_time, device);
+        // }
 
         // Выражение 12
         /// <summary>

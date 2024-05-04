@@ -155,11 +155,11 @@ namespace newAlgorithm
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void button3_Click(object sender, EventArgs e)
+        private void Button3_Click(object sender, EventArgs e)
         {
 
             // Выполняем перестроение матриц
-            tablesRebuild();
+            TablesRebuild();
 
             // TODO: Перед вызовом данной функции необходимо выполнить присваивание для Form1.compositionSets и Form1.timeSets
 
@@ -196,11 +196,11 @@ namespace newAlgorithm
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void button1_Click(object sender, EventArgs e)
+        private void Button1_Click(object sender, EventArgs e)
         {
 
             // Выполняем перестроение матриц
-            tablesRebuild();
+            TablesRebuild();
 
             // Инициализируем вектор длиной dataTypesCount, каждый элемент которого будет равен batchCount
             List<int> batchCountList = CreateBatchCountList();
@@ -240,7 +240,7 @@ namespace newAlgorithm
         {
 
             // Выполняем перестроение матриц
-            tablesRebuild();
+            TablesRebuild();
 
             // Формируем вектор из значений { 2, 4, 8, 16, 32 }, для генерации матриц выполнения и переналадки
             int[] array = { 2, 4, 8, 16, 32 };
@@ -255,7 +255,7 @@ namespace newAlgorithm
                     // Перебираем каждой элемент вектора, как время выполнения задания
                     foreach (int _maxProccessingTime in array)
                     {
-                        for (var tz = 50; tz <= 200; tz = tz + 50)
+                        for (var tz = 50; tz <= 200; tz += 50)
                         {
                             for (var countGroup = 2; countGroup <= 8; countGroup += 2)
                             {
@@ -323,7 +323,7 @@ namespace newAlgorithm
         {
 
             // Выполняем перестроение матриц
-            tablesRebuild();
+            TablesRebuild();
 
             // Формируем вектор из значений { 2, 4, 8, 16, 32 }, для генерации матриц выполнения и переналадки
             var array = new[] { 2, 4, 8, 16, 32 };
@@ -338,7 +338,7 @@ namespace newAlgorithm
                     // Перебираем каждой элемент вектора, как время выполнения задания
                     foreach (var _maxProccessingTime in array)
                     {
-                        for (var tz = 50; tz <= 200; tz = tz + 50)
+                        for (var tz = 50; tz <= 200; tz += 50)
                         {
                             for (var countGroup = 2; countGroup <= 8; countGroup += 2)
                             {
@@ -397,11 +397,11 @@ namespace newAlgorithm
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void button4_Click(object sender, EventArgs e)
+        private void Button4_Click(object sender, EventArgs e)
         {
 
             // Выполняем перестроение матриц
-            tablesRebuild();
+            TablesRebuild();
 
             Form1.direct = checkBox_deadline_on.Checked;
             int[] N_komplect_sostav = { 2, 4 };
@@ -548,12 +548,12 @@ namespace newAlgorithm
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void button5_Click(object sender, EventArgs e)
+        private void Button5Click(object sender, EventArgs e)
         {
 
 
             // Выполняем перестроение матриц
-            tablesRebuild();
+            TablesRebuild();
 
             // Инициализируем выходной файл на добавление
             StreamWriter file_output_method_GAA = new StreamWriter("outputGAASimpleResult.txt", true);
@@ -666,11 +666,11 @@ namespace newAlgorithm
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void button2_Click(object sender, EventArgs e)
+        private void Button2_Click(object sender, EventArgs e)
         {
 
             // Выполняем перестроение матриц
-            tablesRebuild();
+            TablesRebuild();
 
             // Создаём экземпляр класса Random для генерации рандомных данных
             var rand = new Random(0);
@@ -786,11 +786,11 @@ namespace newAlgorithm
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void setsBtn_Click(object sender, EventArgs e)
+        private void SetsBtn_Click(object sender, EventArgs e)
         {
 
             // Выполняем перестроение матриц
-            tablesRebuild();
+            TablesRebuild();
 
             var firstType = new List<int>();
             var secondType = new List<int>();
@@ -817,7 +817,7 @@ namespace newAlgorithm
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void radioButton_TournamentSelection_change(object sender, EventArgs e)
+        private void RadioButton_TournamentSelection_change(object sender, EventArgs e)
         {
             selectoinType = SelectoinType.TournamentSelection;
         }
@@ -827,7 +827,7 @@ namespace newAlgorithm
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void radioButton_RouletteMethod_change(object sender, EventArgs e)
+        private void RadioButton_RouletteMethod_change(object sender, EventArgs e)
         {
             selectoinType = SelectoinType.RouletteMethod;
         }
@@ -837,7 +837,7 @@ namespace newAlgorithm
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void radioButton_UniformRanking_change(object sender, EventArgs e)
+        private void RadioButton_UniformRanking_change(object sender, EventArgs e)
         {
             selectoinType = SelectoinType.UniformRanking;
         }
@@ -847,7 +847,7 @@ namespace newAlgorithm
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void radioButton_SigmaClipping_change(object sender, EventArgs e)
+        private void RadioButton_SigmaClipping_change(object sender, EventArgs e)
         {
             selectoinType = SelectoinType.SigmaClipping;
         }
@@ -859,7 +859,7 @@ namespace newAlgorithm
         /// <summary>
         /// Данная функция выполняет перестроение таблиц
         /// </summary>
-        private void tablesRebuild()
+        private void TablesRebuild()
         {
 
             // Определяем необходимость переопределения данных таблиц
@@ -877,13 +877,13 @@ namespace newAlgorithm
             InitTables();
 
             // Выполяем рандомизацию для таблицы времени обработки
-            randomizeProcessingTime_Click();
+            RandomizeProcessingTime_Click();
 
             // Выполняем рандомизацию для таблицы времени переналадки приборов
-            randomizeChangeoverTime_Click();
+            RandomizeChangeoverTime_Click();
 
             // Выполняем рандомизацию для таблицы времени ПТО
-            randomizePreMaintenanceTime_Click();
+            RandomizePreMaintenanceTime_Click();
 
             // Сбрасываем необходимость переопределения данных таблиц
             isValueChagedToUpdate = false;
@@ -894,7 +894,7 @@ namespace newAlgorithm
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void tabControl_time_setup_Selecting(object sender, TabControlCancelEventArgs e)
+        private void TabControl_time_setup_Selecting(object sender, TabControlCancelEventArgs e)
         {
             // TODO: БАГ. Проблема вызова. При переопределении переменных не переопределяются матрицы
             // Вычисляем выбранную вкладку
@@ -912,7 +912,7 @@ namespace newAlgorithm
                 case 1:
 
                     // При переключении на данную вкладку в случае изменений параметров таблицы выполняем обработку
-                    tablesRebuild();
+                    TablesRebuild();
 
                     break;
 
@@ -928,7 +928,7 @@ namespace newAlgorithm
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void randomizeProcessingTime_Click(object sender = null, EventArgs e = null)
+        private void RandomizeProcessingTime_Click(object sender = null, EventArgs e = null)
         {
             // Формируем рандомайзер на основе введённого значение
             // Random rand = new Random(randomValue);
@@ -972,7 +972,7 @@ namespace newAlgorithm
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void randomizeChangeoverTime_Click(object sender = null, EventArgs e = null)
+        private void RandomizeChangeoverTime_Click(object sender = null, EventArgs e = null)
         {
             // Формируем рандомайзер на основе введённого значение
             // Random rand = new Random(randomValue);
@@ -1031,7 +1031,7 @@ namespace newAlgorithm
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void randomizePreMaintenanceTime_Click(object sender = null, EventArgs e = null)
+        private void RandomizePreMaintenanceTime_Click(object sender = null, EventArgs e = null)
         {
             // Формируем второе рандомное значение, как половина от введённого
             int _randomValue = randomValue / 2;
@@ -1066,7 +1066,7 @@ namespace newAlgorithm
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void copyPreprocessingTime_Click(object sender, EventArgs e)
+        private void CopyPreprocessingTime_Click(object sender, EventArgs e)
         {
 
             // Для всех строк после первого устройства выполняем обработку
@@ -1089,7 +1089,7 @@ namespace newAlgorithm
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void numeric_batch_count_ValueChanged(object sender, EventArgs e)
+        private void Numeric_batch_count_ValueChanged(object sender, EventArgs e)
         {
             batchCount = Convert.ToInt32(numeric_batch_count.Value);
         }
@@ -1099,7 +1099,7 @@ namespace newAlgorithm
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void numeric_max_changeover_time_ValueChanged(object sender, EventArgs e)
+        private void Numeric_max_changeover_time_ValueChanged(object sender, EventArgs e)
         {
             maxChangeoverTime = Convert.ToInt32(numeric_max_changeover_time.Value);
         }
@@ -1109,7 +1109,7 @@ namespace newAlgorithm
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void numeric_max_proccessing_time_ValueChanged(object sender, EventArgs e)
+        private void Numeric_max_proccessing_time_ValueChanged(object sender, EventArgs e)
         {
             maxProccessingTime = Convert.ToInt32(numeric_max_proccessing_time.Value);
         }
@@ -1119,7 +1119,7 @@ namespace newAlgorithm
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void numeric_data_types_count_ValueChanged(object sender, EventArgs e)
+        private void Numeric_data_types_count_ValueChanged(object sender, EventArgs e)
         {
             dataTypesCount = Convert.ToInt32(numeric_data_types_count.Value);
             isValueChagedToUpdate = true;
@@ -1130,7 +1130,7 @@ namespace newAlgorithm
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void numeric_buffer_ValueChanged(object sender, EventArgs e)
+        private void Numeric_buffer_ValueChanged(object sender, EventArgs e)
         {
             buffer = Convert.ToInt32(numeric_buffer.Value);
             Form1.buff = buffer;
@@ -1141,7 +1141,7 @@ namespace newAlgorithm
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void numeric_device_count_ValueChanged(object sender, EventArgs e)
+        private void Numeric_device_count_ValueChanged(object sender, EventArgs e)
         {
             deviceCount = Convert.ToInt32(numeric_device_count.Value);
             isValueChagedToUpdate = true;
@@ -1152,7 +1152,7 @@ namespace newAlgorithm
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void checkBox_fixed_batches_CheckedChanged(object sender, EventArgs e)
+        private void CheckBox_fixed_batches_CheckedChanged(object sender, EventArgs e)
         {
             isFixedBatches = checkBox_fixed_batches.Checked;
         }
@@ -1162,7 +1162,7 @@ namespace newAlgorithm
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void checkBox_optimization_CheckedChanged(object sender, EventArgs e)
+        private void CheckBox_optimization_CheckedChanged(object sender, EventArgs e)
         {
             isOptimization = checkBox_optimization.Checked;
         }
@@ -1172,7 +1172,7 @@ namespace newAlgorithm
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void checkBox_visualization_CheckedChanged(object sender, EventArgs e)
+        private void CheckBox_visualization_CheckedChanged(object sender, EventArgs e)
         {
             Form1.vizualizationOn = checkBox_visualization.Checked;
         }
@@ -1182,7 +1182,7 @@ namespace newAlgorithm
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void numeric_random_ValueChanged(object sender, EventArgs e)
+        private void Numeric_random_ValueChanged(object sender, EventArgs e)
         {
             randomValue = Convert.ToInt32(numeric_random.Value);
         }
@@ -1192,7 +1192,7 @@ namespace newAlgorithm
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void numeric_generation_count_ValueChanged(object sender, EventArgs e)
+        private void Numeric_generation_count_ValueChanged(object sender, EventArgs e)
         {
             generationCount = Convert.ToInt32(numeric_generation_count.Value);
         }
@@ -1202,7 +1202,7 @@ namespace newAlgorithm
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void numericUpDown2_ValueChanged(object sender, EventArgs e)
+        private void NumericUpDown2_ValueChanged(object sender, EventArgs e)
         {
             xromossomiSize = Convert.ToInt32(numeric_xromossomi_size.Value);
         }
@@ -1348,13 +1348,13 @@ namespace newAlgorithm
             InitTables();
 
             // Выполяем рандомизацию для таблицы времени обработки
-            randomizeProcessingTime_Click();
+            RandomizeProcessingTime_Click();
 
             // Выполняем рандомизацию для таблицы времени переналадки приборов
-            randomizeChangeoverTime_Click();
+            RandomizeChangeoverTime_Click();
 
             // Выполняем рандомизацию для таблиц ПТО
-            randomizePreMaintenanceTime_Click();
+            RandomizePreMaintenanceTime_Click();
         }
 
         /// <summary>
