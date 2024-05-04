@@ -54,9 +54,6 @@ namespace magisterDiplom.Fabric
                 // Выводим префикс
                 Console.Write($"{prefix}");
 
-                // Выводим префикс
-                Console.Write($"{prefix}");
-
                 // Выводим разделитель
                 for (batchIndex = 0; batchIndex < batchCount; batchIndex++)
                     Console.Write($"+-");
@@ -70,9 +67,6 @@ namespace magisterDiplom.Fabric
                     Console.Write($"|{matrixY[device][batchIndex]}");
                 Console.WriteLine("|");
             }
-
-            // Выводим префикс
-            Console.Write($"{prefix}");
 
             // Выводим префикс
             Console.Write($"{prefix}");
@@ -274,7 +268,7 @@ namespace magisterDiplom.Fabric
                     for (int i = 0; i < times; i++)
                     {
                         Console.Write(new String('-', genSize));
-                    Console.Write("+");
+                        Console.Write("+");
                     }
                     Console.WriteLine();
                 }
@@ -305,20 +299,20 @@ namespace magisterDiplom.Fabric
                                 // Если текущий момент времени последний и в данной позиции есть ПТО
                                 if (this.startProcessing[device][batchIndex][job] == this.startProcessing[device][batchIndex].Last() && this.matrixY[device][batchIndex] == 1)
                                 {
-                                
+
                                     // Выводим t раз ПТО
                                     for (int t = 0; t < this.config.preMaintenanceTimes[device]; t++) { 
                                         Console.Write($"|");
                                         Console.Write(new String('*', genSize));
-                                }
-                                
-                                // Увеличиваем время
+                                    }
+
+                                    // Увеличиваем время
                                     time += this.config.preMaintenanceTimes[device];
-                            }
+                                }
 
                                 // Увеличиваем время
                                 time += this.config.proccessingTime[device, this.schedule[batchIndex].Type];
-                        }
+                            }
                     }
                     
                     // Если время возможно
@@ -340,7 +334,7 @@ namespace magisterDiplom.Fabric
                 for (int i = 0; i < times; i++)
                 {
                     Console.Write(new String('-', genSize));
-                Console.Write("+");
+                    Console.Write("+");
                 }
                 Console.WriteLine();
             }
