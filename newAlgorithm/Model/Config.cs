@@ -10,7 +10,7 @@ namespace magisterDiplom.Model
     /// <summary>
     /// Структура описывает конфигурацию по которой необходимо выполнить построение расписания
     /// </summary>
-    public struct Config
+    public readonly struct Config
     {
 
         /// <summary>
