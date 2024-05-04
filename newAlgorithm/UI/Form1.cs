@@ -121,19 +121,6 @@ namespace newAlgorithm
 
             // Вызываем самописную функцию инициализации данных и графических компонентов
             InitializeForm();
-
-            /*
-            // Данный код использовался для тестирования на начальных этапах
-            var test = new List<List<int>>();
-            test.Add(new List<int>());
-            test.Add(new List<int>(){2});
-            test.Add(new List<int>(){10, 2});
-            var t = new Shedule(test);
-            //Shedule.L = 5;
-            //t.GetTime();
-            //var a = t.ReturnRIndex(0);
-            //var b = t.ReturnRIndex(1);
-             */
         }
 
         #region Обработка событий разного рода
@@ -1463,6 +1450,47 @@ namespace newAlgorithm
         private void Form1_Load(object sender, EventArgs e)
         {
 
+        }
+
+        private void GetPreMSolution_Click(object sender, EventArgs e)
+        {
+
+            // Преобразуем входные данные в число типа Double
+            Double.TryParse(betaValue.Text, out Double beta);
+
+            // Если beta будет больше 1
+            if (beta > (Double) 1.0) {
+                MessageBox.Show("Ошибка. Значение beta не может быть больше 1");
+                return;
+            }
+
+
+            // Инициализируем расписание
+            Shedule.deviceCount = deviceCount;
+            Shedule.changeoverTime = changeoverTime;
+            Shedule.proccessingTime = proccessingTime;
+
+            // Создаём экземпляр конфигурационной структуры
+            Config config = new Config(
+                dataTypesCount,
+                deviceCount,
+                buffer,
+                (Matrix)(new Matrix(proccessingTime)),
+                Config.ChangeoverTimeConverter(changeoverTime),
+                new Vector(preMaintenanceTimes),
+                new Vector(failureRates),
+                new Vector(restoringDevice),
+                isFixedBatches
+            );
+
+            // Инициализируем вектор длиной dataTypesCount, каждый элемент которого будет равен batchCount
+            List<int> batchCountList = CreateBatchCountList();
+
+            // Формируем первый уровень
+            var firstLevel = new FirstLevel(config, batchCountList);
+
+            // Выполняем генерацию данных для ввсех типов вторым алгоритмом
+            firstLevel.GenetateSolutionWithPremaintenance("Premintenance");
         }
     }
 }

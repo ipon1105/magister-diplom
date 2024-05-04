@@ -29,7 +29,7 @@
         private void InitializeComponent()
         {
             this.numeric_data_types_count = new System.Windows.Forms.NumericUpDown();
-            this.button1 = new System.Windows.Forms.Button();
+            this.GetSolution = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
@@ -38,6 +38,7 @@
             this.button2 = new System.Windows.Forms.Button();
             this.tabControl = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.GetPreMSolution = new System.Windows.Forms.Button();
             this.groupBox_system_setup = new System.Windows.Forms.GroupBox();
             this.checkBox_visualization = new System.Windows.Forms.CheckBox();
             this.textBox2 = new System.Windows.Forms.TextBox();
@@ -84,6 +85,8 @@
             this.numeric_random = new System.Windows.Forms.NumericUpDown();
             this.label7 = new System.Windows.Forms.Label();
             this.label6 = new System.Windows.Forms.Label();
+            this.betaValue = new System.Windows.Forms.TextBox();
+            this.label15 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.numeric_data_types_count)).BeginInit();
             this.tabControl.SuspendLayout();
             this.tabPage1.SuspendLayout();
@@ -129,15 +132,15 @@
             0});
             this.numeric_data_types_count.ValueChanged += new System.EventHandler(this.Numeric_data_types_count_ValueChanged);
             // 
-            // button1
+            // GetSolution
             // 
-            this.button1.Location = new System.Drawing.Point(542, 348);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(90, 38);
-            this.button1.TabIndex = 2;
-            this.button1.Text = "Получить решение";
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.Button1_Click);
+            this.GetSolution.Location = new System.Drawing.Point(542, 348);
+            this.GetSolution.Name = "GetSolution";
+            this.GetSolution.Size = new System.Drawing.Size(90, 38);
+            this.GetSolution.TabIndex = 2;
+            this.GetSolution.Text = "Получить решение";
+            this.GetSolution.UseVisualStyleBackColor = true;
+            this.GetSolution.Click += new System.EventHandler(this.Button1_Click);
             // 
             // label1
             // 
@@ -208,11 +211,12 @@
             // 
             // tabPage1
             // 
+            this.tabPage1.Controls.Add(this.GetPreMSolution);
             this.tabPage1.Controls.Add(this.groupBox_system_setup);
             this.tabPage1.Controls.Add(this.setsBtn);
             this.tabPage1.Controls.Add(this.button4);
             this.tabPage1.Controls.Add(this.button3);
-            this.tabPage1.Controls.Add(this.button1);
+            this.tabPage1.Controls.Add(this.GetSolution);
             this.tabPage1.Location = new System.Drawing.Point(4, 22);
             this.tabPage1.Name = "tabPage1";
             this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
@@ -220,6 +224,16 @@
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "Установка параметров";
             this.tabPage1.UseVisualStyleBackColor = true;
+            // 
+            // GetPreMSolution
+            // 
+            this.GetPreMSolution.Location = new System.Drawing.Point(542, 395);
+            this.GetPreMSolution.Name = "GetPreMSolution";
+            this.GetPreMSolution.Size = new System.Drawing.Size(186, 35);
+            this.GetPreMSolution.TabIndex = 42;
+            this.GetPreMSolution.Text = "Получить решение с ПТО";
+            this.GetPreMSolution.UseVisualStyleBackColor = true;
+            this.GetPreMSolution.Click += new System.EventHandler(this.GetPreMSolution_Click);
             // 
             // groupBox_system_setup
             // 
@@ -627,6 +641,8 @@
             this.tableLayoutPanel.Controls.Add(this.numeric_random, 0, 3);
             this.tableLayoutPanel.Controls.Add(this.label7, 0, 0);
             this.tableLayoutPanel.Controls.Add(this.label6, 2, 0);
+            this.tableLayoutPanel.Controls.Add(this.betaValue, 6, 3);
+            this.tableLayoutPanel.Controls.Add(this.label15, 5, 3);
             this.tableLayoutPanel.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel.Location = new System.Drawing.Point(3, 3);
             this.tableLayoutPanel.Name = "tableLayoutPanel";
@@ -846,6 +862,25 @@
             this.label6.Text = "Время переналадки приборов";
             this.label6.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
+            // betaValue
+            // 
+            this.betaValue.Location = new System.Drawing.Point(1097, 664);
+            this.betaValue.Name = "betaValue";
+            this.betaValue.Size = new System.Drawing.Size(71, 20);
+            this.betaValue.TabIndex = 31;
+            this.betaValue.Text = "0.90";
+            // 
+            // label15
+            // 
+            this.label15.AutoSize = true;
+            this.label15.Dock = System.Windows.Forms.DockStyle.Right;
+            this.label15.Location = new System.Drawing.Point(1060, 661);
+            this.label15.Name = "label15";
+            this.label15.Padding = new System.Windows.Forms.Padding(0, 6, 0, 0);
+            this.label15.Size = new System.Drawing.Size(31, 82);
+            this.label15.TabIndex = 32;
+            this.label15.Text = "beta:";
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -886,7 +921,7 @@
         #endregion
 
         private System.Windows.Forms.NumericUpDown numeric_data_types_count;
-        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Button GetSolution;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label3;
@@ -941,6 +976,9 @@
         private System.Windows.Forms.Label label12;
         private System.Windows.Forms.Label label13;
         private System.Windows.Forms.Label label14;
+        private System.Windows.Forms.TextBox betaValue;
+        private System.Windows.Forms.Button GetPreMSolution;
+        private System.Windows.Forms.Label label15;
     }
 }
 
