@@ -280,7 +280,7 @@ namespace newAlgorithm
 
                                 //var firstLevel = new FirstLevel(_countType, batchCountList, checkBox1.Checked);
                                 //firstLevel.GenetateSolutionForAllTypes("outputFirstAlgorithm.txt");
-                                var oldSecondLevel = new OldSecondLevel(tz, countGroup, deviceCount);
+                                var oldSecondLevel = new OldSecondLevel(tz, countGroup);
 
                                 var listInt = !isOptimization
                                     ? oldSecondLevel.CalcFitnessList(sostav, out int criteria, out int flCrit)
@@ -356,7 +356,7 @@ namespace newAlgorithm
                                 var firstLevel = new FirstLevel(config, batchCountList);
 
                                 firstLevel.GenetateSolutionForAllTypes("outputFirstAlgorithm.txt");
-                                var oldSecondLevel = new OldSecondLevel(tz, countGroup, deviceCount);
+                                var oldSecondLevel = new OldSecondLevel(tz, countGroup);
 
                                 var listInt = !isOptimization
                                     ? oldSecondLevel.CalcFitnessList(firstLevel.PrimeMatrixA, out int criteria, out int flCrit)

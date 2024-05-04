@@ -17,22 +17,19 @@ namespace Diplom
      */
     class BatchTypeClaims
     {
-        private List<List<int>> A;//Матрица составов партий требований максимальных решений
+        private readonly List<List<int>> A;//Матрица составов партий требований максимальных решений
         private List<List<int>> A1;//Матрица составов партий требований в окресности Ок
         private List<List<int>> A2;//Матрица составов партий требований в окресности Ок+1
-        private int countClaims;//Начальное количество требований для текущего типа данных
-        private int np1;//Количество решений по составам партий данных , полученных на текущей (s+g)-ой  итерации алгоритма 
+        private readonly int countClaims;//Начальное количество требований для текущего типа данных
+        private readonly int np1;//Количество решений по составам партий данных , полученных на текущей (s+g)-ой  итерации алгоритма 
         private int np2;//Количество решений по составам партий данных , полученных на последующей  ((s+g)+1)-ой  итерации алгоритма 
         private int q1;//Индекс решения по составам партий данных в А1
         private int q2;//Индекс решения по составам партий данных в А2
-        private int q2i;//Индекс максимального решения по составам партий данных в А2
-        private int g;//Текущая итерация алгоритма
         private int h;//Номер партии, состав которой будет изменяться
-        private int G;//Максимальное по модулю значение дискретного градиента
         private int j;//Дополнительный индекс к номеру партии h
-        private int i;//Идентификатор текущего типа партии
+        private readonly int i;//Идентификатор текущего типа партии
         private int f1;//критерий, полученный с первого уровня для определения лучшего решения
-        private bool inMatrixFlag = false;//флаг проверки входных зачений
+        private readonly bool inMatrixFlag = false;//флаг проверки входных зачений
 
         /*
          * Функция копирования значений между матрицами, предотвращающая копирование указателей
@@ -159,8 +156,6 @@ namespace Diplom
             this.np2 = 1;
             this.np1 = this.A1.Count - 1;
             this.q2 = 0;
-            this.q2i = 0;
-            this.g = 1;
             this.f1 = valieCriterion;
             this.countClaims = valueCountClaims;
         }
@@ -253,7 +248,7 @@ namespace Diplom
                                 count_find++;
                             }
                         }
-                        return count_find == inList.Count ? true : false;
+                        return count_find == inList.Count;
                     });
                     if (lastIndexForDelete != i)
                     {
@@ -388,26 +383,22 @@ namespace Diplom
             {
                 this.A2 = this.SortedMatrix(this.A2);
                 this.np2 = this.A2.Count - 1;
-                this.G = 0;
                 if (this.np2 > 0)
                 {
                     bool flagSolution = false;
                     for (int indexQ = 1; indexQ < this.A2.Count; indexQ++)
                     {
-                        int f1g = 0;
                         List<List<int>> tempA = CopyMatrix(this.A);
                         tempA[this.i] = this.A2[indexQ];
                         OldSecondLevel secondLevel = new OldSecondLevel();
                         secondLevel.GenerateSolution(tempA);
                         List<List<int>> tempMatrixA = secondLevel.ReturnAMatrix();
-                        f1g = this.GetCriterion(tempMatrixA);
-                        Random rand = new Random();
-                        int ret = rand.Next(5, 15);
-                        //if (ret < 10) 
+                        int f1g = this.GetCriterion(tempMatrixA);
+                        // Random rand = new Random();
+                        // int ret = rand.Next(5, 15);
+                        // if (ret < 10) 
                         if (f1g >= this.f1)
                         {
-                            this.q2i = indexQ;
-                            this.G = f1g - this.f1;
                             this.f1 = f1g;
                             flagSolution = true;
                         }

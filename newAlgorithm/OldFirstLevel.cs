@@ -10,12 +10,12 @@ namespace newAlgorithm
 {
     class OldFirstLevel
     {
-        public static bool flag;
-        private List<int> I;//Вектор интерпритируемых типов данных
-        private List<int> Ii;//Вектор интерпритируемых типов данных на текущем шагу алгоритма
-        private List<int> mi;//Вектор количества партий данных для каждого типа данных
-        private List<int> np1i;//задание для каждого i-го типа данных количества решений по составам партий данных i-ых типов, сформированных на текущей ите-рации алгоритма
-        private List<int> np2i;//задание для каждого i-го типа данных количества решений по составам партий данных i-ых типов, сформированных на текущей ите-рации алгоритма
+        public static bool flag = false;
+        private readonly List<int> I;//Вектор интерпритируемых типов данных
+        private readonly List<int> Ii;//Вектор интерпритируемых типов данных на текущем шагу алгоритма
+        private readonly List<int> mi;//Вектор количества партий данных для каждого типа данных
+        private readonly List<int> np1i;//задание для каждого i-го типа данных количества решений по составам партий данных i-ых типов, сформированных на текущей ите-рации алгоритма
+        private readonly List<int> np2i;//задание для каждого i-го типа данных количества решений по составам партий данных i-ых типов, сформированных на текущей ите-рации алгоритма
         private List<List<int>> A1i;//Буферизированная матрица составов партий требований на k+1 шаге 
         private List<List<int>> A1;//Матрица составов партий требований на k+1 шаге 
         private List<List<int>> A2;//Матрица составов партий требований фиксированного типа
@@ -25,15 +25,13 @@ namespace newAlgorithm
         /// <summary>
         /// Данная переменная описывает количество типов данных обрабатываемых в конвейерной системе
         /// </summary>
-        private int dataTypesCount;
+        private readonly int dataTypesCount;
 
-        private List<int> countClaims;//Начальное количество требований для каждого типа данных
+        private readonly List<int> countClaims;//Начальное количество требований для каждого типа данных
         private BatchTypeClaims test;
         private int i;//идентификатор текущего изменяемого типа
-        private int G;
         private int q2;
         private int k;
-        private List<int> fi;//Критерии решений всех типов данных
         private int f1;//Критерий текущего решения для всех типов
         private int f1Buf;//Критерий текущего решения для всех типов
         private bool solutionFlag;
@@ -81,8 +79,10 @@ namespace newAlgorithm
         public void GenerateStartSolution()
         {
             int claim = 2;
-            this.A = new List<List<int>>();
-            this.A.Add(new List<int>());
+            this.A = new List<List<int>>
+            {
+                new List<int>()
+            };
             for (int i = 1; i <= this.dataTypesCount; i++)
             {
                 this.I.Add(1);
@@ -108,7 +108,6 @@ namespace newAlgorithm
                     this.Ii[i - 1] = 0;
                 }
             }
-            this.G = 0;
         }
 
         /*
@@ -225,7 +224,7 @@ namespace newAlgorithm
             //Добавить вычисление значения критерия
             List<List<int>> MaxA = this.CopyMatrix(this.A);
             int maxF1 = this.f1;
-            string s = "";
+            string s;
             if (flag == true)
             {
                 while (!this.CheckType(this.I))
@@ -249,9 +248,11 @@ namespace newAlgorithm
                                 this.A1 = this.CopyMatrix(this.ABuf);
                                 //MessageBox.Show("Решение по составу партий данных " + (this.i + 1) + " типа на " + (this.k + 1) + " шаге алгоритма");
                                 //Получение состава партий фиксированного типа
-                                List<List<int>> toBatchAlgoritm = new List<List<int>>();
-                                toBatchAlgoritm.Add(new List<int>());
-                                toBatchAlgoritm.Add(new List<int>());
+                                List<List<int>> toBatchAlgoritm = new List<List<int>>
+                                {
+                                    new List<int>(),
+                                    new List<int>()
+                                };
                                 toBatchAlgoritm[1] = this.A1[this.i + 1];
                                 test = new BatchTypeClaims(this.f1, this.i + 1, this.countClaims[this.i], toBatchAlgoritm, this.A1);
                                 test.GenerateSolution();
@@ -263,9 +264,11 @@ namespace newAlgorithm
                                 if (tempA2.Count < 2)
                                 {
                                     this.mi[this.i]++;
-                                    this.A2 = new List<List<int>>();
-                                    this.A2.Add(new List<int>());
-                                    this.A2.Add(new List<int>());
+                                    this.A2 = new List<List<int>>
+                                    {
+                                        new List<int>(),
+                                        new List<int>()
+                                    };
                                     this.A2[1].Add(0);
                                     this.A2[1].Add(0);
                                     int sum = 0;
@@ -285,8 +288,10 @@ namespace newAlgorithm
                                 else
                                 {
                                     //this.A2 = this.CopyMatrix(tempA2);
-                                    this.A2 = new List<List<int>>();
-                                    this.A2.Add(new List<int>());
+                                    this.A2 = new List<List<int>>
+                                    {
+                                        new List<int>()
+                                    };
                                     for (int ii = 1; ii < tempA2.Count; ii++)
                                     {
                                         //this.A2.Add(new List<int>());
@@ -301,15 +306,14 @@ namespace newAlgorithm
                                 for (this.q2 = 1; this.q2 < this.A2.Count; this.q2++)
                                 {
                                     this.A1i[this.i + 1] = this.A2[this.q2];
-                                    int f1g = 0;
                                     secondLevel = new OldSecondLevel();
                                     List<List<int>> tempA = CopyMatrix(this.A1i);
                                     secondLevel.GenerateSolution(tempA);
                                     List<List<int>> tempMatrixA = secondLevel.ReturnAMatrix();
-                                    f1g = this.GetCriterion(tempMatrixA);
-                                    Random rand = new Random();
-                                    int ret = rand.Next(5, 15);
-                                    //if(ret < 10)
+                                    int f1g = this.GetCriterion(tempMatrixA);
+                                    // Random rand = new Random();
+                                    // int ret = rand.Next(5, 15);
+                                    // if(ret < 10)
                                     if (f1g >= this.f1Buf)
                                         //if (f1g - this.f1Buf < 0 || f1g == 0)
                                     {

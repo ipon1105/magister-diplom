@@ -80,11 +80,8 @@ namespace newAlgorithm
         public Shedule(List<List<int>> matrixR, int deviceCount)
         {
 
-            // Проверяем инициализацю матрицы
-            if (this.matrixR != null)
-
-                // Если матрицу уже существует - отчищаем её
-                this.matrixR.Clear();
+            // Если матрицу уже существует - отчищаем её
+            this.matrixR?.Clear();
 
             // Выполняем переопределение новой матрицы
             this.matrixR = matrixR;
@@ -118,8 +115,7 @@ namespace newAlgorithm
         {
 
             // Отчищаем существующие матрицы R, если они есть
-            if (matrixR != null)
-                matrixR.Clear();
+            matrixR?.Clear();
 
             // Подсчитываем количество элементов в каждой строке (sum(mi))
             // batchesList представляет из себя множество партий с одним типом
@@ -164,8 +160,7 @@ namespace newAlgorithm
         {
 
             // Если матрица уже существует, отчищаем её
-            if (matrixRWithTime != null)
-                matrixRWithTime.Clear();
+            matrixRWithTime?.Clear();
 
             // Инициализируем матрицу R со временем
             matrixRWithTime = new List<SheduleElement>();
@@ -213,12 +208,10 @@ namespace newAlgorithm
         {
 
             // Проверка на инициализацию словаря
-            if (startProcessing != null)
-                startProcessing.Clear();
+            startProcessing?.Clear();
             
             // Проверка на инициализацию словаря
-            if (stopProcessing != null)
-                stopProcessing.Clear();
+            stopProcessing?.Clear();
 
             // Выполняем инициализацию словарей
             startProcessing = new Dictionary<int, List<List<int>>>();
@@ -577,72 +570,72 @@ namespace newAlgorithm
         /// </summary>
         /// <param name="position1"></param>
         /// <param name="position2"></param>
-        private void ChangeColum(int position1, int position2)
-        {
-            var indd1 = 0;
-            var indd2 = 0;
-            for (var i = 0; i < matrixR[position1].Count; i++)
-            {
-                if (matrixR[position1][i] > 0)
-                {
-                    indd1 = i;
-                }
-            }
-            for (var i = 0; i < matrixR[position2].Count; i++)
-            {
-                if (matrixR[position2][i] > 0)
-                {
-                    indd2 = i;
-                }
-            }
-            var temp = matrixR[position1][indd1];
-            matrixR[position1][indd1] = 0;
-            matrixR[position1][indd2] = matrixR[position2][indd2];
-            matrixR[position2][indd2] = 0;
-            matrixR[position2][indd1] = temp;
-        }
+        // private void ChangeColum(int position1, int position2)
+        // {
+        //     var indd1 = 0;
+        //     var indd2 = 0;
+        //     for (var i = 0; i < matrixR[position1].Count; i++)
+        //     {
+        //         if (matrixR[position1][i] > 0)
+        //         {
+        //             indd1 = i;
+        //         }
+        //     }
+        //     for (var i = 0; i < matrixR[position2].Count; i++)
+        //     {
+        //         if (matrixR[position2][i] > 0)
+        //         {
+        //             indd2 = i;
+        //         }
+        //     }
+        //     var temp = matrixR[position1][indd1];
+        //     matrixR[position1][indd1] = 0;
+        //     matrixR[position1][indd2] = matrixR[position2][indd2];
+        //     matrixR[position2][indd2] = 0;
+        //     matrixR[position2][indd1] = temp;
+        // }
 
         /// <summary>
         /// Выполняем построения расписания, что подразумевает поиск наилучшего времени выполнения всех пакетов заданий в разных позициях
         /// </summary>
-        public void ConstructSheduleCOPY()
-        {
-
-            // Высчитываем временные критерии
-            CalculateShedule();
-
-            // Выполняем копирование матрицы R
-            var matrixRCopy = ListUtils.MatrixIntDeepCopy(matrixR);
-
-            // Сохраняем лучший результат времени выполнения последнего задания
-            var tempTime = timeOfLastScheduleExecution;
-
-            // Пробегаемся по всем позициям матриц R
-            for (var batchIndex_i = 0; batchIndex_i < matrixR.Count - 1; batchIndex_i++)
-            {
-
-                // Пробегаемся по всем позициям матриц R
-                for (var batchIndex_j = batchIndex_i + 1; batchIndex_j < matrixR.Count; batchIndex_j++)
-
-                    // Ранее использовалась функция "ChangeColum(i, j);", которая в результате выполняла перестановку строк
-                    // Выполяем перестановку местами строки i и j
-                    ListUtils.MatrixIntRowSwap(matrixR, batchIndex_i, batchIndex_j);
-
-                // Для новой матрицы выполняем высчитывание временных критерией
-                CalculateShedule();
-
-                // Если сохранённый результат хуже, чем новый, пропускаем итерацию
-                if (tempTime >= timeOfLastScheduleExecution)
-                    continue;
-
-                // TODO: Данная строчка может являеться не корректной, так как выполняет поверхностое
-                // копирования и после первого прохода будет ссылаться на одну и ту же матрицу
-                matrixR = matrixRCopy;
-
-                // Выполняем переопределение нового лучшего времени
-                timeOfLastScheduleExecution = tempTime;
-            }
-        }
+        // public void ConstructSheduleCOPY()
+        // {
+        // 
+        //     // Высчитываем временные критерии
+        //     CalculateShedule();
+        // 
+        //     // Выполняем копирование матрицы R
+        //     var matrixRCopy = ListUtils.MatrixIntDeepCopy(matrixR);
+        // 
+        //     // Сохраняем лучший результат времени выполнения последнего задания
+        //     var tempTime = timeOfLastScheduleExecution;
+        // 
+        //     // Пробегаемся по всем позициям матриц R
+        //     for (var batchIndex_i = 0; batchIndex_i < matrixR.Count - 1; batchIndex_i++)
+        //     {
+        // 
+        //         // Пробегаемся по всем позициям матриц R
+        //         for (var batchIndex_j = batchIndex_i + 1; batchIndex_j < matrixR.Count; batchIndex_j++)
+        // 
+        //             // Ранее использовалась функция "ChangeColum(i, j);", которая в результате выполняла перестановку строк
+        //             // Выполяем перестановку местами строки i и j
+        //             ListUtils.MatrixIntRowSwap(matrixR, batchIndex_i, batchIndex_j);
+        // 
+        //         // Для новой матрицы выполняем высчитывание временных критерией
+        //         CalculateShedule();
+        // 
+        //         // Если сохранённый результат хуже, чем новый, пропускаем итерацию
+        //         if (tempTime >= timeOfLastScheduleExecution)
+        //             continue;
+        // 
+        //         // TODO: Данная строчка может являеться не корректной, так как выполняет поверхностое
+        //         // копирования и после первого прохода будет ссылаться на одну и ту же матрицу
+        //         matrixR = matrixRCopy;
+        // 
+        //         // Выполняем переопределение нового лучшего времени
+        //         timeOfLastScheduleExecution = tempTime;
+        //     }
+        // }
 
         /// <summary>
         /// Данная функция выполняет построение расписания с буфером
@@ -650,45 +643,45 @@ namespace newAlgorithm
         /// <param name="bufferSize">Размер буфера</param>
         /// <param name="dataTypesCount">Количество типов данных</param>
         /// <returns></returns>
-        public void ConstructSheduleWithBuffer1(int bufferSize, int dataTypesCount)
-        {
-
-            // Высчитываем временные критерии
-            CalculateSheduleWithBufer(bufferSize, dataTypesCount);
-
-            // Выполняем копирование матрицы R
-            var tempR = ListUtils.MatrixIntDeepCopy(matrixR);
-
-            // Сохраняем лучший результат времени выполнения последнего задания
-            var tempTime = timeOfLastScheduleExecution;
-
-            // Выполяем все возможные перестановки позиций
-            // Для всех позиций от 0 до matrixR.Count - 1 выполняем перебор
-            for (var batchIndex_i = 0; batchIndex_i < matrixR.Count - 1; batchIndex_i++)
-            {
-
-                // Для всех позиций от pos1 + 1 до matrixR.Count выполняем все перестановку строк (представляющие из себя позицию)
-                for (var batchIndex_j = batchIndex_i + 1; batchIndex_j < matrixR.Count; batchIndex_j++)
-
-                    // Ранее использовалась функция "ChangeColum(i, j);", которая в результате выполняла перестановку строку
-                    // Выполяем перестановку местами строки i и j
-                    ListUtils.MatrixIntRowSwap(matrixR, batchIndex_i, batchIndex_j);
-
-                // Выполяем высчитывание расписания с буфером для всех возможных последовательностей
-                CalculateSheduleWithBufer(bufferSize, dataTypesCount);
-
-                // Если сохранённый результат хуже, чем новый, пропускаем итерацию
-                if (tempTime >= timeOfLastScheduleExecution)
-                    continue;
-
-                // TODO: Данная строчка может являеться не корректной, так как выполняет поверхностое
-                // копирования и после первого прохода будет ссылаться на одну и ту же матрицу
-                matrixR = tempR;
-
-                // Выполняем переопределение нового лучшего времени
-                timeOfLastScheduleExecution = tempTime;
-            }
-        }
+        // public void ConstructSheduleWithBuffer1(int bufferSize, int dataTypesCount)
+        // {
+        // 
+        //     // Высчитываем временные критерии
+        //     CalculateSheduleWithBufer(bufferSize, dataTypesCount);
+        // 
+        //     // Выполняем копирование матрицы R
+        //     var tempR = ListUtils.MatrixIntDeepCopy(matrixR);
+        // 
+        //     // Сохраняем лучший результат времени выполнения последнего задания
+        //     var tempTime = timeOfLastScheduleExecution;
+        // 
+        //     // Выполяем все возможные перестановки позиций
+        //     // Для всех позиций от 0 до matrixR.Count - 1 выполняем перебор
+        //     for (var batchIndex_i = 0; batchIndex_i < matrixR.Count - 1; batchIndex_i++)
+        //     {
+        // 
+        //         // Для всех позиций от pos1 + 1 до matrixR.Count выполняем все перестановку строк (представляющие из себя позицию)
+        //         for (var batchIndex_j = batchIndex_i + 1; batchIndex_j < matrixR.Count; batchIndex_j++)
+        // 
+        //             // Ранее использовалась функция "ChangeColum(i, j);", которая в результате выполняла перестановку строку
+        //             // Выполяем перестановку местами строки i и j
+        //             ListUtils.MatrixIntRowSwap(matrixR, batchIndex_i, batchIndex_j);
+        // 
+        //         // Выполяем высчитывание расписания с буфером для всех возможных последовательностей
+        //         CalculateSheduleWithBufer(bufferSize, dataTypesCount);
+        // 
+        //         // Если сохранённый результат хуже, чем новый, пропускаем итерацию
+        //         if (tempTime >= timeOfLastScheduleExecution)
+        //             continue;
+        // 
+        //         // TODO: Данная строчка может являеться не корректной, так как выполняет поверхностое
+        //         // копирования и после первого прохода будет ссылаться на одну и ту же матрицу
+        //         matrixR = tempR;
+        // 
+        //         // Выполняем переопределение нового лучшего времени
+        //         timeOfLastScheduleExecution = tempTime;
+        //     }
+        // }
 
         #endregion
     }

@@ -796,7 +796,6 @@ namespace newAlgorithm
                 var _f1 = time;
                 f1Optimal = _f1;
                 result[0] = f1Optimal;
-                List<List<int>> maxA; // var maxA = ListUtils.MatrixIntDeepCopy(primeMatrixA);
                 isBestSolution = true;
 
                 // До тех пор пока в наличие есть оставшиеся типы и партии не фиксированные выполняем обработку
@@ -824,7 +823,6 @@ namespace newAlgorithm
 
                     // Для каждого типа и каждого решения в типе строим новое решение и проверяем его на критерий
                     _a2 = new List<List<List<int>>>();
-                    string s;
 
                     // Для кадого типа данных выполняем обработку
                     for (var dataType = 0; dataType < config.dataTypesCount; dataType++)

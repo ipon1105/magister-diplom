@@ -24,20 +24,20 @@ namespace GlobalTest.Model
             #region Input
 
             // Объявляем матрицу переналадки
-            Dictionary<int, Matrix> changeoverTime = new Dictionary<int, Matrix>();
+            Dictionary<int, Matrix> changeoverTime = new();
 
             // Создаём матрицу переналадки для 1 прибора
-            Matrix changeoverTime_1 = new Matrix(new List<List<int>>
+            Matrix changeoverTime_1 = new(new List<List<int>>
                 {
-                    new List<int> { 1, 2 },
-                    new List<int> { 3, 4 },
+                    new() { 1, 2 },
+                    new() { 3, 4 },
                 });
 
             // Создаём матрицу переналадки для 2 прибора
-            Matrix changeoverTime_2 = new Matrix(new List<List<int>>
+            Matrix changeoverTime_2 = new(new List<List<int>>
                 {
-                    new List<int> { 4, 2 },
-                    new List<int> { 3, 1 },
+                    new() { 4, 2 },
+                    new() { 3, 1 },
                 });
 
             // Добавляем матрицы переналадки в changeoverTime
@@ -45,14 +45,14 @@ namespace GlobalTest.Model
             changeoverTime.Add(1, changeoverTime_2);
 
             // Создаём матрицу времени выполнения
-            Matrix proccessingTime = new Matrix(new List<List<int>>
+            Matrix proccessingTime = new(new List<List<int>>
                 {
-                    new List<int> { 1, 2 },
-                    new List<int> { 3, 4 },
+                    new() { 1, 2 },
+                    new() { 3, 4 },
                 });
 
             // Формируем конфигурационный файл
-            Config config = new Config(
+            Config config = new(
                 2, // int dataTypesCount,
                 2, // int deviceCount,
                 999, // int buffer,
@@ -100,20 +100,20 @@ namespace GlobalTest.Model
             #region Input
 
             // Объявляем матрицу переналадки
-            Dictionary<int, Matrix> changeoverTime = new Dictionary<int, Matrix>();
+            Dictionary<int, Matrix> changeoverTime = new();
 
             // Создаём матрицу переналадки для 1 прибора
-            Matrix changeoverTime_1 = new Matrix(new List<List<int>>
+            Matrix changeoverTime_1 = new(new List<List<int>>
                 {
-                    new List<int> { 1, 2 },
-                    new List<int> { 3, 4 },
+                    new() { 1, 2 },
+                    new() { 3, 4 },
                 });
 
             // Создаём матрицу переналадки для 2 прибора
-            Matrix changeoverTime_2 = new Matrix(new List<List<int>>
+            Matrix changeoverTime_2 = new(new List<List<int>>
                 {
-                    new List<int> { 4, 2 },
-                    new List<int> { 3, 1 },
+                    new() { 4, 2 },
+                    new() { 3, 1 },
                 });
 
             // Добавляем матрицы переналадки в changeoverTime
@@ -121,16 +121,16 @@ namespace GlobalTest.Model
             changeoverTime.Add(1, changeoverTime_2);
 
             // Создаём матрицу времени выполнения
-            Matrix proccessingTime = new Matrix(new List<List<int>>
+            Matrix proccessingTime = new(new List<List<int>>
                 {
-                    new List<int> { 1, 2 },
-                    new List<int> { 3, 4 },
+                    new() { 1, 2 },
+                    new() { 3, 4 },
                 });
 
             #endregion
 
             // Формируем конфигурационный файл
-            Config config = new Config(
+            new Config(
                 2, // int dataTypesCount,
                 2, // int deviceCount,
                 999, // int buffer,
@@ -152,20 +152,20 @@ namespace GlobalTest.Model
             #region Input
 
             // Объявляем матрицу переналадки
-            Dictionary<int, Matrix> changeoverTime = new Dictionary<int, Matrix>();
+            Dictionary<int, Matrix> changeoverTime = new();
 
             // Создаём матрицу переналадки для 1 прибора
-            Matrix changeoverTime_1 = new Matrix(new List<List<int>>
+            Matrix changeoverTime_1 = new(new List<List<int>>
                 {
-                    new List<int> { 1, 2 },
-                    new List<int> { 3, 4 },
+                    new() { 1, 2 },
+                    new() { 3, 4 },
                 });
 
             // Создаём матрицу переналадки для 2 прибора
-            Matrix changeoverTime_2 = new Matrix(new List<List<int>>
+            Matrix changeoverTime_2 = new(new List<List<int>>
                 {
-                    new List<int> { 4, 2 },
-                    new List<int> { 3, 1 },
+                    new() { 4, 2 },
+                    new() { 3, 1 },
                 });
 
             // Добавляем матрицы переналадки в changeoverTime
@@ -173,16 +173,16 @@ namespace GlobalTest.Model
             changeoverTime.Add(1, changeoverTime_2);
 
             // Создаём матрицу времени выполнения
-            Matrix proccessingTime = new Matrix(new List<List<int>>
+            Matrix proccessingTime = new(new List<List<int>>
                 {
-                    new List<int> { 1, 2 },
-                    new List<int> { 3, 4 },
+                    new() { 1, 2 },
+                    new() { 3, 4 },
                 });
 
             #endregion
 
             // Формируем конфигурационный файл
-            Config config = new Config(
+            new Config(
                 3, // int dataTypesCount,
                 2, // int deviceCount,
                 999, // int buffer,
@@ -204,20 +204,20 @@ namespace GlobalTest.Model
             #region Input
 
             // Объявляем матрицу переналадки
-            Dictionary<int, Matrix> changeoverTime = new Dictionary<int, Matrix>();
+            Dictionary<int, Matrix> changeoverTime = new();
 
             // Создаём матрицу переналадки для 1 прибора
-            Matrix changeoverTime_1 = new Matrix(new List<List<int>>
+            Matrix changeoverTime_1 = new(new List<List<int>>
                 {
-                    new List<int> { 1, 2 },
-                    new List<int> { 3, 4 },
+                    new() { 1, 2 },
+                    new() { 3, 4 },
                 });
 
             // Создаём матрицу переналадки для 2 прибора
-            Matrix changeoverTime_2 = new Matrix(new List<List<int>>
+            Matrix changeoverTime_2 = new(new List<List<int>>
                 {
-                    new List<int> { 4, 2 },
-                    new List<int> { 3, 1 },
+                    new() { 4, 2 },
+                    new() { 3, 1 },
                 });
 
             // Добавляем матрицы переналадки в changeoverTime
@@ -225,16 +225,16 @@ namespace GlobalTest.Model
             changeoverTime.Add(1, changeoverTime_2);
 
             // Создаём матрицу времени выполнения
-            Matrix proccessingTime = new Matrix(new List<List<int>>
+            Matrix proccessingTime = new(new List<List<int>>
                 {
-                    new List<int> { 1, 2 },
-                    new List<int> { 3, 4 },
+                    new() { 1, 2 },
+                    new() { 3, 4 },
                 });
 
             #endregion
 
             // Формируем конфигурационный файл
-            Config config = new Config(
+            new Config(
                 2, // int dataTypesCount,
                 2, // int deviceCount,
                 999, // int buffer,
@@ -256,20 +256,20 @@ namespace GlobalTest.Model
             #region Input
 
             // Объявляем матрицу переналадки
-            Dictionary<int, Matrix> changeoverTime = new Dictionary<int, Matrix>();
+            Dictionary<int, Matrix> changeoverTime = new();
 
             // Создаём матрицу переналадки для 1 прибора
-            Matrix changeoverTime_1 = new Matrix(new List<List<int>>
+            Matrix changeoverTime_1 = new(new List<List<int>>
                 {
-                    new List<int> { 1, 2 },
-                    new List<int> { 3, 4 },
+                    new() { 1, 2 },
+                    new() { 3, 4 },
                 });
 
             // Создаём матрицу переналадки для 2 прибора
-            Matrix changeoverTime_2 = new Matrix(new List<List<int>>
+            Matrix changeoverTime_2 = new(new List<List<int>>
                 {
-                    new List<int> { 4, 2 },
-                    new List<int> { 3, 1 },
+                    new() { 4, 2 },
+                    new() { 3, 1 },
                 });
 
             // Добавляем матрицы переналадки в changeoverTime
@@ -277,16 +277,17 @@ namespace GlobalTest.Model
             changeoverTime.Add(1, changeoverTime_2);
 
             // Создаём матрицу времени выполнения
-            Matrix proccessingTime = new Matrix(new List<List<int>>
+            Matrix proccessingTime = new(new List<List<int>>
                 {
-                    new List<int> { 1, 2 },
-                    new List<int> { 3, 4 },
+                    new() { 1, 2 },
+                    new() { 3, 4 },
                 });
 
             #endregion
 
+
             // Формируем конфигурационный файл
-            Config config = new Config(
+            new Config(
                 3, // int dataTypesCount,
                 2, // int deviceCount,
                 999, // int buffer,
@@ -309,20 +310,20 @@ namespace GlobalTest.Model
             #region Input
 
             // Объявляем матрицу переналадки
-            Dictionary<int, Matrix> changeoverTime = new Dictionary<int, Matrix>();
+            Dictionary<int, Matrix> changeoverTime = new();
 
             // Создаём матрицу переналадки для 1 прибора
-            Matrix changeoverTime_1 = new Matrix(new List<List<int>>
+            Matrix changeoverTime_1 = new(new List<List<int>>
                 {
-                    new List<int> { 1, 2 },
-                    new List<int> { 3, 4 },
+                    new() { 1, 2 },
+                    new() { 3, 4 },
                 });
 
             // Создаём матрицу переналадки для 2 прибора
-            Matrix changeoverTime_2 = new Matrix(new List<List<int>>
+            Matrix changeoverTime_2 = new(new List<List<int>>
                 {
-                    new List<int> { 4, 2 },
-                    new List<int> { 3, 1 },
+                    new() { 4, 2 },
+                    new() { 3, 1 },
                 });
 
             // Добавляем матрицы переналадки в changeoverTime
@@ -330,16 +331,16 @@ namespace GlobalTest.Model
             changeoverTime.Add(1, changeoverTime_2);
 
             // Создаём матрицу времени выполнения
-            Matrix proccessingTime = new Matrix(new List<List<int>>
+            Matrix proccessingTime = new(new List<List<int>>
                 {
-                    new List<int> { 1, 2 },
-                    new List<int> { 3, 4 },
+                    new() { 1, 2 },
+                    new() { 3, 4 },
                 });
 
             #endregion
 
             // Формируем конфигурационный файл
-            Config config = new Config(
+            new Config(
                 2, // int dataTypesCount,
                 2, // int deviceCount,
                 999, // int buffer,
@@ -361,20 +362,20 @@ namespace GlobalTest.Model
             #region Input
 
             // Объявляем матрицу переналадки
-            Dictionary<int, Matrix> changeoverTime = new Dictionary<int, Matrix>();
+            Dictionary<int, Matrix> changeoverTime = new();
 
             // Создаём матрицу переналадки для 1 прибора
-            Matrix changeoverTime_1 = new Matrix(new List<List<int>>
+            Matrix changeoverTime_1 = new(new List<List<int>>
                 {
-                    new List<int> { 1, 2 },
-                    new List<int> { 3, 4 },
+                    new() { 1, 2 },
+                    new() { 3, 4 },
                 });
 
             // Создаём матрицу переналадки для 2 прибора
-            Matrix changeoverTime_2 = new Matrix(new List<List<int>>
+            Matrix changeoverTime_2 = new(new List<List<int>>
                 {
-                    new List<int> { 4, 2 },
-                    new List<int> { 3, 1 },
+                    new() { 4, 2 },
+                    new() { 3, 1 },
                 });
 
             // Добавляем матрицы переналадки в changeoverTime
@@ -382,16 +383,16 @@ namespace GlobalTest.Model
             changeoverTime.Add(1, changeoverTime_2);
 
             // Создаём матрицу времени выполнения
-            Matrix proccessingTime = new Matrix(new List<List<int>>
+            Matrix proccessingTime = new(new List<List<int>>
                 {
-                    new List<int> { 1, 2 },
-                    new List<int> { 3, 4 },
+                    new() { 1, 2 },
+                    new() { 3, 4 },
                 });
 
             #endregion
 
             // Формируем конфигурационный файл
-            Config config = new Config(
+            new Config(
                 3, // int dataTypesCount,
                 2, // int deviceCount,
                 999, // int buffer,
@@ -413,37 +414,29 @@ namespace GlobalTest.Model
             #region Input
 
             // Объявляем матрицу переналадки
-            Dictionary<int, Matrix> changeoverTime = new Dictionary<int, Matrix>();
+            Dictionary<int, Matrix> changeoverTime = new();
 
             // Создаём матрицу переналадки для 1 прибора
-            Matrix changeoverTime_1 = new Matrix(new List<List<int>>
+            Matrix changeoverTime_1 = new(new List<List<int>>
                 {
-                    new List<int> { 1, 2 },
-                    new List<int> { 3, 4 },
+                    new() { 1, 2 },
+                    new() { 3, 4 },
                 });
 
             // Создаём матрицу переналадки для 2 прибора
-            Matrix changeoverTime_2 = new Matrix(new List<List<int>>
+            Matrix changeoverTime_2 = new(new List<List<int>>
                 {
-                    new List<int> { 4, 2 },
-                    new List<int> { 3, 1 },
+                    new() { 4, 2 },
+                    new() { 3, 1 },
                 });
 
             // Добавляем матрицы переналадки в changeoverTime
             changeoverTime.Add(0, changeoverTime_1);
             changeoverTime.Add(1, changeoverTime_2);
-
-            // Создаём матрицу времени выполнения
-            Matrix proccessingTime = new Matrix(new List<List<int>>
-                {
-                    new List<int> { 1, 2 },
-                    new List<int> { 3, 4 },
-                });
-
             #endregion
 
             // Формируем конфигурационный файл
-            Config config = new Config(
+            new Config(
                 3, // int dataTypesCount,
                 2, // int deviceCount,
                 999, // int buffer,
@@ -465,20 +458,20 @@ namespace GlobalTest.Model
             #region Input
 
             // Объявляем матрицу переналадки
-            Dictionary<int, Matrix> changeoverTime = new Dictionary<int, Matrix>();
+            Dictionary<int, Matrix> changeoverTime = new();
 
             // Создаём матрицу переналадки для 1 прибора
-            Matrix changeoverTime_1 = new Matrix(new List<List<int>>
+            Matrix changeoverTime_1 = new(new List<List<int>>
                 {
-                    new List<int> { 1, 2 },
-                    new List<int> { 3, 4 },
+                    new() { 1, 2 },
+                    new() { 3, 4 },
                 });
 
             // Создаём матрицу переналадки для 2 прибора
-            Matrix changeoverTime_2 = new Matrix(new List<List<int>>
+            Matrix changeoverTime_2 = new(new List<List<int>>
                 {
-                    new List<int> { 4, 2 },
-                    new List<int> { 3, 1 },
+                    new() { 4, 2 },
+                    new() { 3, 1 },
                 });
 
             // Добавляем матрицы переналадки в changeoverTime
@@ -486,16 +479,16 @@ namespace GlobalTest.Model
             changeoverTime.Add(1, changeoverTime_2);
 
             // Создаём матрицу времени выполнения
-            Matrix proccessingTime = new Matrix(new List<List<int>>
+            Matrix proccessingTime = new(new List<List<int>>
                 {
-                    new List<int> { 1, 2 },
-                    new List<int> { 3, 4 },
+                    new() { 1, 2 },
+                    new() { 3, 4 },
                 });
 
             #endregion
 
             // Формируем конфигурационный файл
-            Config config = new Config(
+            new Config(
                 2, // int dataTypesCount,
                 3, // int deviceCount,
                 999, // int buffer,
@@ -517,20 +510,20 @@ namespace GlobalTest.Model
             #region Input
 
             // Объявляем матрицу переналадки
-            Dictionary<int, Matrix> changeoverTime = new Dictionary<int, Matrix>();
+            Dictionary<int, Matrix> changeoverTime = new();
 
             // Создаём матрицу переналадки для 1 прибора
-            Matrix changeoverTime_1 = new Matrix(new List<List<int>>
+            Matrix changeoverTime_1 = new(new List<List<int>>
                 {
-                    new List<int> { 1, 2 },
-                    new List<int> { 3, 4 },
+                    new() { 1, 2 },
+                    new() { 3, 4 },
                 });
 
             // Создаём матрицу переналадки для 2 прибора
-            Matrix changeoverTime_2 = new Matrix(new List<List<int>>
+            Matrix changeoverTime_2 = new(new List<List<int>>
                 {
-                    new List<int> { 4, 2 },
-                    new List<int> { 3, 1 },
+                    new() { 4, 2 },
+                    new() { 3, 1 },
                 });
 
             // Добавляем матрицы переналадки в changeoverTime
@@ -538,16 +531,16 @@ namespace GlobalTest.Model
             changeoverTime.Add(1, changeoverTime_2);
 
             // Создаём матрицу времени выполнения
-            Matrix proccessingTime = new Matrix(new List<List<int>>
+            Matrix proccessingTime = new(new List<List<int>>
                 {
-                    new List<int> { 1, 2, 3 },
-                    new List<int> { 3, 4 },
+                    new() { 1, 2, 3 },
+                    new() { 3, 4 },
                 });
 
             #endregion
 
             // Формируем конфигурационный файл
-            Config config = new Config(
+            new Config(
                 2, // int dataTypesCount,
                 2, // int deviceCount,
                 999, // int buffer,
@@ -569,20 +562,20 @@ namespace GlobalTest.Model
             #region Input
 
             // Объявляем матрицу переналадки
-            Dictionary<int, Matrix> changeoverTime = new Dictionary<int, Matrix>();
+            Dictionary<int, Matrix> changeoverTime = new();
 
             // Создаём матрицу переналадки для 1 прибора
-            Matrix changeoverTime_1 = new Matrix(new List<List<int>>
+            Matrix changeoverTime_1 = new(new List<List<int>>
                 {
-                    new List<int> { 1, 2 },
-                    new List<int> { 3, 4 },
+                    new() { 1, 2 },
+                    new() { 3, 4 },
                 });
 
             // Создаём матрицу переналадки для 2 прибора
-            Matrix changeoverTime_2 = new Matrix(new List<List<int>>
+            Matrix changeoverTime_2 = new(new List<List<int>>
                 {
-                    new List<int> { 4, 2 },
-                    new List<int> { 3, 1 },
+                    new() { 4, 2 },
+                    new() { 3, 1 },
                 });
 
             // Добавляем матрицы переналадки в changeoverTime
@@ -590,16 +583,16 @@ namespace GlobalTest.Model
             changeoverTime.Add(1, changeoverTime_2);
 
             // Создаём матрицу времени выполнения
-            Matrix proccessingTime = new Matrix(new List<List<int>>
+            Matrix proccessingTime = new(new List<List<int>>
                 {
-                    new List<int> { 3, 4 },
-                    new List<int> { 1, 2, 3 },
+                    new() { 3, 4 },
+                    new() { 1, 2, 3 },
                 });
 
             #endregion
 
             // Формируем конфигурационный файл
-            Config config = new Config(
+            new Config(
                 2, // int dataTypesCount,
                 2, // int deviceCount,
                 999, // int buffer,
@@ -621,20 +614,20 @@ namespace GlobalTest.Model
             #region Input
 
             // Объявляем матрицу переналадки
-            Dictionary<int, Matrix> changeoverTime = new Dictionary<int, Matrix>();
+            Dictionary<int, Matrix> changeoverTime = new();
 
             // Создаём матрицу переналадки для 1 прибора
-            Matrix changeoverTime_1 = new Matrix(new List<List<int>>
+            Matrix changeoverTime_1 = new(new List<List<int>>
                 {
-                    new List<int> { 1, 2 },
-                    new List<int> { 3, 4 },
+                    new() { 1, 2 },
+                    new() { 3, 4 },
                 });
 
             // Создаём матрицу переналадки для 2 прибора
-            Matrix changeoverTime_2 = new Matrix(new List<List<int>>
+            Matrix changeoverTime_2 = new(new List<List<int>>
                 {
-                    new List<int> { 4, 2 },
-                    new List<int> { 3, 1 },
+                    new() { 4, 2 },
+                    new() { 3, 1 },
                 });
 
             // Добавляем матрицы переналадки в changeoverTime
@@ -642,16 +635,16 @@ namespace GlobalTest.Model
             changeoverTime.Add(1, changeoverTime_2);
 
             // Создаём матрицу времени выполнения
-            Matrix proccessingTime = new Matrix(new List<List<int>>
+            Matrix proccessingTime = new(new List<List<int>>
                 {
-                    new List<int> { 3, 4 },
-                    new List<int> { 1, 2 },
+                    new() { 3, 4 },
+                    new() { 1, 2 },
                 });
 
             #endregion
 
             // Формируем конфигурационный файл
-            Config config = new Config(
+            new Config(
                 2, // int dataTypesCount,
                 2, // int deviceCount,
                 999, // int buffer,
@@ -673,38 +666,40 @@ namespace GlobalTest.Model
             #region Input
 
             // Объявляем матрицу переналадки
-            Dictionary<int, Matrix> changeoverTime = new Dictionary<int, Matrix>();
+            Dictionary<int, Matrix> changeoverTime = new();
 
             // Создаём матрицу переналадки для 1 прибора
-            Matrix changeoverTime_1 = new Matrix(new List<List<int>>
+            Matrix changeoverTime_1 = new(new List<List<int>>
                 {
-                    new List<int> { 1, 2 },
-                    new List<int> { 3, 4 },
+                    new() { 1, 2 },
+                    new() { 3, 4 },
                 });
 
             // Создаём матрицу переналадки для 2 прибора
-            Matrix changeoverTime_2 = new Matrix(new List<List<int>>
+            Matrix changeoverTime_2 = new(new List<List<int>>
                 {
-                    new List<int> { 4, 2 },
-                    new List<int> { 3, 1 },
+                    new() { 4, 2 },
+                    new() { 3, 1 },
                 });
 
             // Добавляем матрицы переналадки в changeoverTime
             changeoverTime.Add(0, changeoverTime_1);
             changeoverTime.Add(1, changeoverTime_2);
+            #pragma warning disable CS8625 // Литерал, равный NULL, не может быть преобразован в ссылочный тип, не допускающий значение NULL.
             changeoverTime.Add(2, null);
+            #pragma warning restore CS8625 // Литерал, равный NULL, не может быть преобразован в ссылочный тип, не допускающий значение NULL.
 
             // Создаём матрицу времени выполнения
-            Matrix proccessingTime = new Matrix(new List<List<int>>
+            Matrix proccessingTime = new(new List<List<int>>
                 {
-                    new List<int> { 3, 4 },
-                    new List<int> { 1, 2 },
+                    new() { 3, 4 },
+                    new() { 1, 2 },
                 });
 
             #endregion
 
             // Формируем конфигурационный файл
-            Config config = new Config(
+            new Config(
                 2, // int dataTypesCount,
                 2, // int deviceCount,
                 999, // int buffer,
@@ -726,21 +721,21 @@ namespace GlobalTest.Model
             #region Input
 
             // Объявляем матрицу переналадки
-            Dictionary<int, Matrix> changeoverTime = new Dictionary<int, Matrix>();
+            Dictionary<int, Matrix> changeoverTime = new();
 
             // Создаём матрицу переналадки для 1 прибора
-            Matrix changeoverTime_1 = new Matrix(new List<List<int>>
+            Matrix changeoverTime_1 = new(new List<List<int>>
                 {
-                    new List<int> { 1, 2 },
-                    new List<int> { 3, 4 },
-                    new List<int> { 3, 4 },
+                    new() { 1, 2 },
+                    new() { 3, 4 },
+                    new() { 3, 4 },
                 });
 
             // Создаём матрицу переналадки для 2 прибора
-            Matrix changeoverTime_2 = new Matrix(new List<List<int>>
+            Matrix changeoverTime_2 = new(new List<List<int>>
                 {
-                    new List<int> { 4, 2 },
-                    new List<int> { 3, 1 },
+                    new() { 4, 2 },
+                    new() { 3, 1 },
                 });
 
             // Добавляем матрицы переналадки в changeoverTime
@@ -748,16 +743,16 @@ namespace GlobalTest.Model
             changeoverTime.Add(1, changeoverTime_2);
 
             // Создаём матрицу времени выполнения
-            Matrix proccessingTime = new Matrix(new List<List<int>>
+            Matrix proccessingTime = new(new List<List<int>>
                 {
-                    new List<int> { 3, 4 },
-                    new List<int> { 1, 2 },
+                    new() { 3, 4 },
+                    new() { 1, 2 },
                 });
 
             #endregion
 
             // Формируем конфигурационный файл
-            Config config = new Config(
+            new Config(
                 2, // int dataTypesCount,
                 2, // int deviceCount,
                 999, // int buffer,
@@ -779,20 +774,20 @@ namespace GlobalTest.Model
             #region Input
 
             // Объявляем матрицу переналадки
-            Dictionary<int, Matrix> changeoverTime = new Dictionary<int, Matrix>();
+            Dictionary<int, Matrix> changeoverTime = new();
 
             // Создаём матрицу переналадки для 1 прибора
-            Matrix changeoverTime_1 = new Matrix(new List<List<int>>
+            Matrix changeoverTime_1 = new(new List<List<int>>
                 {
-                    new List<int> { 1, 2 },
-                    new List<int> { 3, 4, 5 },
+                    new() { 1, 2 },
+                    new() { 3, 4, 5 },
                 });
 
             // Создаём матрицу переналадки для 2 прибора
-            Matrix changeoverTime_2 = new Matrix(new List<List<int>>
+            Matrix changeoverTime_2 = new(new List<List<int>>
                 {
-                    new List<int> { 4, 2 },
-                    new List<int> { 3, 1 },
+                    new() { 4, 2 },
+                    new() { 3, 1 },
                 });
 
             // Добавляем матрицы переналадки в changeoverTime
@@ -800,16 +795,16 @@ namespace GlobalTest.Model
             changeoverTime.Add(1, changeoverTime_2);
 
             // Создаём матрицу времени выполнения
-            Matrix proccessingTime = new Matrix(new List<List<int>>
+            Matrix proccessingTime = new(new List<List<int>>
                 {
-                    new List<int> { 3, 4 },
-                    new List<int> { 1, 2 },
+                    new() { 3, 4 },
+                    new() { 1, 2 },
                 });
 
             #endregion
 
             // Формируем конфигурационный файл
-            Config config = new Config(
+            new Config(
                 2, // int dataTypesCount,
                 2, // int deviceCount,
                 999, // int buffer,

@@ -9,16 +9,16 @@ namespace newAlgorithm
     class OldSecondLevel
     {
         
-        public static bool c;
-        private Groups groups, Q;
+        public static bool c = false;
+        private readonly Groups groups;
+        private readonly Groups Q;
         private Shedule shedule;
         private List<List<int>> A;
         public static int countL = 4;
-        private int deviceCount  = 4;
         public static int Tz = 80;//вот здесь надо менять время обработки при 40 оно успеваетполностьюобработать все партии
         public int[] Prostoi = new int[4];
         public List<List<List<int>>> PartyList = new List<List<List<int>>>();
-        private int countGroup = 2;
+        private readonly int countGroup = 2;
 
         public OldSecondLevel()
         {
@@ -26,11 +26,10 @@ namespace newAlgorithm
             Q = new Groups(5);
         }
 
-        public OldSecondLevel(int tz, int countGroup, int deviceCount)
+        public OldSecondLevel(int tz, int countGroup)
         {
             Tz = tz;
             this.countGroup = countGroup;
-            this.deviceCount = deviceCount;
             this.groups = new Groups(5);
             this.Q = new Groups(5);
         }
@@ -337,8 +336,10 @@ namespace newAlgorithm
 
         public List<List<int>> ReturnAMatrix()
         {
-            List<List<int>> A1 = new List<List<int>>();
-            A1.Add(new List<int>());
+            List<List<int>> A1 = new List<List<int>>
+            {
+                new List<int>()
+            };
             for (int i = 0; i < this.A.Count(); i++)
             {
                 A1.Add(new List<int>());

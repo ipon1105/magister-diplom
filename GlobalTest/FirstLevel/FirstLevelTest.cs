@@ -71,30 +71,30 @@ namespace GlobalTest.FirstLevel
             */
 
             // Объявляем матрицу переналадки
-            Dictionary<int, Matrix> changeoverTime = new Dictionary<int, Matrix>();
+            Dictionary<int, Matrix> changeoverTime = new();
 
             // Создаём матрицу переналадки для 1 прибора
-            Matrix changeoverTime_1 = new Matrix(new List<List<int>>
+            Matrix changeoverTime_1 = new(new List<List<int>>
                 {
-                    new List<int> { 1, 2, 5 },
-                    new List<int> { 3, 4, 5 },
-                    new List<int> { 3, 4, 5 },
+                    new() { 1, 2, 5 },
+                    new() { 3, 4, 5 },
+                    new() { 3, 4, 5 },
                 });
 
             // Создаём матрицу переналадки для 2 прибора
-            Matrix changeoverTime_2 = new Matrix(new List<List<int>>
+            Matrix changeoverTime_2 = new(new List<List<int>>
                 {
-                    new List<int> { 4, 2, 5 },
-                    new List<int> { 3, 1, 5 },
-                    new List<int> { 3, 4, 5 },
+                    new() { 4, 2, 5 },
+                    new() { 3, 1, 5 },
+                    new() { 3, 4, 5 },
                 });
 
             // Создаём матрицу переналадки для 3 прибора
-            Matrix changeoverTime_3 = new Matrix(new List<List<int>>
+            Matrix changeoverTime_3 = new(new List<List<int>>
                 {
-                    new List<int> { 4, 2, 5 },
-                    new List<int> { 3, 1, 5 },
-                    new List<int> { 3, 4, 5 },
+                    new() { 4, 2, 5 },
+                    new() { 3, 1, 5 },
+                    new() { 3, 4, 5 },
                 });
 
             // Добавляем матрицы переналадки в changeoverTime
@@ -103,15 +103,15 @@ namespace GlobalTest.FirstLevel
             changeoverTime.Add(2, changeoverTime_3);
 
             // Создаём матрицу времени выполнения
-            Matrix proccessingTime = new Matrix(new List<List<int>>
+            Matrix proccessingTime = new(new List<List<int>>
                 {
-                    new List<int> { 1, 2, 5 },
-                    new List<int> { 3, 4, 5 },
-                    new List<int> { 3, 4, 5 },
+                    new() { 1, 2, 5 },
+                    new() { 3, 4, 5 },
+                    new() { 3, 4, 5 },
                 });
 
             // Формируем конфигурационный файл
-            Config config = new Config(
+            Config config = new(
                 3, // int dataTypesCount,
                 3, // int deviceCount,
                 3, // int buffer,
@@ -126,7 +126,10 @@ namespace GlobalTest.FirstLevel
             #endregion
 
             var firstLevel = new newAlgorithm.FirstLevel(config, new List<int> { 12, 12, 12 });
-            var output = new List<List<int>> { new List<int> { 10, 2 }, new List<int> { 10, 2 }, new List<int> { 10, 2 } };
+            var output = new List<List<int>> {
+                new() { 10, 2 },
+                new() { 10, 2 },
+                new() { 10, 2 } };
             firstLevel.GenerateStartSolution();
 
             for (int dataType = 0; dataType < output.Count; dataType++)
@@ -191,30 +194,30 @@ namespace GlobalTest.FirstLevel
             */
 
             // Объявляем матрицу переналадки
-            Dictionary<int, Matrix> changeoverTime = new Dictionary<int, Matrix>();
+            Dictionary<int, Matrix> changeoverTime = new();
 
             // Создаём матрицу переналадки для 1 прибора
-            Matrix changeoverTime_1 = new Matrix(new List<List<int>>
+            Matrix changeoverTime_1 = new(new List<List<int>>
                 {
-                    new List<int> { 1, 2, 5 },
-                    new List<int> { 3, 4, 5 },
-                    new List<int> { 3, 4, 5 },
+                    new() { 1, 2, 5 },
+                    new() { 3, 4, 5 },
+                    new() { 3, 4, 5 },
                 });
 
             // Создаём матрицу переналадки для 2 прибора
-            Matrix changeoverTime_2 = new Matrix(new List<List<int>>
+            Matrix changeoverTime_2 = new(new List<List<int>>
                 {
-                    new List<int> { 4, 2, 5 },
-                    new List<int> { 3, 1, 5 },
-                    new List<int> { 3, 4, 5 },
+                    new() { 4, 2, 5 },
+                    new() { 3, 1, 5 },
+                    new() { 3, 4, 5 },
                 });
 
             // Создаём матрицу переналадки для 3 прибора
-            Matrix changeoverTime_3 = new Matrix(new List<List<int>>
+            Matrix changeoverTime_3 = new(new List<List<int>>
                 {
-                    new List<int> { 4, 2, 5 },
-                    new List<int> { 3, 1, 5 },
-                    new List<int> { 3, 4, 5 },
+                    new() { 4, 2, 5 },
+                    new() { 3, 1, 5 },
+                    new() { 3, 4, 5 },
                 });
 
             // Добавляем матрицы переналадки в changeoverTime
@@ -223,15 +226,15 @@ namespace GlobalTest.FirstLevel
             changeoverTime.Add(2, changeoverTime_3);
 
             // Создаём матрицу времени выполнения
-            Matrix proccessingTime = new Matrix(new List<List<int>>
+            Matrix proccessingTime = new(new List<List<int>>
                 {
-                    new List<int> { 1, 2, 5 },
-                    new List<int> { 3, 4, 5 },
-                    new List<int> { 3, 4, 5 },
+                    new() { 1, 2, 5 },
+                    new() { 3, 4, 5 },
+                    new() { 3, 4, 5 },
                 });
 
             // Формируем конфигурационный файл
-            Config config = new Config(
+            Config config = new(
                 3, // int dataTypesCount,
                 3, // int deviceCount,
                 3, // int buffer,
@@ -246,7 +249,11 @@ namespace GlobalTest.FirstLevel
             #endregion
 
             var firstLevel = new newAlgorithm.FirstLevel(config, new List<int> { 12, 12, 12 });
-            var output = new List<List<int>> { new List<int> { 12 }, new List<int> { 12 }, new List<int> { 12 } };
+            var output = new List<List<int>> {
+                new() { 12 },
+                new() { 12 },
+                new() { 12 }
+            };
             firstLevel.GenerateFixedBatchesSolution();
 
             for (int dataType = 0; dataType < output.Count; dataType++)

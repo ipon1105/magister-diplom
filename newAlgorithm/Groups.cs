@@ -13,39 +13,45 @@ namespace newAlgorithm
         public int typeClaims;
         public List<int> claims;
 
-        public Batch(int valueCount, int valueType, List<int> valueClaims)
+        public Batch(int valueCount, int valueType)
         {
-            this.setCountClaims(valueCount, valueClaims);
-            this.setTypeClaims(valueType);
+            // this.SetCountClaims(valueCount, valueClaims);
+            this.SetCountClaims(valueCount);
+            this.SetTypeClaims(valueType);
         }
 
-        public int getCountClaims()
+        public int GetCountClaims()
         {
             return this.countClaims;
         }
 
-        public int getTypeBid()
+        public int GetTypeBid()
         {
             return this.typeClaims;
         }
 
-        public void setCountClaims(int value, List<int> valueClaims)
+        // public void SetCountClaims(int value, List<int> valueClaims)
+        // {
+        //     this.countClaims = value;
+        //     this.claims = new List<int>(this.countClaims);
+        // }
+        public void SetCountClaims(int value)
         {
             this.countClaims = value;
             this.claims = new List<int>(this.countClaims);
         }
 
-        public void setTypeClaims(int value)
+        public void SetTypeClaims(int value)
         {
             this.typeClaims = value;
         }
 
-        public void incrementCountClaims(int value)
+        public void IncrementCountClaims(int value)
         {
             this.countClaims += value;
         }
 
-        public void decrementCountClaims(int value)
+        public void DecrementCountClaims(int value)
         {
             this.countClaims -= value;
         }
@@ -54,13 +60,13 @@ namespace newAlgorithm
     {
         public int Z = 5;//допустим
         public List<int> M = new List<int>();
-        public int hi1;//dsdsdиндекс партии данных  i-го типа, размещаемой в группе  , число данных в которой соответ-ствует значению элемента   матрицы А. Я не понимаю что это но оно нужно для алгоритма
-        public List<List<Batch>> groups;
+        public int hi1 = 0;//dsdsdиндекс партии данных  i-го типа, размещаемой в группе  , число данных в которой соответ-ствует значению элемента   матрицы А. Я не понимаю что это но оно нужно для алгоритма
+        public List<List<Batch>> groups = null;
         public List<int> Nz = new List<int>();//множество номеров (идентификаторов) групп партий
         public List<List<List<int>>> Nz1 = new List<List<List<int>>>();//сами группы
         public List<int> Nzt = new List<int>();//текущее (изменяемое) множество номеров групп партий, с которым оперирует алгоритм
-        public int i;//тип данных, партия которых размещается в группе
-        public int z;//индекс текущей рассматриваемой группы, в которую добавляется партия  -го типа;
+        public int i = 0;//тип данных, партия которых размещается в группе
+        public int z = 0;//индекс текущей рассматриваемой группы, в которую добавляется партия  -го типа;
         public List<int> k = new List<int>();//количествоелементов в Nz
         public List<int> I1 = new List<int>();//текущее (изменяемое) множество типов данных, партии которых размещаются в группах
         public List<int> I2 = new List<int>();
