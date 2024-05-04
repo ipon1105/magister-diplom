@@ -211,6 +211,7 @@ namespace newAlgorithm
             Shedule.proccessingTime = proccessingTime;
 
             // Создаём экземпляр конфигурационной структуры
+            // TODO: Создать отдельный конфиг для задачи с ПТО
             Config config = new Config(
                 dataTypesCount,
                 deviceCount,
@@ -372,8 +373,8 @@ namespace newAlgorithm
                                 int criteria;
                                 int flCrit;
                                 var listInt = !isOptimization
-                                    ? oldSecondLevel.CalcFitnessList(firstLevel.matrixA_Prime, out criteria, out flCrit)
-                                    : oldSecondLevel.CalcOptimalFitnessList(firstLevel.matrixA_Prime, out criteria, out flCrit);
+                                    ? oldSecondLevel.CalcFitnessList(firstLevel.primeMatrixA, out criteria, out flCrit)
+                                    : oldSecondLevel.CalcOptimalFitnessList(firstLevel.primeMatrixA, out criteria, out flCrit);
 
                                 // Выводим информацию в файл
                                 file.WriteLine($"Tz = {tz}");
@@ -1489,5 +1490,9 @@ namespace newAlgorithm
         */
         #endregion
 
+        private void Form1_Load(object sender, EventArgs e)
+        {
+
+        }
     }
 }

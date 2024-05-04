@@ -84,6 +84,7 @@ namespace magisterDiplom.Fabric
         {
             Console.WriteLine("Матрица моментов начала времени выполнения заданий и ПТО.");
             CalcStartProcessing();
+            CalcMatrixTPM();
             if (this.startProcessing.Count == 0)
                 return;
 
@@ -233,15 +234,26 @@ namespace magisterDiplom.Fabric
 
                 if (IsDebug && IsDebug_ShiftMatrixY) {
                     Console.WriteLine("Новая итерация сдвигов");
-                    PrintStartProcessing();
+
+                    CalcStartProcessing();
+                    CalcMatrixTPM();
+
+                    Console.WriteLine("1");
                     PrintMatrixY();
+                    PrintStartProcessing();
                     Console.WriteLine($"f2 для текущего расписания {this.GetPreMUtility()}");
                 }
 
                 // Для каждого прибора выполняем обработку
                 for (int device = 0; device < config.deviceCount; device++)
                 {
-                    
+
+                    // Вычисляем матрицу моментов начала времени выполнения заданий
+                    CalcStartProcessing();
+
+                    // Вычисляем матрицу моментов окончания времени выполнения ПТО
+                    CalcMatrixTPM();
+
                     // Определяем индекс ПЗ за которым следует последнее ПТО
                     last_prem_batch_index = this.GetLastPreMPos(device); // j*
 
@@ -265,7 +277,6 @@ namespace magisterDiplom.Fabric
                     this.matrixY[device][last_prem_batch_index] = 0;
                     this.matrixY[device][last_prem_batch_index + 1] = 1;
 
-
                     // Вычисляем матрицу моментов начала времени выполнения заданий
                     this.CalcStartProcessing();
 
@@ -274,8 +285,9 @@ namespace magisterDiplom.Fabric
 
                     if (IsDebug && IsDebug_ShiftMatrixY)
                     {
-                        PrintStartProcessing();
+                        Console.WriteLine("2");
                         PrintMatrixY();
+                        PrintStartProcessing();
                     }
 
                     // Если текущее решение не удовлетворяет условию надёжности
@@ -338,8 +350,9 @@ namespace magisterDiplom.Fabric
 
                 if (IsDebug && IsDebug_ShiftMatrixY) {
                     Console.WriteLine("Новое решение:");
-                    PrintStartProcessing();
+                    Console.WriteLine("3");
                     PrintMatrixY();
+                    PrintStartProcessing();
                 }
 
                 // Продолжаем улучшения
