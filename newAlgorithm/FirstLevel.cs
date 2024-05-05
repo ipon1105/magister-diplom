@@ -556,6 +556,19 @@ namespace newAlgorithm
                     file.Write(" +");
                 }
 
+                // Инициализируем матрицу _a1
+                {
+                    _a1 = new List<List<List<int>>>();
+
+                    // Для каждого типа данных выполняем обработку
+                    for (var dataType = 0; dataType < config.dataTypesCount; dataType++)
+                    {
+                        _a1.Add(new List<List<int>>());
+                        _a1[dataType].Add(new List<int>());
+                        _a1[dataType][0] = ListUtils.VectorIntDeepCopy(PrimeMatrixA[dataType]);
+                    }
+                }
+
                 // Если пакеты не фиксированные
                 if (!config.isFixedBatches)
                 {
@@ -624,7 +637,7 @@ namespace newAlgorithm
                                 // TODO:
 
                                 // Если расписание построилось не успешно
-                                if (schedule.Build(tempA))
+                                if (!schedule.Build(tempA))
 
                                     // Пропускаем обработку
                                     continue;
