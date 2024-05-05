@@ -764,8 +764,10 @@ namespace magisterDiplom.Fabric
             matrixTPM = new List<List<PreMSet>>();
         }
 
-        public override bool Build(List<List<int>> matrixA)
+        public override bool Build(List<List<int>> _matrixA)
         {
+            List<List<int>> matrixA = ListUtils.MatrixIntDeepCopy(_matrixA);
+
             // Если флаг оталдки установлен
             if (IsDebug)
             {
