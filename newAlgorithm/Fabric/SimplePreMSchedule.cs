@@ -781,7 +781,7 @@ namespace magisterDiplom.Fabric
                 }
             }
 
-            double beta = 0.99;
+            double beta = 0.15;
 
             // Объявляем тип данных
             int dataType;
@@ -1480,9 +1480,9 @@ namespace magisterDiplom.Fabric
 
             // Выполняем расчёт и возврат доступности
             return (activity_time == 0) ? 1 :
-                (double)config.failureRates[device] / (double)(config.restoringDevice[device] + config.failureRates[device]) +
-                (double)config.restoringDevice[device] / (double)(config.restoringDevice[device] + config.failureRates[device]) *
-                (double)Math.Exp(-1 * (double)(config.restoringDevice[device] + config.failureRates[device]) * (double)activity_time);
+                (double) config.restoringDevice[device] / (double)(config.failureRates[device] + config.restoringDevice[device]) +
+                (double) config.failureRates[device]    / (double)(config.failureRates[device] + config.restoringDevice[device]) *
+                (double) Math.Exp(-1 * (double)(config.failureRates[device] + config.restoringDevice[device]) * (double)activity_time);
         }
 
         // ВЫРАЖЕНИЕ 11
