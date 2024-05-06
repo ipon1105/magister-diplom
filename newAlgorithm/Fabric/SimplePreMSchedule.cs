@@ -289,11 +289,27 @@ namespace magisterDiplom.Fabric
                             if (this.startProcessing[device][batchIndex][job] == time)
                             {
 
+                                // TODO: Ошибка. В this.schedule 2 пакета, а в this.startProcessing 3 пакета
+                                // Вычисляем время выполнения пакета задания с типом this.schedule[batchIndex].Type на приборе device
+                                int proc_time = this.config.proccessingTime[device, this.schedule[batchIndex].Type];
+
                                 // Выводим t заданий
-                                for (int t = 0; t < this.config.proccessingTime[device, this.schedule[batchIndex].Type]; t++) {
-                                    int unspaces = (int)Math.Log10(this.schedule[batchIndex].Type) + 1;
-                                    unspaces += (int)Math.Log10(this.config.proccessingTime[device, this.schedule[batchIndex].Type]) + 1;
-                                    Console.Write($"|{this.schedule[batchIndex].Type}:{this.config.proccessingTime[device, this.schedule[batchIndex].Type]}");
+                                for (int t = 0; t < proc_time; t++) {
+
+                                    // Объявляем число непробельных символов для отображения типа
+                                    int unspaces;
+
+                                    // Вычисляем количество символов для отображения типа
+                                    if (this.schedule[batchIndex].Type == 0)
+                                        unspaces = 1;
+                                    else
+                                        unspaces = (int)Math.Log10(this.schedule[batchIndex].Type) + 1;
+
+                                    // Вычисляем количество символов для отображения времени выполнения
+                                    unspaces += (int)Math.Log10(proc_time) + 1;
+
+                                    // Выводим пакет в формате тип:время выполнения
+                                    Console.Write($"|{this.schedule[batchIndex].Type}:{proc_time}");
                                     Console.Write(new String(' ', genSize - (unspaces + 1)));
                                 }
                                 // Если текущий момент времени последний и в данной позиции есть ПТО
@@ -885,9 +901,10 @@ namespace magisterDiplom.Fabric
             )};
             dataType++;
 
-            if (IsDebug)
+            if (IsDebug) {
+                CalcStartProcessing();
                 PrintSchedule();
-
+            }
             // П.3 Инициализируем матрицу Y
             this.matrixY = new List<List<int>>(capacity: this.config.deviceCount);
             for (int device = 0; device < this.config.deviceCount; device++)

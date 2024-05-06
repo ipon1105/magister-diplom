@@ -443,8 +443,8 @@ namespace magisterDiplom.Model
                     },
                 },
                 new Vector(new List<int> { 2, 3, 4 }),
-                new List<double> { 0.3, 0.3, 0.3 },
                 new List<double> { 0.002, 0.003 ,0.001 },
+                new List<double> { 0.3, 0.3, 0.3 },
                 false
             );
         }
