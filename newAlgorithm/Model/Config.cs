@@ -8,6 +8,113 @@ namespace magisterDiplom.Model
 {
 
     /// <summary>
+    /// Структура описывает конфигурацию для расчёа расписания с ПТО
+    /// </summary>
+    public readonly struct PreMConfig
+    {
+
+        /// <summary>
+        /// Нижняя граница для значения интенсивностей
+        /// </summary>
+        private const double lowerRate = 0.0;
+
+        /// <summary>
+        /// Нижняя граница для значения интенсивностей
+        /// </summary>
+        private const double upperRate = 1.0;
+
+        /// <summary>
+        /// Базовая конфигурационная структура
+        /// </summary>
+        public readonly Config config;
+
+        /// <summary>
+        /// Список из времён вермени выполнения ПТО для соответсвующих приборов: preMaintenanceTimes = [deviceCount]
+        /// </summary>
+        public readonly List<double> preMaintenanceTimes;
+
+        /// <summary>
+        /// Список интенсивностей отказов для соответсвующих приборов: [deviceCount]
+        /// </summary>
+        public readonly List<double> failureRates;
+
+        /// <summary>
+        /// Список интенсивностей востановлений для соответсвующих приборов: [deviceCount]
+        /// </summary>
+        public readonly List<double> restoringDevice;
+
+        /// <summary>
+        /// Нижний порог надёжности
+        /// </summary>
+        public readonly double beta;
+
+        /// <summary>
+        /// Конструктор
+        /// </summary>
+        /// <param name="beta">Нижний порог надёжности</param>
+        /// <param name="failureRates">Интенсивность отказов приборов</param>
+        /// <param name="restoringDevice">Интенсивность восстановления приборов</param>
+        /// <param name="preMaintenanceTimes">Длительности ПТО приборов</param>
+        /// <exception cref="ArgumentException">Переданные данные имеют не верный формат</exception>
+        /// <exception cref="ArgumentNullException">Был передан null</exception>
+        /// <exception cref="IndexOutOfRangeException">Размеры переданных данных не совпадают</exception>
+        public PreMConfig(
+            Config config,
+            List<double> preMaintenanceTimes,
+            List<double> failureRates,
+            List<double> restoringDevice,
+            double beta
+        ) {
+
+            // Переопределяем конфигурационную структуру
+            this.config = config;
+
+            // Вектор ПТО равен null
+            if (preMaintenanceTimes == null)
+                throw new ArgumentNullException("The preMaintenanceTimes list is null.");
+
+            // Размер вектора ПТО не совпадает с количеством приборов
+            if (preMaintenanceTimes.Count() != config.deviceCount)
+                throw new IndexOutOfRangeException("The number of items in the list preMaintenanceTimes does not match the deviceCount.");
+            
+            // Вектор отказов равен null
+            if (failureRates == null)
+                throw new ArgumentNullException("The failureRates list is null.");
+            
+            // Вектор отказов равен null
+            if (failureRates.Count() != config.deviceCount)
+                throw new IndexOutOfRangeException("The number of items in the list failureRates does not match the deviceCount.");
+
+            // Проверяем, что диапазон данных от 0 до 1
+            for (int device = 0; device < config.deviceCount; device++)
+                
+                // Если данные выходят за диапазон
+                if (failureRates[device] < lowerRate || failureRates[device] > upperRate)
+                    throw new ArgumentException($"The value of failure rates must be between {lowerRate} and {upperRate}.");
+
+            // Вектор востановления равен null
+            if (restoringDevice == null)
+                throw new ArgumentNullException("The restoringDevice vector is null.");
+
+            // Вектор отказов равен null
+            if (restoringDevice.Count() != config.deviceCount)
+                throw new IndexOutOfRangeException("The number of items in the list restoringDevice does not match the deviceCount.");
+
+            // Проверяем, что диапазон данных от 0 до 1
+            for (int device = 0; device < config.deviceCount; device++)
+
+                // Если данные выходят за диапазон
+                if (restoringDevice[device] < lowerRate || restoringDevice[device] > upperRate)
+                    throw new ArgumentException($"The value of restore rates must be between {lowerRate} and {upperRate}.");
+            
+            // Выполняем присваивание
+            this.preMaintenanceTimes = preMaintenanceTimes;
+            this.restoringDevice = restoringDevice;
+            this.failureRates = failureRates;
+            this.beta = beta;
+        }
+    }
+    /// <summary>
     /// Структура описывает конфигурацию по которой необходимо выполнить построение расписания
     /// </summary>
     public readonly struct Config
