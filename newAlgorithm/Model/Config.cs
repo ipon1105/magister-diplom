@@ -31,7 +31,7 @@ namespace magisterDiplom.Model
         /// <summary>
         /// Список из времён вермени выполнения ПТО для соответсвующих приборов: preMaintenanceTimes = [deviceCount]
         /// </summary>
-        public readonly List<double> preMaintenanceTimes;
+        public readonly List<int> preMaintenanceTimes;
 
         /// <summary>
         /// Список интенсивностей отказов для соответсвующих приборов: [deviceCount]
@@ -60,7 +60,7 @@ namespace magisterDiplom.Model
         /// <exception cref="IndexOutOfRangeException">Размеры переданных данных не совпадают</exception>
         public PreMConfig(
             Config config,
-            List<double> preMaintenanceTimes,
+            List<int> preMaintenanceTimes,
             List<double> failureRates,
             List<double> restoringDevice,
             double beta
