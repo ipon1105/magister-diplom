@@ -10,6 +10,11 @@ namespace magisterDiplom.Fabric
     {
 
         /// <summary>
+        /// Конфигурационная структура содержащая информацию о ПТО
+        /// </summary>
+        protected PreMConfig preMConfig;
+
+        /// <summary>
         /// Матрица порядка ПТО приборов
         /// </summary>
         protected List<List<int>> matrixY;

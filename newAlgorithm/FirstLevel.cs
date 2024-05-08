@@ -494,7 +494,7 @@ namespace newAlgorithm
         /// <summary>
         /// Алгоритм формирования решения по составам паритй всех типов данных
         /// </summary>
-        public void GenetateSolutionWithPremaintenance(string fileName)
+        public void GenetateSolutionWithPremaintenance(string fileName, PreMConfig preMConfig)
         {
 
             // Переопределяем значение оптимального критерий f1
@@ -505,7 +505,7 @@ namespace newAlgorithm
             {
 
                 // Создаём экземпляр класса для работы с нижним уровнем
-                SimplePreMSchedule schedule = new SimplePreMSchedule(config);
+                SimplePreMSchedule schedule = new SimplePreMSchedule(config, preMConfig);
 
                 // TODO: Костыль для фиксированных пакетов
                 {

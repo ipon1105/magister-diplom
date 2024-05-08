@@ -155,9 +155,6 @@ namespace newAlgorithm
                 buffer,
                 (Matrix)(new Matrix(proccessingTime)),
                 Config.ChangeoverTimeConverter(changeoverTime),
-                new Vector(preMaintenanceTimes),
-                failureRates,
-                restoringDevice,
                 isFixedBatches
             );
 
@@ -195,9 +192,6 @@ namespace newAlgorithm
                 buffer,
                 (Matrix) (new Matrix(proccessingTime)),
                 Config.ChangeoverTimeConverter(changeoverTime),
-                new Vector(preMaintenanceTimes),
-                failureRates,
-                restoringDevice,
                 isFixedBatches
             );
 
@@ -252,9 +246,6 @@ namespace newAlgorithm
                                     buffer,
                                     (Matrix)(new Matrix(OldProccessingTimeGenerator(_maxProccessingTime, deviceCount, dataTypesCount))),
                                     Config.ChangeoverTimeConverter(OldChangeoverTimeGenerator(_maxChangeoverTime, deviceCount, dataTypesCount)),
-                                    new Vector(preMaintenanceTimes),
-                                    failureRates,
-                                    restoringDevice,
                                     isFixedBatches
                                 );
 
@@ -333,9 +324,6 @@ namespace newAlgorithm
                                     buffer,
                                     (Matrix)(new Matrix(OldProccessingTimeGenerator(_maxProccessingTime, deviceCount, dataTypesCount))),
                                     Config.ChangeoverTimeConverter(OldChangeoverTimeGenerator(_maxChangeoverTime, deviceCount, dataTypesCount)),
-                                    new Vector(preMaintenanceTimes),
-                                    failureRates,
-                                    restoringDevice,
                                     isFixedBatches
                                 );
 
@@ -478,9 +466,6 @@ namespace newAlgorithm
                                         buffer,
                                         (Matrix)(new Matrix(OldProccessingTimeGenerator(_maxProccessingTime, _deviceCount, _dataTypesCount))),
                                         Config.ChangeoverTimeConverter(OldChangeoverTimeGenerator(_maxChangeoverTime, _deviceCount, _dataTypesCount)),
-                                        new Vector(preMaintenanceTimes),
-                                        failureRates,
-                                        restoringDevice,
                                         isFixedBatches
                                     );
                                     
@@ -579,9 +564,6 @@ namespace newAlgorithm
                                     buffer,
                                     (Matrix)(new Matrix(OldProccessingTimeGenerator(_maxProccessingTime, _deviceCount, _dataTypesCount))),
                                     Config.ChangeoverTimeConverter(OldChangeoverTimeGenerator(_maxChangeoverTime, _deviceCount, _dataTypesCount)),
-                                    new Vector(preMaintenanceTimes),
-                                    failureRates,
-                                    restoringDevice,
                                     isFixedBatches
                                 );
 
@@ -717,9 +699,6 @@ namespace newAlgorithm
                                                 buffer,
                                                 (Matrix)(new Matrix(OldProccessingTimeGenerator(_maxProccessingTime, _deviceCount, _dataTypesCount))),
                                                 Config.ChangeoverTimeConverter(OldChangeoverTimeGenerator(_maxChangeoverTime, _deviceCount, _dataTypesCount)),
-                                                new Vector(preMaintenanceTimes),
-                                                failureRates,
-                                                restoringDevice,
                                                 isFixedBatches
                                             );
 
@@ -1497,16 +1476,23 @@ namespace newAlgorithm
 
         private void GetPreMSolution_Click(object sender, EventArgs e)
         {
-
             // Преобразуем входные данные в число типа Double
-            Double.TryParse(betaValue.Text, out Double beta);
+            // double beta = Convert.ToDouble(betaValue.Text);
+            double.TryParse(betaValue.Text, out double beta);
 
             // Если beta будет больше 1
-            if (beta > (Double) 1.0) {
+            if (beta > (double)1.0)
+            {
                 MessageBox.Show("Ошибка. Значение beta не может быть больше 1");
                 return;
             }
 
+            // Если beta будет меньше 0
+            if (beta < (double)0.0)
+            {
+                MessageBox.Show("Ошибка. Значение beta не может быть меньше 0");
+                return;
+            }
 
             // Инициализируем расписание
             Shedule.deviceCount = deviceCount;
@@ -1520,10 +1506,16 @@ namespace newAlgorithm
                 buffer,
                 (Matrix)(new Matrix(proccessingTime)),
                 Config.ChangeoverTimeConverter(changeoverTime),
-                new Vector(preMaintenanceTimes),
+                isFixedBatches
+            );
+            
+            // Создаём экземпляр конфигурационной структуры для ПТО
+            PreMConfig preMConfig = new PreMConfig(
+                config,
+                preMaintenanceTimes,
                 failureRates,
                 restoringDevice,
-                isFixedBatches
+                beta
             );
 
             // Инициализируем вектор длиной dataTypesCount, каждый элемент которого будет равен batchCount
@@ -1533,7 +1525,7 @@ namespace newAlgorithm
             var firstLevel = new FirstLevel(config, batchCountList);
 
             // Выполняем генерацию данных для ввсех типов вторым алгоритмом
-            firstLevel.GenetateSolutionWithPremaintenance("Premintenance");
+            firstLevel.GenetateSolutionWithPremaintenance("Premintenance", preMConfig);
         }
     }
 }

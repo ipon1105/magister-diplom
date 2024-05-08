@@ -18,7 +18,7 @@ namespace magisterDiplom.Fabric
         const bool IsDebug_SearchByPosition = true;
         const bool IsDebug_CalcSysReliability = true;
         const bool IsDebug_GetPreMUtility = true;
-        
+
         /// <summary>
         /// Выводим матриц порядка ПТО
         /// </summary>
@@ -242,7 +242,7 @@ namespace magisterDiplom.Fabric
 
                 // Вычисляем размер наибольшего ПТО
                 for (device = 0; device < this.config.deviceCount; device++)
-                    premTime = Math.Max(premTime, this.config.preMaintenanceTimes[device]);
+                    premTime = Math.Max(premTime, this.preMConfig.preMaintenanceTimes[device]);
                 times += premTime;
             }
 
@@ -317,13 +317,13 @@ namespace magisterDiplom.Fabric
                                 {
 
                                     // Выводим t раз ПТО
-                                    for (int t = 0; t < this.config.preMaintenanceTimes[device]; t++) { 
+                                    for (int t = 0; t < this.preMConfig.preMaintenanceTimes[device]; t++) { 
                                         Console.Write($"|");
                                         Console.Write(new String('*', genSize));
                                     }
 
                                     // Увеличиваем время
-                                    time += this.config.preMaintenanceTimes[device];
+                                    time += this.preMConfig.preMaintenanceTimes[device];
                                 }
 
                                 // Увеличиваем время
@@ -380,8 +380,7 @@ namespace magisterDiplom.Fabric
         /// <summary>
         /// Выполняем сдвиг для матрицы ПТО приборов
         /// </summary>
-        /// <param name="beta">Нижний уровень нажёности</param>
-        private void ShiftMatrixY(double beta) 
+        private void ShiftMatrixY() 
         {
 
             if (IsDebug)
@@ -467,7 +466,7 @@ namespace magisterDiplom.Fabric
                     }
 
                     // Если текущее решение не удовлетворяет условию надёжности
-                    if (!this.IsSolutionAcceptable(beta))
+                    if (!this.IsSolutionAcceptable())
                     {
                         if (IsDebug && IsDebug_ShiftMatrixY)
                             Console.WriteLine("РЕШЕНИЕ НЕ ДОПУСТИМО");
@@ -578,14 +577,13 @@ namespace magisterDiplom.Fabric
         /// Данная функция выполняет локальную оптимизацию составов ПЗ
         /// </summary>
         /// <param name="swapCount">Количество перестановок</param>
-        /// <param name="beta">Нижний порог надёжности</param>
         /// <returns>true, если была найдено перестановка удовлетворяющая условию надёжности. Иначе false</returns>
-        private bool SearchByPosition(double beta, int swapCount = 999999)
+        private bool SearchByPosition(int swapCount = 999999)
         {
 
             // Выводим отладачную информацию
             if (IsDebug)
-                Console.WriteLine($"SearchByPosition start: Изменяем позиции пакета заданий. beta:{beta}; swapCount:{swapCount}");
+                Console.WriteLine($"SearchByPosition start: Изменяем позиции пакета заданий. beta:{preMConfig.beta}; swapCount:{swapCount}");
 
             // Флаг перестановки выполняющей условию надёжности
             bool isFind = false;
@@ -613,7 +611,7 @@ namespace magisterDiplom.Fabric
             }
 
             // Проверяем допустимость текущего решения
-            if (this.IsSolutionAcceptable(beta)) {
+            if (this.IsSolutionAcceptable()) {
 
                 // Устанавливаем флаг перестановки выполняющей условию надёжности
                 isFind = true;
@@ -658,7 +656,7 @@ namespace magisterDiplom.Fabric
                 this.CalcMatrixTPM();
 
                 // Проверяем допустимость текущего решения
-                if (this.IsSolutionAcceptable(beta))
+                if (this.IsSolutionAcceptable())
                 {
 
                     // Устанавливаем флаг перестановки выполняющей условию надёжности
@@ -713,14 +711,13 @@ namespace magisterDiplom.Fabric
         /// <summary>
         /// Функция проверяет допустимость решения
         /// </summary>
-        /// <param name="beta">Нижний уровень надёжности</param>
         /// <returns>true - если текущее решение допустимо. Иначе False</returns>
-        private bool IsSolutionAcceptable(double beta)
+        private bool IsSolutionAcceptable()
         {
 
             // Выводим отладачную информацию
             if (IsDebug)
-                Console.WriteLine($"IsSolutionAcceptable start: Проверяем допустимость решения. beta:{beta}");
+                Console.WriteLine($"IsSolutionAcceptable start: Проверяем допустимость решения. beta:{preMConfig.beta}");
                 
             // Для каджого прибора выполняем обработку
             for (int device = 0; device < config.deviceCount; device++)
@@ -744,7 +741,7 @@ namespace magisterDiplom.Fabric
                         CalcMatrixTPM();
 
                         // Проверяем ограничение надёжности
-                        if (!IsConstraint_CalcSysReliability(time, beta)) {
+                        if (!IsConstraint_CalcSysReliability(time)) {
 
                             // Выводим отладачную информацию
                             if (IsDebug && IsDebug_CalcSysReliability)
@@ -766,8 +763,9 @@ namespace magisterDiplom.Fabric
         /// <summary>
         /// Конструктор выполняющий создание экземпляра данного класса 
         /// </summary>
-        public SimplePreMSchedule(Config config) {
+        public SimplePreMSchedule(Config config, PreMConfig preMConfig) {
             this.config = config;
+            this.preMConfig = preMConfig;
 
             // Если флаг оталдки установлен
             if (IsDebug) {
@@ -796,8 +794,6 @@ namespace magisterDiplom.Fabric
                     Console.Write(Environment.NewLine);
                 }
             }
-
-            double beta = 0.15;
 
             // Объявляем тип данных
             int dataType;
@@ -932,17 +928,17 @@ namespace magisterDiplom.Fabric
                 }
 
                 // Если не было найдено расписания удовлетворяющему условию надёжности
-                if (!this.SearchByPosition(beta, 5))
+                if (!this.SearchByPosition(5))
 
                     // Возвращяем 0, как флаг неудачи
                     return false;
 
                 // Выполняем оптимизацию для позиций ПТО приборов
-                this.ShiftMatrixY(beta);
+                this.ShiftMatrixY();
 
                 // Проверяем условие надёжности
                 // TODO: СПОРНО (НЕВОЗМОЖНОАЯ СИТУАЦИЯ) - ПОДСЧИТАТЬ КОЛИЧЕСТВО ВЫЗОВОВ 
-                if (!this.IsSolutionAcceptable(beta))
+                if (!this.IsSolutionAcceptable())
                 {
                     Console.WriteLine("Тот самый случай");
                     // Возвращяем 0, как флаг неудачи
@@ -973,17 +969,17 @@ namespace magisterDiplom.Fabric
                         this.matrixY[device].Add(0);
 
                     // Если не было найдено расписания удовлетворяющему условию надёжности
-                    if (!this.SearchByPosition(beta, 5))
+                    if (!this.SearchByPosition(5))
 
                         // Возвращяем 0, как флаг неудачи
                         return false;
 
                     // Выполняем оптимизацию для позиций ПТО приборов (ШАГ 15)
-                    this.ShiftMatrixY(beta);
+                    this.ShiftMatrixY();
 
                     // Проверяем условие надёжности
                     // TODO: СПОРНО (НЕВОЗМОЖНОАЯ СИТУАЦИЯ) - ПОДСЧИТАТЬ КОЛИЧЕСТВО ВЫЗОВОВ 
-                    if (!this.IsSolutionAcceptable(beta))
+                    if (!this.IsSolutionAcceptable())
                     {
                         Console.WriteLine("Тот самый случай");
                         // Возвращяем 0, как флаг неудачи
@@ -1035,7 +1031,7 @@ namespace magisterDiplom.Fabric
                                 config.proccessingTime[device, schedule[batchIndex].Type] +
 
                                 // Время выполнения ПТО
-                                config.preMaintenanceTimes[device]
+                                preMConfig.preMaintenanceTimes[device]
                             )
                         );
             }
@@ -1116,7 +1112,7 @@ namespace magisterDiplom.Fabric
                         config.changeoverTime[device][schedule[batchIndex - 1].Type, schedule[batchIndex].Type] +
 
                         // Время выполнения ПТО после предыдущего ПЗ
-                        config.preMaintenanceTimes[0] * matrixY[device][batchIndex - 1];
+                        preMConfig.preMaintenanceTimes[0] * matrixY[device][batchIndex - 1];
 
                     // Пробегаемся по всем заданиям пакета в позиции batchIndex
                     for (job = 1; job < schedule[batchIndex].Size; job++)
@@ -1197,7 +1193,7 @@ namespace magisterDiplom.Fabric
                         config.changeoverTime[device][schedule[batchIndex - 1].Type, schedule[batchIndex].Type] +
 
                         // Время выполнения ПТО
-                        config.preMaintenanceTimes[device] * matrixY[device][batchIndex - 1],
+                        preMConfig.preMaintenanceTimes[device] * matrixY[device][batchIndex - 1],
 
                         // Момент начала времени выполнения 1 задания на предыдущем приборе
                         startProcessing[device - 1][batchIndex][job] +
@@ -1497,9 +1493,9 @@ namespace magisterDiplom.Fabric
 
             // Выполняем расчёт и возврат доступности
             return (activity_time == 0) ? 1 :
-                (double) config.restoringDevice[device] / (double)(config.failureRates[device] + config.restoringDevice[device]) +
-                (double) config.failureRates[device]    / (double)(config.failureRates[device] + config.restoringDevice[device]) *
-                (double) Math.Exp(-1 * (double)(config.failureRates[device] + config.restoringDevice[device]) * (double)activity_time);
+                (double) preMConfig.restoringDevice[device] / (double)(preMConfig.failureRates[device] + preMConfig.restoringDevice[device]) +
+                (double) preMConfig.failureRates[device]    / (double)(preMConfig.failureRates[device] + preMConfig.restoringDevice[device]) *
+                (double) Math.Exp(-1 * (double)(preMConfig.failureRates[device] + preMConfig.restoringDevice[device]) * (double)activity_time);
         }
 
         // ВЫРАЖЕНИЕ 11
@@ -1737,14 +1733,13 @@ namespace magisterDiplom.Fabric
         /// Возвращяем результат расчёта ограничения на общую надёжность
         /// </summary>
         /// <param name="time">Момент времени для которого выполняется расчёт надёжности</param>
-        /// <param name="beta">Нижний уровень надёжность</param>
         /// <returns>true, если ограничение выполняется. Иначе false</returns>
-        public bool IsConstraint_CalcSysReliability(int time, double beta)
+        public bool IsConstraint_CalcSysReliability(int time)
         {
             double sysTime = this.CalcSysReliability(time);
             if (IsDebug && IsDebug_CalcSysReliability)
-                Console.WriteLine($"Системная надёжность {sysTime:0.000} >= {beta:0.000}?");
-            return (sysTime >= beta);
+                Console.WriteLine($"Системная надёжность {sysTime:0.000} >= {preMConfig.beta:0.000}?");
+            return (sysTime >= preMConfig.beta);
         }
 
         // ВЫРАЖЕНИЕ 19 ИЗБЫТОЧНО

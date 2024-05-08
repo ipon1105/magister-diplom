@@ -113,7 +113,47 @@ namespace magisterDiplom.Model
             this.failureRates = failureRates;
             this.beta = beta;
         }
+
+        /// <summary>
+        /// Данная функция формируем выходную строку об конфигурационной структуре
+        /// </summary>
+        /// <param name="prefix">Префикс для формированного вывода</param>
+        /// <returns>Результирующая строка со всей необходимой информацией</returns>
+        public string ToString(string prefix = "\t")
+        {
+
+            // Объявляем индекс прибора
+            int device;
+
+            // Результирующая информация
+            string res = "";
+
+            // Выполняем формирование строки времени ПТО
+            res += prefix + "preMaintenanceTimes: [";
+            for (device = 0; device < this.config.deviceCount - 1; device++)
+                res += $"{this.preMaintenanceTimes[device]}, ";
+            res += $"{this.preMaintenanceTimes[device]}];" + Environment.NewLine;
+
+            // Выполняем формирование строки интенсивности востановления приборов
+            res += prefix + "restoringDevice: [";
+            for (device = 0; device < this.config.deviceCount - 1; device++)
+                res += $"{this.restoringDevice[device]}, ";
+            res += $"{this.restoringDevice[device]}];" + Environment.NewLine;
+
+            // Выполняем формирование строки интенсивности отказов приборов
+            res += prefix + "failureRates: [";
+            for (device = 0; device < this.config.deviceCount - 1; device++)
+                res += $"{this.failureRates[device]}, ";
+            res += $"{this.failureRates[device]}];" + Environment.NewLine;
+
+            // Выполняем формирование строки нижнего порога надёжности
+            res += prefix + $"beta: {beta};" + Environment.NewLine;
+
+            // Возвращяем результат
+            return res;
+        }
     }
+    
     /// <summary>
     /// Структура описывает конфигурацию по которой необходимо выполнить построение расписания
     /// </summary>
@@ -159,158 +199,15 @@ namespace magisterDiplom.Model
         /// </summary>
         public readonly Matrix proccessingTime;
 
-        /// <summary>
-        /// Данная переменная содержим в себе список из времён вермени выполнения ПТО для соответсвующего прибора.
-        /// preMaintenanceTimes = [deviceCount]
-        /// </summary>
-        public readonly Vector preMaintenanceTimes;
-         
-        /// <summary>
-        /// Данный список определяет интенсивность отказов для приборов соответсвенно: [deviceCount]. Определяется, как количество отказов в единицу времени
-        /// </summary>
-        public readonly List<double> failureRates;
-
-        /// <summary>
-        /// Данный список определяет интенсивность востановление прибора соответсвенно: [deviceCount]
-        /// </summary>
-        public readonly List<double> restoringDevice;
         public Config(
             int dataTypesCount,
             int deviceCount,
             int buffer,
             Matrix proccessingTime,
             Dictionary<int, Matrix> changeoverTime,
-            Vector preMaintenanceTimes,
-            Vector failureRates,
-            Vector restoringDevice,
             bool isFixedBatches
             )
         {
-            // Вектор ПТО равен null
-            if (preMaintenanceTimes == null)
-                throw new ArgumentNullException("The PreM vector is null.");
-
-            // Вектор отказов равен null
-            if (failureRates == null)
-                throw new ArgumentNullException("The failureRates vector is null.");
-
-            // Вектор отказов равен null
-            if (failureRates.getCount() != deviceCount)
-                throw new ArgumentException("The number of items in the list failureRates does not match the deviceCount.");
-
-            // Вектор востановления равен null
-            if (restoringDevice == null)
-                throw new ArgumentNullException("The restoringDevice vector is null.");
-
-            // Вектор отказов равен null
-            if (restoringDevice.getCount() != deviceCount)
-                throw new ArgumentException("The number of items in the list restoringDevice does not match the deviceCount.");
-
-            // Размер вектора ПТО не совпадает с количеством приборов
-            if (preMaintenanceTimes.getCount() != deviceCount)
-                throw new ArgumentException("The number of items in the list preMaintenanceTimes does not match the deviceCount.");
-
-            // Матрица времени выполнения равна null
-            if (proccessingTime == null)
-                throw new ArgumentNullException("The proccessingTime matrix is null.");
-
-            // Размер матрицы времени выполнения не совпадает с количеством приборов
-            if (proccessingTime.rowCount != deviceCount)
-                throw new ArgumentException("The number of items in the list proccessingTime does not match the deviceCount.");
-
-            // Выполняем проверку исключений для матрицы времени выполнения
-            for (int device = 0; device < proccessingTime.rowCount; device++)
-            {
-
-                // Размер матрицы времени выполнения не совпадает с количеством типов
-                if (proccessingTime.GetVectorSize(device) != dataTypesCount)
-                    throw new ArgumentException("The number of items in the list proccessingTime does not match the dataTypesCount.");
-            }
-
-            // Словарь соответствий времени переналадки равен null
-            if (changeoverTime == null)
-                throw new ArgumentNullException("The changeoverTime matrix is null.");
-
-            // Размер словаря переналадки не совпадает с количеством приборов
-            if (changeoverTime.Count != deviceCount)
-                throw new ArgumentException("The number of items in the Dictionary changeoverTime does not match the deviceCount.");
-
-            // Выполняем проверку для каждого прибора
-            for (int device = 0; device < changeoverTime.Count; device++)
-            {
-
-                // Размер матрицы по словарю переналадки не совпадает с количеством типов
-                if (changeoverTime[device].rowCount != dataTypesCount)
-                    throw new ArgumentException("The number of items in the Dictionary changeoverTime does not match the dataTypesCount.");
-
-                // Размер вектора матрицы по словарю переналадки не совпадает с количеством типов
-                for (int dataType = 0; dataType < changeoverTime[device].rowCount; dataType++)
-                    if (changeoverTime[device].GetVectorSize(dataType) != dataTypesCount)
-                        throw new ArgumentException("The number of items in the Dictionary changeoverTime does not match the dataTypesCount.");
-            }
-            List<double> fr = new List<double>(deviceCount);
-            List<double> rd = new List<double>(deviceCount);
-
-            // Преобразуем данные
-            for (int device = 0; device < deviceCount; device++)
-            {
-                fr.Add(1 / (double)failureRates[device]);
-                rd.Add(1 / (double)restoringDevice[device]);
-            }
-
-            // Выполняем инициализацию
-            this.dataTypesCount = dataTypesCount;
-            this.deviceCount = deviceCount;
-            this.buffer = buffer;
-            this.proccessingTime = proccessingTime;
-            this.changeoverTime = changeoverTime;
-            this.preMaintenanceTimes = preMaintenanceTimes;
-            this.isFixedBatches = isFixedBatches;
-            this.restoringDevice = rd;
-            this.failureRates = fr;
-        }
-
-        /// <summary>
-        /// Конструктор конфигурации конвейерной системы. Содержит в себе всю входную
-        /// информацию небходимую для выполнения локально-оптимальных вычислений
-        /// </summary>
-        public Config(
-            int dataTypesCount,
-            int deviceCount,
-            int buffer,
-            Matrix proccessingTime,
-            Dictionary<int, Matrix> changeoverTime,
-            Vector preMaintenanceTimes,
-            List<double> failureRates,
-            List<double> restoringDevice,
-            bool isFixedBatches
-            )
-        {
-
-            // Вектор ПТО равен null
-            if (preMaintenanceTimes == null)
-                throw new ArgumentNullException("The PreM vector is null.");
-
-            // Вектор отказов равен null
-            if (failureRates == null)
-                throw new ArgumentNullException("The failureRates vector is null.");
-
-            // Вектор отказов равен null
-            if (failureRates.Count() != deviceCount)
-                throw new ArgumentException("The number of items in the list failureRates does not match the deviceCount.");
-
-            // Вектор востановления равен null
-            if (restoringDevice == null)
-                throw new ArgumentNullException("The restoringDevice vector is null.");
-
-            // Вектор отказов равен null
-            if (restoringDevice.Count() != deviceCount)
-                throw new ArgumentException("The number of items in the list restoringDevice does not match the deviceCount.");
-
-            // Размер вектора ПТО не совпадает с количеством приборов
-            if (preMaintenanceTimes.getCount() != deviceCount)
-                throw new ArgumentException("The number of items in the list preMaintenanceTimes does not match the deviceCount.");
-
             // Матрица времени выполнения равна null
             if (proccessingTime == null)
                 throw new ArgumentNullException("The proccessingTime matrix is null.");
@@ -356,10 +253,7 @@ namespace magisterDiplom.Model
             this.buffer = buffer;
             this.proccessingTime = proccessingTime;
             this.changeoverTime = changeoverTime;
-            this.preMaintenanceTimes = preMaintenanceTimes;
             this.isFixedBatches = isFixedBatches;
-            this.restoringDevice = restoringDevice;
-            this.failureRates = failureRates;
         }
 
         /// <summary>
@@ -403,25 +297,6 @@ namespace magisterDiplom.Model
 
             // Добавляем информацию о размере буфера
             res += prefix + $"buffer:         {this.buffer}" + Environment.NewLine;
-
-            // Выполняем формирование вывода времени переналадки
-            int _device;
-            res += prefix + "preMaintenanceTimes: ";
-            for (_device = 0; _device < this.deviceCount - 1; _device++)
-                res += $"{this.preMaintenanceTimes[_device],-2}, ";
-            res += $"{this.preMaintenanceTimes[_device]};" + Environment.NewLine;
-
-            // Выполняем формирование вывода времени отказов приборов
-            res += prefix + "restoringDevice: ";
-            for (_device = 0; _device < this.deviceCount - 1; _device++)
-                res += $"{this.restoringDevice[_device],-2}, ";
-            res += $"{this.restoringDevice[_device]};" + Environment.NewLine;
-
-            // Выполняем формирование вывода времени востановления приборов
-            res += prefix + "failureRates: ";
-            for (_device = 0; _device < this.deviceCount - 1; _device++)
-                res += $"{this.failureRates[_device],-2}, ";
-            res += $"{this.failureRates[_device]};" + Environment.NewLine;
             
             // Выполняем формирование вывода времени выполнения
             res += prefix + "proccessingTime:" + Environment.NewLine;
@@ -462,9 +337,6 @@ namespace magisterDiplom.Model
         /// changeoverTime = 
         ///     1: [[1, 1, 1], [1, 1, 1], [1, 1, 1]]; 
         ///     2: [[2, 2, 2], [2, 2, 2], [2, 2, 2]];
-        /// preMaintenanceTimes = [2, 3];
-        /// failureRates = [7, 7];
-        /// restoringDevice = [11, 15];
         /// isFixedBatches = false;
         /// </summary>
         /// <returns>Объект структуры</returns>
@@ -500,9 +372,6 @@ namespace magisterDiplom.Model
                         })
                     },
                 },
-                new Vector(new List<int> { 2, 3 }),
-                new List<double> { 7, 7 },
-                new List<double> { 11, 15 },
                 false
             );
         }
@@ -549,9 +418,6 @@ namespace magisterDiplom.Model
                         })
                     },
                 },
-                new Vector(new List<int> { 2, 3, 4 }),
-                new List<double> { 0.002, 0.003 ,0.001 },
-                new List<double> { 0.3, 0.3, 0.3 },
                 false
             );
         }

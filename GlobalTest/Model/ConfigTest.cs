@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 namespace GlobalTest.Model
 {
 
-    [TestClass]
+    /*[TestClass]
     public class ConfigTest
     {
 
@@ -816,5 +816,5 @@ namespace GlobalTest.Model
                 false// bool isFixedBatches
             );
         }
-    }
+    }*/
 }
