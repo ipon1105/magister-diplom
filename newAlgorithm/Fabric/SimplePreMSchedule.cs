@@ -958,7 +958,7 @@ namespace magisterDiplom.Fabric
                 {
 
                     // Если индекс пакета превышает максимальный размер пакетов для типа данных dataType
-                    if (batch >= matrixA[dataType].Count)
+                    if (batch >= matrixA[dataTypes[dataType]].Count)
 
                         // Продолжаем обработку для следующего типа данных
                         continue;
