@@ -1239,7 +1239,7 @@ namespace magisterDiplom.Fabric
         /// Возвращяет простои для переданного индекса прибора, данного расписания
         /// </summary>
         /// <returns>Время простоя для переданного индекса прибора</returns>
-        public int GetDowntimeByDevice(int device)
+        private int GetDowntimeByDevice(int device)
         {
 
             // Объявляем и инициализируем простои
@@ -1380,7 +1380,7 @@ namespace magisterDiplom.Fabric
         /// Возвращяем полезность для прибора по переданному индексу
         /// </summary>
         /// <returns>Критерий полезности</returns>
-        public int GetUtilityByDevice(int device)
+        private int GetUtilityByDevice(int device)
         {
 
             // Объявляем значение критерия на нижнем уровне
@@ -1649,13 +1649,13 @@ namespace magisterDiplom.Fabric
         // }
 
         // ВЫРАЖЕНИЕ 13
-        
+
         /// <summary>
         /// Возвращяет доступность для всех приборов для указанного момента времени
         /// </summary>
         /// <param name="time">Момент времени для которого выполняется расчёт надёжности</param>
         /// <returns>Доступность для всех приборов</returns>
-        public double CalcSysReliability(int time)
+        private double CalcSysReliability(int time)
         {
             if (IsDebug && IsDebug_CalcSysReliability)
             
@@ -1703,7 +1703,7 @@ namespace magisterDiplom.Fabric
         /// </summary>
         /// <param name="matrixA">Матрица количества заданий каждого типа на пакет[dataTypesCount x mi]</param>
         /// <returns>Если количество заданий совпадают - true, иначе false</returns>
-        public bool IsConstraint_JobCount(List<List<int>> matrixA)
+        private bool IsConstraint_JobCount(List<List<int>> matrixA)
         {
 
             // Объявляем количество заданий для текущего расписания
@@ -1743,7 +1743,7 @@ namespace magisterDiplom.Fabric
         /// </summary>
         /// <param name="time">Момент времени для которого выполняется расчёт надёжности</param>
         /// <returns>true, если ограничение выполняется. Иначе false</returns>
-        public bool IsConstraint_CalcSysReliability(int time)
+        private bool IsConstraint_CalcSysReliability(int time)
         {
             double sysTime = this.CalcSysReliability(time);
             if (IsDebug && IsDebug_CalcSysReliability)
@@ -1815,7 +1815,7 @@ namespace magisterDiplom.Fabric
         /// </summary>
         /// <param name="matrixA">Матрица количества заданий каждого типа на пакет[dataTypesCount x mi]</param>
         /// <returns>Если количество пакетов заданий совпадают - true, иначе false</returns>
-        public bool IsConstraint_BatchCount(List<List<int>> matrixA)
+        private bool IsConstraint_BatchCount(List<List<int>> matrixA)
         {
 
             // Объявляем количество пакетов заданий
@@ -1839,7 +1839,7 @@ namespace magisterDiplom.Fabric
         /// Возвращяем результат совпадения одного пакета на позицию расписания
         /// </summary>
         /// <returns>Если пакет на позицию 1, то true. Иначе false</returns>
-        public bool IsConstraint_OneBatchOnPos()
+        private bool IsConstraint_OneBatchOnPos()
         {
             // Существующая реализация расписания обязывает иметь один пакет на позицию
             return true;
@@ -1851,7 +1851,7 @@ namespace magisterDiplom.Fabric
         /// </summary>
         /// <param name="matrixA">Матрица количества заданий каждого типа на пакет[dataTypesCount x mi]</param>
         /// <returns>Если количество пакетов заданий по типам совпадают - true, иначе false</returns>
-        public bool IsConstraint_BatchCountByType(List<List<int>> matrixA)
+        private bool IsConstraint_BatchCountByType(List<List<int>> matrixA)
         {
 
             // Объявляем количество пакетов заданий

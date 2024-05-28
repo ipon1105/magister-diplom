@@ -55,7 +55,7 @@ namespace magisterDiplom.Model
         /// <param name="failureRates">Интенсивность отказов приборов</param>
         /// <param name="restoringDevice">Интенсивность восстановления приборов</param>
         /// <param name="preMaintenanceTimes">Длительности ПТО приборов</param>
-        /// <exception cref="ArgumentException">Переданные данные имеют не верный формат</exception>
+        /// <exception cref="ArgumentException">Переданные данные имеют некорректны</exception>
         /// <exception cref="ArgumentNullException">Был передан null</exception>
         /// <exception cref="IndexOutOfRangeException">Размеры переданных данных не совпадают</exception>
         public PreMConfig(
@@ -69,6 +69,10 @@ namespace magisterDiplom.Model
             // Переопределяем конфигурационную структуру
             this.config = config;
 
+            // Если нижний порог выходит за границы
+            if (beta < lowerRate || beta > upperRate)
+                throw new ArgumentException($"The value of beta must be between {lowerRate} and {upperRate}.");
+
             // Вектор ПТО равен null
             if (preMaintenanceTimes == null)
                 throw new ArgumentNullException("The preMaintenanceTimes list is null.");
@@ -76,7 +80,14 @@ namespace magisterDiplom.Model
             // Размер вектора ПТО не совпадает с количеством приборов
             if (preMaintenanceTimes.Count() != config.deviceCount)
                 throw new IndexOutOfRangeException("The number of items in the list preMaintenanceTimes does not match the deviceCount.");
-            
+
+            // Для каждого прибора
+            for (int device = 0; device < config.deviceCount; device++)
+
+                // Если элемент ветора preMaintenanceTimes ниже 0
+                if (preMaintenanceTimes[device] < 0)
+                    throw new ArgumentException("The value in vector preMaintenanceTimes cannot be less than 0");
+
             // Вектор отказов равен null
             if (failureRates == null)
                 throw new ArgumentNullException("The failureRates list is null.");
@@ -186,14 +197,14 @@ namespace magisterDiplom.Model
         public readonly int deviceCount;
 
         /// <summary>
-        /// Данная переменная представляет из словарь соответсвия прибора к матрице переналадки. 
+        /// Данная переменная представляет из себя словарь соответствия прибора к матрице переналадки. 
         /// Для каждого прибора есть матрица переналадки приборов с одного типа задания на другой.
         /// Таким образом changeoverTime = [deviceCount] : [dataTypesCount x dataTypesCount]
         /// </summary>
         public readonly Dictionary<int, List<List<int>>> changeoverTime;
 
         /// <summary>
-        /// Данная переменная представляет из себя двумрную матрицу и используется, как матрица времени выполнения заданий.
+        /// Данная переменная представляет из себя двухмерную матрицу и используется, как матрица времени выполнения заданий.
         /// Первое измерение представляет определяется, как количество приборов на конвейере. Второе измерения это количество
         /// типов данных. Таким образом proccessingTime = [deviceCount x dataTypesCount]
         /// </summary>
