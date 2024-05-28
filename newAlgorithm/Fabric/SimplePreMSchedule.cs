@@ -1050,7 +1050,7 @@ namespace magisterDiplom.Fabric
         /// <summary>
         /// Выполняет построение матрицы начала времени выполнения заданий
         /// </summary>
-        public void CalcStartProcessing()
+        private void CalcStartProcessing()
         {
 
             // Объявляем индекс ПЗ
@@ -1425,7 +1425,7 @@ namespace magisterDiplom.Fabric
 
         // ВЫРАЖЕНИЕ 9
         /// <summary>
-        /// Возвращяет сумму полезности и интервалов между ПТО для данного расписания
+        /// Возвращает сумму полезности и интервалов между ПТО для данного расписания
         /// </summary>
         /// <returns>Сумма полезности и интервалов между ПТО</returns>
         public int GetPreMUtility()
