@@ -25,13 +25,13 @@ namespace magisterDiplom.Fabric
         protected List<List<PreMSet>> matrixTPM;
 
         /// <summary>
-        /// Возвращяет матрицу ПТО приборов
+        /// Возвращает матрицу ПТО приборов
         /// </summary>
         /// <returns>Матрица ПТО приборов</returns>
         public abstract List<List<int>> GetMatrixY();
 
         /// <summary>
-        /// Возвращяет матрицу моментов времени окончания ПТО приборов
+        /// Возвращает матрицу моментов времени окончания ПТО приборов
         /// </summary>
         /// <returns>Матрица моментов времени окончания ПТО приборов</returns>
         public abstract List<List<int>> GetMatrixTPM();

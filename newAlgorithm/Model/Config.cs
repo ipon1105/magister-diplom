@@ -29,17 +29,17 @@ namespace magisterDiplom.Model
         public readonly Config config;
 
         /// <summary>
-        /// Список из времён вермени выполнения ПТО для соответсвующих приборов: preMaintenanceTimes = [deviceCount]
+        /// Список из времён времени выполнения ПТО для соответствующих приборов: preMaintenanceTimes = [deviceCount]
         /// </summary>
         public readonly List<int> preMaintenanceTimes;
 
         /// <summary>
-        /// Список интенсивностей отказов для соответсвующих приборов: [deviceCount]
+        /// Список интенсивностей отказов для соответствующих приборов: [deviceCount]
         /// </summary>
         public readonly List<double> failureRates;
 
         /// <summary>
-        /// Список интенсивностей востановлений для соответсвующих приборов: [deviceCount]
+        /// Список интенсивностей восстановлений для соответствующих приборов: [deviceCount]
         /// </summary>
         public readonly List<double> restoringDevice;
 

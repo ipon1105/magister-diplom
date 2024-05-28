@@ -11,18 +11,8 @@ namespace magisterDiplom
     {
 
         /// <summary>
-        /// Показатель успешности построения расписания
-        /// </summary>
-        public const bool Successfully = true;
-
-        /// <summary>
-        /// Показатель успешности построения расписания
-        /// </summary>
-        public const bool Unsuccessfully = false;
-
-        /// <summary>
         /// Флаг отладки. Если установлен, то в процессе выполнения
-        /// будет выводиться отладачная информация в стандартный поток вывода
+        /// будет выводиться отладочная информация в стандартный поток вывода
         /// </summary>
         protected const bool IsDebug = true;
 
@@ -37,7 +27,7 @@ namespace magisterDiplom
         protected List<Batch> schedule;
 
         /// <summary>
-        /// Словарь соответсвий приборов и матриц моментов начала времени выполнения заданий
+        /// Словарь соответствий приборов и матриц моментов начала времени выполнения заданий
         /// </summary>
         protected Dictionary<int, List<List<int>>> startProcessing;
 
@@ -49,19 +39,19 @@ namespace magisterDiplom
         public abstract bool Build(List<List<int>> matrixA);
 
         /// <summary>
-        /// Возвращяет матрицу количества заданий в пакетах
+        /// Возвращает матрицу количества заданий в пакетах
         /// </summary>
         /// <returns>Матрица количества заданий в пакетах</returns>
         public abstract List<List<int>> GetMatrixR();
 
         /// <summary>
-        /// Возвращяет матрицу распорядке пакетов заданий
+        /// Возвращает матрицу порядка пакетов заданий
         /// </summary>
-        /// <returns>Матрица распорядкя пакетов заданий</returns>
+        /// <returns>Матрица порядка пакетов заданий</returns>
         public abstract List<List<int>> GetMatrixP();
 
         /// <summary>
-        /// Возвращяет 3 мерную матрицу моментов времени выполнения заданий
+        /// Возвращает 3 мерную матрицу моментов времени выполнения заданий
         /// </summary>
         /// <returns>Словарь соответствия прибора к матрице моментов времени выполнения заданий в пакетах</returns>
         public abstract Dictionary<int, List<List<int>>> GetStartProcessing();
