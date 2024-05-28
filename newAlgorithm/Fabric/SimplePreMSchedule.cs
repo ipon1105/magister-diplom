@@ -370,7 +370,7 @@ namespace magisterDiplom.Fabric
                 // Если в текущей позиции существует ПТО
                 if (this.matrixY[device][batchIndex] != 0)
 
-                    // Возвращяем индекс данной позиции
+                    // Возвращаем индекс данной позиции
                     return batchIndex;
 
             // Вернём -1
@@ -704,7 +704,7 @@ namespace magisterDiplom.Fabric
                 PrintSchedule();
             }
 
-            // Возвращяем результат
+            // Возвращаем результат
             return isFind;
         }
 
@@ -939,7 +939,7 @@ namespace magisterDiplom.Fabric
                 // Если не было найдено расписания удовлетворяющему условию надёжности
                 if (!this.SearchByPosition(5))
 
-                    // Возвращяем 0, как флаг неудачи
+                    // Возвращаем 0, как флаг неудачи
                     return false;
 
                 // Выполняем оптимизацию для позиций ПТО приборов
@@ -950,7 +950,7 @@ namespace magisterDiplom.Fabric
                 if (!this.IsSolutionAcceptable())
                 {
                     Console.WriteLine("Тот самый случай");
-                    // Возвращяем 0, как флаг неудачи
+                    // Возвращаем 0, как флаг неудачи
                     return false;
                 }
             }
@@ -980,7 +980,7 @@ namespace magisterDiplom.Fabric
                     // Если не было найдено расписания удовлетворяющему условию надёжности
                     if (!this.SearchByPosition(5))
 
-                        // Возвращяем 0, как флаг неудачи
+                        // Возвращаем 0, как флаг неудачи
                         return false;
 
                     // Выполняем оптимизацию для позиций ПТО приборов (ШАГ 15)
@@ -991,7 +991,7 @@ namespace magisterDiplom.Fabric
                     if (!this.IsSolutionAcceptable())
                     {
                         Console.WriteLine("Тот самый случай");
-                        // Возвращяем 0, как флаг неудачи
+                        // Возвращаем 0, как флаг неудачи
                         return false;
                     }
                 }
@@ -1377,7 +1377,7 @@ namespace magisterDiplom.Fabric
 
         // ВЫРАЖЕНИЕ 8 ДЛЯ ОДНОГО ПРИБОРА
         /// <summary>
-        /// Возвращяем полезность для прибора по переданному индексу
+        /// Возвращаем полезность для прибора по переданному индексу
         /// </summary>
         /// <returns>Критерий полезности</returns>
         private int GetUtilityByDevice(int device)
@@ -1398,13 +1398,13 @@ namespace magisterDiplom.Fabric
             // Вычитаем простои
             sum -= this.GetDowntimeByDevice(device);
 
-            // Возвращяем критерий
+            // Возвращаем критерий
             return sum;
         }
 
         // ВЫРАЖЕНИЕ 8
         /// <summary>
-        /// Возвращяем полезность для данного расписания
+        /// Возвращаем полезность для данного расписания
         /// </summary>
         /// <returns>Время полезности</returns>
         public int GetUtility()
@@ -1419,7 +1419,7 @@ namespace magisterDiplom.Fabric
                 // Добавляем критерий для данного прибора
                 sum += this.GetUtilityByDevice(device);
             
-            // Возвращяем критерий
+            // Возвращаем критерий
             return sum;
         }
 
@@ -1486,7 +1486,7 @@ namespace magisterDiplom.Fabric
             if (IsDebug && IsDebug_GetPreMUtility)
                 Console.WriteLine($"Критерий f2 {sum}{Environment.NewLine}");
 
-            // Возвращяем критерий
+            // Возвращаем критерий
             return sum;
         }
 
@@ -1563,7 +1563,7 @@ namespace magisterDiplom.Fabric
                         // Увеличиваем время активности до прибора
                         activityTime += time - start_time;
 
-                        // Возвращяем время активности
+                        // Возвращаем время активности
                         return activityTime;
                     }
 
@@ -1571,7 +1571,7 @@ namespace magisterDiplom.Fabric
                     activityTime += proc_time;
                 }
 
-            // Возвращяем время активности
+            // Возвращаем время активности
             return activityTime;
         }
 
@@ -1687,7 +1687,7 @@ namespace magisterDiplom.Fabric
                 reliability *= this.CalcReliabilityByDevice(activity_time, device);
             }
 
-            // Возвращяем надёжность
+            // Возвращаем надёжность
             return reliability;
         }
 
@@ -1729,7 +1729,7 @@ namespace magisterDiplom.Fabric
                     // Увеличиваем количество необходимых заданий
                     tar_jobCount += matrixA[dataType][batch];
 
-            // Возвращяем результат сравнения
+            // Возвращаем результат сравнения
             return (cur_jobCount == tar_jobCount);
         }
 
@@ -1739,7 +1739,7 @@ namespace magisterDiplom.Fabric
 
         // ВЫРАЖЕНИЕ 18
         /// <summary>
-        /// Возвращяем результат расчёта ограничения на общую надёжность
+        /// Возвращаем результат расчёта ограничения на общую надёжность
         /// </summary>
         /// <param name="time">Момент времени для которого выполняется расчёт надёжности</param>
         /// <returns>true, если ограничение выполняется. Иначе false</returns>
@@ -1791,13 +1791,13 @@ namespace magisterDiplom.Fabric
                 // Если момент окончания ПТО в позиции index не удовлетворяет условиям
                 if (matrixTPM[device][index].TimePreM > time)
 
-                    // Возвращяем индекс ПЗ после которого выполнится последнее ПТО
+                    // Возвращаем индекс ПЗ после которого выполнится последнее ПТО
                     return matrixTPM[device][index - 1].BatchIndex;
 
                 // Если момент окончания ПТО в позиции index не удовлетворяет условиям
                 if (matrixTPM[device][index].TimePreM == time)
 
-                    // Возвращяем индекс ПЗ после которого выполнится последнее ПТО
+                    // Возвращаем индекс ПЗ после которого выполнится последнее ПТО
                     return matrixTPM[device][index].BatchIndex;
             }
 
@@ -1830,13 +1830,13 @@ namespace magisterDiplom.Fabric
                 // Увеличиваем количество пакетов
                 tar_batchCount += matrixA[dataType].Count;
 
-            // Возвращяем true
+            // Возвращаем true
             return (cur_batchCount == tar_batchCount);
         }
 
         // ВЫРАЖЕНИЕ 24
         /// <summary>
-        /// Возвращяем результат совпадения одного пакета на позицию расписания
+        /// Возвращаем результат совпадения одного пакета на позицию расписания
         /// </summary>
         /// <returns>Если пакет на позицию 1, то true. Иначе false</returns>
         private bool IsConstraint_OneBatchOnPos()
@@ -1879,11 +1879,11 @@ namespace magisterDiplom.Fabric
                 // Выполяем проверку
                 if (tar_batchCountByType != cur_batchCountByType)
 
-                    // Возвращяем false
+                    // Возвращаем false
                     return false;
             }
 
-            // Возвращяем true
+            // Возвращаем true
             return true;
         }
 
@@ -1905,7 +1905,7 @@ namespace magisterDiplom.Fabric
                 // Заполняем элементы матрицы количества заданий в пакетах
                 res[this.schedule[batchIndex].Type][batchIndex] = 1;
 
-            // Возвращяем результат
+            // Возвращаем результат
             return res;
         }
 
@@ -1927,7 +1927,7 @@ namespace magisterDiplom.Fabric
                 // Заполняем элементы матрицы количества заданий в пакетах
                 res[this.schedule[batchIndex].Type][batchIndex] = this.schedule[batchIndex].Size;
 
-            // Возвращяем результат
+            // Возвращаем результат
             return res;
         }
 
@@ -1950,7 +1950,7 @@ namespace magisterDiplom.Fabric
                     res[device].Add(matrixTPM[device][batchIndex].TimePreM);
             }
 
-            // Возвращяем результат
+            // Возвращаем результат
             return res;
         }
 
