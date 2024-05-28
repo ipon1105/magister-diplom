@@ -153,7 +153,7 @@ namespace newAlgorithm
                 dataTypesCount,
                 deviceCount,
                 buffer,
-                (Matrix)(new Matrix(proccessingTime)),
+                proccessingTime,
                 Config.ChangeoverTimeConverter(changeoverTime),
                 isFixedBatches
             );
@@ -190,7 +190,7 @@ namespace newAlgorithm
                 dataTypesCount,
                 deviceCount,
                 buffer,
-                (Matrix) (new Matrix(proccessingTime)),
+                proccessingTime,
                 Config.ChangeoverTimeConverter(changeoverTime),
                 isFixedBatches
             );
@@ -244,7 +244,7 @@ namespace newAlgorithm
                                     dataTypesCount,
                                     deviceCount,
                                     buffer,
-                                    (Matrix)(new Matrix(OldProccessingTimeGenerator(_maxProccessingTime, deviceCount, dataTypesCount))),
+                                    OldProccessingTimeGenerator(_maxProccessingTime, deviceCount, dataTypesCount),
                                     Config.ChangeoverTimeConverter(OldChangeoverTimeGenerator(_maxChangeoverTime, deviceCount, dataTypesCount)),
                                     isFixedBatches
                                 );
@@ -322,7 +322,7 @@ namespace newAlgorithm
                                     dataTypesCount,
                                     deviceCount,
                                     buffer,
-                                    (Matrix)(new Matrix(OldProccessingTimeGenerator(_maxProccessingTime, deviceCount, dataTypesCount))),
+                                    OldProccessingTimeGenerator(_maxProccessingTime, deviceCount, dataTypesCount),
                                     Config.ChangeoverTimeConverter(OldChangeoverTimeGenerator(_maxChangeoverTime, deviceCount, dataTypesCount)),
                                     isFixedBatches
                                 );
@@ -464,7 +464,7 @@ namespace newAlgorithm
                                         _dataTypesCount,
                                         _deviceCount,
                                         buffer,
-                                        (Matrix)(new Matrix(OldProccessingTimeGenerator(_maxProccessingTime, _deviceCount, _dataTypesCount))),
+                                        OldProccessingTimeGenerator(_maxProccessingTime, _deviceCount, _dataTypesCount),
                                         Config.ChangeoverTimeConverter(OldChangeoverTimeGenerator(_maxChangeoverTime, _deviceCount, _dataTypesCount)),
                                         isFixedBatches
                                     );
@@ -562,7 +562,7 @@ namespace newAlgorithm
                                     _dataTypesCount,
                                     _deviceCount,
                                     buffer,
-                                    (Matrix)(new Matrix(OldProccessingTimeGenerator(_maxProccessingTime, _deviceCount, _dataTypesCount))),
+                                    OldProccessingTimeGenerator(_maxProccessingTime, _deviceCount, _dataTypesCount),
                                     Config.ChangeoverTimeConverter(OldChangeoverTimeGenerator(_maxChangeoverTime, _deviceCount, _dataTypesCount)),
                                     isFixedBatches
                                 );
@@ -697,7 +697,7 @@ namespace newAlgorithm
                                                 _dataTypesCount,
                                                 _deviceCount,
                                                 buffer,
-                                                (Matrix)(new Matrix(OldProccessingTimeGenerator(_maxProccessingTime, _deviceCount, _dataTypesCount))),
+                                                OldProccessingTimeGenerator(_maxProccessingTime, _deviceCount, _dataTypesCount),
                                                 Config.ChangeoverTimeConverter(OldChangeoverTimeGenerator(_maxChangeoverTime, _deviceCount, _dataTypesCount)),
                                                 isFixedBatches
                                             );
@@ -1504,7 +1504,7 @@ namespace newAlgorithm
                 dataTypesCount,
                 deviceCount,
                 buffer,
-                (Matrix)(new Matrix(proccessingTime)),
+                proccessingTime,
                 Config.ChangeoverTimeConverter(changeoverTime),
                 isFixedBatches
             );

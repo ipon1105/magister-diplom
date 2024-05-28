@@ -190,39 +190,71 @@ namespace magisterDiplom.Model
         /// Для каждого прибора есть матрица переналадки приборов с одного типа задания на другой.
         /// Таким образом changeoverTime = [deviceCount] : [dataTypesCount x dataTypesCount]
         /// </summary>
-        public readonly Dictionary<int, Matrix> changeoverTime;
+        public readonly Dictionary<int, List<List<int>>> changeoverTime;
 
         /// <summary>
         /// Данная переменная представляет из себя двумрную матрицу и используется, как матрица времени выполнения заданий.
         /// Первое измерение представляет определяется, как количество приборов на конвейере. Второе измерения это количество
         /// типов данных. Таким образом proccessingTime = [deviceCount x dataTypesCount]
         /// </summary>
-        public readonly Matrix proccessingTime;
+        public readonly List<List<int>> proccessingTime;
 
+        /// <summary>
+        /// Конструктор конфигурационного класса
+        /// </summary>
+        /// <param name="dataTypesCount">Количество типов данных</param>
+        /// <param name="deviceCount">Количество приборов</param>
+        /// <param name="buffer">Размер буфера</param>
+        /// <param name="proccessingTime">Матрица времени выполнения</param>
+        /// <param name="changeoverTime">Матрица времене переналадки</param>
+        /// <param name="isFixedBatches">Размеры пакетов фиксированные, если True, иначе False</param>
+        /// <exception cref="ArgumentNullException">Один из переданных аргументов имеет Null</exception>
+        /// <exception cref="ArgumentOutOfRangeException">Размеры переданных данных не совпадают</exception>
+        /// <exception cref="ArgumentException">Один из переданных аргументов неверный</exception>
         public Config(
             int dataTypesCount,
             int deviceCount,
             int buffer,
-            Matrix proccessingTime,
-            Dictionary<int, Matrix> changeoverTime,
+            List<List<int>> proccessingTime,
+            Dictionary<int, List<List<int>>> changeoverTime,
             bool isFixedBatches
             )
         {
+
+            // Если количество типов данных меньше или равно 0
+            if (dataTypesCount <= 0)
+                throw new ArgumentException("The value in dataTypesCount cannot be less or equal than 0");
+
+            // Если количество приборов меньше или равно 0
+            if (deviceCount <= 0)
+                throw new ArgumentException("The value in deviceCount cannot be less or equal than 0");
+
+            // Если количество приборов меньше 0
+            if (buffer < 0)
+                throw new ArgumentException("The value in buffer cannot be less than 0");
+
             // Матрица времени выполнения равна null
             if (proccessingTime == null)
                 throw new ArgumentNullException("The proccessingTime matrix is null.");
 
             // Размер матрицы времени выполнения не совпадает с количеством приборов
-            if (proccessingTime.rowCount != deviceCount)
-                throw new ArgumentException("The number of items in the list proccessingTime does not match the deviceCount.");
+            if (proccessingTime.Count != deviceCount) 
+                throw new ArgumentOutOfRangeException("The number of items in the list proccessingTime does not match the deviceCount.");
 
             // Выполняем проверку исключений для матрицы времени выполнения
-            for (int device = 0; device < proccessingTime.rowCount; device++)
-            {
+            for (int device = 0; device < proccessingTime.Count; device++) { 
 
                 // Размер матрицы времени выполнения не совпадает с количеством типов
-                if (proccessingTime.GetVectorSize(device) != dataTypesCount)
-                    throw new ArgumentException("The number of items in the list proccessingTime does not match the dataTypesCount.");
+                if (proccessingTime[device].Count != dataTypesCount)
+                    throw new ArgumentOutOfRangeException("The number of items in the list proccessingTime does not match the dataTypesCount.");
+
+                // Выполняем проверку исключений для матрицы времени выполнения
+                for (int dataType = 0; dataType < proccessingTime[device].Count; dataType++) { 
+                
+                    // Если элемент матрицы меньше или равен 0
+                    if (proccessingTime[device][dataType] <= 0)
+                        throw new ArgumentException("The value in matrix proccessingTime cannot be less or equal than 0");
+                }
             }
 
             // Словарь соответствий времени переналадки равен null
@@ -231,20 +263,30 @@ namespace magisterDiplom.Model
 
             // Размер словаря переналадки не совпадает с количеством приборов
             if (changeoverTime.Count != deviceCount)
-                throw new ArgumentException("The number of items in the Dictionary changeoverTime does not match the deviceCount.");
+                throw new ArgumentOutOfRangeException("The number of items in the Dictionary changeoverTime does not match the deviceCount.");
 
             // Выполняем проверку для каждого прибора
             for (int device = 0; device < changeoverTime.Count; device++)
             {
 
                 // Размер матрицы по словарю переналадки не совпадает с количеством типов
-                if (changeoverTime[device].rowCount != dataTypesCount)
-                    throw new ArgumentException("The number of items in the Dictionary changeoverTime does not match the dataTypesCount.");
+                if (changeoverTime[device].Count != dataTypesCount)
+                    throw new ArgumentOutOfRangeException("The number of items in the Dictionary changeoverTime does not match the dataTypesCount.");
 
                 // Размер вектора матрицы по словарю переналадки не совпадает с количеством типов
-                for (int dataType = 0; dataType < changeoverTime[device].rowCount; dataType++)
-                    if (changeoverTime[device].GetVectorSize(dataType) != dataTypesCount)
-                        throw new ArgumentException("The number of items in the Dictionary changeoverTime does not match the dataTypesCount.");
+                for (int fromDataType = 0; fromDataType < changeoverTime[device].Count; fromDataType++) {
+
+                    // Если размеры не совпадают
+                    if (changeoverTime[device][fromDataType].Count != dataTypesCount)
+                        throw new ArgumentOutOfRangeException("The number of items in the Dictionary changeoverTime does not match the dataTypesCount.");
+
+                    // Выполняем проверку исключений для матрицы времени выполнения
+                    for (int toDataType = 0; toDataType < proccessingTime[device].Count; toDataType++)
+
+                        // Если элемент матрицы меньше 0
+                        if (changeoverTime[device][fromDataType][toDataType] < 0)
+                            throw new ArgumentException("The value in matrix changeoverTime cannot be less than 0");
+                }
             }
 
             // Выполняем инициализацию
@@ -261,15 +303,15 @@ namespace magisterDiplom.Model
         /// </summary>
         /// <param name="changeoverTime">3-ёх мерная матрица</param>
         /// <returns>Словарь соответствий приборов и матриц переналадок</returns>
-        public static Dictionary<int, Matrix> ChangeoverTimeConverter(List<List<List<int>>> changeoverTime)
+        public static Dictionary<int, List<List<int>>> ChangeoverTimeConverter(List<List<List<int>>> changeoverTime)
         {
 
             // Создаём словарь матриц переналадки
-            Dictionary<int, Matrix> _changeoverTime = new Dictionary<int, Matrix>();
+            Dictionary<int, List<List<int>>> _changeoverTime = new Dictionary<int, List<List<int>>>();
 
             // Для каждого прибора выполняем переопределение данных в необходимую форму
             for (int device = 0; device < changeoverTime.Count; device++)
-                _changeoverTime.Add(device, (Matrix)(new Matrix(changeoverTime[device])));
+                _changeoverTime.Add(device, changeoverTime[device]);
 
             // Возвращаем словарь матриц переналадки
             return _changeoverTime;
@@ -305,8 +347,8 @@ namespace magisterDiplom.Model
                 int dataType;
                 res += prefix + prefix + $"Device {device}: " + prefix;
                 for (dataType = 0; dataType < this.dataTypesCount - 1; dataType++)
-                    res += $"{this.proccessingTime[device, dataType],-2}, ";
-                res += $"{this.proccessingTime[device, dataType]};" + Environment.NewLine;
+                    res += $"{this.proccessingTime[device][dataType],-2}, ";
+                res += $"{this.proccessingTime[device][dataType]};" + Environment.NewLine;
             }
             res += prefix + "changeoverTime:" + Environment.NewLine;
 
@@ -319,8 +361,8 @@ namespace magisterDiplom.Model
                     int dataTypeCol;
                     res += prefix + prefix + prefix + $"Type {dataTypeRow}: " + prefix;
                     for (dataTypeCol = 0; dataTypeCol < this.dataTypesCount - 1; dataTypeCol++)
-                        res += $"{this.changeoverTime[device][dataTypeRow, dataTypeCol],-2}, ";
-                    res += $"{this.changeoverTime[device][dataTypeRow, dataTypeCol]};" + Environment.NewLine;
+                        res += $"{this.changeoverTime[device][dataTypeRow][dataTypeCol],-2}, ";
+                    res += $"{this.changeoverTime[device][dataTypeRow][dataTypeCol]};" + Environment.NewLine;
                 }
             }
 
@@ -346,30 +388,30 @@ namespace magisterDiplom.Model
                 3,
                 2,
                 5,
-                new Matrix(new List<List<int>>()
+                new List<List<int>>()
                 {
                     new List<int> { 2, 2, 1 },
                     new List<int> { 1, 3, 3 },
-                }),
-                new Dictionary<int, Matrix>
+                },
+                new Dictionary<int, List<List<int>>>
                 {
                     {
                         0,
-                        new Matrix(new List<List<int>>()
+                        new List<List<int>>()
                         {
                             new List<int>{1, 1, 1},
                             new List<int>{1, 1, 1},
                             new List<int>{1, 1, 1},
-                        })
+                        }
                     },
                     {
                         1,
-                        new Matrix(new List<List<int>>()
+                        new List<List<int>>()
                         {
                             new List<int>{2, 2, 2},
                             new List<int>{2, 2, 2},
                             new List<int>{2, 2, 2},
-                        })
+                        }
                     },
                 },
                 false
@@ -382,40 +424,40 @@ namespace magisterDiplom.Model
                 3,
                 3,
                 5,
-                new Matrix(new List<List<int>>()
+                new List<List<int>>()
                 {
                     new List<int> { 2, 2, 1 },
                     new List<int> { 1, 3, 2 },
                     new List<int> { 1, 2, 3 },
-                }),
-                new Dictionary<int, Matrix>
+                },
+                new Dictionary<int, List<List<int>>>
                 {
                     {
                         0,
-                        new Matrix(new List<List<int>>()
+                        new List<List<int>>()
                         {
                             new List<int>{1, 2, 3},
                             new List<int>{1, 2, 3},
                             new List<int>{1, 2, 3},
-                        })
+                        }
                     },
                     {
                         1,
-                        new Matrix(new List<List<int>>()
+                        new List<List<int>>()
                         {
                             new List<int>{1, 2, 3},
                             new List<int>{1, 2, 3},
                             new List<int>{1, 2, 3},
-                        })
+                        }
                     },
                     {
                         2,
-                        new Matrix(new List<List<int>>()
+                        new List<List<int>>()
                         {
                             new List<int>{1, 2, 3},
                             new List<int>{1, 2, 3},
                             new List<int>{1, 2, 3},
-                        })
+                        }
                     },
                 },
                 false

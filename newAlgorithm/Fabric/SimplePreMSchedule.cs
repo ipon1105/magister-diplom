@@ -225,7 +225,7 @@ namespace magisterDiplom.Fabric
             procSize = 0;
             for (device = 0; device < this.config.deviceCount; device++)
                 for (dataType = 0; dataType < this.config.dataTypesCount; dataType++)
-                    procSize = Math.Max(procSize, this.config.proccessingTime[device, dataType]);
+                    procSize = Math.Max(procSize, this.config.proccessingTime[device][dataType]);
             procSize = (int)Math.Log10(procSize) + 1;
 
             // Расчитываем общее количество символов для вывода отрезка равной единице времени
@@ -291,7 +291,7 @@ namespace magisterDiplom.Fabric
 
                                 // TODO: Ошибка. В this.schedule 2 пакета, а в this.startProcessing 3 пакета
                                 // Вычисляем время выполнения пакета задания с типом this.schedule[batchIndex].Type на приборе device
-                                int proc_time = this.config.proccessingTime[device, this.schedule[batchIndex].Type];
+                                int proc_time = this.config.proccessingTime[device][this.schedule[batchIndex].Type];
 
                                 // Выводим t заданий
                                 for (int t = 0; t < proc_time; t++) {
@@ -327,7 +327,7 @@ namespace magisterDiplom.Fabric
                                 }
 
                                 // Увеличиваем время
-                                time += this.config.proccessingTime[device, this.schedule[batchIndex].Type];
+                                time += this.config.proccessingTime[device][this.schedule[batchIndex].Type];
                             }
                     }
                     
@@ -736,7 +736,7 @@ namespace magisterDiplom.Fabric
                             this.startProcessing[device][batch].Last() +
 
                             // Время выполнения задания на текущем приборе в текущей позиции 
-                            this.config.proccessingTime[device, this.schedule[batch].Type];
+                            this.config.proccessingTime[device][this.schedule[batch].Type];
 
                         CalcMatrixTPM();
 
@@ -830,8 +830,8 @@ namespace magisterDiplom.Fabric
                 double sum = 0;
                 for (int device = 1; device < this.config.deviceCount; device++)
                     sum +=
-                        (double)this.config.proccessingTime[device, dataType] /
-                        (double)this.config.proccessingTime[device - 1, dataType];
+                        (double)this.config.proccessingTime[device][dataType] /
+                        (double)this.config.proccessingTime[device - 1][dataType];
                 m.Add(dataType, sum);
             }
 
@@ -890,8 +890,17 @@ namespace magisterDiplom.Fabric
             batch = 0;
             dataType = 0;
 
+            // Объявляем количество пакетов заданий
+            int batchCount = 0;
+
+            // Для каждого типа данных
+            for (int _dataType = 0; _dataType < matrixA.Count(); _dataType++)
+
+                // Увеличиваем общее количество пакетов заданий
+                batchCount += matrixA[_dataType].Count();
+
             // П.2 Добавляем 
-            this.schedule = new List<Batch>() { new Batch(
+            this.schedule = new List<Batch>(batchCount) { new Batch(
                 dataTypes[dataType],
                 matrixA[dataTypes[dataType]][batch]
             )};
@@ -1028,7 +1037,7 @@ namespace magisterDiplom.Fabric
                                 startProcessing[device][batchIndex].Last() +
 
                                 // Время выполнения задания с типов пакета на позиции batchIndex
-                                config.proccessingTime[device, schedule[batchIndex].Type] +
+                                config.proccessingTime[device][schedule[batchIndex].Type] +
 
                                 // Время выполнения ПТО
                                 preMConfig.preMaintenanceTimes[device]
@@ -1078,7 +1087,7 @@ namespace magisterDiplom.Fabric
                 job = 0;
 
                 // Устанавливаем момент начала времени выполнения 1 задания в 1 пакете на 1 приборе, как наладку
-                startProcessing[device][batchIndex][job] = config.changeoverTime[device][schedule[batchIndex].Type, schedule[batchIndex].Type];
+                startProcessing[device][batchIndex][job] = config.changeoverTime[device][schedule[batchIndex].Type][schedule[batchIndex].Type];
 
                 // Пробегаемся по всем заданиям пакета в первой позиции
                 for (job = 1; job < schedule[batchIndex].Size; job++)
@@ -1090,7 +1099,7 @@ namespace magisterDiplom.Fabric
                         startProcessing[device][batchIndex][job - 1] +
 
                         // Время выполнения предыдущего задания
-                        config.proccessingTime[device, schedule[batchIndex].Type];
+                        config.proccessingTime[device][schedule[batchIndex].Type];
 
                 // Пробегаемся по всем возможным позициям cо второго пакета
                 for (batchIndex = 1; batchIndex < schedule.Count(); batchIndex++)
@@ -1106,10 +1115,10 @@ namespace magisterDiplom.Fabric
                         startProcessing[device][batchIndex - 1].Last() +
 
                         // Время выполнения задания в предыдущем пакете
-                        config.proccessingTime[device, schedule[batchIndex - 1].Type] +
+                        config.proccessingTime[device][schedule[batchIndex - 1].Type] +
 
                         // Время переналадки с предыдущего типа на текущий
-                        config.changeoverTime[device][schedule[batchIndex - 1].Type, schedule[batchIndex].Type] +
+                        config.changeoverTime[device][schedule[batchIndex - 1].Type][schedule[batchIndex].Type] +
 
                         // Время выполнения ПТО после предыдущего ПЗ
                         preMConfig.preMaintenanceTimes[0] * matrixY[device][batchIndex - 1];
@@ -1124,7 +1133,7 @@ namespace magisterDiplom.Fabric
                             startProcessing[device][batchIndex][job - 1] +
 
                             // Время выполнения предыдущего задания
-                            config.proccessingTime[device, schedule[batchIndex].Type];
+                            config.proccessingTime[device][schedule[batchIndex].Type];
                 }
             }
 
@@ -1144,10 +1153,10 @@ namespace magisterDiplom.Fabric
                 startProcessing[device][batchIndex][job] = Math.Max(
 
                     // Время наладки прибора на выполнение 1 задания в 1 пакете
-                    config.changeoverTime[device][schedule[batchIndex].Type, schedule[batchIndex].Type],
+                    config.changeoverTime[device][schedule[batchIndex].Type][schedule[batchIndex].Type],
 
                     // Время окончания выполнения 1 задания в 1 пакете на предыдущем приборе
-                    startProcessing[device - 1][batchIndex][job] + config.proccessingTime[device - 1, schedule[batchIndex].Type]
+                    startProcessing[device - 1][batchIndex][job] + config.proccessingTime[device - 1][schedule[batchIndex].Type]
                 );
 
                 // Пробегаемся по всем возможным заданиям пакета в позиции batchIndex
@@ -1162,13 +1171,13 @@ namespace magisterDiplom.Fabric
                         startProcessing[device][batchIndex][job - 1] +
 
                         // Время выполнения предыдущего задания
-                        config.proccessingTime[device, schedule[batchIndex].Type],
+                        config.proccessingTime[device][schedule[batchIndex].Type],
 
                         // Момент начала времени выполнения текущего задания на предыдущем приборе
                         startProcessing[device - 1][batchIndex][job] +
 
                         // Время выполнения текущего задания на предыдущем приборе
-                        config.proccessingTime[device - 1, schedule[batchIndex].Type]
+                        config.proccessingTime[device - 1][schedule[batchIndex].Type]
                     );
 
                 // Пробегаемся по всем возможным позициям пакетов
@@ -1187,10 +1196,10 @@ namespace magisterDiplom.Fabric
                         startProcessing[device][batchIndex - 1].Last() +
 
                         // Время выполнения последнего задания в предыдущем ПЗ
-                        config.proccessingTime[device, schedule[batchIndex - 1].Type] +
+                        config.proccessingTime[device][schedule[batchIndex - 1].Type] +
 
                         // Время переналадки с предыдущего типа на текущий
-                        config.changeoverTime[device][schedule[batchIndex - 1].Type, schedule[batchIndex].Type] +
+                        config.changeoverTime[device][schedule[batchIndex - 1].Type][schedule[batchIndex].Type] +
 
                         // Время выполнения ПТО
                         preMConfig.preMaintenanceTimes[device] * matrixY[device][batchIndex - 1],
@@ -1199,7 +1208,7 @@ namespace magisterDiplom.Fabric
                         startProcessing[device - 1][batchIndex][job] +
 
                         // Время выполнения 1 задания на предыдущем приборе
-                        config.proccessingTime[device - 1, schedule[batchIndex].Type]);
+                        config.proccessingTime[device - 1][schedule[batchIndex].Type]);
 
                     // Пробегаемся по всем возможным заданиям пакета в позиции batchIndex
                     for (job = 1; job < schedule[batchIndex].Size; job++)
@@ -1213,13 +1222,13 @@ namespace magisterDiplom.Fabric
                             startProcessing[device][batchIndex][job - 1] +
 
                             // Время выполнения предыдущего задания
-                            config.proccessingTime[device, schedule[batchIndex].Type],
+                            config.proccessingTime[device][schedule[batchIndex].Type],
 
                             // Момент начала времени выполнения задания на предыдущем приборе
                             startProcessing[device - 1][batchIndex][job] +
 
                             // Время выполнения задания на предыдущем приборе
-                            config.proccessingTime[device - 1, schedule[batchIndex].Type]
+                            config.proccessingTime[device - 1][schedule[batchIndex].Type]
                         );
                 }
             }
@@ -1254,7 +1263,7 @@ namespace magisterDiplom.Fabric
                         startProcessing[device][0][job - 1] +
 
                         // Время выполнения предыдущего задания
-                        config.proccessingTime[device, schedule[0].Type]
+                        config.proccessingTime[device][schedule[0].Type]
                     );
 
             // Для каждого пакета со второго выполняем обработку
@@ -1271,7 +1280,7 @@ namespace magisterDiplom.Fabric
                     (startProcessing[device][batchIndex - 1].Last() +
 
                     // Время выполнения задания в предыдущем пакете
-                    config.proccessingTime[device, schedule[batchIndex - 1].Type]);
+                    config.proccessingTime[device][schedule[batchIndex - 1].Type]);
 
                 // Для кажого задания пакета на первой позиции
                 for (int job = 1; job < startProcessing[device][batchIndex].Count(); job++)
@@ -1288,7 +1297,7 @@ namespace magisterDiplom.Fabric
                             startProcessing[device][batchIndex][job - 1] +
 
                             // Время выполнения предыдущего задания
-                            config.proccessingTime[device, schedule[batchIndex].Type]
+                            config.proccessingTime[device][schedule[batchIndex].Type]
                         );
             }
             
@@ -1327,7 +1336,7 @@ namespace magisterDiplom.Fabric
                         (startProcessing[device][0][job - 1] +
 
                         // Время выполнения предыдущего задания
-                        config.proccessingTime[device, schedule[0].Type]);
+                        config.proccessingTime[device][schedule[0].Type]);
 
                 // Для каждого пакета со второго выполняем обработку
                 for (int batchIndex = 1; batchIndex < startProcessing[device].Count(); batchIndex++)
@@ -1343,7 +1352,7 @@ namespace magisterDiplom.Fabric
                         (startProcessing[device][batchIndex - 1].Last() +
 
                         // Время выполнения задания в предыдущем пакете
-                        config.proccessingTime[device, schedule[batchIndex - 1].Type]);
+                        config.proccessingTime[device][schedule[batchIndex - 1].Type]);
 
                     // Для кажого задания пакета на первой позиции
                     for (int job = 1; job < startProcessing[device][batchIndex].Count(); job++)
@@ -1358,7 +1367,7 @@ namespace magisterDiplom.Fabric
                             (startProcessing[device][batchIndex][job - 1] +
 
                             // Время выполнения предыдущего задания
-                            config.proccessingTime[device, schedule[batchIndex].Type]);
+                            config.proccessingTime[device][schedule[batchIndex].Type]);
                 }
             }
 
@@ -1384,7 +1393,7 @@ namespace magisterDiplom.Fabric
                 this.startProcessing[device].Last().Last() +
 
                 // Время выполнения последнего заданий в последенем пакете
-                this.config.proccessingTime[device, this.schedule.Last().Type];
+                this.config.proccessingTime[device][this.schedule.Last().Type];
 
             // Вычитаем простои
             sum -= this.GetDowntimeByDevice(device);
@@ -1437,7 +1446,7 @@ namespace magisterDiplom.Fabric
                 // Выводим отладочную информацию
                 if (IsDebug && IsDebug_GetPreMUtility) {
                     Console.WriteLine($"device:{device}");
-                    Console.WriteLine($"\tМомент окончания последнего задания { this.startProcessing[device].Last().Last() + this.config.proccessingTime[device, this.schedule.Last().Type] }");
+                    Console.WriteLine($"\tМомент окончания последнего задания { this.startProcessing[device].Last().Last() + this.config.proccessingTime[device][this.schedule.Last().Type] }");
                 }
 
                 // Добавляем момент времени окончания всех заданий на приборе
@@ -1447,7 +1456,7 @@ namespace magisterDiplom.Fabric
                     this.startProcessing[device].Last().Last() +
 
                     // Время выполнения последнего заданий в последенем пакете
-                    this.config.proccessingTime[device, this.schedule.Last().Type];
+                    this.config.proccessingTime[device][this.schedule.Last().Type];
 
                 // Выводим отладочную информацию
                 if (IsDebug && IsDebug_GetPreMUtility)
@@ -1543,7 +1552,7 @@ namespace magisterDiplom.Fabric
                         return activityTime;
 
                     // Высчитываем время выполнения
-                    int proc_time = this.config.proccessingTime[device, this.schedule[batchIndex].Type];
+                    int proc_time = this.config.proccessingTime[device][this.schedule[batchIndex].Type];
 
                     // Высчитываем момент начала времени выполнения
                     int start_time = this.startProcessing[device][batchIndex][job];
@@ -1685,7 +1694,7 @@ namespace magisterDiplom.Fabric
         // ВЫРАЖЕНИЕ 14
         public override int GetMakespan()
         {
-            return startProcessing[config.deviceCount - 1].Last().Last() + config.proccessingTime[config.deviceCount - 1, schedule.Last().Type];
+            return startProcessing[config.deviceCount - 1].Last().Last() + config.proccessingTime[config.deviceCount - 1][schedule.Last().Type];
         }
 
         // ВЫРАЖЕНИЕ 15
