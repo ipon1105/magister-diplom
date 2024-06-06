@@ -9,6 +9,7 @@ using newAlgorithm.Service;
 using Excel = Microsoft.Office.Interop.Excel;
 using Microsoft.Office.Interop.Excel;
 using System;
+using System.Diagnostics.Eventing.Reader;
 
 namespace newAlgorithm
 {
@@ -346,7 +347,6 @@ namespace newAlgorithm
             }
         }
 
-
         /// <summary>
         /// Рекурсивная комбинация всех типов _a2 с фиксированным решением _a
         /// </summary>
@@ -541,6 +541,376 @@ namespace newAlgorithm
             }
         }
 
+        /// <summary>
+        /// Функция отображает информацию параметрах характеризующих систему и задания в Excel форме
+        /// </summary>
+        /// <param name="worksheet">Закладка отображения</param>
+        /// <param name="row">Номер строки начала отрисовки</param>
+        /// <param name="col">Номер столбца начала отрисовки</param>
+        private void visualizeConfig(Excel.Worksheet worksheet, int row = 0, int col = 0)
+        {
+
+            // Объявляем диапазон
+            Excel.Range r = null;
+
+            // Выводим количество типов данных
+            {
+                worksheet.Cells[row, col] = "Типов данных:";
+                worksheet.Cells[row, col].EntireRow.Font.Bold = true;
+                worksheet.Cells[row, col + 1] = $"{config.dataTypesCount}";
+                r = worksheet.Range[worksheet.Cells[row, col], worksheet.Cells[row, col + 1]];
+                r.Borders.LineStyle = XlLineStyle.xlContinuous;
+                r.Borders.Weight = XlBorderWeight.xlThin;
+                row += 2;
+            }
+
+            // Выводим количество приборов
+            {
+                worksheet.Cells[row, col] = "Приборов:";
+                worksheet.Cells[row, col].EntireRow.Font.Bold = true;
+                worksheet.Cells[row, col + 1] = $"{config.deviceCount}";
+                r = worksheet.Range[worksheet.Cells[row, col], worksheet.Cells[row, col + 1]];
+                r.Borders.LineStyle = XlLineStyle.xlContinuous;
+                r.Borders.Weight = XlBorderWeight.xlThin;
+                row += 2;
+            }
+
+            // Визуализируем матрицу времени выполнения
+            {
+                r = worksheet.Range[worksheet.Cells[row, col], worksheet.Cells[row, col + config.dataTypesCount]];
+                r.Merge(true);
+                r.Columns.AutoFit();
+                worksheet.Cells[row, col] = "Времени выполнения";
+                worksheet.Cells[row, col].HorizontalAlignment = Excel.XlHAlign.xlHAlignCenter;
+                worksheet.Cells[row, col].EntireRow.Font.Bold = true;
+                for (int dataType = 0; dataType < config.dataTypesCount; dataType++)
+                    worksheet.Cells[row, col + dataType + 1] = $"Тип {dataType + 1}";
+                for (int device = 0; device < config.deviceCount; device++)
+                {
+                    worksheet.Cells[row + device + 1, col] = $"Прибор {device + 1}";
+                    worksheet.Cells[row + device + 1, col].HorizontalAlignment = Excel.XlHAlign.xlHAlignRight;
+                }
+                for (int device = 0; device < config.deviceCount; device++)
+                    for (int dataType = 0; dataType < config.dataTypesCount; dataType++)
+                        worksheet.Cells[row + device + 1, col + dataType + 1] = $"{config.proccessingTime[device][dataType]}";
+
+                // Получаем диапазон ячеек и устанавливаем границы
+                r = worksheet.Range[worksheet.Cells[row, col], worksheet.Cells[row + config.deviceCount, col + config.dataTypesCount]];
+                r.Borders.LineStyle = XlLineStyle.xlContinuous;
+                r.Borders.Weight = XlBorderWeight.xlThin;
+
+                // Изменяем позицию для следующих данных
+                row += config.deviceCount + 2;
+            }
+
+            // Визуализируем матрицу переналадки
+            {
+                for (int device = 0; device < config.deviceCount; device++)
+                {
+
+                    // Визуализируем матрицу переналадки для прибора device
+                    r = worksheet.Range[worksheet.Cells[row, col], worksheet.Cells[row, col + config.dataTypesCount]];
+                    r.Merge(true);
+                    r.Columns.AutoFit();
+                    worksheet.Cells[row, col] = $"Переналадка для прибора {device + 1}";
+                    worksheet.Cells[row, col].HorizontalAlignment = Excel.XlHAlign.xlHAlignCenter;
+                    worksheet.Cells[row, col].EntireRow.Font.Bold = true;
+                    for (int fromDataType = 0; fromDataType < config.dataTypesCount; fromDataType++)
+                    {
+                        worksheet.Cells[row + fromDataType + 2, col] = $"Тип {fromDataType + 1}";
+                        worksheet.Cells[row + fromDataType + 2, col].HorizontalAlignment = Excel.XlHAlign.xlHAlignRight;
+                    }
+                    for (int toDataType = 0; toDataType < config.dataTypesCount; toDataType++)
+                        worksheet.Cells[row + 1, col + toDataType + 1] = $"Тип {toDataType + 1}";
+                    for (int fromDataType = 0; fromDataType < config.dataTypesCount; fromDataType++)
+                        for (int toDataType = 0; toDataType < config.dataTypesCount; toDataType++)
+                            worksheet.Cells[row + fromDataType + 2, col + toDataType + 1] = $"{config.changeoverTime[device][fromDataType][toDataType]}";
+
+                    // Получаем диапазон ячеек и устанавливаем границы
+                    r = worksheet.Range[worksheet.Cells[row, col], worksheet.Cells[row + config.dataTypesCount + 1, col + config.dataTypesCount]];
+                    r.Borders.LineStyle = XlLineStyle.xlContinuous;
+                    r.Borders.Weight = XlBorderWeight.xlThin;
+
+                    // Изменяем позицию для следующих данных
+                    row += config.dataTypesCount + 3;
+                }
+            }
+
+            // Устанавливаем авторасширение блока по тексту
+            worksheet.Rows.AutoFit();
+            worksheet.Columns.AutoFit();
+        }
+
+        /// <summary>
+        /// Функция отображает информацию параметрах характеризующих систему и задания в Excel форме
+        /// </summary>
+        /// <param name="worksheet">Закладка отображения</param>
+        /// <param name="preMConfig">Параметры характеризующие ПТО</param>
+        /// <param name="row">Номер строки начала отрисовки</param>
+        /// <param name="col">Номер столбца начала отрисовки</param>
+        private void visualizeConfig(Excel.Worksheet worksheet, PreMConfig preMConfig, int row = 0, int col = 0)
+        {
+            // Изменяем название закладки
+            worksheet.Name = "Начальные параметры";
+
+            // Объявляем диапазон
+            Excel.Range r = null;
+
+            // Выводим количество типов данных
+            {
+                worksheet.Cells[row, col] = "Типов данных:";
+                worksheet.Cells[row, col].Font.Bold = true;
+                worksheet.Cells[row, col + 1] = $"{config.dataTypesCount}";
+                r = worksheet.Range[worksheet.Cells[row, col], worksheet.Cells[row, col + 1]];
+                r.Borders.LineStyle = XlLineStyle.xlContinuous;
+                r.Borders.Weight = XlBorderWeight.xlThin;
+                row += 2;
+            }
+
+            // Выводим количество приборов
+            {
+                worksheet.Cells[row, col] = "Приборов:";
+                worksheet.Cells[row, col].Font.Bold = true;
+                worksheet.Cells[row, col + 1] = $"{config.deviceCount}";
+                r = worksheet.Range[worksheet.Cells[row, col], worksheet.Cells[row, col + 1]];
+                r.Borders.LineStyle = XlLineStyle.xlContinuous;
+                r.Borders.Weight = XlBorderWeight.xlThin;
+                row += 2;
+            }
+
+            // Выводим нижний порог надёжности
+            {
+                worksheet.Cells[row, col] = "Надёжность:";
+                worksheet.Cells[row, col + 1] = preMConfig.beta;
+                worksheet.Cells[row, col].Font.Bold = true;
+                r = worksheet.Range[worksheet.Cells[row, col], worksheet.Cells[row, col + 1]];
+                r.Borders.LineStyle = XlLineStyle.xlContinuous;
+                r.Borders.Weight = XlBorderWeight.xlThin;
+                row += 2;
+            }
+
+            // Визуализируем матрицу времени выполнения
+            {
+                r = worksheet.Range[worksheet.Cells[row, col], worksheet.Cells[row, col + config.dataTypesCount]];
+                r.Merge(true);
+                r.Columns.AutoFit();
+                worksheet.Cells[row, col] = "Времени выполнения";
+                worksheet.Cells[row, col].HorizontalAlignment = Excel.XlHAlign.xlHAlignCenter;
+                worksheet.Cells[row, col].Font.Bold = true;
+                for (int dataType = 0; dataType < config.dataTypesCount; dataType++)
+                    worksheet.Cells[row + 1, col + dataType + 1] = $"Тип {dataType + 1}";
+                for (int device = 0; device < config.deviceCount; device++) {
+                    worksheet.Cells[row + device + 2, col] = $"Прибор {device + 1}";
+                    worksheet.Cells[row + device + 2, col].HorizontalAlignment = Excel.XlHAlign.xlHAlignRight;
+                }
+                for (int device = 0; device < config.deviceCount; device++)
+                    for (int dataType = 0; dataType < config.dataTypesCount; dataType++)
+                        worksheet.Cells[row + device + 2, col + dataType + 1] = $"{config.proccessingTime[device][dataType]}";
+
+                // Получаем диапазон ячеек и устанавливаем границы
+                r = worksheet.Range[worksheet.Cells[row, col], worksheet.Cells[row + config.deviceCount + 1, col + config.dataTypesCount]];
+                r.Borders.LineStyle = XlLineStyle.xlContinuous;
+                r.Borders.Weight = XlBorderWeight.xlThin;
+
+                // Изменяем позицию для следующих данных
+                col += config.dataTypesCount + 2;
+                row = 1;
+            }
+
+            // Визуализируем матрицу переналадки
+            {
+                for (int device = 0; device < config.deviceCount; device++)
+                {
+
+                    // Визуализируем матрицу переналадки для прибора device
+                    r = worksheet.Range[worksheet.Cells[row, col], worksheet.Cells[row, col + config.dataTypesCount]];
+                    r.Merge(true);
+                    worksheet.Cells[row, col] = $"Переналадка для прибора {device + 1}";
+                    worksheet.Cells[row, col].HorizontalAlignment = Excel.XlHAlign.xlHAlignCenter;
+                    worksheet.Cells[row, col].Font.Bold = true;
+                    r.Columns.AutoFit();
+                    for (int fromDataType = 0; fromDataType < config.dataTypesCount; fromDataType++) { 
+                        worksheet.Cells[row + fromDataType + 2, col] = $"Тип {fromDataType + 1}";
+                        worksheet.Cells[row + fromDataType + 2, col].HorizontalAlignment = Excel.XlHAlign.xlHAlignRight;
+                    }
+                    for (int toDataType = 0; toDataType < config.dataTypesCount; toDataType++)
+                        worksheet.Cells[row + 1, col + toDataType + 1] = $"Тип {toDataType + 1}";
+                    for (int fromDataType = 0; fromDataType < config.dataTypesCount; fromDataType++)
+                        for (int toDataType = 0; toDataType < config.dataTypesCount; toDataType++)
+                            worksheet.Cells[row + fromDataType + 2, col + toDataType + 1] = $"{config.changeoverTime[device][fromDataType][toDataType]}";
+
+                    // Получаем диапазон ячеек и устанавливаем границы
+                    r = worksheet.Range[worksheet.Cells[row, col], worksheet.Cells[row + config.dataTypesCount + 1, col + config.dataTypesCount]];
+                    r.Borders.LineStyle = XlLineStyle.xlContinuous;
+                    r.Borders.Weight = XlBorderWeight.xlThin;
+
+                    // Изменяем позицию для следующих данных
+                    row += config.dataTypesCount + 3;
+                }
+
+                row = 1;
+                col += config.dataTypesCount + 2;
+            }
+
+            // Визуализируем вектор длительностей ПТО
+            {
+                r = worksheet.Range[worksheet.Cells[row, col], worksheet.Cells[row, col + 1]];
+                r.Merge(true);
+                r.Columns.AutoFit();
+                worksheet.Cells[row, col] = $"Длительность ПТО";
+                worksheet.Cells[row, col].HorizontalAlignment = Excel.XlHAlign.xlHAlignCenter;
+                worksheet.Cells[row, col].Font.Bold = true;
+                worksheet.Cells[row + 1, col + 1] = "Время";
+                for (int device = 0; device < config.deviceCount; device++)
+                {
+                    worksheet.Cells[row + device + 2, col] = $"Прибор {device + 1}";
+                    worksheet.Cells[row + device + 2, col + 1] = $"{preMConfig.preMaintenanceTimes[device]}";
+                }
+                // Получаем диапазон ячеек и устанавливаем границы
+                r = worksheet.Range[worksheet.Cells[row, col], worksheet.Cells[row + config.deviceCount + 1, col + 1]];
+                r.Borders.LineStyle = XlLineStyle.xlContinuous;
+                r.Borders.Weight = XlBorderWeight.xlThin;
+
+                // Изменяем позицию для следующих данных
+                row += config.deviceCount + 3;
+            }
+
+            // Визуализируем вектор интенсивности отказов приборов
+            {
+                r = worksheet.Range[worksheet.Cells[row, col], worksheet.Cells[row, col + 1]];
+                r.Merge(true);
+                worksheet.Cells[row, col] = $"Интенсивность отказов";
+                worksheet.Cells[row, col].HorizontalAlignment = Excel.XlHAlign.xlHAlignCenter;
+                worksheet.Cells[row, col].Font.Bold = true;
+                r.Columns.AutoFit();
+                worksheet.Cells[row + 1, col + 1] = "Вероятность";
+                worksheet.Cells[row + 1, col + 1].Columns.AutoFit();
+                for (int device = 0; device < config.deviceCount; device++)
+                {
+                    worksheet.Cells[row + device + 2, col] = $"Прибор {device + 1}";
+                    worksheet.Cells[row + device + 2, col + 1] =preMConfig.failureRates[device];
+                }
+                // Получаем диапазон ячеек и устанавливаем границы
+                r = worksheet.Range[worksheet.Cells[row, col], worksheet.Cells[row + config.deviceCount + 1, col + 1]];
+                r.Borders.LineStyle = XlLineStyle.xlContinuous;
+                r.Borders.Weight = XlBorderWeight.xlThin;
+
+                // Изменяем позицию для следующих данных
+                row += config.deviceCount + 3;
+            }
+
+            // Визуализируем вектор интенсивности восстановления приборов
+            {
+                r = worksheet.Range[worksheet.Cells[row, col], worksheet.Cells[row, col + 1]];
+                r.Merge(true);
+                worksheet.Cells[row, col] = $"Интенсивность восстановления";
+                worksheet.Cells[row, col].HorizontalAlignment = Excel.XlHAlign.xlHAlignCenter;
+                worksheet.Cells[row, col].Font.Bold = true;
+                r.Columns.AutoFit();
+                worksheet.Cells[row + 1, col + 1] = "Вероятность";
+                worksheet.Cells[row + 1, col + 1].Columns.AutoFit();
+                for (int device = 0; device < config.deviceCount; device++)
+                {
+                    worksheet.Cells[row + device + 2, col] = $"Прибор {device + 1}";
+                    worksheet.Cells[row + device + 2, col + 1] = preMConfig.restoringDevice[device];
+                }
+                // Получаем диапазон ячеек и устанавливаем границы
+                r = worksheet.Range[worksheet.Cells[row, col], worksheet.Cells[row + config.deviceCount + 1, col + 1]];
+                r.Borders.LineStyle = XlLineStyle.xlContinuous;
+                r.Borders.Weight = XlBorderWeight.xlThin;
+
+                // Изменяем позицию для следующих данных
+                row += config.deviceCount + 3;
+            }
+        }
+
+        /// <summary>
+        /// Функция отображает информацию о обрабатываемых данных в Excel форме
+        /// </summary>
+        /// <param name="worksheet">Закладка отображения</param>
+        /// <param name="matrixA">Матрица составов пакетов заданий</param>
+        /// <param name="preMSchedule">Абстрактный класс расписания с ПТО</param>
+        /// <param name="row">Номер строки начала отрисовки</param>
+        /// <param name="col">Номер столбца начала отрисовки</param>
+        private void visualizeData(Excel.Worksheet worksheet, List<List<int>> matrixA, PreMSchedule preMSchedule, int row = 1, int col = 1)
+        {
+
+            // Объявляем диапазон
+            Excel.Range r = null;
+
+            int maxBatchCount = 0;
+
+            // Отображаем вектор А
+            {
+
+                // Объединяем несколько ячеек для заголовка
+                r = worksheet.Range[worksheet.Cells[row, col], worksheet.Cells[row, col + 1]];
+                r.Merge(true);
+
+                // Устанавливаем автовыравнивание
+                r.Columns.AutoFit();
+
+                // Выводим заголовок таблицы
+                worksheet.Cells[row, col] = "Вектор A";
+                worksheet.Cells[row, col].Font.Bold = true;
+                worksheet.Cells[row, col].HorizontalAlignment = Excel.XlHAlign.xlHAlignCenter;
+                worksheet.Cells[row + 1, col + 1] = "Рамзер ПЗ";
+
+                // Выводим таблицу
+                for (int dataType = 0; dataType < config.dataTypesCount; dataType++) {
+                    worksheet.Cells[row + dataType + 2, col] = $"Тип {dataType + 1}";
+                    worksheet.Cells[row + dataType + 2, col + 1] = $"{matrixA[dataType].Count}";
+                    
+                    // Определяем количество пакетов заданий
+                    maxBatchCount = Math.Max(maxBatchCount, matrixA[dataType].Count);
+                }
+
+                // Обводим границы
+                r = worksheet.Range[worksheet.Cells[row, col], worksheet.Cells[row + config.dataTypesCount + 1, col + 1]];
+                r.Borders.LineStyle = XlLineStyle.xlContinuous;
+                r.Borders.Weight = XlBorderWeight.xlThin;
+
+                // Устанавливаем следующий стобец
+                col += 3;
+            }
+
+            // Отображаем матрицу M
+            {
+                // Объединяем несколько ячеек для заголовка
+                r = worksheet.Range[worksheet.Cells[row, col], worksheet.Cells[row, col + maxBatchCount]];
+                r.Merge(true);
+
+                // Устанавливаем автовыравнивание
+                r.Columns.AutoFit();
+
+                // Выводим заголовок таблицы
+                worksheet.Cells[row, col] = "Матрица M";
+                worksheet.Cells[row, col].Font.Bold = true;
+                worksheet.Cells[row, col].HorizontalAlignment = Excel.XlHAlign.xlHAlignCenter;
+
+                for (int batchCount = 0; batchCount < maxBatchCount; batchCount++)
+                    worksheet.Cells[row + 1, col + batchCount + 1] = $"ПЗ {batchCount + 1}";
+                for (int dataType = 0; dataType < config.dataTypesCount; dataType++)
+                    worksheet.Cells[row + dataType + 2, col] = $"Тип {dataType + 1}";
+                for (int dataType = 0; dataType < config.dataTypesCount; dataType++)
+                    for (int batchCount = 0; batchCount < matrixA[dataType].Count; batchCount++)
+                        worksheet.Cells[row + dataType + 2, col + 1] = $"{matrixA[dataType][batchCount]}";
+
+                // Обводим границы
+                r = worksheet.Range[worksheet.Cells[row, col], worksheet.Cells[row + config.dataTypesCount + 1, col + maxBatchCount]];
+                r.Borders.LineStyle = XlLineStyle.xlContinuous;
+                r.Borders.Weight = XlBorderWeight.xlThin;
+
+                // Устанавливаем следующий стобец
+                col += maxBatchCount + 2;
+            }
+            
+            worksheet.Cells[row, col] = "T^0l";
+            row++;
+            worksheet.Cells[row, col] = "Y";
+            row++;
+            worksheet.Cells[row, col] = "T^pm";
+        }
 
         /// <summary>
         /// Алгоритм формирования решения по составам паритй всех типов данных
@@ -559,20 +929,28 @@ namespace newAlgorithm
             // Объявляем владку для работы с Excel
             excelSheet = null;
 
-            // Если визуализация включена
-            if (Form1.vizualizationOn) { 
+            // Устанавливаем владку для работы с временными данными
+            Excel.Worksheet metaData = null;
 
+            // Если визуализация включена
+            if (Form1.vizualizationOn) {
+                
                 // Инициализируем объект для работы с Excel
                 excelApplication = new Excel.Application();
 
                 // Устанавливаем флаг отображение 
                 excelApplication.Visible = true;
 
-                // Создаём рабочую вкладку
+                // Создаём вкладку
                 Workbook mainWorkbook = excelApplication.Workbooks.Add(Type.Missing);
+                mainWorkbook.Worksheets.Add();
+                mainWorkbook.Worksheets.Add();
 
-                // Получаем вкладку
-                excelSheet = (Excel.Worksheet) excelApplication.Worksheets.get_Item(1);
+                // Получаем вкладку с параметрами
+                visualizeConfig((Excel.Worksheet)excelApplication.Worksheets.get_Item(1), preMConfig, 1, 1);
+
+                // Получаем вкладки
+                excelSheet = (Excel.Worksheet)excelApplication.Worksheets.get_Item(2);
 
                 // Устанавливаем имя вкладки
                 excelSheet.Name = "Результаты";
@@ -583,6 +961,12 @@ namespace newAlgorithm
 
                 excelSheet.Rows.AutoFit();
                 excelSheet.Columns.AutoFit();
+
+                // Получаем вкладку с параметрами
+                metaData = (Excel.Worksheet)excelApplication.Worksheets.get_Item(3);
+
+                // Устанавливаем имя вкладки
+                metaData.Name = "Промежуточные данные";
             }
 
             // Переопределяем значение оптимального критерий f1
@@ -609,6 +993,7 @@ namespace newAlgorithm
                             excelSheet.Cells[displayRowNumber + compositionNumber, displayColumnNumber + 0] = $"{compositionNumber}";
                             excelSheet.Cells[displayRowNumber + compositionNumber, displayColumnNumber + 1] = $"{schedule.GetMakespan()}";
                             excelSheet.Cells[displayRowNumber + compositionNumber, displayColumnNumber + 2] = $"{schedule.GetPreMUtility()}";
+                            visualizeData(metaData, PrimeMatrixA, schedule, 1, 1);
                         }
 
                         // Получаем f1 критерий
