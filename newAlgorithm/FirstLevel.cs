@@ -5,6 +5,10 @@ using System.IO;
 using magisterDiplom.Utils;
 using magisterDiplom.Model;
 using magisterDiplom.Fabric;
+using newAlgorithm.Service;
+using Excel = Microsoft.Office.Interop.Excel;
+using Microsoft.Office.Interop.Excel;
+using System;
 
 namespace newAlgorithm
 {
@@ -57,6 +61,32 @@ namespace newAlgorithm
         private int f1Optimal;
         private List<int> _nTemp;
         private bool isBestSolution;
+
+
+        /// <summary>
+        /// Номер состава пакетов
+        /// </summary>
+        private int compositionNumber;
+
+        /// <summary>
+        /// Номер строки отображения в Excel таблице
+        /// </summary>
+        private int displayRowNumber;
+
+        /// <summary>
+        /// Номер колонки отображения в Excel таблице
+        /// </summary>
+        private int displayColumnNumber;
+
+        /// <summary>
+        /// Объект для работы с Excel
+        /// </summary>
+        private Excel.Application excelApplication;
+
+        /// <summary>
+        /// Владка для работы с Excel
+        /// </summary>
+        private Excel.Worksheet excelSheet;
 
         /// <summary>
         /// Конструктор с параметрами принимающий структуру конфигурации
@@ -339,12 +369,25 @@ namespace newAlgorithm
                 if (schedule.Build(tempM))
                 {
 
+                    // Если установлен флаг визуализации
+                    if (Form1.vizualizationOn)
+                    {
+                        excelSheet.Cells[displayRowNumber + compositionNumber, displayColumnNumber + 0] = $"{compositionNumber}";
+                        excelSheet.Cells[displayRowNumber + compositionNumber, displayColumnNumber + 1] = $"{schedule.GetMakespan()}";
+                        excelSheet.Cells[displayRowNumber + compositionNumber, displayColumnNumber + 2] = $"{schedule.GetPreMUtility()}";
+                    }
                     var fBuf = schedule.GetMakespan();
                     string s = ListUtils.MatrixIntToString(tempM, ", ", "", ";");
                     file.Write(s + " " + fBuf);
-                    MessageBox.Show(s + " Время обработки " + fBuf);
+                    // MessageBox.Show(s + " Время обработки " + fBuf);
                     if (fBuf < f1Optimal)
                     {
+                        if (Form1.vizualizationOn)
+                        {
+                            excelSheet.Cells[displayRowNumber + compositionNumber, displayColumnNumber + 0].Interior.Color = System.Drawing.ColorTranslator.ToOle(System.Drawing.Color.Lime);
+                            excelSheet.Cells[displayRowNumber + compositionNumber, displayColumnNumber + 1].Interior.Color = System.Drawing.ColorTranslator.ToOle(System.Drawing.Color.Lime);
+                            excelSheet.Cells[displayRowNumber + compositionNumber, displayColumnNumber + 2].Interior.Color = System.Drawing.ColorTranslator.ToOle(System.Drawing.Color.Lime);
+                        }
                         bestMatrixA = ListUtils.MatrixIntDeepCopy(tempM);
                         solutionFlag = true;
                         f1Optimal = fBuf;
@@ -352,7 +395,15 @@ namespace newAlgorithm
                         return;
                     }
                     file.WriteLine();
+
                 }
+                else if (Form1.vizualizationOn)
+                {
+                    excelSheet.Cells[displayRowNumber + compositionNumber, displayColumnNumber + 0] = $"{compositionNumber}";
+                    excelSheet.Cells[displayRowNumber + compositionNumber, displayColumnNumber + 1] = $"{0}";
+                    excelSheet.Cells[displayRowNumber + compositionNumber, displayColumnNumber + 2] = $"{0}";
+                }
+                compositionNumber++;
             }
         }
 
@@ -497,6 +548,43 @@ namespace newAlgorithm
         public void GenetateSolutionWithPremaintenance(string fileName, PreMConfig preMConfig)
         {
 
+            // Инициализируем значения
+            compositionNumber = 1;
+            displayRowNumber = 1;
+            displayColumnNumber = 1;
+
+            // Объявляем объект для работы с Excel
+            excelApplication = null;
+
+            // Объявляем владку для работы с Excel
+            excelSheet = null;
+
+            // Если визуализация включена
+            if (Form1.vizualizationOn) { 
+
+                // Инициализируем объект для работы с Excel
+                excelApplication = new Excel.Application();
+
+                // Устанавливаем флаг отображение 
+                excelApplication.Visible = true;
+
+                // Создаём рабочую вкладку
+                Workbook mainWorkbook = excelApplication.Workbooks.Add(Type.Missing);
+
+                // Получаем вкладку
+                excelSheet = (Excel.Worksheet) excelApplication.Worksheets.get_Item(1);
+
+                // Устанавливаем имя вкладки
+                excelSheet.Name = "Результаты";
+
+                excelSheet.Cells[displayRowNumber, displayColumnNumber + 0] = "Номер состава";
+                excelSheet.Cells[displayRowNumber, displayColumnNumber + 1] = "Критерий f1";
+                excelSheet.Cells[displayRowNumber, displayColumnNumber + 2] = "Критерий f2";
+
+                excelSheet.Rows.AutoFit();
+                excelSheet.Columns.AutoFit();
+            }
+
             // Переопределяем значение оптимального критерий f1
             f1Optimal = int.MaxValue;
             f1Current = int.MaxValue;
@@ -511,38 +599,74 @@ namespace newAlgorithm
                 {
                     GenerateFixedBatchesSolution();
 
-                    // TODO: Использовать объёкт своего класса
-                    
+                    // Если построение расписание выполнено удачно
                     if (schedule.Build(PrimeMatrixA))
                     {
+
+                        // Если установлен флаг визуализации
+                        if (Form1.vizualizationOn)
+                        {
+                            excelSheet.Cells[displayRowNumber + compositionNumber, displayColumnNumber + 0] = $"{compositionNumber}";
+                            excelSheet.Cells[displayRowNumber + compositionNumber, displayColumnNumber + 1] = $"{schedule.GetMakespan()}";
+                            excelSheet.Cells[displayRowNumber + compositionNumber, displayColumnNumber + 2] = $"{schedule.GetPreMUtility()}";
+                        }
 
                         // Получаем f1 критерий
                         f1Current = schedule.GetMakespan();
 
-                        MessageBox.Show(ListUtils.MatrixIntToString(PrimeMatrixA, ", ", "", ";") + "Время обработки " + f1Current);
+                        // MessageBox.Show(ListUtils.MatrixIntToString(PrimeMatrixA, ", ", "", ";") + "Время обработки " + f1Current);
                         f1Optimal = f1Current;
                         file.WriteLine(f1Optimal);
                         // TODO: ненужное присваивание
                         // var maxA = ListUtils.MatrixIntDeepCopy(primeMatrixA);
                         isBestSolution = true;
+
+                    } else if (Form1.vizualizationOn)
+                    {
+                        excelSheet.Cells[displayRowNumber + compositionNumber, displayColumnNumber + 0] = $"{compositionNumber}";
+                        excelSheet.Cells[displayRowNumber + compositionNumber, displayColumnNumber + 1] = $"{0}";
+                        excelSheet.Cells[displayRowNumber + compositionNumber, displayColumnNumber + 2] = $"{0}";
                     }
+                    compositionNumber++;
                 }
                 
                 // Генерируем начальное решение
                 GenerateStartSolution();
 
                 // Вызываем расчёты
-                if (schedule.Build(PrimeMatrixA)) { 
-                    
+                if (schedule.Build(PrimeMatrixA)) {
+
+                    // Если установлен флаг визуализации
+                    if (Form1.vizualizationOn)
+                    {
+                        excelSheet.Cells[displayRowNumber + compositionNumber, displayColumnNumber + 0] = $"{compositionNumber}";
+                        excelSheet.Cells[displayRowNumber + compositionNumber, displayColumnNumber + 1] = $"{schedule.GetMakespan()}";
+                        excelSheet.Cells[displayRowNumber + compositionNumber, displayColumnNumber + 2] = $"{schedule.GetPreMUtility()}";
+                    }
+
                     // Получаем f1
                     f1Current = schedule.GetMakespan();
-                    MessageBox.Show(ListUtils.MatrixIntToString(PrimeMatrixA, ", ", "", ";") + " Время обработки " + f1Current);
+                    // MessageBox.Show(ListUtils.MatrixIntToString(PrimeMatrixA, ", ", "", ";") + " Время обработки " + f1Current);
+                    
+                } else if (Form1.vizualizationOn)
+                {
+                    excelSheet.Cells[displayRowNumber + compositionNumber, displayColumnNumber + 0] = $"{compositionNumber}";
+                    excelSheet.Cells[displayRowNumber + compositionNumber, displayColumnNumber + 1] = $"{0}";
+                    excelSheet.Cells[displayRowNumber + compositionNumber, displayColumnNumber + 2] = $"{0}";
                 }
+                compositionNumber++;
 
                 // Если текущей критерий лучше оптимального
                 if (f1Current < f1Optimal)
                 {
 
+                    // Если установлен флаг визуализации
+                    if (Form1.vizualizationOn)
+                    {
+                        excelSheet.Cells[displayRowNumber + compositionNumber - 1, displayColumnNumber + 0].Interior.Color = System.Drawing.ColorTranslator.ToOle(System.Drawing.Color.Lime);
+                        excelSheet.Cells[displayRowNumber + compositionNumber - 1, displayColumnNumber + 1].Interior.Color = System.Drawing.ColorTranslator.ToOle(System.Drawing.Color.Lime);
+                        excelSheet.Cells[displayRowNumber + compositionNumber - 1, displayColumnNumber + 2].Interior.Color = System.Drawing.ColorTranslator.ToOle(System.Drawing.Color.Lime);
+                    }
                     // Копируем матрицу с лучшим решением
                     bestMatrixA = ListUtils.MatrixIntDeepCopy(PrimeMatrixA);
 
@@ -633,24 +757,41 @@ namespace newAlgorithm
                             {
                                 tempA = SetTempAFromA2(dataType, batchIndex);
 
-                                // TODO: Вызывать построение нижнего уровня
-                                // TODO:
-
                                 // Если расписание построилось не успешно
                                 if (!schedule.Build(tempA))
-
+                                {
+                                    if (Form1.vizualizationOn)
+                                    {
+                                        excelSheet.Cells[displayRowNumber + compositionNumber, displayColumnNumber + 0] = $"{compositionNumber}";
+                                        excelSheet.Cells[displayRowNumber + compositionNumber, displayColumnNumber + 1] = $"{0}";
+                                        excelSheet.Cells[displayRowNumber + compositionNumber, displayColumnNumber + 2] = $"{0}";
+                                    }
+                                    compositionNumber++;
                                     // Пропускаем обработку
                                     continue;
-
+                                } else if (Form1.vizualizationOn)
+                                {
+                                    excelSheet.Cells[displayRowNumber + compositionNumber, displayColumnNumber + 0] = $"{compositionNumber}";
+                                    excelSheet.Cells[displayRowNumber + compositionNumber, displayColumnNumber + 1] = $"{schedule.GetMakespan()}";
+                                    excelSheet.Cells[displayRowNumber + compositionNumber, displayColumnNumber + 2] = $"{schedule.GetPreMUtility()}";
+                                }
+                                compositionNumber++;
                                 // Получаем критерий f1
                                 var fBuf = schedule.GetMakespan();
+
                                 s = ListUtils.MatrixIntToString(tempA, ", ", "", ";");
                                 file.Write(s + " " + fBuf);
-                                MessageBox.Show(s + " Время обработки " + fBuf);
+                                // MessageBox.Show(s + " Время обработки " + fBuf);
 
                                 // Если текущее решение лучше
                                 if (fBuf < f1Optimal)
                                 {
+                                    if (Form1.vizualizationOn)
+                                    {
+                                        excelSheet.Cells[displayRowNumber + compositionNumber - 1, displayColumnNumber + 0].Interior.Color = System.Drawing.ColorTranslator.ToOle(System.Drawing.Color.Lime);
+                                        excelSheet.Cells[displayRowNumber + compositionNumber - 1, displayColumnNumber + 1].Interior.Color = System.Drawing.ColorTranslator.ToOle(System.Drawing.Color.Lime);
+                                        excelSheet.Cells[displayRowNumber + compositionNumber - 1, displayColumnNumber + 2].Interior.Color = System.Drawing.ColorTranslator.ToOle(System.Drawing.Color.Lime);
+                                    }
 
                                     // Копируем матрицу с лучшим решением
                                     bestMatrixA = ListUtils.MatrixIntDeepCopy(tempA);
@@ -684,7 +825,7 @@ namespace newAlgorithm
                         // Если лучшее решения было найдено
                         if (isBestSolution)
                         {
-                            MessageBox.Show("Лучшее решение " + ListUtils.MatrixIntToString(bestMatrixA, ", ", "", ";") + " Время обработки " + f1Optimal);
+                            // MessageBox.Show("Лучшее решение " + ListUtils.MatrixIntToString(bestMatrixA, ", ", "", ";") + " Время обработки " + f1Optimal);
 
                             // Запоминаем лучшее решение
                             PrimeMatrixA = ListUtils.MatrixIntDeepCopy(bestMatrixA);

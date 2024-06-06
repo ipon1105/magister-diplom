@@ -101,10 +101,19 @@ namespace newAlgorithm
         /// </summary>
         List<double> restoringDevice;
 
+        /// <summary>
+        /// Переменная сообщает программе о необходимости визуализации процесса с помощью Excel
+        /// </summary>
+        public static bool vizualizationOn;
+
+        /// <summary>
+        /// Переменная сообщает программе о необходимости генерации лог файлов
+        /// </summary>
+        public static bool loggingOn;
+
         // TODO: разобраться со статическими типами данных
         public static int buff;
         public static bool direct;
-        public static bool vizualizationOn;
         public static List<List<int>> compositionSets;
         public static List<List<int>> timeSets;
 
@@ -1115,6 +1124,16 @@ namespace newAlgorithm
         private void CheckBox_visualization_CheckedChanged(object sender, EventArgs e)
         {
             Form1.vizualizationOn = checkBox_visualization.Checked;
+        }
+
+        /// <summary>
+        /// Данная функция определяет входные параметры с графического компонента checkBox_logging и записывает их в loggingOn
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void CheckBox_logging_CheckedChanged(object sender, EventArgs e)
+        {
+            Form1.loggingOn = checkBox_logging.Checked;
         }
 
         /// <summary>

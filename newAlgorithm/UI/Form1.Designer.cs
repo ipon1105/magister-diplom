@@ -40,6 +40,7 @@
             this.tabPage1 = new System.Windows.Forms.TabPage();
             this.GetPreMSolution = new System.Windows.Forms.Button();
             this.groupBox_system_setup = new System.Windows.Forms.GroupBox();
+            this.checkBox_logging = new System.Windows.Forms.CheckBox();
             this.checkBox_visualization = new System.Windows.Forms.CheckBox();
             this.textBox2 = new System.Windows.Forms.TextBox();
             this.numeric_generation_count = new System.Windows.Forms.NumericUpDown();
@@ -237,6 +238,7 @@
             // 
             // groupBox_system_setup
             // 
+            this.groupBox_system_setup.Controls.Add(this.checkBox_logging);
             this.groupBox_system_setup.Controls.Add(this.checkBox_visualization);
             this.groupBox_system_setup.Controls.Add(this.numeric_data_types_count);
             this.groupBox_system_setup.Controls.Add(this.textBox2);
@@ -270,6 +272,17 @@
             this.groupBox_system_setup.TabIndex = 41;
             this.groupBox_system_setup.TabStop = false;
             this.groupBox_system_setup.Text = "Настройки системы";
+            // 
+            // checkBox_logging
+            // 
+            this.checkBox_logging.AutoSize = true;
+            this.checkBox_logging.Location = new System.Drawing.Point(305, 298);
+            this.checkBox_logging.Name = "checkBox_logging";
+            this.checkBox_logging.Size = new System.Drawing.Size(141, 17);
+            this.checkBox_logging.TabIndex = 42;
+            this.checkBox_logging.Text = "Генерация лог файлов";
+            this.checkBox_logging.UseVisualStyleBackColor = true;
+            this.checkBox_logging.CheckedChanged += new System.EventHandler(this.CheckBox_logging_CheckedChanged);
             // 
             // checkBox_visualization
             // 
@@ -979,6 +992,7 @@
         private System.Windows.Forms.TextBox betaValue;
         private System.Windows.Forms.Button GetPreMSolution;
         private System.Windows.Forms.Label label15;
+        private System.Windows.Forms.CheckBox checkBox_logging;
     }
 }
 
