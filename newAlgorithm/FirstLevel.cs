@@ -425,8 +425,8 @@ namespace newAlgorithm
                 else if (Form1.vizualizationOn)
                 {
                     excelSheet.Cells[displayRowNumber + compositionNumber, displayColumnNumber + 0] = $"{compositionNumber}";
-                    excelSheet.Cells[displayRowNumber + compositionNumber, displayColumnNumber + 1] = $"{0}";
-                    excelSheet.Cells[displayRowNumber + compositionNumber, displayColumnNumber + 2] = $"{0}";
+                    excelSheet.Cells[displayRowNumber + compositionNumber, displayColumnNumber + 1] = "#N/A";
+                    excelSheet.Cells[displayRowNumber + compositionNumber, displayColumnNumber + 2] = "#N/A";
                     
                     // Визуализируем промежуточные данные
                     visualizeData(tempM, schedule, preMConfig, ref helpRowNumber, false);
@@ -1325,11 +1325,14 @@ namespace newAlgorithm
             displayRowNumber = 1;
             displayColumnNumber = 1;
 
-            // Объявляем объект для работы с Excel
+            // Инициализируем объект для работы с Excel
             excelApplication = null;
 
             // Инициализируем владки для работы с Excel
             excelSheet = null; metaDataSheet = null;
+
+            // Объявляем линейный график
+            ChartObjects linerChart = null;
 
             // Если визуализация включена
             if (Form1.vizualizationOn) {
@@ -1415,8 +1418,8 @@ namespace newAlgorithm
                     } else if (Form1.vizualizationOn)
                     {
                         excelSheet.Cells[displayRowNumber + compositionNumber, displayColumnNumber + 0] = $"{compositionNumber}";
-                        excelSheet.Cells[displayRowNumber + compositionNumber, displayColumnNumber + 1] = $"{0}";
-                        excelSheet.Cells[displayRowNumber + compositionNumber, displayColumnNumber + 2] = $"{0}";
+                        excelSheet.Cells[displayRowNumber + compositionNumber, displayColumnNumber + 1] = "#N/A";
+                        excelSheet.Cells[displayRowNumber + compositionNumber, displayColumnNumber + 2] = "#N/A";
 
                         // Визуализируем промежуточные данные
                         visualizeData(PrimeMatrixA, schedule, preMConfig, ref helpRowNumber, false);
@@ -1458,8 +1461,8 @@ namespace newAlgorithm
                 } else if (Form1.vizualizationOn)
                 {
                     excelSheet.Cells[displayRowNumber + compositionNumber, displayColumnNumber + 0] = $"{compositionNumber}";
-                    excelSheet.Cells[displayRowNumber + compositionNumber, displayColumnNumber + 1] = $"{0}";
-                    excelSheet.Cells[displayRowNumber + compositionNumber, displayColumnNumber + 2] = $"{0}";
+                    excelSheet.Cells[displayRowNumber + compositionNumber, displayColumnNumber + 1] = "#N/A";
+                    excelSheet.Cells[displayRowNumber + compositionNumber, displayColumnNumber + 2] = "#N/A";
 
                     // Визуализируем промежуточные данные
                     visualizeData(PrimeMatrixA, schedule, preMConfig, ref helpRowNumber, false);
@@ -1579,8 +1582,8 @@ namespace newAlgorithm
                                     if (Form1.vizualizationOn)
                                     {
                                         excelSheet.Cells[displayRowNumber + compositionNumber, displayColumnNumber + 0] = $"{compositionNumber}";
-                                        excelSheet.Cells[displayRowNumber + compositionNumber, displayColumnNumber + 1] = $"{0}";
-                                        excelSheet.Cells[displayRowNumber + compositionNumber, displayColumnNumber + 2] = $"{0}";
+                                        excelSheet.Cells[displayRowNumber + compositionNumber, displayColumnNumber + 1] = "#N/A";
+                                        excelSheet.Cells[displayRowNumber + compositionNumber, displayColumnNumber + 2] = "#N/A";
 
                                         // Визуализируем промежуточные данные
                                         visualizeData(tempA, schedule, preMConfig, ref helpRowNumber, false);
@@ -1675,11 +1678,26 @@ namespace newAlgorithm
                     return;
                 }
 
+                // Если флаг визуализации установлен
+                if (Form1.vizualizationOn)
+                {
+                    // Инициализируем линейный график
+                    Excel.Range r = excelSheet.Range[
+                        excelSheet.Cells[displayRowNumber, displayColumnNumber + 1],
+                        excelSheet.Cells[displayRowNumber + compositionNumber, displayColumnNumber + 1]
+                    ];
+                    linerChart = (ChartObjects)excelSheet.ChartObjects(Type.Missing);
+                    ChartObject charts = linerChart.Add(400, 0, 600, 300);
+                    Chart chart = (Chart)charts.Chart;
+                    chart.SetSourceData(r);
+                    chart.ChartType = XlChartType.xlLine;
+                }
+
                 // Логируем лучший критерий f1
                 file.WriteLine(f1Optimal);
                 file.Close();
                 MessageBox.Show("Решения найдены");
-            
+
             }
         }
 
