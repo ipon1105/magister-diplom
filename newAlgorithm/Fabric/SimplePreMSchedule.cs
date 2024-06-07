@@ -2186,6 +2186,16 @@ namespace magisterDiplom.Fabric
             return true;
         }
 
+        /// <summary>
+        /// Вернёт тип данных по переданному индексу ПЗ
+        /// </summary>
+        /// <param name="batchIndex">Индекс ПЗ</param>
+        /// <returns>Тип данных</returns>
+        public int GetDataTypeByBatchIndex(int batchIndex)
+        {
+            return this.schedule[batchIndex].Type;
+        }
+
         public override List<List<int>> GetMatrixP()
         {
 
@@ -2233,6 +2243,8 @@ namespace magisterDiplom.Fabric
         public override List<List<int>> GetMatrixTPM()
         {
 
+            CalcMatrixTPM();
+
             // Объявляем матрицу
             List<List<int>> res = new List<List<int>>(matrixTPM.Count);
 
@@ -2266,6 +2278,7 @@ namespace magisterDiplom.Fabric
 
         public override Dictionary<int, List<List<int>>> GetStartProcessing()
         {
+            CalcStartProcessing();
             return startProcessing;
         }
     }

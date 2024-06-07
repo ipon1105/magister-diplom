@@ -111,6 +111,11 @@ namespace newAlgorithm
         /// </summary>
         public static bool loggingOn;
 
+        /// <summary>
+        /// Переменная сообщает программе о необходимости отрисовки диаграммы Ганта
+        /// </summary>
+        public static bool gantaOn;
+
         // TODO: разобраться со статическими типами данных
         public static int buff;
         public static bool direct;
@@ -1124,6 +1129,11 @@ namespace newAlgorithm
         private void CheckBox_visualization_CheckedChanged(object sender, EventArgs e)
         {
             Form1.vizualizationOn = checkBox_visualization.Checked;
+            if (!Form1.vizualizationOn) { 
+                checkBox_ganta.Checked = false;
+                Form1.gantaOn = false;
+            }
+            checkBox_ganta.Enabled = Form1.vizualizationOn;
         }
 
         /// <summary>
@@ -1134,6 +1144,16 @@ namespace newAlgorithm
         private void CheckBox_logging_CheckedChanged(object sender, EventArgs e)
         {
             Form1.loggingOn = checkBox_logging.Checked;
+        }
+
+        /// <summary>
+        /// Данная функция определяет входные параметры с графического компонента checkBox_ganta и записывает их в gantaOn
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void checkBox_ganta_CheckedChanged(object sender, EventArgs e)
+        {
+            Form1.gantaOn = checkBox_ganta.Checked;
         }
 
         /// <summary>
@@ -1546,5 +1566,6 @@ namespace newAlgorithm
             // Выполняем генерацию данных для ввсех типов вторым алгоритмом
             firstLevel.GenetateSolutionWithPremaintenance("Premintenance", preMConfig);
         }
+
     }
 }

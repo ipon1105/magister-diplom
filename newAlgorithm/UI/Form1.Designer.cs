@@ -40,8 +40,10 @@
             this.tabPage1 = new System.Windows.Forms.TabPage();
             this.GetPreMSolution = new System.Windows.Forms.Button();
             this.groupBox_system_setup = new System.Windows.Forms.GroupBox();
-            this.checkBox_logging = new System.Windows.Forms.CheckBox();
+            this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.checkBox_ganta = new System.Windows.Forms.CheckBox();
             this.checkBox_visualization = new System.Windows.Forms.CheckBox();
+            this.checkBox_logging = new System.Windows.Forms.CheckBox();
             this.textBox2 = new System.Windows.Forms.TextBox();
             this.numeric_generation_count = new System.Windows.Forms.NumericUpDown();
             this.label10 = new System.Windows.Forms.Label();
@@ -92,6 +94,7 @@
             this.tabControl.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.groupBox_system_setup.SuspendLayout();
+            this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numeric_generation_count)).BeginInit();
             this.group_box_data_proccessing.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numeric_device_count)).BeginInit();
@@ -238,8 +241,8 @@
             // 
             // groupBox_system_setup
             // 
+            this.groupBox_system_setup.Controls.Add(this.groupBox1);
             this.groupBox_system_setup.Controls.Add(this.checkBox_logging);
-            this.groupBox_system_setup.Controls.Add(this.checkBox_visualization);
             this.groupBox_system_setup.Controls.Add(this.numeric_data_types_count);
             this.groupBox_system_setup.Controls.Add(this.textBox2);
             this.groupBox_system_setup.Controls.Add(this.numeric_generation_count);
@@ -273,27 +276,50 @@
             this.groupBox_system_setup.TabStop = false;
             this.groupBox_system_setup.Text = "Настройки системы";
             // 
-            // checkBox_logging
+            // groupBox1
             // 
-            this.checkBox_logging.AutoSize = true;
-            this.checkBox_logging.Location = new System.Drawing.Point(305, 298);
-            this.checkBox_logging.Name = "checkBox_logging";
-            this.checkBox_logging.Size = new System.Drawing.Size(141, 17);
-            this.checkBox_logging.TabIndex = 42;
-            this.checkBox_logging.Text = "Генерация лог файлов";
-            this.checkBox_logging.UseVisualStyleBackColor = true;
-            this.checkBox_logging.CheckedChanged += new System.EventHandler(this.CheckBox_logging_CheckedChanged);
+            this.groupBox1.Controls.Add(this.checkBox_ganta);
+            this.groupBox1.Controls.Add(this.checkBox_visualization);
+            this.groupBox1.Location = new System.Drawing.Point(267, 215);
+            this.groupBox1.Name = "groupBox1";
+            this.groupBox1.Size = new System.Drawing.Size(200, 59);
+            this.groupBox1.TabIndex = 43;
+            this.groupBox1.TabStop = false;
+            this.groupBox1.Text = "Визуализация";
+            // 
+            // checkBox_ganta
+            // 
+            this.checkBox_ganta.AutoSize = true;
+            this.checkBox_ganta.Enabled = false;
+            this.checkBox_ganta.Location = new System.Drawing.Point(6, 41);
+            this.checkBox_ganta.Name = "checkBox_ganta";
+            this.checkBox_ganta.Size = new System.Drawing.Size(120, 17);
+            this.checkBox_ganta.TabIndex = 44;
+            this.checkBox_ganta.Text = "Диаграммы Ганта";
+            this.checkBox_ganta.UseVisualStyleBackColor = true;
+            this.checkBox_ganta.CheckedChanged += new System.EventHandler(this.checkBox_ganta_CheckedChanged);
             // 
             // checkBox_visualization
             // 
             this.checkBox_visualization.AutoSize = true;
-            this.checkBox_visualization.Location = new System.Drawing.Point(305, 276);
+            this.checkBox_visualization.Location = new System.Drawing.Point(6, 19);
             this.checkBox_visualization.Name = "checkBox_visualization";
             this.checkBox_visualization.Size = new System.Drawing.Size(141, 17);
             this.checkBox_visualization.TabIndex = 41;
             this.checkBox_visualization.Text = "Отображение в EXCEL";
             this.checkBox_visualization.UseVisualStyleBackColor = true;
             this.checkBox_visualization.CheckedChanged += new System.EventHandler(this.CheckBox_visualization_CheckedChanged);
+            // 
+            // checkBox_logging
+            // 
+            this.checkBox_logging.AutoSize = true;
+            this.checkBox_logging.Location = new System.Drawing.Point(273, 280);
+            this.checkBox_logging.Name = "checkBox_logging";
+            this.checkBox_logging.Size = new System.Drawing.Size(141, 17);
+            this.checkBox_logging.TabIndex = 42;
+            this.checkBox_logging.Text = "Генерация лог файлов";
+            this.checkBox_logging.UseVisualStyleBackColor = true;
+            this.checkBox_logging.CheckedChanged += new System.EventHandler(this.CheckBox_logging_CheckedChanged);
             // 
             // textBox2
             // 
@@ -908,6 +934,8 @@
             this.tabPage1.ResumeLayout(false);
             this.groupBox_system_setup.ResumeLayout(false);
             this.groupBox_system_setup.PerformLayout();
+            this.groupBox1.ResumeLayout(false);
+            this.groupBox1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numeric_generation_count)).EndInit();
             this.group_box_data_proccessing.ResumeLayout(false);
             this.group_box_data_proccessing.PerformLayout();
@@ -993,6 +1021,8 @@
         private System.Windows.Forms.Button GetPreMSolution;
         private System.Windows.Forms.Label label15;
         private System.Windows.Forms.CheckBox checkBox_logging;
+        private System.Windows.Forms.GroupBox groupBox1;
+        private System.Windows.Forms.CheckBox checkBox_ganta;
     }
 }
 
