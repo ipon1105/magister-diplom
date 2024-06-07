@@ -1,10 +1,17 @@
 ﻿using magisterDiplom.Model;
 using magisterDiplom.Utils;
+using newAlgorithm;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.Eventing.Reader;
+using System.IO;
 using System.Linq;
+using System.Text;
+using System.Windows.Forms;
 using System.Xml.XPath;
+using static System.Net.Mime.MediaTypeNames;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.TaskbarClock;
+using Batch = magisterDiplom.Model.Batch;
 
 namespace magisterDiplom.Fabric
 {
@@ -20,13 +27,69 @@ namespace magisterDiplom.Fabric
         const bool IsDebug_GetPreMUtility = true;
 
         /// <summary>
-        /// Выводим матриц порядка ПТО
+        /// Поток записи в файл
         /// </summary>
-        private void PrintMatrixY(String prefix = "")
+        private FileStream fstream = null;
+
+        /// <summary>
+        /// Установит файл записи
+        /// </summary>
+        /// <param name="filename">Имя файла для записи</param>
+        public void SetLogFile(string filename)
         {
 
+            // Создаём объект для записи в файл
+            fstream = new FileStream(filename, FileMode.Create);
+        }
+
+        /// <summary>
+        /// Закроет объект для записи в файла
+        /// </summary>
+        private void UnsetLogFile()
+        {
+
+            // Закрываем объект
+            fstream?.Close();
+            fstream = null;
+        }
+
+        /// <summary>
+        /// Запишит переданный текст в конец файла
+        /// </summary>
+        /// <param name="text">Текст для записи в конец файла</param>
+        private void WriteToLogFile(string text)
+        {
+
+            // Если объекта для записи не существует
+            if (fstream == null)
+
+                // Закончим обработку
+                return;
+
+            // Преобразуем текстовые данные в множество байт
+            byte[] buffer = Encoding.Default.GetBytes($"{text}");
+
+            // Записываем данные в файл
+            fstream.Write(buffer, 0, buffer.Length);
+        }
+
+        /// <summary>
+        /// Выводим матриц порядка ПТО
+        /// </summary>
+        private void WriteToLogFileMatrixY(String prefix = "")
+        {
+
+            // Если объекта для записи не существует
+            if (fstream == null)
+
+                // Закончим обработку
+                return;
+
+            // Создаём строку с 10000 символов вместимостью
+            StringBuilder str = new StringBuilder(10000);
+
             // Выводим информационное сообщение
-            Console.WriteLine($"{prefix}Матрица порядка ПТО [Y].");
+            str.AppendLine($"{prefix}Матрица порядка ПТО [Y].");
 
             // Объявляем количество пакетов
             int batchCount;
@@ -36,7 +99,7 @@ namespace magisterDiplom.Fabric
             {
 
                 // Выводим информационное сообщение
-                Console.WriteLine($"{prefix}Не существует.");
+                str.AppendLine($"{prefix}Не существует.");
 
                 // Прекращяем вывод
                 return;
@@ -52,36 +115,51 @@ namespace magisterDiplom.Fabric
             for (device = 0; device < this.config.deviceCount; device++) {
 
                 // Выводим префикс
-                Console.Write($"{prefix}");
+                str.Append($"{prefix}");
 
                 // Выводим разделитель
                 for (batchIndex = 0; batchIndex < batchCount; batchIndex++)
-                    Console.Write($"+-");
-                Console.WriteLine("+");
+                    str.Append($"+-");
+                str.AppendLine("+");
 
                 // Выводим префикс
-                Console.Write($"{prefix}");
+                str.Append($"{prefix}");
 
                 // Выводим данные
                 for (batchIndex = 0; batchIndex < this.matrixY[device].Count(); batchIndex++)
-                    Console.Write($"|{matrixY[device][batchIndex]}");
-                Console.WriteLine("|");
+                    str.Append($"|{matrixY[device][batchIndex]}");
+                str.AppendLine("|");
             }
 
             // Выводим префикс
-            Console.Write($"{prefix}");
+            str.Append($"{prefix}");
 
             // Выводим разделитель
             for (batchIndex = 0; batchIndex < batchCount; batchIndex++)
-                Console.Write($"+-");
-            Console.WriteLine("+");
+                str.Append($"+-");
+            str.AppendLine("+");
+
+            // Преобразуем текстовые данные в множество байт
+            byte[] buffer = Encoding.Default.GetBytes(str.ToString());
+
+            // Записываем данные в файл
+            fstream.Write(buffer, 0, buffer.Length);
         }
 
         /// <summary>
         /// Функция выполняет вывод матриц порядка и количества пакетов заданий
         /// </summary>
         /// <param name="prefix">Префикс перед выводом матриц</param>
-        private void PrintSchedule(String prefix = "") {
+        private void WriteToLogFileSchedule(String prefix = "") {
+
+            // Если объекта для записи не существует
+            if (fstream == null)
+
+                // Закончим обработку
+                return;
+
+            // Создаём строку с 10000 символов вместимостью
+            StringBuilder str = new StringBuilder(10000);
 
             // Объявляем количество пакетов
             int batchCount;
@@ -96,14 +174,14 @@ namespace magisterDiplom.Fabric
             int symbols = 0;
 
             // Выводим информационное сообщение
-            Console.WriteLine($"{prefix}Матрица порядка и количества пакетов заданий [P,R].");
+            str.AppendLine($"{prefix}Матрица порядка и количества пакетов заданий [P,R].");
             
             // Если расписание пустое
             if ((batchCount = this.schedule.Count()) == 0)
             {
 
                 // Выводим информационное сообщение
-                Console.WriteLine($"{prefix}Не существует.");
+                str.AppendLine($"{prefix}Не существует.");
 
                 // Прекращяем вывод
                 return;
@@ -124,74 +202,89 @@ namespace magisterDiplom.Fabric
             for (dataType = 0; dataType < this.config.dataTypesCount; dataType++) {
 
                 // Выводим префикс
-                Console.Write($"{prefix}");
+                str.Append($"{prefix}");
 
                 // Выводим разделитель
                 for (batchIndex = 0; batchIndex < batchCount; batchIndex++)
-                    Console.Write($"+-");
-                Console.Write("+   ");
+                    str.Append($"+-");
+                str.Append("+   ");
 
                 // Выводим разделитель
-                for (batchIndex = 0; batchIndex < batchCount; batchIndex++) { 
-                    Console.Write($"+");
-                    Console.Write(new String('-', symbols));
+                for (batchIndex = 0; batchIndex < batchCount; batchIndex++) {
+                    str.Append($"+");
+                    str.Append(new String('-', symbols));
                 }
-                Console.WriteLine("+");
+                str.AppendLine("+");
 
                 // Выводим префикс
-                Console.Write($"{prefix}");
+                str.Append($"{prefix}");
 
                 // Выводим элементы матрицы P
-                for (batchIndex = 0; batchIndex < batchCount; batchIndex++) { 
-                    Console.Write($"|{mP[dataType][batchIndex]}");
+                for (batchIndex = 0; batchIndex < batchCount; batchIndex++) {
+                    str.Append($"|{mP[dataType][batchIndex]}");
                 }
-                Console.Write("|   ");
+                str.Append("|   ");
 
                 // Выводим элементы матрицы R
                 for (batchIndex = 0; batchIndex < batchCount; batchIndex++)
                 {
 
-                    Console.Write($"|{mR[dataType][batchIndex]}");
+                    str.Append($"|{mR[dataType][batchIndex]}");
                     if (mR[dataType][batchIndex] == 0)
-                        Console.Write(new String(' ', symbols - 1));
+                        str.Append(new String(' ', symbols - 1));
                     else
-                        Console.Write(new String(' ', (symbols - (int) Math.Log10(mR[dataType][batchIndex]) - 1 ) ));
+                        str.Append(new String(' ', (symbols - (int) Math.Log10(mR[dataType][batchIndex]) - 1 ) ));
                 }
-                Console.WriteLine("|");
+                str.AppendLine("|");
             }
 
             // Выводим префикс
-            Console.Write($"{prefix}");
+            str.Append($"{prefix}");
 
             // Выводим разделитель
             for (batchIndex = 0; batchIndex < batchCount; batchIndex++)
-                Console.Write($"+-");
-            Console.Write("+   ");
+                str.Append($"+-");
+            str.Append("+   ");
 
             // Выводим разделитель
             for (batchIndex = 0; batchIndex < batchCount; batchIndex++) {
-                Console.Write($"+");
-                Console.Write(new String('-', symbols));
+                str.Append($"+");
+                str.Append(new String('-', symbols));
             }
-            Console.WriteLine("+");
+            str.AppendLine("+");
+
+            // Преобразуем текстовые данные в множество байт
+            byte[] buffer = Encoding.Default.GetBytes(str.ToString());
+
+            // Записываем данные в файл
+            fstream.Write(buffer, 0, buffer.Length);
         }
 
         /// <summary>
         /// Функция выполняет вывод матрицы моментов начала времени выполнения заданий и ПТО
         /// </summary>
         /// <param name="prefix">Префикс перед выводом матрицы</param>
-        private void PrintStartProcessing(String prefix = "")
+        private void WriteToLogFileStartProcessing(String prefix = "")
         {
 
+            // Если объекта для записи не существует
+            if (fstream == null)
+
+                // Закончим обработку
+                return;
+
+            // Создаём строку с 10000 символов вместимостью
+            StringBuilder str = new StringBuilder(10000);
+
             // Выводим информационное сообщение
-            Console.WriteLine($"{prefix}Матрица моментов начала времени выполнения заданий и ПТО.");
+            str.AppendLine($"{prefix}Матрица моментов начала времени выполнения заданий и ПТО.");
 
             // Если матрица начала моментов времени выполнения заданий пуста
             if (this.startProcessing.Count == 0)
             {
 
                 // Выводим информационное сообщение
-                Console.WriteLine($"{prefix}Не существует.");
+                str.AppendLine($"{prefix}Не существует.");
 
                 // Заканчиваем вывод
                 return;
@@ -248,14 +341,14 @@ namespace magisterDiplom.Fabric
 
             // Выводим разделитель
             {
-                Console.Write($"{prefix}{0}");
-                Console.Write(new String(' ', genSize));
+                str.Append($"{prefix}{0}");
+                str.Append(new String(' ', genSize));
                 for (int j = 1; j < times + 1; j++)
                 {
-                    Console.Write($"{j}");
-                    Console.Write(new String(' ', (genSize - ((int)Math.Log10(j)))));
+                    str.Append($"{j}");
+                    str.Append(new String(' ', (genSize - ((int)Math.Log10(j)))));
                 }
-                Console.WriteLine();
+                str.AppendLine();
             }
 
             // Для каждого прибора
@@ -264,16 +357,16 @@ namespace magisterDiplom.Fabric
 
                 // Выводим разделитель
                 {
-                    Console.Write($"{prefix}+");
+                    str.Append($"{prefix}+");
                     for (int i = 0; i < times; i++)
                     {
-                        Console.Write(new String('-', genSize));
-                        Console.Write("+");
+                        str.Append(new String('-', genSize));
+                        str.Append("+");
                     }
-                    Console.WriteLine();
+                    str.AppendLine();
                 }
 
-                Console.Write($"{prefix}");
+                str.Append($"{prefix}");
 
                 // Для каждого временного отделителя
                 for (int time = 0; time < times; time++)
@@ -289,7 +382,6 @@ namespace magisterDiplom.Fabric
                             if (this.startProcessing[device][batchIndex][job] == time)
                             {
 
-                                // TODO: Ошибка. В this.schedule 2 пакета, а в this.startProcessing 3 пакета
                                 // Вычисляем время выполнения пакета задания с типом this.schedule[batchIndex].Type на приборе device
                                 int proc_time = this.config.proccessingTime[device][this.schedule[batchIndex].Type];
 
@@ -309,17 +401,18 @@ namespace magisterDiplom.Fabric
                                     unspaces += (int)Math.Log10(proc_time) + 1;
 
                                     // Выводим пакет в формате тип:время выполнения
-                                    Console.Write($"|{this.schedule[batchIndex].Type}:{proc_time}");
-                                    Console.Write(new String(' ', genSize - (unspaces + 1)));
+                                    str.Append($"|{this.schedule[batchIndex].Type}:{proc_time}");
+                                    str.Append(new String(' ', genSize - (unspaces + 1)));
                                 }
+
                                 // Если текущий момент времени последний и в данной позиции есть ПТО
                                 if (this.startProcessing[device][batchIndex][job] == this.startProcessing[device][batchIndex].Last() && this.matrixY[device][batchIndex] == 1)
                                 {
 
                                     // Выводим t раз ПТО
                                     for (int t = 0; t < this.preMConfig.preMaintenanceTimes[device]; t++) { 
-                                        Console.Write($"|");
-                                        Console.Write(new String('*', genSize));
+                                        str.Append($"|");
+                                        str.Append(new String('*', genSize));
                                     }
 
                                     // Увеличиваем время
@@ -335,25 +428,31 @@ namespace magisterDiplom.Fabric
                     if (time < times) {
 
                         // Отрисовывем пробел
-                        Console.Write($"|");
-                        Console.Write(new String(' ', genSize));
+                        str.Append($"|");
+                        str.Append(new String(' ', genSize));
                     }
                 }
 
                 // Переводим курсор
-                Console.WriteLine("|");
+                str.AppendLine("|");
             }
 
             // Выводим разделитель
             {
-                Console.Write($"{prefix}+");
+                str.Append($"{prefix}+");
                 for (int i = 0; i < times; i++)
                 {
-                    Console.Write(new String('-', genSize));
-                    Console.Write("+");
+                    str.Append(new String('-', genSize));
+                    str.Append("+");
                 }
-                Console.WriteLine();
+                str.AppendLine();
             }
+
+            // Преобразуем текстовые данные в множество байт
+            byte[] buffer = Encoding.Default.GetBytes(str.ToString());
+             
+            // Записываем данные в файл
+            fstream.Write(buffer, 0, buffer.Length);
         }
 
         /// <summary>
@@ -383,8 +482,11 @@ namespace magisterDiplom.Fabric
         private void ShiftMatrixY() 
         {
 
-            if (IsDebug)
-                Console.WriteLine("ShiftMatrixY start: Улучшаем позиции ПТО.");
+            // Если логирование установлена
+            if (Form1.loggingOn)
+
+                // Выводим информацию
+                WriteToLogFile($"ShiftMatrixY start: Улучшаем позиции ПТО.{Environment.NewLine}");
 
             // Объявляем индекс прибора
             int bestDevice = -1;
@@ -407,16 +509,17 @@ namespace magisterDiplom.Fabric
                 // Обнуляем критерий f2 для текущего расписания
                 f2 = 0;
 
-                if (IsDebug && IsDebug_ShiftMatrixY) {
-                    Console.WriteLine("Новая итерация сдвигов");
+                // Если логирование установлено
+                if (Form1.loggingOn) {
+                    WriteToLogFile($"Новая итерация сдвигов{Environment.NewLine}");
 
                     CalcStartProcessing();
                     CalcMatrixTPM();
 
-                    Console.WriteLine("1");
-                    PrintMatrixY();
-                    PrintStartProcessing();
-                    Console.WriteLine($"f2 для текущего расписания {this.GetPreMUtility()}");
+                    WriteToLogFile($"1{Environment.NewLine}");
+                    WriteToLogFileMatrixY();
+                    WriteToLogFileStartProcessing();
+                    WriteToLogFile($"f2 для текущего расписания {this.GetPreMUtility()}{Environment.NewLine}");
                 }
 
                 // Для каждого прибора выполняем обработку
@@ -435,14 +538,15 @@ namespace magisterDiplom.Fabric
                     // Определяем индекс последнего ПЗ для текущего расписания
                     last_batch_index = this.matrixY[device].Count() - 1; // j^max
 
-                    if (IsDebug && IsDebug_ShiftMatrixY) {
-                        Console.WriteLine($"Выполняем сдвиг для прибора {device} j*={last_prem_batch_index}; j^max={last_batch_index}");
-                    }
+                    // Если логирование установлено
+                    if (Form1.loggingOn)
+                        WriteToLogFile($"Выполняем сдвиг для прибора {device} j*={last_prem_batch_index}; j^max={last_batch_index}{Environment.NewLine}");
+                    
 
                     // Проверяем на необходимость проведения операций перестановки
                     if (last_prem_batch_index == last_batch_index) {
                         if (IsDebug && IsDebug_ShiftMatrixY)
-                            Console.WriteLine($"Пропускаем сдвиг для прибора: {device}");
+                            WriteToLogFile($"Пропускаем сдвиг для прибора: {device}{Environment.NewLine}");
 
                         // Пропускаем итерацию для текущего прибора
                         continue;
@@ -458,18 +562,20 @@ namespace magisterDiplom.Fabric
                     // Вычисляем матрицу моментов окончания времени выполнения ПТО
                     this.CalcMatrixTPM();
 
-                    if (IsDebug && IsDebug_ShiftMatrixY)
+                    // Если логирование установлено
+                    if (Form1.loggingOn)
                     {
-                        Console.WriteLine("2");
-                        PrintMatrixY();
-                        PrintStartProcessing();
+                        WriteToLogFile($"2{Environment.NewLine}");
+                        WriteToLogFileMatrixY();
+                        WriteToLogFileStartProcessing();
                     }
 
                     // Если текущее решение не удовлетворяет условию надёжности
                     if (!this.IsSolutionAcceptable())
                     {
-                        if (IsDebug && IsDebug_ShiftMatrixY)
-                            Console.WriteLine("РЕШЕНИЕ НЕ ДОПУСТИМО");
+                        // Если логирование установлено
+                        if (Form1.loggingOn)
+                            WriteToLogFile($"РЕШЕНИЕ НЕ ДОПУСТИМО{Environment.NewLine}");
                         
                         // Выполняем обратный сдвиг ПТО
                         this.matrixY[device][last_prem_batch_index] = 1;
@@ -481,8 +587,10 @@ namespace magisterDiplom.Fabric
 
                     // Вычисляем критерий f2 для текущего расписания со сдвигом
                     new_f2 = this.GetPreMUtility();
-                    if (IsDebug && IsDebug_ShiftMatrixY)
-                        Console.WriteLine($"РЕШЕНИЕ ДОПУСТИМО. G(f2)={f2};new_f2={new_f2}");
+
+                    // Если логирование установлено
+                    if (Form1.loggingOn)
+                        WriteToLogFile($"РЕШЕНИЕ ДОПУСТИМО. G(f2)={f2};new_f2={new_f2}{Environment.NewLine}");
 
                     // Если текущее расписания лучше предыдущего
                     if (new_f2 > f2)
@@ -500,21 +608,24 @@ namespace magisterDiplom.Fabric
                     this.matrixY[device][last_prem_batch_index + 1] = 0;
                 }
 
-                if (IsDebug && IsDebug_ShiftMatrixY)
-                    Console.WriteLine($"{Environment.NewLine}f2={f2}");
+                // Если логирование установлено
+                if (Form1.loggingOn)
+                    WriteToLogFile($"f2={f2}{Environment.NewLine}");
 
                 // Если улучшений позиций ПТО не было найдено
                 if (f2 == 0)
                 {
-                    if (IsDebug && IsDebug_ShiftMatrixY)
-                        Console.WriteLine("Улучшений не было найдено");
+                    // Если логирование установлено
+                    if (Form1.loggingOn)
+                        WriteToLogFile($"Улучшений не было найдено{Environment.NewLine}");
 
                     // Прекращаем обработку
                     break;
                 }
 
-                if (IsDebug && IsDebug_ShiftMatrixY)
-                    Console.WriteLine("Было найдено улучшение.");
+                // Если логирование установлено
+                if (Form1.loggingOn)
+                    WriteToLogFile($"Было найдено улучшение.{Environment.NewLine}");
 
                 // Определяем индекс ПЗ за которым следует последнее ПТО
                 last_prem_batch_index = this.GetLastPreMPos(bestDevice); // j*
@@ -523,27 +634,30 @@ namespace magisterDiplom.Fabric
                 this.matrixY[bestDevice][last_prem_batch_index] = 0;
                 this.matrixY[bestDevice][last_prem_batch_index + 1] = 1;
 
-                if (IsDebug && IsDebug_ShiftMatrixY) {
-                    Console.WriteLine("Новое решение:");
-                    Console.WriteLine("3");
-                    PrintMatrixY();
-                    PrintStartProcessing();
+                // Если логирование установлено
+                if (Form1.loggingOn) { 
+                    WriteToLogFile($"Новое решение:{Environment.NewLine}");
+                    WriteToLogFile($"3{Environment.NewLine}");
+                    WriteToLogFileMatrixY();
+                    WriteToLogFileStartProcessing();
                 }
 
                 // Продолжаем улучшения
             } while (true);
 
-            if (IsDebug && IsDebug_ShiftMatrixY)
+            // Если логирование установлено
+            if (Form1.loggingOn)
             {
-                Console.WriteLine("Было найдено решение с помощью сдвигов.");
-                Console.WriteLine("Выполняется заполнение позиций ПТО не найденных с помощью сдвигов.");
+                WriteToLogFile($"Было найдено решение с помощью сдвигов.{Environment.NewLine}");
+                WriteToLogFile($"Выполняется заполнение позиций ПТО не найденных с помощью сдвигов.{Environment.NewLine}");
             }
 
             // Для каждого прибора выполняем дополнение для матрицы ПТО 1
             for (int device = 0; device < this.config.deviceCount; device++)
             {
-                if (IsDebug && IsDebug_ShiftMatrixY) {
-                    Console.Write($"Для прибора: {device};");
+                // Если логирование установлено
+                if (Form1.loggingOn) { 
+                    WriteToLogFile($"Для прибора: {device};{Environment.NewLine}");
                 }
 
                 // Определяем индекс ПЗ за которым следует последнее ПТО
@@ -555,21 +669,25 @@ namespace magisterDiplom.Fabric
                 // Если матрица Y не оканчивается 1
                 if (last_prem_batch_index < last_batch_index) {
 
-                    if (IsDebug && IsDebug_ShiftMatrixY)
-                        Console.WriteLine($"ПТО добавляется.");
+                    // Если логирование установлено
+                    if (Form1.loggingOn)
+                        WriteToLogFile($"ПТО добавляется.{Environment.NewLine}");
 
                     // Изменяем индекс последнего ПТО нп 1
                     this.matrixY[device][last_batch_index] = 1;
                 }
-                else if (IsDebug && IsDebug_ShiftMatrixY)
-                    Console.WriteLine($"ПТО не добавляется.");
+                
+                // Если логирование установлено
+                else if (Form1.loggingOn)
+                    WriteToLogFile($"ПТО не добавляется.{Environment.NewLine}");
             }
 
-            if (IsDebug && IsDebug_ShiftMatrixY)
+            // Если логирование установлено
+            if (Form1.loggingOn)
             {
-                PrintStartProcessing();
-                PrintMatrixY();
-                Console.WriteLine("ShiftMatrixY stop.");
+                WriteToLogFileStartProcessing();
+                WriteToLogFileMatrixY();
+                WriteToLogFile($"ShiftMatrixY stop.{Environment.NewLine}");
             }
         }
 
@@ -581,9 +699,9 @@ namespace magisterDiplom.Fabric
         private bool SearchByPosition(int swapCount = 999999)
         {
 
-            // Выводим отладачную информацию
-            if (IsDebug)
-                Console.WriteLine($"SearchByPosition start: Изменяем позиции пакета заданий. beta:{preMConfig.beta}; swapCount:{swapCount}");
+            // Если логирование установлено
+            if (Form1.loggingOn)
+                WriteToLogFile($"SearchByPosition start: Изменяем позиции пакета заданий. beta:{preMConfig.beta}; swapCount:{swapCount}{Environment.NewLine}");
 
             // Флаг перестановки выполняющей условию надёжности
             bool isFind = false;
@@ -603,11 +721,11 @@ namespace magisterDiplom.Fabric
             // Вычисляем матрицу моментов окончания ПТО приборов
             this.CalcMatrixTPM();
 
-            // Выводим отладачную информацию
-            if (IsDebug && IsDebug_SearchByPosition)
+            // Если логирование установлено
+            if (Form1.loggingOn)
             {
-                Console.WriteLine("Начальное расписание:");
-                PrintSchedule(); PrintStartProcessing();
+                WriteToLogFile($"Начальное расписание:{Environment.NewLine}");
+                WriteToLogFileSchedule(); WriteToLogFileStartProcessing();
             }
 
             // Проверяем допустимость текущего решения
@@ -622,15 +740,19 @@ namespace magisterDiplom.Fabric
                 // Устанавливаем лучшее расписание
                 bestSchedule = new List<Batch>(this.schedule);
 
-                if (IsDebug && IsDebug_SearchByPosition)
+                // Если логирование установлено
+                if (Form1.loggingOn)
                 {
-                    Console.WriteLine("Начальное расписание допустимо");
-                    Console.WriteLine($"f2 для текущего расписания:{bestTime}");
+                    WriteToLogFile($"Начальное расписание допустимо{Environment.NewLine}");
+                    WriteToLogFile($"f2 для текущего расписания:{bestTime}{Environment.NewLine}");
                 }
-            } else if (IsDebug && IsDebug_SearchByPosition)
-            {
-                Console.WriteLine("Начальное расписание не допустимо");
             }
+            
+            // Если логирование установлено
+            else if (Form1.loggingOn)
+            
+                WriteToLogFile($"Начальное расписание не допустимо{Environment.NewLine}");
+            
 
             // Выполняем заявленное количество перестановок, заявленно количество раз
             for (int batchIndex = schedule.Count - 1; batchIndex > 0 && swapCount > 0; batchIndex--, swapCount--)
@@ -643,10 +765,11 @@ namespace magisterDiplom.Fabric
                 // this.schedule[batchIndex] = this.schedule[batchIndex - 1];
                 // this.schedule[batchIndex - 1] = batch;
 
-                if (IsDebug && IsDebug_SearchByPosition)
+                // Если логирование установлено
+                if (Form1.loggingOn)
                 {
-                    Console.WriteLine($"Выполняем перестановку {batchIndex} и {batchIndex - 1}");
-                    PrintSchedule();
+                    WriteToLogFile($"Выполняем перестановку {batchIndex} и {batchIndex - 1}{Environment.NewLine}");
+                    WriteToLogFileSchedule();
                 }
 
                 // Вычисляем матрицу моментов времени начала выполнения заданий
@@ -665,20 +788,22 @@ namespace magisterDiplom.Fabric
                     // Высчитываем новый критерий makespan
                     newTime = this.GetPreMUtility();
 
-                    if (IsDebug && IsDebug_SearchByPosition)
+                    // Если логирование установлено
+                    if (Form1.loggingOn)
                     {
-                        Console.WriteLine("Текущее расписание допустимо");
-                        Console.WriteLine($"new_f2 для текущего расписания:{newTime}");
+                        WriteToLogFile($"Текущее расписание допустимо{Environment.NewLine}");
+                        WriteToLogFile($"new_f2 для текущего расписания:{newTime}{Environment.NewLine}");
                     }
 
                     // Если новое время лучше, то выполняем переопределение
                     if (newTime > bestTime)
                     {
 
-                        if (IsDebug && IsDebug_SearchByPosition)
-                        {
-                            Console.WriteLine($"Текущее расписание лучше предыдущего. ({newTime} > {bestTime}).");
-                        }
+                        // Если логирование установлено
+                        if (Form1.loggingOn)
+                        
+                            WriteToLogFile($"Текущее расписание лучше предыдущего. ({newTime} > {bestTime}).{Environment.NewLine}");
+                        
 
                         // TODO: Избавиться от копирования списка в пользу использования индекса наилучшей позиции
                         // Переопределяем лучшее расписание
@@ -688,20 +813,22 @@ namespace magisterDiplom.Fabric
                         bestTime = newTime;
                     }
                 }
-                else if (IsDebug && IsDebug_SearchByPosition)
+                
+                // Если логирование установлено
+                else if (Form1.loggingOn)
                 {
-                    Console.WriteLine("Текущее расписание не допустимо");
+                    WriteToLogFile($"Текущее расписание не допустимо{Environment.NewLine}");
                 }
             }
 
             // Выполняем переопределение наилучшего раысписания составов ПЗ
             this.schedule = bestSchedule;
 
-            // Выводим отладачную информацию
-            if (IsDebug && IsDebug_SearchByPosition && isFind)
+            // Если логирование установлено
+            if (Form1.loggingOn)
             {
-                Console.WriteLine("Извлекаем лучшее расписание");
-                PrintSchedule();
+                WriteToLogFile($"Извлекаем лучшее расписание{Environment.NewLine}");
+                WriteToLogFileSchedule();
             }
 
             // Возвращаем результат
@@ -715,9 +842,9 @@ namespace magisterDiplom.Fabric
         private bool IsSolutionAcceptable()
         {
 
-            // Выводим отладачную информацию
-            if (IsDebug)
-                Console.WriteLine($"IsSolutionAcceptable start: Проверяем допустимость решения. beta:{preMConfig.beta}");
+            // Если логирование установлено
+            if (Form1.loggingOn)
+                WriteToLogFile($"IsSolutionAcceptable start: Проверяем допустимость решения. beta:{preMConfig.beta}{Environment.NewLine}");
                 
             // Для каджого прибора выполняем обработку
             for (int device = 0; device < config.deviceCount; device++)
@@ -743,17 +870,17 @@ namespace magisterDiplom.Fabric
                         // Проверяем ограничение надёжности
                         if (!IsConstraint_CalcSysReliability(time)) {
 
-                            // Выводим отладачную информацию
-                            if (IsDebug && IsDebug_CalcSysReliability)
-                                Console.WriteLine($"Ограничение не выполняется{Environment.NewLine}");
+                            // Если логирование установлено
+                            if (Form1.loggingOn)
+                                WriteToLogFile($"Ограничение не выполняется{Environment.NewLine}");
 
                             // Если ограничение не выполняется, вернуть false
                             return false;
                         }
 
-                        // Выводим отладачную информацию
-                        if (IsDebug && IsDebug_CalcSysReliability)
-                            Console.WriteLine($"Ограничение выполняется{Environment.NewLine}");
+                        // Если логирование установлено
+                        if (Form1.loggingOn)
+                            WriteToLogFile($"Ограничение выполняется{Environment.NewLine}");
                     }
             
             // Все ограничения выпоняются, вернуть true
@@ -771,7 +898,7 @@ namespace magisterDiplom.Fabric
             if (IsDebug) {
 
                 // Выводим информацию о переданной конфигурационной структуре
-                Console.WriteLine(config.ToString());
+                WriteToLogFile($"{config.ToString()}{Environment.NewLine}");
             }
 
             startProcessing = new Dictionary<int, List<List<int>>>();
@@ -780,19 +907,44 @@ namespace magisterDiplom.Fabric
 
         public override bool Build(List<List<int>> _matrixA)
         {
+
+            // Если установлено логирование
+            if (Form1.loggingOn)
+
+                // Записываем данные в файл
+                WriteToLogFile($"Начинаем выполнять операции на нижнем уровне;{Environment.NewLine}");
+
             List<List<int>> matrixA = ListUtils.MatrixIntDeepCopy(_matrixA);
 
-            // Если флаг оталдки установлен
-            if (IsDebug)
+            // Если установлено логирование
+            if (Form1.loggingOn)
             {
-                Console.WriteLine("matrixA:");
+
+                // Cоздаём экземпляр класса для работы со строками
+                StringBuilder str = new StringBuilder(200);
+
+                // Объявляем временную строку
+                str.AppendLine($"Матрица A:");
+
+                // Для каждого типа данных
                 for (int _dataType = 0; _dataType < matrixA.Count(); _dataType++)
                 {
-                    Console.Write($"\t{_dataType}: ");
+
+                    // Добавляем новые данные в строку
+                    str.Append($"\tТип {_dataType + 1}: ");
+
+                    // Для каждого пакета в векторе типа _dataType матрицы A
                     for (int _batchIndex = 0; _batchIndex < matrixA[_dataType].Count(); _batchIndex++)
-                        Console.Write($"{matrixA[_dataType][_batchIndex]} ");
-                    Console.Write(Environment.NewLine);
+
+                        // Добавляем в строку данные
+                        str.Append($"{matrixA[_dataType][_batchIndex]} ");
+
+                    // Добавляем перевод строки
+                    str.Append(Environment.NewLine);
                 }
+
+                // Записываем заголовок
+                WriteToLogFile(str.ToString());
             }
 
             // Объявляем тип данных
@@ -807,11 +959,11 @@ namespace magisterDiplom.Fabric
             // Вычисляем максимальное количество пакетов среди всех типов данных
             calcMaxBatchCount();
 
-            // Если флаг оталдки установлен
-            if (IsDebug)
+            // Если установлено логирование
+            if (Form1.loggingOn)
 
-                // Выводим максимальное количество пакетов среди всех типов данных
-                Console.WriteLine($"maxBatchCount: {maxBatchCount}");
+                // Записываем данные в файл
+                WriteToLogFile($"maxBatchCount: {maxBatchCount}{Environment.NewLine}");
 
             // Вернёт максимальное количество пакетов среди всех типов данных
             void calcMaxBatchCount()
@@ -835,56 +987,72 @@ namespace magisterDiplom.Fabric
                 m.Add(dataType, sum);
             }
 
-            // Если флаг оталдки установлен
-            if (IsDebug)
+            // Если установлено логирование
+            if (Form1.loggingOn)
 
-                // Выводим информацию
-                Console.WriteLine("dataTypes:");
+                // Записываем данные в файл
+                WriteToLogFile($"Типы данных:{Environment.NewLine}");
 
             while (m.Any())
             {
                 int myDataType = m.Aggregate((l, r) => l.Value > r.Value ? l : r).Key;
-
-                // Если флаг оталдки установлен
-                if (IsDebug)
-
-                    // Выводим информацию
-                    Console.WriteLine($"\t{myDataType}: {m[myDataType]}");
-
                 dataTypes.Add(myDataType);
+                // Если установлено логирование
+                if (Form1.loggingOn)
+
+                    // Записываем данные в файл
+                    WriteToLogFile($"\t{myDataType}: {m[myDataType]}{Environment.NewLine}");
                 m.Remove(myDataType);
             }
 
 
-            // Если флаг оталдки установлен
-            if (IsDebug)
+            // Если установлено логирование
+            if (Form1.loggingOn)
             {
 
                 // Выводим информацию
-                Console.WriteLine("dataTypes:");
+                WriteToLogFile($"dataTypes:{Environment.NewLine}");
 
                 // Для каждого типа
                 for (int _dataType = 0; _dataType < this.config.dataTypesCount; _dataType++)
 
                     // Выводим информацию
-                    Console.WriteLine($"\t{_dataType}: {dataTypes[_dataType]}");
+                    WriteToLogFile($"\t{_dataType}: {dataTypes[_dataType]}{Environment.NewLine}");
             }
 
             // Сортируем матрицу A
             for (dataType = 0; dataType < this.config.dataTypesCount; dataType++)
                 matrixA[dataType].Sort();
 
-            // Если флаг оталдки установлен
-            if (IsDebug)
+            // Если установлено логирование
+            if (Form1.loggingOn)
             {
-                Console.WriteLine("matrixA':");
+
+                // Cоздаём экземпляр класса для работы со строками
+                StringBuilder str = new StringBuilder(200);
+
+                // Объявляем временную строку
+                str.AppendLine($"Матрица A:");
+
+                // Для каждого типа данных
                 for (int _dataType = 0; _dataType < matrixA.Count(); _dataType++)
                 {
-                    Console.Write($"\t{_dataType}: ");
+
+                    // Добавляем новые данные в строку
+                    str.Append($"\tТип {_dataType + 1}: ");
+
+                    // Для каждого пакета в векторе типа _dataType матрицы A
                     for (int _batchIndex = 0; _batchIndex < matrixA[_dataType].Count(); _batchIndex++)
-                        Console.Write($"{matrixA[_dataType][_batchIndex]} ");
-                    Console.Write(Environment.NewLine);
+
+                        // Добавляем в строку данные
+                        str.Append($"{matrixA[_dataType][_batchIndex]} ");
+
+                    // Добавляем перевод строки
+                    str.Append(Environment.NewLine);
                 }
+
+                // Записываем заголовок
+                WriteToLogFile(str.ToString());
             }
 
             batch = 0;
@@ -906,9 +1074,10 @@ namespace magisterDiplom.Fabric
             )};
             dataType++;
 
-            if (IsDebug) {
+            // Если логирование установлено
+            if (Form1.loggingOn) {
                 CalcStartProcessing();
-                PrintSchedule();
+                WriteToLogFileSchedule();
             }
             // П.3 Инициализируем матрицу Y
             this.matrixY = new List<List<int>>(capacity: this.config.deviceCount);
@@ -917,9 +1086,10 @@ namespace magisterDiplom.Fabric
                 this.matrixY.Add(new List<int>());
                 this.matrixY[device].Add(1);
             }
-            if (IsDebug)
+            // Если логирование установлено
+            if (Form1.loggingOn)
             {
-                PrintMatrixY();
+                WriteToLogFileMatrixY();
             }
 
             // Для каждого типа данных выполняем обрабоку
@@ -931,26 +1101,32 @@ namespace magisterDiplom.Fabric
                 for (int device = 0; device < this.config.deviceCount; device++)
                     this.matrixY[device].Add(0);
 
-                if (IsDebug)
+                // Если логирование установлено
+                if (Form1.loggingOn)
                 {
-                    PrintStartProcessing();
+                    WriteToLogFileStartProcessing();
                 }
 
                 // Если не было найдено расписания удовлетворяющему условию надёжности
-                if (!this.SearchByPosition(5))
+                if (!this.SearchByPosition(5)) {
 
-                    // Возвращаем 0, как флаг неудачи
+                    // Закрываем файл
+                    UnsetLogFile();
+
+                    // Возвращаем флаг неудачи
                     return false;
+                }
 
                 // Выполняем оптимизацию для позиций ПТО приборов
                 this.ShiftMatrixY();
 
                 // Проверяем условие надёжности
-                // TODO: СПОРНО (НЕВОЗМОЖНОАЯ СИТУАЦИЯ) - ПОДСЧИТАТЬ КОЛИЧЕСТВО ВЫЗОВОВ 
-                if (!this.IsSolutionAcceptable())
-                {
-                    Console.WriteLine("Тот самый случай");
-                    // Возвращаем 0, как флаг неудачи
+                if (!this.IsSolutionAcceptable()) {
+
+                    // Закрываем файл
+                    UnsetLogFile();
+
+                    // Возвращаем флаг неудачи
                     return false;
                 }
             }
@@ -978,20 +1154,25 @@ namespace magisterDiplom.Fabric
                         this.matrixY[device].Add(0);
 
                     // Если не было найдено расписания удовлетворяющему условию надёжности
-                    if (!this.SearchByPosition(5))
+                    if (!this.SearchByPosition(5)) {
 
-                        // Возвращаем 0, как флаг неудачи
+                        // Закрываем файл
+                        UnsetLogFile();
+
+                        // Возвращаем флаг неудачи
                         return false;
+                    }
 
                     // Выполняем оптимизацию для позиций ПТО приборов (ШАГ 15)
                     this.ShiftMatrixY();
 
                     // Проверяем условие надёжности
-                    // TODO: СПОРНО (НЕВОЗМОЖНОАЯ СИТУАЦИЯ) - ПОДСЧИТАТЬ КОЛИЧЕСТВО ВЫЗОВОВ 
-                    if (!this.IsSolutionAcceptable())
-                    {
-                        Console.WriteLine("Тот самый случай");
-                        // Возвращаем 0, как флаг неудачи
+                    if (!this.IsSolutionAcceptable()) {
+
+                        // Закрываем файл
+                        UnsetLogFile();
+
+                        // Возвращаем флаг неудачи
                         return false;
                     }
                 }
@@ -1000,7 +1181,17 @@ namespace magisterDiplom.Fabric
                 batch++;
             }
 
+            // Если установлено логирование
+            if (Form1.loggingOn) {
 
+                // Записываем данные в файл
+                WriteToLogFile($"Начинаем выполнять операции на нижнем уровне;{Environment.NewLine}");
+
+                // Закрываем файл
+                UnsetLogFile();
+            }
+
+            // Возвращяем флаг удачного построения расписания
             return true;
         }
 
@@ -1009,7 +1200,15 @@ namespace magisterDiplom.Fabric
         /// </summary>
         public void CalcMatrixTPM()
         {
-            matrixTPM.Clear();
+
+            // Если установлено логирование и объект для записи существует
+            if (Form1.loggingOn) 
+
+                // Записываем данные в файл
+                WriteToLogFile($"Вычисляем матрицу T^pm;{Environment.NewLine}");
+            
+            // Отчищяем матрицу T^pm
+            matrixTPM?.Clear();
 
             // Для каждого прибора выполням обработку
             for (int device = 0; device < config.deviceCount; device++)
@@ -1052,6 +1251,12 @@ namespace magisterDiplom.Fabric
         /// </summary>
         private void CalcStartProcessing()
         {
+
+            // Если установлено логирование и объект для записи существует
+            if (Form1.loggingOn)
+
+                // Записываем данные в файл
+                WriteToLogFile($"Вычисляем матрицу T^0l;{Environment.NewLine}");
 
             // Объявляем индекс ПЗ
             int batchIndex;
@@ -1242,6 +1447,12 @@ namespace magisterDiplom.Fabric
         private int GetDowntimeByDevice(int device)
         {
 
+            // Если установлено логирование и объект для записи существует
+            if (Form1.loggingOn)
+
+                // Записываем данные в файл
+                WriteToLogFile($"Вычисляем простои для прибора {device};{Environment.NewLine}");
+
             // Объявляем и инициализируем простои
             int downtime = 0;
 
@@ -1313,6 +1524,12 @@ namespace magisterDiplom.Fabric
         public int GetDowntime()
         {
 
+            // Если установлено логирование и объект для записи существует
+            if (Form1.loggingOn)
+
+                // Записываем данные в файл
+                WriteToLogFile($"Вычисляем простои для всех приборов;{Environment.NewLine}");
+
             // Объявляем и инициализируем простои
             int downtime = 0;
 
@@ -1383,6 +1600,12 @@ namespace magisterDiplom.Fabric
         private int GetUtilityByDevice(int device)
         {
 
+            // Если установлено логирование и объект для записи существует
+            if (Form1.loggingOn)
+
+                // Записываем данные в файл
+                WriteToLogFile($"Вычисляем полезность для прибора {device};{Environment.NewLine}");
+
             // Объявляем значение критерия на нижнем уровне
             int sum = 0;
 
@@ -1410,6 +1633,12 @@ namespace magisterDiplom.Fabric
         public int GetUtility()
         {
 
+            // Если установлено логирование и объект для записи существует
+            if (Form1.loggingOn)
+
+                // Записываем данные в файл
+                WriteToLogFile($"Вычисляем полезность для всех приборов;{Environment.NewLine}");
+
             // Объявляем значение критерия на нижнем уровне
             int sum = 0;
 
@@ -1431,11 +1660,19 @@ namespace magisterDiplom.Fabric
         public int GetPreMUtility()
         {
 
-            // Выводим отладочную информацию
-            if (IsDebug) {
-                PrintStartProcessing();
-                Console.WriteLine("GetPreMUtility start: Вычисляем сумму полезности и итервалов между ПТО");
+            // Если установлено логирование и объект для записи существует
+            if (Form1.loggingOn) {
+
+                // Записываем данные в файл
+                WriteToLogFile($"Вычисляем полезность с учётом ПТО для всех приборов;{Environment.NewLine}");
+
+                // Выводим информацию о матрице начал моментов времени выполнения
+                WriteToLogFileStartProcessing();
+
+                // Выводим информацию
+                WriteToLogFile($"GetPreMUtility start: Вычисляем сумму полезности и итервалов между ПТО{Environment.NewLine}");
             }
+
             // Объявляем значение критерия на нижнем уровне
             int sum = 0;
 
@@ -1443,10 +1680,10 @@ namespace magisterDiplom.Fabric
             for (int device = 0; device < config.deviceCount; device++)
             {
 
-                // Выводим отладочную информацию
-                if (IsDebug && IsDebug_GetPreMUtility) {
-                    Console.WriteLine($"device:{device}");
-                    Console.WriteLine($"\tМомент окончания последнего задания { this.startProcessing[device].Last().Last() + this.config.proccessingTime[device][this.schedule.Last().Type] }");
+                // Если логирование установлено
+                if (Form1.loggingOn) {
+                    WriteToLogFile($"device:{device}{Environment.NewLine}");
+                    WriteToLogFile($"\tМомент окончания последнего задания { this.startProcessing[device].Last().Last() + this.config.proccessingTime[device][this.schedule.Last().Type] }{Environment.NewLine}");
                 }
 
                 // Добавляем момент времени окончания всех заданий на приборе
@@ -1458,15 +1695,14 @@ namespace magisterDiplom.Fabric
                     // Время выполнения последнего заданий в последенем пакете
                     this.config.proccessingTime[device][this.schedule.Last().Type];
 
-                // Выводим отладочную информацию
-                if (IsDebug && IsDebug_GetPreMUtility)
-                    Console.WriteLine($"\tПростои для данного прибора с учётом ПТО { this.GetDowntimeByDevice(device) }");
+                // Если логирование установлено
+                if (Form1.loggingOn)
+                    WriteToLogFile($"\tПростои для данного прибора с учётом ПТО { this.GetDowntimeByDevice(device) }{Environment.NewLine}");
 
                 // Вычитаем простои
                 sum -= this.GetDowntimeByDevice(device);
 
-                int intervals = 0;
-                intervals += matrixTPM[device].First().TimePreM;
+                int intervals = matrixTPM[device].First().TimePreM;
 
                 // Для каждого пакета выполняем обработку
                 for (int batchIndex = 1; batchIndex < matrixTPM[device].Count(); batchIndex++)
@@ -1474,17 +1710,17 @@ namespace magisterDiplom.Fabric
                     // Добавляем интервалы времени между ПТО разных пакетов
                     intervals += matrixTPM[device][batchIndex].TimePreM - matrixTPM[device][batchIndex - 1].TimePreM;
 
-                // Выводим отладочную информацию
-                if (IsDebug && IsDebug_GetPreMUtility)
-                    Console.WriteLine($"\tИнтервалы времени между ПТО { intervals }");
+                // Если логирование установлено
+                if (Form1.loggingOn)
+                    WriteToLogFile($"\tИнтервалы времени между ПТО { intervals }{Environment.NewLine}");
                 
                 // Выполняем подсчёт суммы интервалов времени на первом пакете ПТО
                 sum += intervals;
             }
 
-            // Выводим отладочную информацию
-            if (IsDebug && IsDebug_GetPreMUtility)
-                Console.WriteLine($"Критерий f2 {sum}{Environment.NewLine}");
+            // Если логирование установлено
+            if (Form1.loggingOn)
+                WriteToLogFile($"Критерий f2 {sum}{Environment.NewLine}");
 
             // Возвращаем критерий
             return sum;
@@ -1499,6 +1735,12 @@ namespace magisterDiplom.Fabric
         /// <returns>Надёжность прибора по индексу device</returns>
         private double CalcReliabilityByDevice(int activity_time, int device)
         {
+
+            // Если установлено логирование и объект для записи существует
+            if (Form1.loggingOn)
+
+                // Записываем данные в файл
+                WriteToLogFile($"Вычисляем надёжность для прибора {device} с временем активности {activity_time};{Environment.NewLine}");
 
             // Выполняем расчёт и возврат доступности
             return (activity_time == 0) ? 1 :
@@ -1523,6 +1765,7 @@ namespace magisterDiplom.Fabric
         // }
 
         // Выражение 12
+        
         /// <summary>
         /// Функция вернёт время активности прибора от предыдущего ПТО
         /// </summary>
@@ -1531,7 +1774,13 @@ namespace magisterDiplom.Fabric
         /// <returns>Время активности</returns>
         private int GetActivityTimeByDevice(int device, int time)
         {
-            
+
+            // Если установлено логирование и объект для записи существует
+            if (Form1.loggingOn)
+
+                // Записываем данные в файл
+                WriteToLogFile($"Вычисляем временя активности для прибора {device} для момента времени {time};{Environment.NewLine}");
+
             // Определяем начальный индекс
             int batchIndex = GetBatchIndex(device, time) + 1;
 
@@ -1657,9 +1906,12 @@ namespace magisterDiplom.Fabric
         /// <returns>Доступность для всех приборов</returns>
         private double CalcSysReliability(int time)
         {
-            if (IsDebug && IsDebug_CalcSysReliability)
-            
-                Console.WriteLine($"Вычисляем системную надёжность для момента времени {time}");
+
+            // Если установлено логирование и объект для записи существует
+            if (Form1.loggingOn)
+
+                // Записываем данные в файл
+                WriteToLogFile($"Вычисляем системную надёжность для момента времени {time};{Environment.NewLine}");
             
             // Объявляем надёжность
             double reliability = 1;
@@ -1673,9 +1925,11 @@ namespace magisterDiplom.Fabric
                 // Вычисляем время активности
                 activity_time = this.GetActivityTimeByDevice(device, time);
 
-                if (IsDebug && IsDebug_CalcSysReliability)
+                // Если логирование установлено
+                if (Form1.loggingOn)
 
-                    Console.WriteLine($"\tДля прибора {device} время активности {activity_time} и надёжность {this.CalcReliabilityByDevice(activity_time, device):0.000}");
+                    // Выводим информацию
+                    WriteToLogFile($"\tДля прибора {device} время активности {activity_time} и надёжность {this.CalcReliabilityByDevice(activity_time, device):0.000}{Environment.NewLine}");
                 
                 // Если прибор не был активным
                 if (activity_time == 0)
@@ -1706,12 +1960,17 @@ namespace magisterDiplom.Fabric
         private bool IsConstraint_JobCount(List<List<int>> matrixA)
         {
 
+            // Если установлено логирование и объект для записи существует
+            if (Form1.loggingOn)
+
+                // Записываем данные в файл
+                WriteToLogFile($"Проверяем ограничение 15;{Environment.NewLine}");
+
             // Объявляем количество заданий для текущего расписания
             int cur_jobCount = 0;
 
             // Объявляем необходимое количество заданий 
             int tar_jobCount = 0;
-
 
             // Для каждого пакета подсчитываем количество заданий
             for (int batch = 0; batch < this.schedule.Count; batch++)
@@ -1738,6 +1997,7 @@ namespace magisterDiplom.Fabric
         // ВЫРАЖЕНИЕ 17 = 11
 
         // ВЫРАЖЕНИЕ 18
+        
         /// <summary>
         /// Возвращаем результат расчёта ограничения на общую надёжность
         /// </summary>
@@ -1745,15 +2005,28 @@ namespace magisterDiplom.Fabric
         /// <returns>true, если ограничение выполняется. Иначе false</returns>
         private bool IsConstraint_CalcSysReliability(int time)
         {
+
+            // Если установлено логирование и объект для записи существует
+            if (Form1.loggingOn)
+
+                // Записываем данные в файл
+                WriteToLogFile($"Проверяем ограничение 16 для момента времени {time};{Environment.NewLine}");
+
             double sysTime = this.CalcSysReliability(time);
-            if (IsDebug && IsDebug_CalcSysReliability)
-                Console.WriteLine($"Системная надёжность {sysTime:0.000} >= {preMConfig.beta:0.000}?");
+
+            // Если логирование установлено
+            if (Form1.loggingOn)
+
+                // Выводим информацию
+                WriteToLogFile($"Системная надёжность {sysTime:0.000} >= {preMConfig.beta:0.000}?{Environment.NewLine}");
+
             return (sysTime >= preMConfig.beta);
         }
 
         // ВЫРАЖЕНИЕ 19 ИЗБЫТОЧНО
 
         // ВЫРАЖЕНИЕ 20 
+        
         /// <summary>
         /// Возвращает индекс последнего ПЗ после которого выполняется ПТО до заданного времени
         /// </summary>
@@ -1762,6 +2035,13 @@ namespace magisterDiplom.Fabric
         /// <returns>Индекс ПЗ после которого будет выполняться последнее ПТО</returns>
         private int GetBatchIndex(int device, int time)
         {
+            
+            // Если установлено логирование и объект для записи существует
+            if (Form1.loggingOn)
+
+                // Записываем данные в файл
+                WriteToLogFile($"Вычисляем индекс последнего ПЗ для прибора {device} для момента времени {time};{Environment.NewLine}");
+
             // Если список пустой
             if (matrixTPM[device].Count == 0)
 
@@ -1810,6 +2090,7 @@ namespace magisterDiplom.Fabric
         // ВЫРАЖЕНИЕ 22 ИЗБЫТОЧНО
 
         // ВЫРАЖЕНИЕ 23
+        
         /// <summary>
         /// Возвращает результат совпадения количества пакетов заданий
         /// </summary>
@@ -1817,6 +2098,12 @@ namespace magisterDiplom.Fabric
         /// <returns>Если количество пакетов заданий совпадают - true, иначе false</returns>
         private bool IsConstraint_BatchCount(List<List<int>> matrixA)
         {
+
+            // Если установлено логирование и объект для записи существует
+            if (Form1.loggingOn)
+
+                // Записываем данные в файл
+                WriteToLogFile($"Проверяем ограничение 21;{Environment.NewLine}");
 
             // Объявляем количество пакетов заданий
             int cur_batchCount = this.schedule.Count;
@@ -1841,6 +2128,12 @@ namespace magisterDiplom.Fabric
         /// <returns>Если пакет на позицию 1, то true. Иначе false</returns>
         private bool IsConstraint_OneBatchOnPos()
         {
+            // Если установлено логирование и объект для записи существует
+            if (Form1.loggingOn)
+
+                // Записываем данные в файл
+                WriteToLogFile($"Проверяем ограничение 24;{Environment.NewLine}");
+
             // Существующая реализация расписания обязывает иметь один пакет на позицию
             return true;
         }
@@ -1853,6 +2146,12 @@ namespace magisterDiplom.Fabric
         /// <returns>Если количество пакетов заданий по типам совпадают - true, иначе false</returns>
         private bool IsConstraint_BatchCountByType(List<List<int>> matrixA)
         {
+
+            // Если установлено логирование и объект для записи существует
+            if (Form1.loggingOn)
+
+                // Записываем данные в файл
+                WriteToLogFile($"Проверяем ограничение 25;{Environment.NewLine}");
 
             // Объявляем количество пакетов заданий
             int cur_batchCountByType;
@@ -1944,10 +2243,16 @@ namespace magisterDiplom.Fabric
                 res.Add(new List<int>(matrixTPM[device].Count));
 
                 // Для каждого элемента матрицы matrixTPM
-                for (int batchIndex = 0; batchIndex < matrixTPM.Count; batchIndex++)
+                for (int batchIndex = 0; batchIndex < schedule.Count; batchIndex++)
 
+                    // Устанавливаем в 0
+                    res[device].Add(0);
+
+                // Для каждого элемента матрицы matrixTPM
+                for (int batchIndex = 0; batchIndex < matrixTPM[device].Count; batchIndex++)
+                    
                     // Инициализируем столбцы матрицы
-                    res[device].Add(matrixTPM[device][batchIndex].TimePreM);
+                    res[device][matrixTPM[device][batchIndex].BatchIndex] = matrixTPM[device][batchIndex].TimePreM;
             }
 
             // Возвращаем результат

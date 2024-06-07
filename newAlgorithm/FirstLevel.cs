@@ -80,6 +80,16 @@ namespace newAlgorithm
         private int displayColumnNumber;
 
         /// <summary>
+        /// Номер строки для отображения данных в спомогательной вкладке
+        /// </summary>
+        private int helpRowNumber;
+
+        /// <summary>
+        /// Строка с именем файла для логирования
+        /// </summary>
+        private string logFileNamePrefix;
+
+        /// <summary>
         /// Объект для работы с Excel
         /// </summary>
         private Excel.Application excelApplication;
@@ -366,6 +376,13 @@ namespace newAlgorithm
             }
             else
             {
+                // Если флаг логгирования установлен
+                if (Form1.loggingOn)
+
+                    // Задаём новое имя файла для записи
+                    schedule.SetLogFile($"{logFileNamePrefix}_{compositionNumber}.log");
+
+                // Если построение расписание прошло успешно
                 if (schedule.Build(tempM))
                 {
 
@@ -547,7 +564,7 @@ namespace newAlgorithm
         /// <param name="worksheet">Закладка отображения</param>
         /// <param name="row">Номер строки начала отрисовки</param>
         /// <param name="col">Номер столбца начала отрисовки</param>
-        private void visualizeConfig(Excel.Worksheet worksheet, int row = 0, int col = 0)
+        private void visualizeConfig(Worksheet worksheet, int row = 0, int col = 0)
         {
 
             // Объявляем диапазон
@@ -648,13 +665,13 @@ namespace newAlgorithm
         /// <param name="preMConfig">Параметры характеризующие ПТО</param>
         /// <param name="row">Номер строки начала отрисовки</param>
         /// <param name="col">Номер столбца начала отрисовки</param>
-        private void visualizeConfig(Excel.Worksheet worksheet, PreMConfig preMConfig, int row = 0, int col = 0)
+        private void visualizeConfig(Worksheet worksheet, PreMConfig preMConfig, int row = 0, int col = 0)
         {
             // Изменяем название закладки
             worksheet.Name = "Начальные параметры";
 
             // Объявляем диапазон
-            Excel.Range r = null;
+            Range r = null;
 
             // Выводим количество типов данных
             {
@@ -832,13 +849,20 @@ namespace newAlgorithm
         /// <param name="preMSchedule">Абстрактный класс расписания с ПТО</param>
         /// <param name="row">Номер строки начала отрисовки</param>
         /// <param name="col">Номер столбца начала отрисовки</param>
-        private void visualizeData(Excel.Worksheet worksheet, List<List<int>> matrixA, PreMSchedule preMSchedule, int row = 1, int col = 1)
+        private void visualizeData(Worksheet worksheet, List<List<int>> matrixA, PreMSchedule preMSchedule, int row = 1, int col = 1)
         {
+
+            // Объявим и инициализируем строку
+            int startRow = row;
+
+            // Объявляем максимальное количество заданий
+            int maxJobCount = 0;
 
             // Объявляем диапазон
             Excel.Range r = null;
 
             int maxBatchCount = 0;
+            int batchSize = 0;
 
             // Отображаем вектор А
             {
@@ -855,14 +879,19 @@ namespace newAlgorithm
                 worksheet.Cells[row, col].Font.Bold = true;
                 worksheet.Cells[row, col].HorizontalAlignment = Excel.XlHAlign.xlHAlignCenter;
                 worksheet.Cells[row + 1, col + 1] = "Рамзер ПЗ";
+                worksheet.Cells[row + 1, col + 1].Columns.AutoFit();
 
                 // Выводим таблицу
                 for (int dataType = 0; dataType < config.dataTypesCount; dataType++) {
                     worksheet.Cells[row + dataType + 2, col] = $"Тип {dataType + 1}";
                     worksheet.Cells[row + dataType + 2, col + 1] = $"{matrixA[dataType].Count}";
                     
+                    for (int batchIndex = 0; batchIndex < matrixA[dataType].Count; batchIndex++)
+                        maxJobCount = Math.Max(maxJobCount, matrixA[dataType][batchIndex]);
+                    
                     // Определяем количество пакетов заданий
                     maxBatchCount = Math.Max(maxBatchCount, matrixA[dataType].Count);
+                    batchSize += matrixA[dataType].Count;
                 }
 
                 // Обводим границы
@@ -904,12 +933,180 @@ namespace newAlgorithm
                 // Устанавливаем следующий стобец
                 col += maxBatchCount + 2;
             }
-            
-            worksheet.Cells[row, col] = "T^0l";
-            row++;
-            worksheet.Cells[row, col] = "Y";
-            row++;
-            worksheet.Cells[row, col] = "T^pm";
+
+            // Отображаем матрицу P
+            {
+                // Получаем матрицу P
+                List<List<int>> matrixP = preMSchedule.GetMatrixP();
+
+                // Объединяем несколько ячеек для заголовка
+                r = worksheet.Range[worksheet.Cells[row, col], worksheet.Cells[row, col + batchSize]];
+                r.Merge(true);
+
+                // Выводим заголовок таблицы
+                worksheet.Cells[row, col] = "Матрица P";
+                worksheet.Cells[row, col].Font.Bold = true;
+                worksheet.Cells[row, col].HorizontalAlignment = Excel.XlHAlign.xlHAlignCenter;
+
+                // Устанавливаем автовыравнивание
+                r.Columns.AutoFit();
+
+                for (int dataType = 0; dataType < matrixP.Count; dataType++)
+                    worksheet.Cells[row + dataType + 2, col] = $"Тип {dataType + 1}";
+                for (int batchIndex = 0; batchIndex < matrixP[0].Count; batchIndex++)
+                    worksheet.Cells[row + 1, col + batchIndex + 1] = $"ПЗ {batchIndex + 1}";
+                for (int dataType = 0; dataType < matrixP.Count; dataType++)
+                    for (int batchIndex = 0; batchIndex < matrixP[0].Count; batchIndex++)
+                        worksheet.Cells[row + dataType + 2, col + batchIndex + 1] = $"{matrixP[dataType][batchIndex]}";
+
+                // Обводим границы
+                r = worksheet.Range[worksheet.Cells[row, col], worksheet.Cells[row + config.dataTypesCount + 1, col + matrixP[0].Count]];
+                r.Borders.LineStyle = XlLineStyle.xlContinuous;
+                r.Borders.Weight = XlBorderWeight.xlThin;
+
+                // Устанавливаем следующий стобец
+                row += matrixP[0].Count + 2;
+            }
+
+            // Отображаем матрицу R
+            {
+                // Получаем матрицу R
+                List<List<int>> matrixR = preMSchedule.GetMatrixR();
+
+                // Объединяем несколько ячеек для заголовка
+                r = worksheet.Range[worksheet.Cells[row, col], worksheet.Cells[row, col + batchSize]];
+                r.Merge(true);
+
+                // Выводим заголовок таблицы
+                worksheet.Cells[row, col] = "Матрица R";
+                worksheet.Cells[row, col].Font.Bold = true;
+                worksheet.Cells[row, col].HorizontalAlignment = Excel.XlHAlign.xlHAlignCenter;
+
+                // Устанавливаем автовыравнивание
+                r.Columns.AutoFit();
+
+                for (int dataType = 0; dataType < matrixR.Count; dataType++)
+                    worksheet.Cells[row + dataType + 2, col] = $"Тип {dataType + 1}";
+                for (int batchIndex = 0; batchIndex < matrixR[0].Count; batchIndex++)
+                    worksheet.Cells[row + 1, col + batchIndex + 1] = $"ПЗ {batchIndex + 1}";
+                for (int dataType = 0; dataType < matrixR.Count; dataType++)
+                    for (int batchIndex = 0; batchIndex < matrixR[0].Count; batchIndex++)
+                        worksheet.Cells[row + dataType + 2, col + batchIndex + 1] = $"{matrixR[dataType][batchIndex]}";
+
+                // Обводим границы
+                r = worksheet.Range[worksheet.Cells[row, col], worksheet.Cells[row + config.dataTypesCount + 1, col + matrixR[0].Count]];
+                r.Borders.LineStyle = XlLineStyle.xlContinuous;
+                r.Borders.Weight = XlBorderWeight.xlThin;
+
+                // Устанавливаем следующий стобец
+                row += matrixR[0].Count + 2;
+            }
+
+            // Отображаем матрицу Y
+            {
+
+                // Получаем матрицу Y
+                List<List<int>> matrixY = preMSchedule.GetMatrixY();
+
+                // Объединяем несколько ячеек для заголовка
+                r = worksheet.Range[worksheet.Cells[row, col], worksheet.Cells[row, col + batchSize]];
+                r.Merge(true);
+
+                // Выводим заголовок таблицы
+                worksheet.Cells[row, col] = "Матрица Y";
+                worksheet.Cells[row, col].Font.Bold = true;
+                worksheet.Cells[row, col].HorizontalAlignment = Excel.XlHAlign.xlHAlignCenter;
+
+                // Устанавливаем автовыравнивание
+                r.Columns.AutoFit();
+
+                for (int dataType = 0; dataType < matrixY.Count; dataType++)
+                    worksheet.Cells[row + dataType + 2, col] = $"Тип {dataType + 1}";
+                for (int batchIndex = 0; batchIndex < matrixY[0].Count; batchIndex++)
+                    worksheet.Cells[row + 1, col + batchIndex + 1] = $"ПЗ {batchIndex + 1}";
+                for (int dataType = 0; dataType < matrixY.Count; dataType++)
+                    for (int batchIndex = 0; batchIndex < matrixY[0].Count; batchIndex++)
+                        worksheet.Cells[row + dataType + 2, col + batchIndex + 1] = $"{matrixY[dataType][batchIndex]}";
+
+                // Обводим границы
+                r = worksheet.Range[worksheet.Cells[row, col], worksheet.Cells[row + matrixY.Count + 1, col + matrixY[0].Count]];
+                r.Borders.LineStyle = XlLineStyle.xlContinuous;
+                r.Borders.Weight = XlBorderWeight.xlThin;
+
+                // Устанавливаем следующий стобец
+                row += matrixY.Count + 3;
+            }
+
+            // Отображаем матрицу T^0l
+            {
+
+                // Получаем матрицу T^0l
+                Dictionary<int, List<List<int>>> startProcessing = preMSchedule.GetStartProcessing();
+                for (int device = 0; device < config.deviceCount; device++)
+                {
+                    // Объединяем несколько ячеек для заголовка
+                    r = worksheet.Range[worksheet.Cells[row, col], worksheet.Cells[row, col + maxJobCount]];
+                    r.Merge(true);
+
+                    // Устанавливаем автовыравнивание
+                    r.Columns.AutoFit();
+
+                    // Заголовок
+                    worksheet.Cells[row, col] = $"Матрица для прибора {device + 1}";
+                    worksheet.Cells[row, col].Font.Bold = true;
+                    worksheet.Cells[row, col].HorizontalAlignment = Excel.XlHAlign.xlHAlignCenter;
+                    for (int batchIndex = 0; batchIndex < startProcessing[device].Count(); batchIndex++)
+                        worksheet.Cells[row + batchIndex + 2, col] = $"ПЗ {batchIndex+ 1}";
+                    worksheet.Cells[row + 1, col] = "Задание:";
+                    for (int job = 0; job < maxJobCount; job++)
+                        worksheet.Cells[row + 1, col + job + 1] = job + 1;
+                    for (int batchIndex = 0; batchIndex < startProcessing[device].Count(); batchIndex++)
+                        for (int job = 0; job < startProcessing[device][batchIndex].Count; job++)
+                            worksheet.Cells[row + batchIndex + 2, col + job + 1] = startProcessing[device][batchIndex][job];
+
+                    // Обводим границы
+                    r = worksheet.Range[worksheet.Cells[row, col], worksheet.Cells[row + startProcessing[device].Count() + 1, col + maxJobCount]];
+                    r.Borders.LineStyle = XlLineStyle.xlContinuous;
+                    r.Borders.Weight = XlBorderWeight.xlThin;
+
+                    row += startProcessing[device].Count() + 3;
+                }
+            }
+
+            // Отображаем матрицу T^pm
+            {
+
+                // Получаем матрицу TPM
+                List<List<int>> matrixTPM = preMSchedule.GetMatrixTPM();
+
+                // Объединяем несколько ячеек для заголовка
+                r = worksheet.Range[worksheet.Cells[row, col], worksheet.Cells[row, col + batchSize]];
+                r.Merge(true);
+
+                // Выводим заголовок таблицы
+                worksheet.Cells[row, col] = "Матрица TPM";
+                worksheet.Cells[row, col].Font.Bold = true;
+                worksheet.Cells[row, col].HorizontalAlignment = Excel.XlHAlign.xlHAlignCenter;
+
+                // Устанавливаем автовыравнивание
+                r.Columns.AutoFit();
+
+                for (int dataType = 0; dataType < matrixTPM.Count; dataType++)
+                    worksheet.Cells[row + dataType + 2, col] = $"Тип {dataType + 1}";
+                for (int batchIndex = 0; batchIndex < matrixTPM[0].Count; batchIndex++)
+                    worksheet.Cells[row + 1, col + batchIndex + 1] = $"ПЗ {batchIndex + 1}";
+                for (int dataType = 0; dataType < matrixTPM.Count; dataType++)
+                    for (int batchIndex = 0; batchIndex < matrixTPM[0].Count; batchIndex++)
+                        worksheet.Cells[row + dataType + 2, col + batchIndex + 1] = $"{matrixTPM[dataType][batchIndex]}";
+
+                // Обводим границы
+                r = worksheet.Range[worksheet.Cells[row, col], worksheet.Cells[row + matrixTPM.Count + 1, col + matrixTPM[0].Count]];
+                r.Borders.LineStyle = XlLineStyle.xlContinuous;
+                r.Borders.Weight = XlBorderWeight.xlThin;
+
+                // Устанавливаем следующий стобец
+                row += matrixTPM[0].Count + 2;
+            }
         }
 
         /// <summary>
@@ -917,6 +1114,9 @@ namespace newAlgorithm
         /// </summary>
         public void GenetateSolutionWithPremaintenance(string fileName, PreMConfig preMConfig)
         {
+
+            // Формируем имя файла
+            logFileNamePrefix = $"{DateTime.Now.Day}_{DateTime.Now.Month}_{DateTime.Now.Year}_{DateTime.Now.Hour}_{DateTime.Now.Minute}";
 
             // Инициализируем значения
             compositionNumber = 1;
@@ -983,6 +1183,12 @@ namespace newAlgorithm
                 {
                     GenerateFixedBatchesSolution();
 
+                    // Если флаг логгирования установлен
+                    if (Form1.loggingOn)
+
+                        // Задаём новое имя файла для записи
+                        schedule.SetLogFile($"{logFileNamePrefix}_{compositionNumber}.log");
+
                     // Если построение расписание выполнено удачно
                     if (schedule.Build(PrimeMatrixA))
                     {
@@ -1017,6 +1223,12 @@ namespace newAlgorithm
                 
                 // Генерируем начальное решение
                 GenerateStartSolution();
+
+                // Если флаг логгирования установлен
+                if (Form1.loggingOn)
+
+                    // Задаём новое имя файла для записи
+                    schedule.SetLogFile($"{logFileNamePrefix}_{compositionNumber}.log");
 
                 // Вызываем расчёты
                 if (schedule.Build(PrimeMatrixA)) {
@@ -1141,6 +1353,12 @@ namespace newAlgorithm
                             for (var batchIndex = 0; batchIndex < _a2[dataType].Count; batchIndex++)
                             {
                                 tempA = SetTempAFromA2(dataType, batchIndex);
+
+                                // Если флаг логгирования установлен
+                                if (Form1.loggingOn)
+
+                                    // Задаём новое имя файла для записи
+                                    schedule.SetLogFile($"{logFileNamePrefix}_{compositionNumber}.log");
 
                                 // Если расписание построилось не успешно
                                 if (!schedule.Build(tempA))
