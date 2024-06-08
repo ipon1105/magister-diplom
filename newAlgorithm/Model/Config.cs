@@ -177,6 +177,11 @@ namespace magisterDiplom.Model
         public readonly static bool isDebug = true;
 
         /// <summary>
+        /// Устанавливаем количество заданий для каждого типа данных
+        /// </summary>
+        public readonly int batchCount;
+
+        /// <summary>
         /// Данная переменная определяет являются ли партии фиксированными
         /// </summary>
         public readonly bool isFixedBatches;
@@ -228,13 +233,17 @@ namespace magisterDiplom.Model
             int buffer,
             List<List<int>> proccessingTime,
             Dictionary<int, List<List<int>>> changeoverTime,
-            bool isFixedBatches
-            )
-        {
+            bool isFixedBatches,
+            int batchCount = 12
+        ) {
 
             // Если количество типов данных меньше или равно 0
             if (dataTypesCount <= 0)
                 throw new ArgumentException("The value in dataTypesCount cannot be less or equal than 0");
+
+            // Если количество заданий для каждого типа данных меньше или равно 2
+            if (batchCount <= 2)
+                throw new ArgumentException("The value in batchCount cannot be less or equal than 2");
 
             // Если количество приборов меньше или равно 0
             if (deviceCount <= 0)
@@ -307,6 +316,7 @@ namespace magisterDiplom.Model
             this.proccessingTime = proccessingTime;
             this.changeoverTime = changeoverTime;
             this.isFixedBatches = isFixedBatches;
+            this.batchCount = batchCount;
         }
 
         /// <summary>

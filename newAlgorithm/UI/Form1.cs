@@ -1,5 +1,4 @@
-﻿using Json.Net;
-using magisterDiplom;
+﻿using magisterDiplom;
 using magisterDiplom.Model;
 using magisterDiplom.Utils;
 using System;
@@ -7,14 +6,14 @@ using System.Collections.Generic;
 using System.Data;
 using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices.ComTypes;
 using System.Text;
 using System.Windows.Forms;
-using System.Xml;
-using static System.Net.Mime.MediaTypeNames;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace newAlgorithm
 {
+
     public partial class Form1 : Form
     {
 
@@ -31,19 +30,9 @@ namespace newAlgorithm
         int batchCount;
 
         /// <summary>
-        /// Данная переменная определяет количество типов данных
-        /// </summary>
-        int dataTypesCount;
-
-        /// <summary>
         /// Данная переменная определяет размер буфера перед приборами
         /// </summary>
         int buffer;
-
-        /// <summary>
-        /// Данная переменная определяет длину конвейера, как количество приборов
-        /// </summary>
-        int deviceCount;
 
         /// <summary>
         /// Данная переменная определяет значения для генерации рандомных данных
@@ -61,11 +50,6 @@ namespace newAlgorithm
         bool isOptimization;
 
         /// <summary>
-        /// Данная переменная определяет необходимость обновления данных при переходах на вкладку "Установка времени"
-        /// </summary>
-        private bool isValueChagedToUpdate;
-
-        /// <summary>
         /// TODO: Написать описание
         /// </summary>
         int generationCount;
@@ -74,36 +58,6 @@ namespace newAlgorithm
         /// Данная переменная определяет размер списка из хромосом
         /// </summary>
         int xromossomiSize;
-
-        /// <summary>
-        /// Данная переменная представляет из 3-мерную матрицу и используется, как матрица переналадки приборов с одного
-        /// типа задания на другой. Первое измерение определяется, как количество приборов на конвейере. Второе и третье
-        /// измерения это количество типов данных. Таким образом changeoverTime = [deviceCount x dataTypesCount x dataTypesCount]
-        /// </summary>
-        List<List<List<int>>> changeoverTime = new List<List<List<int>>>();
-
-        /// <summary>
-        /// Данная переменная представляет из себя двумрную матрицу и используется, как матрица времени выполнения заданий.
-        /// Первое измерение представляет определяется, как количество приборов на конвейере. Второе измерения это количество
-        /// типов данных. Таким образом proccessingTime = [deviceCount x dataTypesCount]
-        /// </summary>ы
-        List<List<int>> proccessingTime = new List<List<int>>();
-
-        /// <summary>
-        /// Данная переменная содержим в себе список из времён вермени выполнения ПТО для соответсвующего прибора.
-        /// preMaintenanceTimes = [deviceCount]
-        /// </summary>
-        List<int> preMaintenanceTimes;
-
-        /// <summary>
-        /// Данный список определяет интенсивность отказов для приборов соответсвенно: [deviceCount]
-        /// </summary>
-        List<double> failureRates;
-
-        /// <summary>
-        /// Данный список определяет востановление прибора соответсвенно: [deviceCount]
-        /// </summary>
-        List<double> restoringDevice;
 
         /// <summary>
         /// Переменная сообщает программе о необходимости визуализации процесса с помощью Excel
@@ -161,20 +115,13 @@ namespace newAlgorithm
             // Инициализируем вектор длиной dataTypesCount, каждый элемент которого будет равен batchCount
             List<int> batchCountList = CreateBatchCountList();
 
-            // Инициализируем расписание
-            Shedule.deviceCount = deviceCount;
-            Shedule.changeoverTime = changeoverTime;
-            Shedule.proccessingTime = proccessingTime;
-
             // Создаём экземпляр конфигурационной структуры
-            Config config = new Config(
-                dataTypesCount,
-                deviceCount,
-                buffer,
-                proccessingTime,
-                Config.ChangeoverTimeConverter(changeoverTime),
-                isFixedBatches
-            );
+            Config config = GetConfig();
+
+            // Инициализируем расписание
+            Shedule.deviceCount = config.deviceCount;
+            Shedule.proccessingTime = config.proccessingTime;
+            Shedule.changeoverTime = GetChangeoverTimeList();
 
             // Формируем первый уровень
             var firstLevel = new FirstLevel(config, batchCountList);
@@ -196,22 +143,14 @@ namespace newAlgorithm
 
             // Инициализируем вектор длиной dataTypesCount, каждый элемент которого будет равен batchCount
             List<int> batchCountList = CreateBatchCountList();
-            
-            // Инициализируем расписание
-            Shedule.deviceCount = deviceCount;
-            Shedule.changeoverTime = changeoverTime;
-            Shedule.proccessingTime = proccessingTime;
 
             // Создаём экземпляр конфигурационной структуры
-            // TODO: Создать отдельный конфиг для задачи с ПТО
-            Config config = new Config(
-                dataTypesCount,
-                deviceCount,
-                buffer,
-                proccessingTime,
-                Config.ChangeoverTimeConverter(changeoverTime),
-                isFixedBatches
-            );
+            Config config = GetConfig();
+
+            // Инициализируем расписание
+            Shedule.deviceCount = config.deviceCount;
+            Shedule.proccessingTime = config.proccessingTime;
+            Shedule.changeoverTime = GetChangeoverTimeList();
 
             // Формируем первый уровень
             var firstLevel = new FirstLevel(config, batchCountList);
@@ -228,13 +167,19 @@ namespace newAlgorithm
         private void OldSecondLevelAll_Click(object sender, EventArgs e)
         {
 
+            // Объявляем и инициализируем количество типов данных
+            int DataType = Convert.ToInt32(numeric_data_types_count.Value);
+
+            // Объявляем и инициализируем количество приборов
+            int Device = Convert.ToInt32(numeric_device_count.Value);
+
             // Выполняем перестроение матриц
             TablesRebuild();
 
             // Формируем вектор из значений { 2, 4, 8, 16, 32 }, для генерации матриц выполнения и переналадки
             int[] array = { 2, 4, 8, 16, 32 };
 
-            using (var file = new StreamWriter("Га, оптимизации групп " + isOptimization + " N=" + dataTypesCount + "L=" + deviceCount + ".txt", false))
+            using (var file = new StreamWriter("Га, оптимизации групп " + isOptimization + " N=" + DataType + "L=" + Device + ".txt", false))
             {
 
                 // Перебираем каждой элемент вектора, как время переналадки приборов
@@ -253,22 +198,15 @@ namespace newAlgorithm
                                 List<int> batchCountList = CreateBatchCountList();
 
                                 // Выполняем настройку расписания
-                                Shedule.deviceCount = deviceCount;
-                                Shedule.changeoverTime = OldChangeoverTimeGenerator(_maxChangeoverTime, deviceCount, dataTypesCount);
-                                Shedule.proccessingTime = OldProccessingTimeGenerator(_maxProccessingTime, deviceCount, dataTypesCount);
+                                Shedule.deviceCount = Device;
+                                Shedule.changeoverTime = OldChangeoverTimeGenerator(_maxChangeoverTime, Device, DataType);
+                                Shedule.proccessingTime = OldProccessingTimeGenerator(_maxProccessingTime, Device, DataType);
 
                                 // Создаём экземпляр конфигурационной структуры
-                                Config config = new Config(
-                                    dataTypesCount,
-                                    deviceCount,
-                                    buffer,
-                                    OldProccessingTimeGenerator(_maxProccessingTime, deviceCount, dataTypesCount),
-                                    Config.ChangeoverTimeConverter(OldChangeoverTimeGenerator(_maxChangeoverTime, deviceCount, dataTypesCount)),
-                                    isFixedBatches
-                                );
+                                Config config = GetConfig();
 
                                 // Создаём экземпляр класса GAA
-                                var gaa = new GAA(dataTypesCount, batchCountList, isFixedBatches, batchCount);
+                                var gaa = new GAA(DataType, batchCountList, isFixedBatches, batchCount);
 
                                 // Определяем количество хромосом в списке из хромосом
                                 gaa.SetXrom(xromossomiSize);
@@ -306,13 +244,19 @@ namespace newAlgorithm
         private void OldSecondLevelButton_Click(object sender, EventArgs e)
         {
 
+            // Объявляем и инициализируем количество типов данных
+            int DataType = Convert.ToInt32(numeric_data_types_count.Value);
+
+            // Объявляем и инициализируем количество приборов
+            int Device = Convert.ToInt32(numeric_device_count.Value);
+
             // Выполняем перестроение матриц
             TablesRebuild();
 
             // Формируем вектор из значений { 2, 4, 8, 16, 32 }, для генерации матриц выполнения и переналадки
             var array = new[] { 2, 4, 8, 16, 32 };
 
-            using (var file = new StreamWriter("Фиксированные партии - " + isFixedBatches + ", оптимизации групп " + isOptimization + " N=" + dataTypesCount + " L=" + deviceCount + ".txt", false))
+            using (var file = new StreamWriter("Фиксированные партии - " + isFixedBatches + ", оптимизации групп " + isOptimization + " N=" + DataType + " L=" + Device + ".txt", false))
             {
 
                 // Перебираем каждой элемент вектора, как время переналадки приборов
@@ -331,19 +275,12 @@ namespace newAlgorithm
                                 List<int> batchCountList = CreateBatchCountList();
 
                                 // Формируем расписание
-                                Shedule.deviceCount = deviceCount;
-                                Shedule.changeoverTime = OldChangeoverTimeGenerator(_maxChangeoverTime, deviceCount, dataTypesCount);
-                                Shedule.proccessingTime = OldProccessingTimeGenerator(_maxProccessingTime, deviceCount, dataTypesCount);
+                                Shedule.deviceCount = Device;
+                                Shedule.changeoverTime = OldChangeoverTimeGenerator(_maxChangeoverTime, Device, DataType);
+                                Shedule.proccessingTime = OldProccessingTimeGenerator(_maxProccessingTime, Device, DataType);
 
                                 // Создаём экземпляр конфигурационной структуры
-                                Config config = new Config(
-                                    dataTypesCount,
-                                    deviceCount,
-                                    buffer,
-                                    OldProccessingTimeGenerator(_maxProccessingTime, deviceCount, dataTypesCount),
-                                    Config.ChangeoverTimeConverter(OldChangeoverTimeGenerator(_maxChangeoverTime, deviceCount, dataTypesCount)),
-                                    isFixedBatches
-                                );
+                                Config config = GetConfig();
 
                                 // Формируем первый уровень
                                 var firstLevel = new FirstLevel(config, batchCountList);
@@ -813,34 +750,16 @@ namespace newAlgorithm
         /// <summary>
         /// Данная функция выполняет перестроение таблиц
         /// </summary>
-        private void TablesRebuild()
-        {
+        private void TablesRebuild() {
 
-            // Определяем необходимость переопределения данных таблиц
-            if (!isValueChagedToUpdate)
-                return;
-
-            // Отчищаем внутреннии таблицы
-            changeoverTime.Clear();
-            proccessingTime.Clear();
-
-            // Выполняем инициализацию графических таблиц
-            InitDataGridView();
-
-            // Выполняем инициализацию внутренних таблиц
-            InitTables();
-
-            // Выполяем рандомизацию для таблицы времени обработки
+            // Устанавливаем рандомные значения времени выполнения
             RandomizeProcessingTime_Click();
 
-            // Выполняем рандомизацию для таблицы времени переналадки приборов
+            // Устанавливаем рандомные значения времени переналдки
             RandomizeChangeoverTime_Click();
 
-            // Выполняем рандомизацию для таблицы времени ПТО
+            // Устанавливаем рандомные значения времени ПТО
             RandomizePreMaintenanceTime_Click();
-
-            // Сбрасываем необходимость переопределения данных таблиц
-            isValueChagedToUpdate = false;
         }
 
         /// <summary>
@@ -848,34 +767,7 @@ namespace newAlgorithm
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void TabControl_time_setup_Selecting(object sender, TabControlCancelEventArgs e)
-        {
-            // TODO: БАГ. Проблема вызова. При переопределении переменных не переопределяются матрицы
-            // Вычисляем выбранную вкладку
-            switch (e.TabPageIndex)
-            {
-
-                // Вкладка "Установка времени"
-                case 0:
-
-                    // При переключении на данную вкладку считываем новые данные с таблиц
-                    GetTime();
-                    break;
-
-                // Вкладка "Установка параметров"
-                case 1:
-
-                    // При переключении на данную вкладку в случае изменений параметров таблицы выполняем обработку
-                    TablesRebuild();
-
-                    break;
-
-                // Невозможный случай
-                default:
-                    MessageBox.Show("Шойтан, как ты суда попал?");
-                    break;
-            }
-        }
+        private void TabControl_time_setup_Selecting(object sender, TabControlCancelEventArgs e) { }
 
         /// <summary>
         /// Данная функция выполняет рандомизацию таблицы слева (таблица времени обработки)
@@ -884,41 +776,42 @@ namespace newAlgorithm
         /// <param name="e"></param>
         private void RandomizeProcessingTime_Click(object sender = null, EventArgs e = null)
         {
-            // Формируем рандомайзер на основе введённого значение
-            // Random rand = new Random(randomValue);
 
-            // Формируем второе рандомное значение, как половина от введённого
-            // TODO: Выполнить инициализацию второй переменной с введённого числа с View.
+            // Объявляем и инициализируем количество приборов
+            int Device = Convert.ToInt32(numeric_device_count.Value);
+
+            // Объявляем и инициализируем количество приборов
+            int DataType = Convert.ToInt32(numeric_data_types_count.Value);
+
+            // Объявляем и инциализируем рандомные значения
             int _randomValue = randomValue / 2;
 
-            // Для каждого прибора (проходимся по всем строкам таблицы dataGridView_proccessing_time)
-            for (int device = 0; device < dataGridView_proccessing_time.RowCount; device++)
-            {
+            // Объявляем матрицу времени выполнения
+            List<List<int>> processingTime = new List<List<int>>(Device);
+            
+            // Для каждого прибора
+            for (int device = 0; device < Device; device++) {
 
-                // Выполняем наименование строки
-                dataGridView_proccessing_time.Rows[device].HeaderCell.Value = string.Format("Device {0}", device);
+                // Добавляем новую строку
+                processingTime.Add(new List<int>(DataType));
 
                 // Чередуем два рандомных значения _randomValue и randomValue с каждой новой строкой
                 int value = (device % 2 == 0) ? _randomValue : randomValue;
 
-                // Для каждого типа данных (проходися по всем столбцам таблица dataGridView_proccessing_time)
-                for (int dataType = 0; dataType < dataGridView_proccessing_time.ColumnCount; dataType++)
-                {
-
-                    // Выполняем наименование строки
-                    dataGridView_proccessing_time.Columns[dataType].HeaderCell.Value = string.Format("Type {0}", dataType);
+                // Для каждого типа данных
+                for (int dataType = 0; dataType < DataType; dataType++) {
 
 
                     // Чередуем два рандомных значения _randomValue и randomValue с каждой новой колонкой
                     value = (value == _randomValue) ? randomValue : _randomValue;
 
-                    // Присваиваем новое рандомное значение в таблице dataGridView_proccessing_time
-                    dataGridView_proccessing_time.Rows[device].Cells[dataType].Value = value;
+                    // Добавляем новое значение
+                    processingTime[device].Add(value);
                 }
             }
 
-            // Сохраняем сгенерированные данные
-            GetTime();
+            // Устанавливаем матрицу времени выполнения
+            SetProcessingTime(processingTime);
         }
 
         /// <summary>
@@ -928,40 +821,45 @@ namespace newAlgorithm
         /// <param name="e"></param>
         private void RandomizeChangeoverTime_Click(object sender = null, EventArgs e = null)
         {
-            // Формируем рандомайзер на основе введённого значение
-            // Random rand = new Random(randomValue);
 
-            // Формируем второе рандомное значение, как половина от введённого
+            // Объявляем и инициализируем количество приборов
+            int Device = Convert.ToInt32(numeric_device_count.Value);
+
+            // Объявляем и инициализируем количество приборов
+            int DataType = Convert.ToInt32(numeric_data_types_count.Value);
+
+            // Объявляем и инциализируем рандомные значения
             int _randomValue = randomValue / 2;
 
+            // Объявляем матрицу времени выполнения
+            List<List<List<int>>> changeoverTime = new List<List<List<int>>>(Device);
+
             // Для каждого устройства
-            for (int device = 0; device < deviceCount; device++)
+            for (int device = 0; device < Device; device++)
             {
 
-                // Для каждого типа данных (проходимся по всем строкам таблицы dataGridView_changeover_time)
-                for (int row_dataType = 0; row_dataType < dataTypesCount; row_dataType++)
+                // Добавляем строку
+                changeoverTime.Add(new List<List<int>>(DataType));
+
+                // Для каждого типа данных
+                for (int fromDataType = 0; fromDataType < DataType; fromDataType++)
                 {
 
-                    // Выполняем наименование строки
-                    dataGridView_changeover_time.Rows[row_dataType + device * dataTypesCount].HeaderCell.Value = string.Format("Type {0}", row_dataType);
+                    // Добавляем строку
+                    changeoverTime[device].Add(new List<int>(DataType));
 
                     // Чередуем два рандомных значения _randomValue и randomValue с каждой новой строкой
-                    int value = (row_dataType % 2 == 0) ? _randomValue : randomValue;
+                    int value = (fromDataType % 2 == 0) ? _randomValue : randomValue;
 
-                    // Для каждого типа данных (проходися по всем столбцам таблица dataGridView_changeover_time)
-                    for (int col_dataType = 0; col_dataType < dataTypesCount; col_dataType++)
+                    // Для каждого типа данных
+                    for (int toDataType = 0; toDataType < DataType; toDataType++)
                     {
 
-                        // Выполняем наименование столбцов
-                        if (device == 0)
-                            dataGridView_changeover_time.Columns[col_dataType].HeaderCell.Value = string.Format("Type {0}", col_dataType);
-
                         // Когда индекс по строке равен индексу по столбцу
-                        if (row_dataType == col_dataType)
-                        {
+                        if (fromDataType == toDataType) {
 
-                            // Присваиваем значение 0 таблице dataGridView_changeover_time
-                            dataGridView_changeover_time.Rows[row_dataType + device * dataTypesCount].Cells[col_dataType].Value = 0;
+                            // Присваиваем значение 0
+                            changeoverTime[device][fromDataType].Add(0);
 
                             // Продолжаем обработку
                             continue;
@@ -970,14 +868,14 @@ namespace newAlgorithm
                         // Чередуем два рандомных значения _randomValue и randomValue с каждой новой колонкой
                         value = (value == _randomValue) ? randomValue : _randomValue;
 
-                        // Присваиваем новое рандомное значение в таблице dataGridView_changeover_time
-                        dataGridView_changeover_time.Rows[row_dataType + device * dataTypesCount].Cells[col_dataType].Value = value;
+                        // Присваиваем значение value
+                        changeoverTime[device][fromDataType].Add(value);
                     }
                 }
             }
 
-            // Сохраняем сгенерированные данные
-            GetTime();
+            // Устанавливаем данные в таблице
+            SetChangeoverTime(changeoverTime);
         }
 
         /// <summary>
@@ -988,32 +886,48 @@ namespace newAlgorithm
         private void RandomizePreMaintenanceTime_Click(object sender = null, EventArgs e = null)
         {
 
+            // Объявляем и инициализируем количество приборов
+            int Device = Convert.ToInt32(numeric_device_count.Value);
+
+            // Объявляем и инициализируем количество приборов
+            int DataType = Convert.ToInt32(numeric_data_types_count.Value);
+
+            // Объявляем и инициализируем вектор длительностей ПТО
+            List<int> preMaintenanceTimes = new List<int>(Device);
+
+            // Объявляем и инициализируем вектор интенсивности отказов
+            List<double> restoringDevice = new List<double>(Device);
+
+            // Объявляем и инициализируем вектор интенсивности восстановлени
+            List<double> failureRates = new List<double>(Device);
+
             // Создаём объект для генерации рандомного значения
             var random = new Random(randomValue);
 
             // Формируем второе рандомное значение, как половина от введённого
             int _randomValue = randomValue / 2;
 
-            // Устанавливаем заголовок столбца
-            dataGridView_pre_maintenance.Columns[0].HeaderCell.Value = "Time";
-            dataGridView_preM_failureRates.Columns[0].HeaderCell.Value = "Time";
-            dataGridView_preM_restoringDevice.Columns[0].HeaderCell.Value = "Time";
-
             // Для каждого устройства
-            for (int device = 0; device < deviceCount; device++)
-            {
+            for (int device = 0; device < Device; device++) {
 
-                // Устанавливаем заголовок строки
-                dataGridView_pre_maintenance.Rows[device].HeaderCell.Value = string.Format("Device {0}", device);
-                dataGridView_preM_failureRates.Rows[device].HeaderCell.Value = string.Format("Device {0}", device);
-                dataGridView_preM_restoringDevice.Rows[device].HeaderCell.Value = string.Format("Device {0}", device);
+                // Рандомим значение длительностей ПТО
+                preMaintenanceTimes.Add((device % 2 == 0) ? randomValue : _randomValue);
 
-                dataGridView_pre_maintenance.Rows[device].Cells[0].Value = (device % 2 == 0) ? randomValue : _randomValue;
-                dataGridView_preM_failureRates.Rows[device].Cells[0].Value = random.NextDouble() % 0.01;
-                dataGridView_preM_restoringDevice.Rows[device].Cells[0].Value = random.NextDouble();
+                // Рандомим значение интенсивности восстановления
+                restoringDevice.Add(random.NextDouble() % 0.01);
+
+                // Рандомим значение интенсивности отказов
+                failureRates.Add(random.NextDouble());
             }
 
-            GetTime();
+            // Устанавливаем значение таблицы длительностей ПТО
+            SetPreMaintenanceTimes(preMaintenanceTimes);
+
+            // Устанавливаем значение таблицы длительностей ПТО
+            SetRestoringDevice(restoringDevice);
+
+            // Устанавливаем значение таблицы длительностей ПТО
+            SetFailureRates(failureRates);
         }
         #endregion
 
@@ -1027,8 +941,14 @@ namespace newAlgorithm
         private void CopyPreprocessingTime_Click(object sender, EventArgs e)
         {
 
+            // Объявляем и инициализируем количество типов данных
+            int DataType = Convert.ToInt32(numeric_data_types_count.Value);
+
+            // Объявляем и инициализируем количество приборов
+            int Device = Convert.ToInt32(numeric_device_count.Value);
+
             // Для всех строк после первого устройства выполняем обработку
-            for (int rowIndex = dataTypesCount; rowIndex < dataTypesCount * deviceCount; rowIndex++)
+            for (int rowIndex = DataType; rowIndex < DataType * Device; rowIndex++)
             {
 
                 // Определяем обрабатываемую строку
@@ -1038,7 +958,7 @@ namespace newAlgorithm
                 for (int columnIndex = 0; columnIndex < row.Cells.Count; columnIndex++)
 
                     // Определяем новое значение в ячейке, как скопированное с первого устройства
-                    dataGridView_changeover_time.Rows[rowIndex].Cells[columnIndex].Value = dataGridView_changeover_time.Rows[rowIndex % dataTypesCount].Cells[columnIndex].Value;
+                    dataGridView_changeover_time.Rows[rowIndex].Cells[columnIndex].Value = dataGridView_changeover_time.Rows[rowIndex % DataType].Cells[columnIndex].Value;
             }
         }
 
@@ -1079,8 +999,7 @@ namespace newAlgorithm
         /// <param name="e"></param>
         private void Numeric_data_types_count_ValueChanged(object sender, EventArgs e)
         {
-            dataTypesCount = Convert.ToInt32(numeric_data_types_count.Value);
-            isValueChagedToUpdate = true;
+            TablesRebuild();
         }
 
         /// <summary>
@@ -1092,6 +1011,7 @@ namespace newAlgorithm
         {
             buffer = Convert.ToInt32(numeric_buffer.Value);
             Form1.buff = buffer;
+            TablesRebuild();
         }
 
         /// <summary>
@@ -1101,8 +1021,7 @@ namespace newAlgorithm
         /// <param name="e"></param>
         private void Numeric_device_count_ValueChanged(object sender, EventArgs e)
         {
-            deviceCount = Convert.ToInt32(numeric_device_count.Value);
-            isValueChagedToUpdate = true;
+            TablesRebuild();
         }
 
         /// <summary>
@@ -1207,9 +1126,12 @@ namespace newAlgorithm
         /// <returns>Вектор длиной _dataTypesCount, каждый элемент которого равен _batchCount</returns>
         private List<int> CreateBatchCountList(int _batchCount = -1, int _dataTypesCount = 0)
         {
+            // Объявляем и инициализируем количество типов данных
+            int DataType = Convert.ToInt32(numeric_data_types_count.Value);
+
             // Проверяем аргументы на корректные параметры
             _batchCount = _batchCount == -1 ? batchCount : _batchCount;
-            _dataTypesCount = _dataTypesCount == 0 ? dataTypesCount : _dataTypesCount;
+            _dataTypesCount = _dataTypesCount == 0 ? DataType : _dataTypesCount;
 
             // Объявляем переменную списка содержащую количество элементов каждого типа
             List<int> batchCountList = new List<int>(_dataTypesCount);
@@ -1298,9 +1220,7 @@ namespace newAlgorithm
             // Инициализируем переменные с внешних компонентов
             // maxChangeoverTime = Convert.ToInt32(numeric_max_changeover_time.Value);
             // maxProccessingTime = Convert.ToInt32(numeric_max_proccessing_time.Value);
-            dataTypesCount = Convert.ToInt32(numeric_data_types_count.Value);
             xromossomiSize = Convert.ToInt32(numeric_xromossomi_size.Value);
-            deviceCount = Convert.ToInt32(numeric_device_count.Value);
             batchCount = Convert.ToInt32(numeric_batch_count.Value);
             randomValue = Convert.ToInt32(numeric_random.Value);
             buffer = Convert.ToInt32(numeric_buffer.Value);
@@ -1308,7 +1228,6 @@ namespace newAlgorithm
             isOptimization = checkBox_optimization.Checked;
             selectoinType = SelectoinType.Undefined;
             Form1.vizualizationOn = false;
-            isValueChagedToUpdate = false;
             Form1.buff = buffer;
 
             // Выполняем проверку на наличие Excel на компьютере
@@ -1317,163 +1236,8 @@ namespace newAlgorithm
                 // Выключаем графический компонент checkBox_visualization, если Excel нет на компьютере
                 checkBox_visualization.Enabled = false;
 
-            // Инициализируем перменные для данных таблиц
-            changeoverTime = new List<List<List<int>>>();
-            proccessingTime = new List<List<int>>();
-            preMaintenanceTimes = new List<int>();
-            
-            // Отчищаем список
-            failureRates?.Clear();
-            failureRates = new List<double>(deviceCount);
-            failureRates.AddRange(Enumerable.Repeat(0.0, deviceCount));
-
-            // Отчищаем список
-            restoringDevice?.Clear();
-            restoringDevice = new List<double>(deviceCount);
-            restoringDevice.AddRange(Enumerable.Repeat(0.0, deviceCount));
-
-            // Выполняем инициализацию графических таблиц
-            InitDataGridView();
-
             // Выполняем инициализацию внутренних таблиц
-            InitTables();
-
-            // Выполяем рандомизацию для таблицы времени обработки
-            RandomizeProcessingTime_Click();
-
-            // Выполняем рандомизацию для таблицы времени переналадки приборов
-            RandomizeChangeoverTime_Click();
-
-            // Выполняем рандомизацию для таблиц ПТО
-            RandomizePreMaintenanceTime_Click();
-        }
-
-        /// <summary>
-        /// Данная функция выполняет инициализацию внутренних таблиц
-        /// </summary>
-        private void InitTables()
-        {
-            // Инициализируем вектор времени ПТО
-            preMaintenanceTimes  = ListUtils.InitVectorInt(deviceCount, 0);
-            failureRates = new List<double>(deviceCount);// ListUtils.InitVectorInt(deviceCount, 0);
-            restoringDevice = new List<double>(deviceCount);// ListUtils.InitVectorInt(deviceCount, 0);
-
-            // Для каждого прибора выполняем обработку
-            for (var device = 0; device < deviceCount; device++)
-            {
-
-                // Инициализируем новые элементы в таблицы
-                proccessingTime.Add(new List<int>());
-                changeoverTime.Add(new List<List<int>>());
-
-                // Для каждого типа данных выполняем обработку
-                for (var row_dataType = 0; row_dataType < dataTypesCount; row_dataType++)
-                {
-
-                    // Инициализируем новые элементы в таблицы
-                    proccessingTime[device].Add(0);
-                    changeoverTime[device].Add(new List<int>());
-
-                    // Для каждого типа данных выполняем обработку
-                    for (var col_dataType = 0; col_dataType < dataTypesCount; col_dataType++)
-                        changeoverTime[device][row_dataType].Add(0);
-                }
-            }
-        }
-
-        /// <summary>
-        /// Данная функция переопределяет графические таблицы в зависимости от структуры сети
-        /// </summary>
-        private void InitDataGridView()
-        {
-
-            // Удаляем структуру таблиц
-            dataGridView_proccessing_time.Rows.Clear();
-            dataGridView_proccessing_time.Columns.Clear();
-            dataGridView_changeover_time.Rows.Clear();
-            dataGridView_changeover_time.Columns.Clear();
-            dataGridView_pre_maintenance.Rows.Clear();
-            dataGridView_pre_maintenance.Columns.Clear();
-            dataGridView_preM_failureRates.Rows.Clear();
-            dataGridView_preM_failureRates.Columns.Clear();
-            dataGridView_preM_restoringDevice.Rows.Clear();
-            dataGridView_preM_restoringDevice.Columns.Clear();
-
-            // Определяем новую структуру
-            dataGridView_proccessing_time.RowCount = deviceCount;
-            dataGridView_proccessing_time.ColumnCount = dataTypesCount;
-            dataGridView_changeover_time.RowCount = deviceCount * dataTypesCount;
-            dataGridView_changeover_time.ColumnCount = dataTypesCount;
-
-            // Определяем новую таблицу времени ПТО
-            dataGridView_pre_maintenance.RowCount = deviceCount;
-            dataGridView_pre_maintenance.ColumnCount = 1;
-            dataGridView_preM_failureRates.RowCount = deviceCount;
-            dataGridView_preM_failureRates.ColumnCount = 1;
-            dataGridView_preM_restoringDevice.RowCount = deviceCount;
-            dataGridView_preM_restoringDevice.ColumnCount = 1;
-        }
-
-        /// <summary>
-        /// Данная функция выполняет считывание данных из графических таблиц во внутреннии
-        /// </summary>
-        private bool GetTime()
-        {
-
-            // Отчищаем список
-            failureRates?.Clear();
-            failureRates = new List<double>(deviceCount);
-            failureRates.AddRange(Enumerable.Repeat(0.0, deviceCount));
-
-            // Отчищаем список
-            restoringDevice?.Clear();
-            restoringDevice = new List<double>(deviceCount);
-            restoringDevice.AddRange(Enumerable.Repeat(0.0, deviceCount));
-
-            // Для каждого прибора выполняем считывание
-            for (int device = 0; device < deviceCount; device++)
-            {
-
-                // Считываем данные во внутрнние таблицы
-                preMaintenanceTimes[device] = Convert.ToInt32(dataGridView_pre_maintenance.Rows[device].Cells[0].Value);
-
-                // Считываем элемент 
-                failureRates[device] = Convert.ToDouble(dataGridView_preM_failureRates.Rows[device].Cells[0].Value);
-                if (failureRates[device] > 1) {
-                    MessageBox.Show("Ошибка, значение не может быть больше 1");
-                    return false;
-                } else if (failureRates[device] < 0)
-                {
-                    MessageBox.Show("Ошибка, значение не может быть отрицательным");
-                    return false;
-                }
-
-                restoringDevice[device] = Convert.ToDouble(dataGridView_preM_restoringDevice.Rows[device].Cells[0].Value);
-                if (restoringDevice[device] > 1) {
-                    MessageBox.Show("Ошибка, значение не может быть больше 1");
-                    return false;
-                } else if (restoringDevice[device] < 0) {
-                    MessageBox.Show("Ошибка, значение не может быть отрицательным");
-                    return false;
-                }
-
-                // Для каждого типа данных выполняем считывание
-                for (int row_dataType = 0; row_dataType < dataTypesCount; row_dataType++)
-                {
-
-                    // Считываем данные во внутрнние таблицы
-                    proccessingTime[device][row_dataType] = Convert.ToInt32(dataGridView_proccessing_time.Rows[device].Cells[row_dataType].Value);
-
-                    // Для каждого типа данных выполняем считывание
-                    for (var col_dataType = 0; col_dataType < dataTypesCount; col_dataType++)
-
-                        // Считываем данные во внутрнние таблицы
-                        changeoverTime[device][row_dataType][col_dataType] = Convert.ToInt32(dataGridView_changeover_time.Rows[row_dataType + device * dataTypesCount].Cells[col_dataType].Value);
-                }
-            }
-
-            // Возвращяем флаг успешного считываения данных
-            return true;
+            TablesRebuild();
         }
 
         #endregion
@@ -1519,56 +1283,511 @@ namespace newAlgorithm
 
         private void GetPreMSolution_Click(object sender, EventArgs e)
         {
-            // Преобразуем входные данные в число типа Double
-            // double beta = Convert.ToDouble(betaValue.Text);
-            double.TryParse(betaValue.Text, out double beta);
 
-            // Если beta будет больше 1
-            if (beta > (double)1.0)
-            {
-                MessageBox.Show("Ошибка. Значение beta не может быть больше 1");
-                return;
-            }
-
-            // Если beta будет меньше 0
-            if (beta < (double)0.0)
-            {
-                MessageBox.Show("Ошибка. Значение beta не может быть меньше 0");
-                return;
-            }
+            // Получаем экземпляр конфигурационной структуры для ПТО
+            PreMConfig preMConfig = GetPreMConfig();
 
             // Инициализируем расписание
-            Shedule.deviceCount = deviceCount;
-            Shedule.changeoverTime = changeoverTime;
-            Shedule.proccessingTime = proccessingTime;
-
-            // Создаём экземпляр конфигурационной структуры
-            Config config = new Config(
-                dataTypesCount,
-                deviceCount,
-                buffer,
-                proccessingTime,
-                Config.ChangeoverTimeConverter(changeoverTime),
-                isFixedBatches
-            );
-            
-            // Создаём экземпляр конфигурационной структуры для ПТО
-            PreMConfig preMConfig = new PreMConfig(
-                config,
-                preMaintenanceTimes,
-                failureRates,
-                restoringDevice,
-                beta
-            );
+            Shedule.deviceCount = preMConfig.config.deviceCount;
+            Shedule.proccessingTime = preMConfig.config.proccessingTime;
+            Shedule.changeoverTime = GetChangeoverTimeList();
 
             // Инициализируем вектор длиной dataTypesCount, каждый элемент которого будет равен batchCount
             List<int> batchCountList = CreateBatchCountList();
 
             // Формируем первый уровень
-            var firstLevel = new FirstLevel(config, batchCountList);
+            var firstLevel = new FirstLevel(preMConfig.config, batchCountList);
 
-            // Выполняем генерацию данных для ввсех типов вторым алгоритмом
-            firstLevel.GenetateSolutionWithPremaintenance("Premintenance", preMConfig);
+            // Выполняем генерацию данных для всех типов вторым алгоритмом
+            firstLevel.GenetateSolutionWithPremaintenance("PreMaintenance", preMConfig);
+        }
+
+        /// <summary>
+        /// Установим матрицу времени выполнения заданий
+        /// </summary>
+        /// <param name="processingTime">Матрица времени выполнения заданий</param>
+        private void SetProcessingTime(List<List<int>> processingTime)
+        {
+
+            // Объявляем и инициализируем количество приборов
+            int Device = Convert.ToInt32(numeric_device_count.Value);
+
+            // Объявляем и инициализируем количество типов данных
+            int DataType = Convert.ToInt32(numeric_data_types_count.Value);
+
+            // Отчищаяем матрицу времени выполнения
+            dataGridView_processing_time.Rows.Clear();
+            dataGridView_processing_time.Columns.Clear();
+
+            // Устанавливаем количество строк и колонок для матрицы времени выполнения
+            dataGridView_processing_time.RowCount = Device;
+            dataGridView_processing_time.ColumnCount = DataType;
+
+            // Для каждого типа данных
+            for (int dataType = 0; dataType < DataType; dataType++)
+
+                // Устанавливаем заголовок строки
+                dataGridView_processing_time.Columns[dataType].HeaderCell.Value = $"Тип {dataType + 1}";
+
+            // Для каждого прибора
+            for (int device = 0; device < Device; device++)
+            {
+
+                // Устанавливаем заголовок строки
+                dataGridView_processing_time.Rows[device].HeaderCell.Value = $"Прибор {device + 1}";
+
+                // Для каждого типа данных
+                for (int dataType = 0; dataType < DataType; dataType++)
+
+                    // Устанавливаем значение матрицы времени выполнения
+                    dataGridView_processing_time.Rows[device].Cells[dataType].Value = processingTime[device][dataType];
+            }
+        }
+
+        /// <summary>
+        /// Функция вернёт матрицу времени выполнения
+        /// </summary>
+        /// <returns>Матрица времени выполнения</returns>
+        private List<List<int>> GetProcessingTime()
+        {
+
+            // Объявляем и инициализируем количество приборов
+            int Device = Convert.ToInt32(numeric_device_count.Value);
+
+            // Объявляем и инициализируем количество типов данных
+            int DataType = Convert.ToInt32(numeric_data_types_count.Value);
+
+            // Объявляем матрицу время выполнения
+            List<List<int>> processingTime = new List<List<int>>(Device);
+
+            // Для каждого прибора
+            for (int device = 0; device < Device; device++) {
+
+                // Добавляем новую строку
+                processingTime.Add(new List<int> (DataType));
+
+                // Для каждого типа данных
+                for (int dataType = 0; dataType < DataType; dataType++)
+
+                    // Добавляем элемент в строку
+                    processingTime[device].Add(Convert.ToInt32(this.dataGridView_processing_time.Rows[device].Cells[dataType].Value)); 
+            }
+
+            // Возвращяем матрицу
+            return processingTime;
+        }
+
+        /// <summary>
+        /// Функция установит матрицу времени переналадки
+        /// </summary>
+        /// <param name="changeoverTime">Матрица времени переналадки</param>
+        private void SetChangeoverTime(List<List<List<int>>> changeoverTime)
+        {
+
+            // Объявляем и инициализируем количество приборов
+            int Device = Convert.ToInt32(numeric_device_count.Value);
+
+            // Объявляем и инициализируем количество типов данных
+            int DataType = Convert.ToInt32(numeric_data_types_count.Value);
+
+            // Отчищаяем матрицу времени переналадки
+            dataGridView_changeover_time.Rows.Clear();
+            dataGridView_changeover_time.Columns.Clear();
+
+            // Устанавливаем количество строк и колонок для матрицы времени переналадки
+            dataGridView_changeover_time.RowCount = Device * DataType;
+            dataGridView_changeover_time.ColumnCount = DataType;
+            
+            // Для каждой строки
+            for (int deviceAndDataType = 0; deviceAndDataType < Device * DataType; deviceAndDataType++)
+
+                // Устанавливаем заголовок строки
+                dataGridView_changeover_time.Rows[deviceAndDataType].HeaderCell.Value = $"Тип {(deviceAndDataType % DataType)+1}";
+
+            // Для каждого столбца
+            for (int dataType = 0; dataType < DataType; dataType++)
+
+                // Устанавливаем заголовок строки
+                dataGridView_changeover_time.Columns[dataType].HeaderCell.Value = $"Тип {dataType + 1}";
+
+            // Для каждого прибора
+            for (int device = 0; device < Device; device++)
+            
+                // Для каждого типа данных
+                for (int fromDataType = 0; fromDataType < DataType; fromDataType++)
+
+                    // Для каждого типа данных
+                    for (int toDataType = 0; toDataType < DataType; toDataType++)
+
+                        // Устанавливаем значение матрицы времени переналадки
+                        dataGridView_changeover_time.Rows[device * DataType + fromDataType].Cells[toDataType].Value = changeoverTime[device][fromDataType][toDataType];
+        }
+
+        /// <summary>
+        /// Функция установит матрицу времени переналадки
+        /// </summary>
+        /// <param name="changeoverTime">Матрица времени переналадки</param>
+        private void SetChangeoverTime(Dictionary<int, List<List<int>>> changeoverTime)
+        {
+
+            // Объявляем и инициализируем количество приборов
+            int Device = Convert.ToInt32(numeric_device_count.Value);
+
+            // Объявляем и инициализируем количество типов данных
+            int DataType = Convert.ToInt32(numeric_data_types_count.Value);
+
+            // Отчищаяем матрицу времени переналадки
+            dataGridView_changeover_time.Rows.Clear();
+            dataGridView_changeover_time.Columns.Clear();
+
+            // Устанавливаем количество строк и колонок для матрицы времени переналадки
+            dataGridView_changeover_time.RowCount = Device * DataType;
+            dataGridView_changeover_time.ColumnCount = DataType;
+
+            // Для каждой строки
+            for (int deviceAndDataType = 0; deviceAndDataType < Device * DataType; deviceAndDataType++)
+
+                // Устанавливаем заголовок строки
+                dataGridView_changeover_time.Rows[deviceAndDataType].HeaderCell.Value = $"Тип {(deviceAndDataType % DataType) + 1}";
+
+            // Для каждого столбца
+            for (int dataType = 0; dataType < DataType; dataType++)
+
+                // Устанавливаем заголовок строки
+                dataGridView_changeover_time.Columns[dataType].HeaderCell.Value = $"Тип {dataType + 1}";
+
+            // Для каждого прибора
+            for (int device = 0; device < Device; device++)
+
+                // Для каждого типа данных
+                for (int fromDataType = 0; fromDataType < DataType; fromDataType++)
+
+                    // Для каждого типа данных
+                    for (int toDataType = 0; toDataType < DataType; toDataType++)
+
+                        // Устанавливаем значение матрицы времени переналадки
+                        dataGridView_changeover_time.Rows[device * DataType + fromDataType].Cells[toDataType].Value = changeoverTime[device][fromDataType][toDataType];
+        }
+
+        /// <summary>
+        /// Функция вернёт матриц времени переналадки
+        /// </summary>
+        /// <returns></returns>
+        private List<List<List<int>>> GetChangeoverTimeList()
+        {
+
+            // Объявляем и инициализируем количество приборов
+            int Device = Convert.ToInt32(numeric_device_count.Value);
+
+            // Объявляем и инициализируем количество типов данных
+            int DataType = Convert.ToInt32(numeric_data_types_count.Value);
+
+            // Объявляем матрицу времени переналадки
+            List<List<List<int>>> changeoverTime = new List<List<List<int>>>(Device);
+
+            // Для каждого прибора
+            for (var device = 0; device < Device; device++)
+            {
+
+                // Добавляем новую матрицу
+                changeoverTime.Add(new List<List<int>>(DataType));
+
+                // Для каждого типа данных
+                for (var fromDataType = 0; fromDataType < DataType; fromDataType++)
+                {
+
+                    // Добавляем новую строку
+                    changeoverTime[device].Add(new List<int>(DataType));
+
+                    // Для каждого типа данных
+                    for (var toDataType = 0; toDataType < DataType; toDataType++)
+
+                        // Добавляем значения в матрицу
+                        changeoverTime[device][fromDataType].Add(Convert.ToInt32(dataGridView_changeover_time.Rows[device * DataType + fromDataType].Cells[toDataType].Value));
+                }
+            }
+
+            // Вернём матрицу
+            return changeoverTime;
+        }
+
+        /// <summary>
+        /// Функция вернёт матриц времени переналадки
+        /// </summary>
+        /// <returns>Матрица переналадки</returns>
+        private Dictionary<int, List<List<int>>> GetChangeoverTimeDict()
+        {
+
+            // Объявляем и инициализируем количество приборов
+            int Device = Convert.ToInt32(numeric_device_count.Value);
+
+            // Объявляем и инициализируем количество типов данных
+            int DataType = Convert.ToInt32(numeric_data_types_count.Value);
+
+            // Объявляем матрицу времени переналадки
+            Dictionary<int, List<List<int>>> changeoverTime = new Dictionary<int, List<List<int>>>(Device);
+
+            // Для каждого прибора
+            for (var device = 0; device < Device; device++)
+            {
+
+                // Добавляем новую матрицу
+                changeoverTime.Add(device, new List<List<int>>(DataType));
+
+                // Для каждого типа данных
+                for (var fromDataType = 0; fromDataType < DataType; fromDataType++)
+                {
+
+                    // Добавляем новую строку
+                    changeoverTime[device].Add(new List<int>(DataType));
+
+                    // Для каждого типа данных
+                    for (var toDataType = 0; toDataType < DataType; toDataType++)
+
+                        // Добавляем значения в матрицу
+                        changeoverTime[device][fromDataType].Add(Convert.ToInt32(dataGridView_changeover_time.Rows[device * DataType + fromDataType].Cells[toDataType].Value));
+                }
+            }
+
+            // Вернём матрицу
+            return changeoverTime;
+        }
+
+        /// <summary>
+        /// Функция установит длительности ПТО
+        /// </summary>
+        /// <param name="preMaintenanceTimes">Вектор длительностей ПТО</param>
+        private void SetPreMaintenanceTimes(List<int> preMaintenanceTimes)
+        {
+
+            // Отчищаяем матрицу времени длительностей ПТО
+            dataGridView_pre_maintenance.Rows.Clear();
+            dataGridView_pre_maintenance.Columns.Clear();
+
+            // Устанавливаем количество строк и колонок для матрицы времени длительностей ПТО
+            dataGridView_pre_maintenance.RowCount = preMaintenanceTimes.Count;
+            dataGridView_pre_maintenance.ColumnCount = 1;
+
+            // Устанавливаем заголовок столбца
+            dataGridView_pre_maintenance.Columns[0].HeaderCell.Value = $"Время";
+
+            // Для каждого прибора
+            for (int device = 0; device < preMaintenanceTimes.Count; device++) {
+
+                // Устанавливаем заголовки строк
+                dataGridView_pre_maintenance.Rows[device].HeaderCell.Value = $"Прибор {device + 1}";
+
+                // Устанавливаем значения таблицы
+                dataGridView_pre_maintenance.Rows[device].Cells[0].Value = preMaintenanceTimes[device];
+            }
+        }
+
+        /// <summary>
+        /// Функция вернёт длительности ПТО
+        /// </summary>
+        /// <returns>Вектори длительностей ПТО</returns>
+        private List<int> GetPreMaintenanceTimes()
+        {
+
+            // Объявляем вектор длительностей ПТО
+            List<int> preMaintenanceTimes = new List<int>(dataGridView_pre_maintenance.RowCount);
+
+            // Для каждого прибора
+            for (int device = 0; device < dataGridView_pre_maintenance.RowCount; device++)
+
+                // Считываем матрицу длительностей ПТО
+                preMaintenanceTimes.Add(Convert.ToInt32(dataGridView_pre_maintenance.Rows[device].Cells[0].Value));
+
+            // Вовзращяем вектор длительностей ПТО
+            return preMaintenanceTimes; 
+        }
+
+        /// <summary>
+        /// Функция установит вектор интенсивности восстановления
+        /// </summary>
+        /// <param name="restoringDevice">Вектор интенсивности восстановления</param>
+        private void SetRestoringDevice(List<double> restoringDevice)
+        {
+
+            // Отчищаяем вектор интенсивности восстановления
+            dataGridView_preM_restoringDevice.Rows.Clear();
+            dataGridView_preM_restoringDevice.Columns.Clear();
+
+            // Устанавливаем количество строк и колонок для вектора интенсивности восстановления
+            dataGridView_preM_restoringDevice.RowCount = restoringDevice.Count;
+            dataGridView_preM_restoringDevice.ColumnCount = 1;
+
+            // Для каждого прибора
+            for (int device = 0; device < restoringDevice.Count; device++) {
+
+                // Устанавливаем заголовки строк
+                dataGridView_preM_restoringDevice.Rows[device].HeaderCell.Value = $"Прибор {device + 1}";
+
+                // Установим значение для таблицы
+                dataGridView_preM_restoringDevice.Rows[device].Cells[0].Value = restoringDevice[device];
+            }
+        }
+
+        /// <summary>
+        /// Функция вернёт вектор интенсивности восстановления
+        /// </summary>
+        /// <returns>Вектор интенсивности восстановления</returns>
+        private List<double> GetRestoringDevice()
+        {
+
+            // Объявляем вектор интенсивности восстановления
+            List<double> restoringDevice = new List<double>(Convert.ToInt32(dataGridView_preM_restoringDevice.RowCount));
+
+            // Для каждого прибора
+            for (int device = 0; device < dataGridView_preM_restoringDevice.RowCount; device++)
+
+                // Считываем вектор интенсивности восстановления
+                restoringDevice.Add(Convert.ToDouble(dataGridView_preM_restoringDevice.Rows[device].Cells[0].Value));
+
+            // Вовзращяем вектор интенсивности восстановления
+            return restoringDevice;
+        }
+
+        /// <summary>
+        /// Функция установит вектор интенсивности отказов
+        /// </summary>
+        /// <param name="failureRates">Вектор интенсивности отказов</param>
+        private void SetFailureRates(List<double> failureRates)
+        {
+
+            // Отчищаяем вектор интенсивности отказов
+            dataGridView_preM_failureRates.Rows.Clear();
+            dataGridView_preM_failureRates.Columns.Clear();
+
+            // Устанавливаем количество строк и колонок для вектора интенсивности отказов
+            dataGridView_preM_failureRates.RowCount = failureRates.Count;
+            dataGridView_preM_failureRates.ColumnCount = 1;
+
+            // Для каждого прибора
+            for (int device = 0; device < failureRates.Count; device++) {
+
+                // Устанавливаем заголовки строк
+                dataGridView_preM_failureRates.Rows[device].HeaderCell.Value = $"Прибор {device + 1}";
+
+                // Установим значение для таблицы
+                dataGridView_preM_failureRates.Rows[device].Cells[0].Value = failureRates[device];
+            }
+        }
+
+        /// <summary>
+        /// Функция вернёт вектор интенсивности отказов
+        /// </summary>
+        /// <returns>Вектор интенсивности отказов</returns>
+        private List<double> GetFailureRates()
+        {
+
+            // Объявляем вектор интенсивности отказов
+            List<double> failureRates= new List<double>(Convert.ToInt32(dataGridView_preM_failureRates.RowCount));
+
+            // Для каждого прибора
+            for (int device = 0; device < dataGridView_preM_failureRates.RowCount; device++)
+
+                // Считываем вектор интенсивности отказов
+                failureRates.Add(Convert.ToDouble(dataGridView_preM_failureRates.Rows[device].Cells[0].Value));
+
+            // Вовзращяем вектор интенсивности отказов
+            return failureRates;
+        }
+
+        /// <summary>
+        /// Импортируем данные из конфигурационной структуры
+        /// </summary>
+        /// <param name="config">Конфигурационная структура</param>
+        /// <returns>True - если импорт был успешен и False иначе </returns>
+        private bool ImportFromConfig(Config config)
+        {
+
+            // Устанавливаем размер буфера
+            this.numeric_data_types_count.Value = config.dataTypesCount;
+
+            // Устанавливаем количество приборов
+            this.numeric_device_count.Value = config.deviceCount;
+
+            // Устанавливаем размер буфера
+            this.numeric_buffer.Value = config.buffer;
+
+            // Устанавливаем количества заданий для каждого типа
+            this.numeric_batch_count.Value = config.batchCount;
+
+            // Устнавливаем матрицу времени выполнения
+            SetProcessingTime(config.proccessingTime);
+
+            // Устнавливаем матрицу времени переналадки
+            SetChangeoverTime(config.changeoverTime);
+            
+            // Вернём флаг успешной загрузки данных
+            return true;
+        }
+
+        /// <summary>
+        /// Импортируем данные из конфигурационной ПТО структуры
+        /// </summary>
+        /// <param name="preMConfig">Конфигурационная ПТО структура</param>
+        /// <returns>True - если импорт был успешен и False иначе </returns>
+        private bool ImportFromPreMConfig(PreMConfig preMConfig)
+        {
+
+            // Импортируем данные из конфигурационной структуры
+            ImportFromConfig(preMConfig.config);
+
+            // Устанавливаем вектор интенсивности отказов
+            SetFailureRates(preMConfig.failureRates);
+
+            // Устанавливаем вектор интенсивности восстановления
+            SetRestoringDevice(preMConfig.restoringDevice);
+
+            // Устанавливаем вектор длительности ПТО
+            SetPreMaintenanceTimes(preMConfig.preMaintenanceTimes);
+
+            // Устанавливаем значение beta
+            this.betaValue.Text = preMConfig.beta.ToString();
+
+            // Вернём флаг успешной загрузки данных
+            return true;
+        }
+
+        /// <summary>
+        /// Функция вернёт конфигурационную структуру
+        /// </summary>
+        /// <returns>Конфигурационная структура</returns>
+        private Config GetConfig()
+        {
+
+            // Возвращяем генерируемый конфигурационную структуру
+            return new Config(
+                Convert.ToInt32(numeric_data_types_count.Value),
+                Convert.ToInt32(numeric_device_count.Value),
+                Convert.ToInt32(numeric_buffer.Value),
+                GetProcessingTime(),
+                GetChangeoverTimeDict(),
+                checkBox_fixed_batches.Checked,
+                Convert.ToInt32(numeric_batch_count.Value)
+            );
+        }
+
+        /// <summary>
+        /// Функция вернёт конфигурационную ПТО структуру
+        /// </summary>
+        /// <returns>Конфигурационная ПТО структура</returns>
+        private PreMConfig GetPreMConfig()
+        {
+
+            // Получаем нижний порог надёжности
+            double.TryParse(betaValue.Text, out double beta);
+
+            // Возвращяем генерируемый конфигурационную ПТО структуру
+            return new PreMConfig(
+                GetConfig(),
+                GetPreMaintenanceTimes(),
+                GetFailureRates(),
+                GetRestoringDevice(),
+                beta
+            );
         }
 
         /// <summary>
@@ -1579,13 +1798,60 @@ namespace newAlgorithm
         private void button_import_Click(object sender, EventArgs e)
         {
 
-            // Десереализируем данные
-            //___ data = JsonNet.Deserialize<Pet>(___);
+            // Объявляем конфигурационную структуру данных
+            PreMConfig preMConfig;
 
+            // Объявляем строку
+            string jsonText;
+
+            // Открываем диалоговое окно для открытия файла
+            {
+
+                OpenFileDialog fileDialog = new OpenFileDialog
+                {
+                    Filter = "json files (*.json)|*.json",
+                    FilterIndex = 2,
+                    RestoreDirectory = true
+                };
+
+                // Пытаемя открыть диалоговое окно
+                if (fileDialog.ShowDialog() == DialogResult.OK) {
+
+                    // Читаем данные из json файла
+                    jsonText = File.ReadAllText(fileDialog.FileName);
+
+                    // Пытаемся десереализировать данные
+                    try {
+
+                        // Десереализируем данные
+                        preMConfig = JsonConvert.DeserializeObject<PreMConfig>(jsonText);
+
+                        // Импортируем данные из конфигурационной ПТО структуры
+                        ImportFromPreMConfig(preMConfig);
+
+                    // Обрабатываем ошибку десереализации
+                    } catch (JsonException ex) {
+
+                        // Выводим информационное сообщение
+                        MessageBox.Show("Указанный имеет некорректный формат.", "Ошибка");
+
+                        // Прекращяем обработку
+                        return;
+                    }
+
+                } else {
+
+                    // Выводим информационное сообщение
+                    MessageBox.Show("Указан некорректный файл.", "Предупреждение");
+
+                    // Прекращяем обработку
+                    return;
+                }
+            }
         }
 
         /// <summary>
-        /// Фуния открывает диалоговое окно, для экспорта параметров системы
+        /// Функция открывает диалоговое окно, для экспорта параметров системы
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -1593,62 +1859,37 @@ namespace newAlgorithm
         {
 
             // Объявляем конфигурационную структуру данных
-            PreMConfig preMConfig;
-
-            // Получаем данные
-            {
-                // Преобразуем входные данные в число типа Double
-                double.TryParse(betaValue.Text, out double beta);
-
-                // Создаём экземпляр конфигурационной структуры
-                Config config = new Config(
-                    dataTypesCount,
-                    deviceCount,
-                    buffer,
-                    proccessingTime,
-                    Config.ChangeoverTimeConverter(changeoverTime),
-                    isFixedBatches
-                );
-
-                // Создаём экземпляр конфигурационной структуры для ПТО
-                preMConfig = new PreMConfig(
-                    config,
-                    preMaintenanceTimes,
-                    failureRates,
-                    restoringDevice,
-                    beta
-                );
-            }
-
-            // var options = new SerializationOptions();
+            PreMConfig preMConfig = GetPreMConfig();
 
             // Сереализируем данные
-            // string jsonText = JsonNet.Serialize(
-            //     preMConfig,
-            // 
-            // );
+            string jsonText = JsonConvert.SerializeObject(preMConfig, Formatting.Indented);
 
             // Открываем диалоговое окно для сохранения файла
-            // {
-            //     Stream myStream;
-            //     SaveFileDialog fileDialog = new SaveFileDialog
-            //     {
-            //         Filter = "json files (*.json)|*.json",
-            //         FilterIndex = 2,
-            //         RestoreDirectory = true
-            //     };
-            // 
-            //     // Пытаемя открыть диалоговое окно
-            //     if (fileDialog.ShowDialog() == DialogResult.OK)
-            //         if ((myStream = fileDialog.OpenFile()) != null)
-            //         {
-            //             byte[] buffer = Encoding.Default.GetBytes($"{jsonText}");
-            //             myStream.Write(buffer, 0, buffer.Length);
-            //             myStream.Close();
-            //         }
-            // }
+            {
+                Stream myStream;
+                SaveFileDialog fileDialog = new SaveFileDialog
+                {
+                    Filter = "json files (*.json)|*.json",
+                    FilterIndex = 2,
+                    RestoreDirectory = true
+                };
+            
+                // Пытаемя открыть диалоговое окно
+                if (fileDialog.ShowDialog() == DialogResult.OK)
+                    if ((myStream = fileDialog.OpenFile()) != null)
+                    {
+                        byte[] buffer = Encoding.Default.GetBytes($"{jsonText}");
+                        myStream.Write(buffer, 0, buffer.Length);
+                        myStream.Close();
+                    }
+            }
         }
 
+        /// <summary>
+        /// Функция управляет значением нижнего порога надёжности
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void betaValue_TextChanged(object sender, EventArgs e)
         {
 

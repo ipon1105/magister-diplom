@@ -73,7 +73,7 @@
             this.button3 = new System.Windows.Forms.Button();
             this.tabPage2 = new System.Windows.Forms.TabPage();
             this.tableLayoutPanel = new System.Windows.Forms.TableLayoutPanel();
-            this.dataGridView_proccessing_time = new System.Windows.Forms.DataGridView();
+            this.dataGridView_processing_time = new System.Windows.Forms.DataGridView();
             this.dataGridView_changeover_time = new System.Windows.Forms.DataGridView();
             this.dataGridView_pre_maintenance = new System.Windows.Forms.DataGridView();
             this.dataGridView_preM_failureRates = new System.Windows.Forms.DataGridView();
@@ -107,7 +107,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.numeric_buffer)).BeginInit();
             this.tabPage2.SuspendLayout();
             this.tableLayoutPanel.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.dataGridView_proccessing_time)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dataGridView_processing_time)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView_changeover_time)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView_pre_maintenance)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView_preM_failureRates)).BeginInit();
@@ -678,7 +678,7 @@
             this.tableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 5.518394F));
             this.tableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 5.518394F));
             this.tableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 5.518394F));
-            this.tableLayoutPanel.Controls.Add(this.dataGridView_proccessing_time, 0, 1);
+            this.tableLayoutPanel.Controls.Add(this.dataGridView_processing_time, 0, 1);
             this.tableLayoutPanel.Controls.Add(this.dataGridView_changeover_time, 2, 1);
             this.tableLayoutPanel.Controls.Add(this.dataGridView_pre_maintenance, 4, 2);
             this.tableLayoutPanel.Controls.Add(this.dataGridView_preM_failureRates, 6, 2);
@@ -710,18 +710,18 @@
             // 
             // dataGridView_proccessing_time
             // 
-            this.dataGridView_proccessing_time.AllowUserToAddRows = false;
-            this.dataGridView_proccessing_time.AllowUserToDeleteRows = false;
-            this.dataGridView_proccessing_time.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.AllCells;
-            this.dataGridView_proccessing_time.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.tableLayoutPanel.SetColumnSpan(this.dataGridView_proccessing_time, 2);
-            this.dataGridView_proccessing_time.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.dataGridView_proccessing_time.Location = new System.Drawing.Point(3, 85);
-            this.dataGridView_proccessing_time.Name = "dataGridView_proccessing_time";
-            this.dataGridView_proccessing_time.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.AutoSizeToAllHeaders;
-            this.tableLayoutPanel.SetRowSpan(this.dataGridView_proccessing_time, 2);
-            this.dataGridView_proccessing_time.Size = new System.Drawing.Size(464, 573);
-            this.dataGridView_proccessing_time.TabIndex = 17;
+            this.dataGridView_processing_time.AllowUserToAddRows = false;
+            this.dataGridView_processing_time.AllowUserToDeleteRows = false;
+            this.dataGridView_processing_time.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.AllCells;
+            this.dataGridView_processing_time.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.tableLayoutPanel.SetColumnSpan(this.dataGridView_processing_time, 2);
+            this.dataGridView_processing_time.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.dataGridView_processing_time.Location = new System.Drawing.Point(3, 85);
+            this.dataGridView_processing_time.Name = "dataGridView_proccessing_time";
+            this.dataGridView_processing_time.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.AutoSizeToAllHeaders;
+            this.tableLayoutPanel.SetRowSpan(this.dataGridView_processing_time, 2);
+            this.dataGridView_processing_time.Size = new System.Drawing.Size(464, 573);
+            this.dataGridView_processing_time.TabIndex = 17;
             // 
             // dataGridView_changeover_time
             // 
@@ -974,7 +974,7 @@
             this.tabPage2.PerformLayout();
             this.tableLayoutPanel.ResumeLayout(false);
             this.tableLayoutPanel.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.dataGridView_proccessing_time)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dataGridView_processing_time)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView_changeover_time)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView_pre_maintenance)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView_preM_failureRates)).EndInit();
@@ -999,7 +999,7 @@
         private System.Windows.Forms.TabPage tabPage2;
         private System.Windows.Forms.Label label6;
         private System.Windows.Forms.Label label7;
-        private System.Windows.Forms.DataGridView dataGridView_proccessing_time;
+        private System.Windows.Forms.DataGridView dataGridView_processing_time;
         private System.Windows.Forms.CheckBox checkBox_fixed_batches;
         private System.Windows.Forms.Button button3;
         private System.Windows.Forms.RadioButton radioButton_UniformRanking;

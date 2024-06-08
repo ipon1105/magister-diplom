@@ -12,6 +12,7 @@ using System;
 using System.Diagnostics.Eventing.Reader;
 using newAlgorithm.Model;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.TaskbarClock;
+using magisterDiplom;
 
 namespace newAlgorithm
 {
