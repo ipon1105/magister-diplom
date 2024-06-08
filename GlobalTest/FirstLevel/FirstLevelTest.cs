@@ -71,31 +71,31 @@ namespace GlobalTest.FirstLevel
             */
 
             // Объявляем матрицу переналадки
-            Dictionary<int, Matrix> changeoverTime = new();
+            Dictionary<int, List<List<int>>> changeoverTime = new();
 
             // Создаём матрицу переналадки для 1 прибора
-            Matrix changeoverTime_1 = new(new List<List<int>>
-                {
+            List<List<int>> changeoverTime_1 = new()
+            {
                     new() { 1, 2, 5 },
                     new() { 3, 4, 5 },
                     new() { 3, 4, 5 },
-                });
+                };
 
             // Создаём матрицу переналадки для 2 прибора
-            Matrix changeoverTime_2 = new(new List<List<int>>
-                {
+            List<List<int>> changeoverTime_2 = new()
+            {
                     new() { 4, 2, 5 },
                     new() { 3, 1, 5 },
                     new() { 3, 4, 5 },
-                });
+                };
 
             // Создаём матрицу переналадки для 3 прибора
-            Matrix changeoverTime_3 = new(new List<List<int>>
-                {
+            List<List<int>> changeoverTime_3 = new()
+            {
                     new() { 4, 2, 5 },
                     new() { 3, 1, 5 },
                     new() { 3, 4, 5 },
-                });
+                };
 
             // Добавляем матрицы переналадки в changeoverTime
             changeoverTime.Add(0, changeoverTime_1);
@@ -103,12 +103,12 @@ namespace GlobalTest.FirstLevel
             changeoverTime.Add(2, changeoverTime_3);
 
             // Создаём матрицу времени выполнения
-            Matrix proccessingTime = new(new List<List<int>>
-                {
+            List<List<int>> proccessingTime = new()
+            {
                     new() { 1, 2, 5 },
                     new() { 3, 4, 5 },
                     new() { 3, 4, 5 },
-                });
+                };
 
             // Формируем конфигурационный файл
             Config config = new(
@@ -191,31 +191,31 @@ namespace GlobalTest.FirstLevel
             */
 
             // Объявляем матрицу переналадки
-            Dictionary<int, Matrix> changeoverTime = new();
+            Dictionary<int, List<List<int>>> changeoverTime = new();
 
             // Создаём матрицу переналадки для 1 прибора
-            Matrix changeoverTime_1 = new(new List<List<int>>
-                {
+            List<List<int>> changeoverTime_1 = new()
+            {
                     new() { 1, 2, 5 },
                     new() { 3, 4, 5 },
                     new() { 3, 4, 5 },
-                });
+                };
 
             // Создаём матрицу переналадки для 2 прибора
-            Matrix changeoverTime_2 = new(new List<List<int>>
-                {
+            List<List<int>> changeoverTime_2 = new()
+            {
                     new() { 4, 2, 5 },
                     new() { 3, 1, 5 },
                     new() { 3, 4, 5 },
-                });
+                };
 
             // Создаём матрицу переналадки для 3 прибора
-            Matrix changeoverTime_3 = new(new List<List<int>>
-                {
+            List<List<int>> changeoverTime_3 = new()
+            {
                     new() { 4, 2, 5 },
                     new() { 3, 1, 5 },
                     new() { 3, 4, 5 },
-                });
+                };
 
             // Добавляем матрицы переналадки в changeoverTime
             changeoverTime.Add(0, changeoverTime_1);
@@ -223,12 +223,12 @@ namespace GlobalTest.FirstLevel
             changeoverTime.Add(2, changeoverTime_3);
 
             // Создаём матрицу времени выполнения
-            Matrix proccessingTime = new(new List<List<int>>
-                {
+            List<List<int>> proccessingTime = new()
+            {
                     new() { 1, 2, 5 },
                     new() { 3, 4, 5 },
                     new() { 3, 4, 5 },
-                });
+                };
 
             // Формируем конфигурационный файл
             Config config = new(

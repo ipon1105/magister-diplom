@@ -1,13 +1,17 @@
-﻿using magisterDiplom;
+﻿using Json.Net;
+using magisterDiplom;
 using magisterDiplom.Model;
 using magisterDiplom.Utils;
-using newAlgorithm.Model;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices.ComTypes;
+using System.Text;
 using System.Windows.Forms;
+using System.Xml;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace newAlgorithm
 {
@@ -1567,5 +1571,105 @@ namespace newAlgorithm
             firstLevel.GenetateSolutionWithPremaintenance("Premintenance", preMConfig);
         }
 
+        /// <summary>
+        /// Фуния открывает диалоговое окно, для импорта параметров системы
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void button_import_Click(object sender, EventArgs e)
+        {
+
+            // Десереализируем данные
+            //___ data = JsonNet.Deserialize<Pet>(___);
+
+        }
+
+        /// <summary>
+        /// Фуния открывает диалоговое окно, для экспорта параметров системы
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void button_export_Click(object sender, EventArgs e)
+        {
+
+            // Объявляем конфигурационную структуру данных
+            PreMConfig preMConfig;
+
+            // Получаем данные
+            {
+                // Преобразуем входные данные в число типа Double
+                double.TryParse(betaValue.Text, out double beta);
+
+                // Создаём экземпляр конфигурационной структуры
+                Config config = new Config(
+                    dataTypesCount,
+                    deviceCount,
+                    buffer,
+                    proccessingTime,
+                    Config.ChangeoverTimeConverter(changeoverTime),
+                    isFixedBatches
+                );
+
+                // Создаём экземпляр конфигурационной структуры для ПТО
+                preMConfig = new PreMConfig(
+                    config,
+                    preMaintenanceTimes,
+                    failureRates,
+                    restoringDevice,
+                    beta
+                );
+            }
+
+            // var options = new SerializationOptions();
+
+            // Сереализируем данные
+            // string jsonText = JsonNet.Serialize(
+            //     preMConfig,
+            // 
+            // );
+
+            // Открываем диалоговое окно для сохранения файла
+            // {
+            //     Stream myStream;
+            //     SaveFileDialog fileDialog = new SaveFileDialog
+            //     {
+            //         Filter = "json files (*.json)|*.json",
+            //         FilterIndex = 2,
+            //         RestoreDirectory = true
+            //     };
+            // 
+            //     // Пытаемя открыть диалоговое окно
+            //     if (fileDialog.ShowDialog() == DialogResult.OK)
+            //         if ((myStream = fileDialog.OpenFile()) != null)
+            //         {
+            //             byte[] buffer = Encoding.Default.GetBytes($"{jsonText}");
+            //             myStream.Write(buffer, 0, buffer.Length);
+            //             myStream.Close();
+            //         }
+            // }
+        }
+
+        private void betaValue_TextChanged(object sender, EventArgs e)
+        {
+
+            // Преобразуем входные данные в число типа Double
+            double.TryParse(betaValue.Text, out double beta);
+
+            // Если beta будет больше 1
+            if (beta > (double)1.0)
+            {
+                MessageBox.Show("Ошибка. Значение beta не может быть больше 1");
+                betaValue.Text = (0.9999).ToString();
+                return;
+            }
+
+            // Если beta будет меньше 0
+            if (beta < (double)0.0)
+            {
+                MessageBox.Show("Ошибка. Значение beta не может быть меньше 0");
+                betaValue.Text = (0.0001).ToString();
+                return;
+            }
+        }
     }
 }

@@ -38,6 +38,7 @@
             this.button2 = new System.Windows.Forms.Button();
             this.tabControl = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.button_import = new System.Windows.Forms.Button();
             this.GetPreMSolution = new System.Windows.Forms.Button();
             this.groupBox_system_setup = new System.Windows.Forms.GroupBox();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
@@ -90,6 +91,7 @@
             this.label6 = new System.Windows.Forms.Label();
             this.betaValue = new System.Windows.Forms.TextBox();
             this.label15 = new System.Windows.Forms.Label();
+            this.button_export = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.numeric_data_types_count)).BeginInit();
             this.tabControl.SuspendLayout();
             this.tabPage1.SuspendLayout();
@@ -229,6 +231,16 @@
             this.tabPage1.Text = "Установка параметров";
             this.tabPage1.UseVisualStyleBackColor = true;
             // 
+            // button_import
+            // 
+            this.button_import.Location = new System.Drawing.Point(267, 29);
+            this.button_import.Name = "button_import";
+            this.button_import.Size = new System.Drawing.Size(75, 23);
+            this.button_import.TabIndex = 43;
+            this.button_import.Text = "Импорт";
+            this.button_import.UseVisualStyleBackColor = true;
+            this.button_import.Click += new System.EventHandler(this.button_import_Click);
+            // 
             // GetPreMSolution
             // 
             this.GetPreMSolution.Location = new System.Drawing.Point(542, 395);
@@ -241,7 +253,9 @@
             // 
             // groupBox_system_setup
             // 
+            this.groupBox_system_setup.Controls.Add(this.button_export);
             this.groupBox_system_setup.Controls.Add(this.groupBox1);
+            this.groupBox_system_setup.Controls.Add(this.button_import);
             this.groupBox_system_setup.Controls.Add(this.checkBox_logging);
             this.groupBox_system_setup.Controls.Add(this.numeric_data_types_count);
             this.groupBox_system_setup.Controls.Add(this.textBox2);
@@ -908,6 +922,7 @@
             this.betaValue.Size = new System.Drawing.Size(71, 20);
             this.betaValue.TabIndex = 31;
             this.betaValue.Text = "0,90";
+            this.betaValue.TextChanged += new System.EventHandler(this.betaValue_TextChanged);
             // 
             // label15
             // 
@@ -919,6 +934,16 @@
             this.label15.Size = new System.Drawing.Size(31, 82);
             this.label15.TabIndex = 32;
             this.label15.Text = "beta:";
+            // 
+            // button_export
+            // 
+            this.button_export.Location = new System.Drawing.Point(267, 58);
+            this.button_export.Name = "button_export";
+            this.button_export.Size = new System.Drawing.Size(75, 23);
+            this.button_export.TabIndex = 44;
+            this.button_export.Text = "Экспорт";
+            this.button_export.UseVisualStyleBackColor = true;
+            this.button_export.Click += new System.EventHandler(this.button_export_Click);
             // 
             // Form1
             // 
@@ -1023,6 +1048,8 @@
         private System.Windows.Forms.CheckBox checkBox_logging;
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.CheckBox checkBox_ganta;
+        private System.Windows.Forms.Button button_import;
+        private System.Windows.Forms.Button button_export;
     }
 }
 

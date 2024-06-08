@@ -395,7 +395,7 @@ namespace newAlgorithm
                         excelSheet.Cells[displayRowNumber + compositionNumber, displayColumnNumber + 2] = $"{schedule.GetPreMUtility()}";
 
                         // Визуализируем промежуточные данные
-                        visualizeData(tempM, schedule, preMConfig, ref helpRowNumber);
+                        VisualizeData(tempM, schedule, preMConfig, ref helpRowNumber);
                     }
                     var fBuf = schedule.GetMakespan();
                     string s = ListUtils.MatrixIntToString(tempM, ", ", "", ";");
@@ -429,7 +429,7 @@ namespace newAlgorithm
                     excelSheet.Cells[displayRowNumber + compositionNumber, displayColumnNumber + 2] = "#N/A";
                     
                     // Визуализируем промежуточные данные
-                    visualizeData(tempM, schedule, preMConfig, ref helpRowNumber, false);
+                    VisualizeData(tempM, schedule, preMConfig, ref helpRowNumber, false);
                 }
                 // Увеличиваем счётчик составов пакетов заданий
                 compositionNumber++;
@@ -576,11 +576,11 @@ namespace newAlgorithm
         /// <param name="worksheet">Закладка отображения</param>
         /// <param name="row">Номер строки начала отрисовки</param>
         /// <param name="col">Номер столбца начала отрисовки</param>
-        private void visualizeConfig(Worksheet worksheet, int row = 0, int col = 0)
+        private void VisualizeConfig(Worksheet worksheet, int row = 0, int col = 0)
         {
 
             // Объявляем диапазон
-            Excel.Range r = null;
+            Excel.Range r;
 
             // Выводим количество типов данных
             {
@@ -677,13 +677,13 @@ namespace newAlgorithm
         /// <param name="preMConfig">Параметры характеризующие ПТО</param>
         /// <param name="row">Номер строки начала отрисовки</param>
         /// <param name="col">Номер столбца начала отрисовки</param>
-        private void visualizeConfig(Worksheet worksheet, PreMConfig preMConfig, int row = 0, int col = 0)
+        private void VisualizeConfig(Worksheet worksheet, PreMConfig preMConfig, int row = 0, int col = 0)
         {
             // Изменяем название закладки
             worksheet.Name = "Начальные параметры";
 
             // Объявляем диапазон
-            Range r = null;
+            Range r;
 
             // Выводим количество типов данных
             {
@@ -847,9 +847,6 @@ namespace newAlgorithm
                 r = worksheet.Range[worksheet.Cells[row, col], worksheet.Cells[row + config.deviceCount + 1, col + 1]];
                 r.Borders.LineStyle = XlLineStyle.xlContinuous;
                 r.Borders.Weight = XlBorderWeight.xlThin;
-
-                // Изменяем позицию для следующих данных
-                row += config.deviceCount + 3;
             }
         }
 
@@ -858,10 +855,10 @@ namespace newAlgorithm
         /// </summary>
         /// <param name="matrixA">Матрица составов пакетов заданий</param>
         /// <param name="row">Номер строки для отображения</param>
-        private void visualizeUpperLevel(List<List<int>> matrixA, ref int row)
+        private void VisualizeUpperLevel(List<List<int>> matrixA, ref int row)
         {
             // Объявляем диапазон
-            Range r = null;
+            Range r;
 
             // Объявляем номер колонки
             int col = 2;
@@ -953,7 +950,7 @@ namespace newAlgorithm
         /// <param name="preMConfig">Конфигурационная структура для отображения общих данных</param>
         /// <param name="row">Номер строки начала отрисовки</param>
         /// <param name="isSuccessfully">Флаг построения расписания</param>
-        private void visualizeData(
+        private void VisualizeData(
             List<List<int>> matrixA,
             SimplePreMSchedule preMSchedule,
             PreMConfig preMConfig,
@@ -979,7 +976,7 @@ namespace newAlgorithm
             int batchSize = 0;
 
             // Объявляем диапазон
-            Excel.Range r = null;
+            Excel.Range r;
 
             // Получаем матрицу Y
             List<List<int>> matrixY = preMSchedule.GetMatrixY();
@@ -1015,7 +1012,7 @@ namespace newAlgorithm
             calcBatchSize();
 
             // Визуализируем верхний уровень
-            visualizeUpperLevel(matrixA, ref row);
+            VisualizeUpperLevel(matrixA, ref row);
 
             // Вычисляем номер конечной строки
             nextRow = Math.Max(nextRow, row);
@@ -1336,12 +1333,13 @@ namespace newAlgorithm
 
             // Если визуализация включена
             if (Form1.vizualizationOn) {
-                
-                // Инициализируем объект для работы с Excel
-                excelApplication = new Excel.Application();
 
-                // Устанавливаем флаг отображение 
-                excelApplication.Visible = true;
+                // Инициализируем объект для работы с Excel
+                excelApplication = new Excel.Application
+                {
+                    // Устанавливаем флаг отображение 
+                    Visible = true
+                };
 
                 // Создаём вкладку
                 Workbook mainWorkbook = excelApplication.Workbooks.Add(Type.Missing);
@@ -1349,7 +1347,7 @@ namespace newAlgorithm
                 mainWorkbook.Worksheets.Add();
 
                 // Получаем вкладку с параметрами
-                visualizeConfig((Excel.Worksheet)excelApplication.Worksheets.get_Item(1), preMConfig, 1, 1);
+                VisualizeConfig((Excel.Worksheet)excelApplication.Worksheets.get_Item(1), preMConfig, 1, 1);
 
                 // Получаем вкладки и переключаемся на неё
                 excelSheet = (Excel.Worksheet)excelApplication.Worksheets.get_Item(2);
@@ -1404,7 +1402,7 @@ namespace newAlgorithm
                             excelSheet.Cells[displayRowNumber + compositionNumber, displayColumnNumber + 2] = $"{schedule.GetPreMUtility()}";
 
                             // Визуализируем промежуточные данные
-                            visualizeData(PrimeMatrixA, schedule, preMConfig, ref helpRowNumber);
+                            VisualizeData(PrimeMatrixA, schedule, preMConfig, ref helpRowNumber);
                         }
 
                         // Получаем f1 критерий
@@ -1422,7 +1420,7 @@ namespace newAlgorithm
                         excelSheet.Cells[displayRowNumber + compositionNumber, displayColumnNumber + 2] = "#N/A";
 
                         // Визуализируем промежуточные данные
-                        visualizeData(PrimeMatrixA, schedule, preMConfig, ref helpRowNumber, false);
+                        VisualizeData(PrimeMatrixA, schedule, preMConfig, ref helpRowNumber, false);
                     }
                     compositionNumber++;
                 }
@@ -1451,7 +1449,7 @@ namespace newAlgorithm
                         excelSheet.Cells[displayRowNumber + compositionNumber, displayColumnNumber + 2] = $"{schedule.GetPreMUtility()}";
 
                         // Визуализируем промежуточные данные
-                        visualizeData(PrimeMatrixA, schedule, preMConfig, ref helpRowNumber);
+                        VisualizeData(PrimeMatrixA, schedule, preMConfig, ref helpRowNumber);
                     }
 
                     // Получаем f1
@@ -1465,7 +1463,7 @@ namespace newAlgorithm
                     excelSheet.Cells[displayRowNumber + compositionNumber, displayColumnNumber + 2] = "#N/A";
 
                     // Визуализируем промежуточные данные
-                    visualizeData(PrimeMatrixA, schedule, preMConfig, ref helpRowNumber, false);
+                    VisualizeData(PrimeMatrixA, schedule, preMConfig, ref helpRowNumber, false);
                 }
                 compositionNumber++;
 
@@ -1586,7 +1584,7 @@ namespace newAlgorithm
                                         excelSheet.Cells[displayRowNumber + compositionNumber, displayColumnNumber + 2] = "#N/A";
 
                                         // Визуализируем промежуточные данные
-                                        visualizeData(tempA, schedule, preMConfig, ref helpRowNumber, false);
+                                        VisualizeData(tempA, schedule, preMConfig, ref helpRowNumber, false);
                                     }
                                     compositionNumber++;
                                     // Пропускаем обработку
@@ -1598,7 +1596,7 @@ namespace newAlgorithm
                                     excelSheet.Cells[displayRowNumber + compositionNumber, displayColumnNumber + 2] = $"{schedule.GetPreMUtility()}";
 
                                     // Визуализируем промежуточные данные
-                                    visualizeData(tempA, schedule, preMConfig, ref helpRowNumber);
+                                    VisualizeData(tempA, schedule, preMConfig, ref helpRowNumber);
                                 }
                                 compositionNumber++;
                                 // Получаем критерий f1
