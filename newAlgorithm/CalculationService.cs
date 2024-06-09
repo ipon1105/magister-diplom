@@ -129,22 +129,22 @@ namespace newAlgorithm.Service
                     {
 
                         // Для первого прибора выполняем обработку
-                        if (device + 1 == 1)
+                        if (device == 0)
                         {
 
                             // Для первого пакета в последовательности выполняем обработку
                             // 4.1 (4)
-                            if (batchIndex + 1 == 1)
+                            if (batchIndex == 0)
                             {
 
                                 // Если данное задание является первым в пакете, добавляем его в матрицу
-                                if (job + 1 == 1)
+                                if (job == 0)
 
                                     // TODO: Релазиовать наладку приборов
                                     tnMatrix.AddNode(device + 1, batchIndex + 1, job + 1, 0);
 
                                 // Если данное задание не первое и не превышает размер буфера, выполняем обработку
-                                if (1 < job + 1 && job + 1 <= bufferSize + 1)
+                                if (job > 0 && job <= bufferSize)
                                 {
 
                                     // Высчитываем время начала и выполнения задания
@@ -163,8 +163,7 @@ namespace newAlgorithm.Service
 
                                 // Если данное задание превышает размер буфера, выполняем обработку
                                 // 45
-                                // TODO: нет необходимости обрабатывать случай (job + 1 <= currentJobCount), если значение job + 1 не имзеняется динамично, так как условие прописано в 
-                                if (bufferSize + 1 < job + 1 && job + 1 <= currentJobCount)
+                                if (job > bufferSize && job <= currentJobCount - 1)
                                 {
 
                                     // Высчитываем время начала и выполнения задания
@@ -189,12 +188,11 @@ namespace newAlgorithm.Service
                             }
 
                             // Для любого не первого пакета в последовательности выполняем обработку
-                            // TODO: нет необходимости обрабатывать случай (batchIndex + 1 <= batchesForAllDataTypes), если значение batchIndex + 1 не имзеняется динамично, так как условие прописано в цикле
-                            if (2 <= batchIndex + 1 && batchIndex + 1 <= maxBatchesPositions)
+                            if (batchIndex >= 1 && batchIndex <= maxBatchesPositions - 1)
                             {
 
                                 // Для первого задания в пакете выполняем обработку
-                                if (job + 1 == 1)
+                                if (job == 0)
                                 {
 
                                     // Высчитываем время начала и выполнения задания
@@ -222,7 +220,7 @@ namespace newAlgorithm.Service
                                 }
 
                                 // Если данное задание не первое и не превышает размер буфера, выполняем обработку
-                                if (1 < job + 1 && job + 1 <= bufferSize)
+                                if (job > 0 && job <= bufferSize - 1)
                                 {
 
                                     // Высчитываем время начала и выполнения задания
@@ -247,8 +245,7 @@ namespace newAlgorithm.Service
 
                                 // Если данное задание превышает размер буфера, выполняем обработку
                                 // 45
-                                // TODO: нет необходимости обрабатывать случай (job + 1 <= currentJobCount), если значение job + 1 не имзеняется динамично, так как условие прописано в 
-                                if (bufferSize + 1 <= job + 1 && job + 1 <= currentJobCount)
+                                if (job >= bufferSize && job <= currentJobCount - 1)
                                 {
 
                                     // Высчитываем время начала и выполнения задания
@@ -275,16 +272,16 @@ namespace newAlgorithm.Service
 
                         // Для любого не первого и не последнего прибора выполняем обработку
                         //4.3 (6)
-                        if (2 <= device + 1 && device + 1 <= deviceCount - 1)
+                        if (device >= 1 && device <= deviceCount - 2)
                         {
 
                             // Для первого пакета в последовательности выполняем обработку
-                            if(batchIndex + 1 == 1)
+                            if(batchIndex == 0)
                             {
 
                                 // Для первого задания в пакете выполняем обработку
                                 // 49
-                                if (job + 1 == 1)
+                                if (job == 0)
                                 {
 
                                     // Высчитываем время начала и выполнения задания
@@ -303,7 +300,7 @@ namespace newAlgorithm.Service
 
                                 // Если данное задание не первое и не превышает размер буфера, выполняем обработку
                                 //50
-                                if (1 < job + 1 && job + 1 <= bufferSize + 1)
+                                if (job > 0 && job <= bufferSize)
                                 {
 
                                     // Высчитываем время начала и выполнения задания
@@ -332,8 +329,7 @@ namespace newAlgorithm.Service
 
                                 // Если данное задание превышает размер буфера, выполняем обработку
                                 // 45
-                                // TODO: нет необходимости обрабатывать случай (job + 1 <= currentJobCount), если значение job + 1 не имзеняется динамично, так как условие прописано в 
-                                if (bufferSize + 1 < job + 1 && job + 1 <= currentJobCount)
+                                if (job > bufferSize && job <= currentJobCount - 1)
                                 {
 
                                     // Высчитываем время начала и выполнения задания
@@ -369,12 +365,11 @@ namespace newAlgorithm.Service
 
                             // Для любого не первого пакета в последовательности выполняем обработку
                             //4.4 (7)
-                            // TODO: нет необходимости обрабатывать случай (batchIndex + 1 <= batchesForAllDataTypes), если значение batchIndex + 1 не имзеняется динамично, так как условие прописано в цикле
-                            if (2 <= batchIndex + 1 && batchIndex + 1 <= maxBatchesPositions)
+                            if (batchIndex >= 1 && batchIndex <= maxBatchesPositions - 1)
                             {
                                 
                                 // Для первого задания в пакете выполняем обработку
-                                if (job + 1 == 1)
+                                if (job == 0)
                                 {
 
                                     // Высчитываем время начала и выполнения задания
@@ -413,7 +408,7 @@ namespace newAlgorithm.Service
 
                                 // Если данное задание не первое и не превышает размер буфера, выполняем обработку
                                 //53
-                                if (1 < job + 1 && job + 1 <= bufferSize)
+                                if (job > 0 && job <= bufferSize - 1)
                                 {
 
                                     // Высчитываем время начала и выполнения задания
@@ -448,8 +443,7 @@ namespace newAlgorithm.Service
 
                                 // Если данное задание превышает размер буфера, выполняем обработку
                                 // 54
-                                // TODO: нет необходимости обрабатывать случай (job + 1 <= currentJobCount), если значение job + 1 не имзеняется динамично, так как условие прописано в 
-                                if (bufferSize + 1 <= job + 1 && job + 1 <= currentJobCount)
+                                if (job >= bufferSize && job <= currentJobCount - 1)
                                 {
 
                                     // Высчитываем время начала и выполнения задания
@@ -485,15 +479,15 @@ namespace newAlgorithm.Service
                         }
 
                         // Для последнего прибора выполняем обработку
-                        if (device + 1 == deviceCount)
+                        if (device == deviceCount - 1)
                         {
 
                             // Для первого пакета в последовательности выполняем обработку
-                            if (batchIndex + 1 == 1)
+                            if (batchIndex == 0)
                             {
 
                                 // Для первого задания в пакете выполняем обработку
-                                if (job + 1 == 1)
+                                if (job == 0)
                                 {
 
                                     // Подсчитываем время выполнения для всех пакетов
@@ -502,7 +496,7 @@ namespace newAlgorithm.Service
                                         result += getProccessingTimeOnDeviceInBatch(li - 1, 0);
 
                                     // Добавляем результат в матрицу
-                                    tnMatrix.AddNode(deviceCount, batchIndex + 1, job + 1, result);
+                                    tnMatrix.AddNode(deviceCount, 0 + 1, 0 + 1, result);
 
                                     // Продолжаем вычисления для следующего прибора
                                     continue;
@@ -511,7 +505,7 @@ namespace newAlgorithm.Service
                                 // Если данное задание превышает размер буфера, выполняем обработку
                                 // 45
                                 // TODO: нет необходимости обрабатывать случай (job + 1 <= currentJobCount), если значение job + 1 не имзеняется динамично, так как условие прописано в 
-                                if (1 < job + 1 && job + 1 <= currentJobCount)
+                                if (job > 0 && job <= currentJobCount - 1)
                                 {
 
                                     // Высчитываем время начала и выполнения задания
@@ -541,12 +535,11 @@ namespace newAlgorithm.Service
 
                             // Дл
                             // 4.5 (9)
-                            // TODO: нет необходимости обрабатывать случай (batchIndex + 1 <= batchesForAllDataTypes), если значение batchIndex + 1 не имзеняется динамично, так как условие прописано в цикле
-                            if (2 <= batchIndex + 1 && batchIndex + 1 <= maxBatchesPositions)
+                            if (batchIndex >= 1 && batchIndex <= maxBatchesPositions - 1)
                             {
 
                                 // Для первого задания в пакете выполняем 
-                                if (job + 1 == 1)
+                                if (job == 0)
                                 {
 
                                     // Высчитываем время начала и выполнения задания
@@ -581,7 +574,7 @@ namespace newAlgorithm.Service
                                 // Если данное задание превышает размер буфера, выполняем обработку
                                 // 48
                                 // TODO: нет необходимости обрабатывать случай (job + 1 <= currentJobCount), если значение job + 1 не имзеняется динамично, так как условие прописано в 
-                                if (1 < job + 1 && job + 1 <= currentJobCount)
+                                if (job > 0 && job <= currentJobCount - 1)
                                 {
 
                                     // Высчитываем время начала и выполнения задания
