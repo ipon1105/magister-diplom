@@ -328,7 +328,7 @@ namespace newAlgorithm
         /// <param name="file"></param>
         /// <param name="tempA"></param>
         /// <param name="type"></param>
-        public void CombinationType(StreamWriter file, List<List<List<int>>> tempMatrix, int type, List<List<int>> tempM, ref Schedule schedule, ref bool solutionFlag )
+        public void CombinationType(StreamWriter file, List<List<List<int>>> tempMatrix, int type, List<List<int>> tempM, ref BufferSchedule schedule, ref bool solutionFlag, ref int helpRowNumber)
         {
             if (type < config.dataTypesCount)
             {
@@ -337,10 +337,22 @@ namespace newAlgorithm
                     List<List<int>> tempB = (tempM != null) ? ListUtils.MatrixIntDeepCopy(tempM) : new List<List<int>>();
 
                     tempB.Add(tempMatrix[type][variantOfSplitIndex]);
-                    CombinationType(file, tempMatrix, type + 1, tempB, ref schedule, ref solutionFlag);
+                    CombinationType(file, tempMatrix, type + 1, tempB, ref schedule, ref solutionFlag, ref helpRowNumber);
                 }
             } else {
                 schedule.Build(tempM);
+
+                // Если установлен флаг визуализации
+                if (Form1.vizualizationOn)
+                {
+                    excelSheet.Cells[displayRowNumber + compositionNumber, displayColumnNumber + 0] = $"{compositionNumber}";
+                    excelSheet.Cells[displayRowNumber + compositionNumber, displayColumnNumber + 1] = $"{schedule.GetMakespan()}";
+                    excelSheet.Cells[displayRowNumber + compositionNumber, displayColumnNumber + 2] = $"{schedule.GetPreMUtility()}";
+
+                    // Визуализируем промежуточные данные
+                    VisualizeData(PrimeMatrixA, schedule, ref helpRowNumber);
+                    compositionNumber++;
+                }
                 var fBuf = schedule.GetMakespan();
                 string s = ListUtils.MatrixIntToString(tempM, ", ", "", ";");
                 file.Write(s + " " + fBuf);
@@ -439,12 +451,85 @@ namespace newAlgorithm
         /// </summary>
         public void GenetateSolutionForAllTypes(string fileName)
         {
+            // Устанавливам номер строки
+            int helpRowNumber = 1;
+
+            // Формируем имя файла
+            logFileNamePrefix = $"{DateTime.Now.Day}_{DateTime.Now.Month}_{DateTime.Now.Year}_{DateTime.Now.Hour}_{DateTime.Now.Minute}";
+
+            // Инициализируем значения
+            compositionNumber = 1;
+            displayRowNumber = 1;
+            displayColumnNumber = 1;
+
+            // Инициализируем объект для работы с Excel
+            excelApplication = null;
+
+            // Инициализируем владки для работы с Excel
+            excelSheet = null; metaDataSheet = null;
+
+            // Объявляем линейный график
+            ChartObjects linerChart = null;
+
+            // Если визуализация включена
+            if (Form1.vizualizationOn)
+            {
+
+                // Инициализируем объект для работы с Excel
+                excelApplication = new Excel.Application
+                {
+                    // Устанавливаем флаг отображение 
+                    Visible = true
+                };
+
+                // Создаём вкладку
+                Workbook mainWorkbook = excelApplication.Workbooks.Add(Type.Missing);
+                mainWorkbook.Worksheets.Add();
+                mainWorkbook.Worksheets.Add();
+
+                // Получаем вкладку с параметрами
+                VisualizeConfig((Excel.Worksheet)excelApplication.Worksheets.get_Item(1), 1, 1);
+
+                // Получаем вкладки и переключаемся на неё
+                excelSheet = (Excel.Worksheet)excelApplication.Worksheets.get_Item(2);
+                excelSheet.Activate();
+
+                // Устанавливаем имя вкладки
+                excelSheet.Name = "Результаты";
+
+                excelSheet.Cells[displayRowNumber, displayColumnNumber + 0] = "Номер состава";
+                excelSheet.Cells[displayRowNumber, displayColumnNumber + 1] = "Критерий f1";
+                excelSheet.Cells[displayRowNumber, displayColumnNumber + 2] = "Критерий f2";
+
+                excelSheet.Rows.AutoFit();
+                excelSheet.Columns.AutoFit();
+
+                // Получаем вкладку с параметрами
+                metaDataSheet = (Excel.Worksheet)excelApplication.Worksheets.get_Item(3);
+
+                // Устанавливаем имя вкладки
+                metaDataSheet.Name = "Промежуточные данные";
+            }
+
             using (var file = new StreamWriter(fileName))
             {
                 GenerateFixedBatchesSolution();
-                Schedule schedule = new BufferSchedule(config);
-                //shedule.ConstructShedule();
+                BufferSchedule schedule = new BufferSchedule(config);
+                
                 schedule.Build(PrimeMatrixA);
+
+                // Если установлен флаг визуализации
+                if (Form1.vizualizationOn)
+                {
+                    excelSheet.Cells[displayRowNumber + compositionNumber, displayColumnNumber + 0] = $"{compositionNumber}";
+                    excelSheet.Cells[displayRowNumber + compositionNumber, displayColumnNumber + 1] = $"{schedule.GetMakespan()}";
+                    excelSheet.Cells[displayRowNumber + compositionNumber, displayColumnNumber + 2] = $"{schedule.GetPreMUtility()}";
+
+                    // Визуализируем промежуточные данные
+                    VisualizeData(PrimeMatrixA, schedule, ref helpRowNumber);
+                    compositionNumber++;
+                }
+
                 f1Current = schedule.GetMakespan();
 
                 MessageBox.Show(ListUtils.MatrixIntToString(PrimeMatrixA, ", ", "", ";") + "Время обработки " + f1Current);
@@ -457,6 +542,17 @@ namespace newAlgorithm
                 GenerateStartSolution();
 
                 schedule.Build(PrimeMatrixA);
+                // Если установлен флаг визуализации
+                if (Form1.vizualizationOn)
+                {
+                    excelSheet.Cells[displayRowNumber + compositionNumber, displayColumnNumber + 0] = $"{compositionNumber}";
+                    excelSheet.Cells[displayRowNumber + compositionNumber, displayColumnNumber + 1] = $"{schedule.GetMakespan()}";
+                    excelSheet.Cells[displayRowNumber + compositionNumber, displayColumnNumber + 2] = $"{schedule.GetPreMUtility()}";
+
+                    // Визуализируем промежуточные данные
+                    VisualizeData(PrimeMatrixA, schedule, ref helpRowNumber);
+                    compositionNumber++;
+                }
                 f1Current = schedule.GetMakespan();
                 MessageBox.Show(ListUtils.MatrixIntToString(PrimeMatrixA, ", ", "", ";") + " Время обработки " + f1Current);
                 if (f1Current < f1Optimal)
@@ -520,6 +616,17 @@ namespace newAlgorithm
                             {
                                 tempA = SetTempAFromA2(dataType, batchIndex);
                                 schedule.Build(tempA);
+                                // Если установлен флаг визуализации
+                                if (Form1.vizualizationOn)
+                                {
+                                    excelSheet.Cells[displayRowNumber + compositionNumber, displayColumnNumber + 0] = $"{compositionNumber}";
+                                    excelSheet.Cells[displayRowNumber + compositionNumber, displayColumnNumber + 1] = $"{schedule.GetMakespan()}";
+                                    excelSheet.Cells[displayRowNumber + compositionNumber, displayColumnNumber + 2] = $"{schedule.GetPreMUtility()}";
+
+                                    // Визуализируем промежуточные данные
+                                    VisualizeData(PrimeMatrixA, schedule, ref helpRowNumber);
+                                    compositionNumber++;
+                                }
                                 var fBuf = schedule.GetMakespan();
                                 s = ListUtils.MatrixIntToString(tempA, ", ", "", ";");
                                 file.Write(s + " " + fBuf);
@@ -537,7 +644,7 @@ namespace newAlgorithm
                         if (!isBestSolution)
                         {
                             file.WriteLine("комбинации типов");
-                            CombinationType(file, _a2, 0, null, ref schedule, ref isBestSolution);
+                            CombinationType(file, _a2, 0, null, ref schedule, ref isBestSolution, ref helpRowNumber);
                         }
 
                         if (isBestSolution)
@@ -579,7 +686,7 @@ namespace newAlgorithm
             // Выводим количество типов данных
             {
                 worksheet.Cells[row, col] = "Типов данных:";
-                worksheet.Cells[row, col].EntireRow.Font.Bold = true;
+                worksheet.Cells[row, col].Font.Bold = true;
                 worksheet.Cells[row, col + 1] = $"{config.dataTypesCount}";
                 r = worksheet.Range[worksheet.Cells[row, col], worksheet.Cells[row, col + 1]];
                 r.Borders.LineStyle = XlLineStyle.xlContinuous;
@@ -590,7 +697,7 @@ namespace newAlgorithm
             // Выводим количество приборов
             {
                 worksheet.Cells[row, col] = "Приборов:";
-                worksheet.Cells[row, col].EntireRow.Font.Bold = true;
+                worksheet.Cells[row, col].Font.Bold = true;
                 worksheet.Cells[row, col + 1] = $"{config.deviceCount}";
                 r = worksheet.Range[worksheet.Cells[row, col], worksheet.Cells[row, col + 1]];
                 r.Borders.LineStyle = XlLineStyle.xlContinuous;
@@ -605,25 +712,26 @@ namespace newAlgorithm
                 r.Columns.AutoFit();
                 worksheet.Cells[row, col] = "Времени выполнения";
                 worksheet.Cells[row, col].HorizontalAlignment = Excel.XlHAlign.xlHAlignCenter;
-                worksheet.Cells[row, col].EntireRow.Font.Bold = true;
+                worksheet.Cells[row, col].Font.Bold = true;
                 for (int dataType = 0; dataType < config.dataTypesCount; dataType++)
-                    worksheet.Cells[row, col + dataType + 1] = $"Тип {dataType + 1}";
+                    worksheet.Cells[row + 1, col + dataType + 1] = $"Тип {dataType + 1}";
                 for (int device = 0; device < config.deviceCount; device++)
                 {
-                    worksheet.Cells[row + device + 1, col] = $"Прибор {device + 1}";
-                    worksheet.Cells[row + device + 1, col].HorizontalAlignment = Excel.XlHAlign.xlHAlignRight;
+                    worksheet.Cells[row + device + 2, col] = $"Прибор {device + 1}";
+                    worksheet.Cells[row + device + 2, col].HorizontalAlignment = Excel.XlHAlign.xlHAlignRight;
                 }
                 for (int device = 0; device < config.deviceCount; device++)
                     for (int dataType = 0; dataType < config.dataTypesCount; dataType++)
-                        worksheet.Cells[row + device + 1, col + dataType + 1] = $"{config.proccessingTime[device][dataType]}";
+                        worksheet.Cells[row + device + 2, col + dataType + 1] = $"{config.proccessingTime[device][dataType]}";
 
                 // Получаем диапазон ячеек и устанавливаем границы
-                r = worksheet.Range[worksheet.Cells[row, col], worksheet.Cells[row + config.deviceCount, col + config.dataTypesCount]];
+                r = worksheet.Range[worksheet.Cells[row, col], worksheet.Cells[row + config.deviceCount + 1, col + config.dataTypesCount]];
                 r.Borders.LineStyle = XlLineStyle.xlContinuous;
                 r.Borders.Weight = XlBorderWeight.xlThin;
 
                 // Изменяем позицию для следующих данных
-                row += config.deviceCount + 2;
+                col += config.dataTypesCount + 2;
+                row = 1;
             }
 
             // Визуализируем матрицу переналадки
@@ -634,10 +742,10 @@ namespace newAlgorithm
                     // Визуализируем матрицу переналадки для прибора device
                     r = worksheet.Range[worksheet.Cells[row, col], worksheet.Cells[row, col + config.dataTypesCount]];
                     r.Merge(true);
-                    r.Columns.AutoFit();
                     worksheet.Cells[row, col] = $"Переналадка для прибора {device + 1}";
                     worksheet.Cells[row, col].HorizontalAlignment = Excel.XlHAlign.xlHAlignCenter;
-                    worksheet.Cells[row, col].EntireRow.Font.Bold = true;
+                    worksheet.Cells[row, col].Font.Bold = true;
+                    r.Columns.AutoFit();
                     for (int fromDataType = 0; fromDataType < config.dataTypesCount; fromDataType++)
                     {
                         worksheet.Cells[row + fromDataType + 2, col] = $"Тип {fromDataType + 1}";
@@ -657,6 +765,9 @@ namespace newAlgorithm
                     // Изменяем позицию для следующих данных
                     row += config.dataTypesCount + 3;
                 }
+
+                row = 1;
+                col += config.dataTypesCount + 2;
             }
 
             // Устанавливаем авторасширение блока по тексту
@@ -1298,6 +1409,280 @@ namespace newAlgorithm
             // Устанавливаем следующую строку
             row = nextRow + 2;
         }
+
+
+        /// <summary>
+        /// Функция отображает информацию о обрабатываемых данных в Excel форме
+        /// </summary>
+        /// <param name="metaDataSheet">Закладка на который выполняется отображение данных верхенго уровня</param>
+        /// <param name="matrixA">Матрица составов пакетов заданий</param>
+        /// <param name="schedule">Класс для получения данных из нижнего уровня</param>
+        /// <param name="config">Конфигурационная структура для отображения общих данных</param>
+        /// <param name="row">Номер строки начала отрисовки</param>
+        /// <param name="isSuccessfully">Флаг построения расписания</param>
+        private void VisualizeData(
+            List<List<int>> matrixA,
+            BufferSchedule schedule,
+            ref int row
+        ) {
+
+            // Устанавливаем номер колонки
+            int col = 2;
+
+            // Объявим и инициализируем начальную строку
+            int startRow = row;
+
+            // Объявим и инициализируем конечную строку
+            int nextRow = row;
+
+            // Объявляем максимальное количество заданий
+            int maxJobCount = 0;
+
+            // Объявляем максимальное количество пакетов заданий
+            int maxBatchCount = 0;
+
+            int batchSize = 0;
+
+            // Объявляем диапазон
+            Excel.Range r;
+
+            // Функция подсчёта максимального количества заданий
+            void calcMaxJobCount()
+            {
+                for (int dataType = 0; dataType < this.config.dataTypesCount; dataType++)
+                    for (int batchIndex = 0; batchIndex < matrixA[dataType].Count; batchIndex++)
+                        maxJobCount = Math.Max(maxJobCount, matrixA[dataType][batchIndex]);
+            }
+
+            // Функция расчёта максимального количества пакетов заданий
+            void calcMaxBatchCount()
+            {
+                for (int dataType = 0; dataType < this.config.dataTypesCount; dataType++)
+                    maxBatchCount = Math.Max(maxBatchCount, matrixA[dataType].Count);
+            }
+
+            // Функция расчёта общего количества пакетов заданий
+            void calcBatchSize()
+            {
+                for (int dataType = 0; dataType < this.config.dataTypesCount; dataType++)
+                    batchSize += matrixA[dataType].Count;
+            }
+
+            // Вычисляем максимальное количество заданий
+            calcMaxJobCount();
+
+            // Вычисляем максимальное количество пакетов заданий
+            calcMaxBatchCount();
+
+            // Вычисляем общее количество пакетов заданий
+            calcBatchSize();
+
+            // Визуализируем верхний уровень
+            VisualizeUpperLevel(matrixA, ref row);
+
+            // Вычисляем номер конечной строки
+            nextRow = Math.Max(nextRow, row);
+
+            // Устанавливаем номер колонки со смещением
+            col += maxBatchCount + 2;
+
+            // Устанавливаем начальный номер строки
+            row = startRow;
+
+            // Отображаем матрицу P
+            {
+                // Получаем матрицу P
+                List<List<int>> matrixP = schedule.GetMatrixP();
+
+                // Объединяем несколько ячеек для заголовка
+                r = metaDataSheet.Range[metaDataSheet.Cells[row, col], metaDataSheet.Cells[row, col + batchSize]];
+                r.Merge(true);
+
+                // Выводим заголовок таблицы
+                metaDataSheet.Cells[row, col] = "Матрица P";
+                metaDataSheet.Cells[row, col].Font.Bold = true;
+                metaDataSheet.Cells[row, col].HorizontalAlignment = Excel.XlHAlign.xlHAlignCenter;
+
+                // Устанавливаем автовыравнивание
+                r.Columns.AutoFit();
+
+                for (int dataType = 0; dataType < matrixP.Count; dataType++)
+                    metaDataSheet.Cells[row + dataType + 2, col] = $"Тип {dataType + 1}";
+                for (int batchIndex = 0; batchIndex < matrixP[0].Count; batchIndex++)
+                    metaDataSheet.Cells[row + 1, col + batchIndex + 1] = $"ПЗ {batchIndex + 1}";
+                for (int dataType = 0; dataType < matrixP.Count; dataType++)
+                    for (int batchIndex = 0; batchIndex < matrixP[0].Count; batchIndex++)
+                        metaDataSheet.Cells[row + dataType + 2, col + batchIndex + 1] = $"{matrixP[dataType][batchIndex]}";
+
+                // Обводим границы
+                r = metaDataSheet.Range[metaDataSheet.Cells[row, col], metaDataSheet.Cells[row + this.config.dataTypesCount + 1, col + matrixP[0].Count]];
+                r.Borders.LineStyle = XlLineStyle.xlContinuous;
+                r.Borders.Weight = XlBorderWeight.xlThin;
+
+                nextRow = Math.Max(nextRow, row + matrixP.Count + 1);
+
+                // Устанавливаем следующий стобец
+                row += matrixP.Count + 2;
+            }
+
+            // Отображаем матрицу R
+            {
+                // Получаем матрицу R
+                List<List<int>> matrixR = schedule.GetMatrixR();
+
+                // Объединяем несколько ячеек для заголовка
+                r = metaDataSheet.Range[metaDataSheet.Cells[row, col], metaDataSheet.Cells[row, col + batchSize]];
+                r.Merge(true);
+
+                // Выводим заголовок таблицы
+                metaDataSheet.Cells[row, col] = "Матрица R";
+                metaDataSheet.Cells[row, col].Font.Bold = true;
+                metaDataSheet.Cells[row, col].HorizontalAlignment = Excel.XlHAlign.xlHAlignCenter;
+
+                // Устанавливаем автовыравнивание
+                r.Columns.AutoFit();
+
+                for (int dataType = 0; dataType < matrixR.Count; dataType++)
+                    metaDataSheet.Cells[row + dataType + 2, col] = $"Тип {dataType + 1}";
+                for (int batchIndex = 0; batchIndex < matrixR[0].Count; batchIndex++)
+                    metaDataSheet.Cells[row + 1, col + batchIndex + 1] = $"ПЗ {batchIndex + 1}";
+                for (int dataType = 0; dataType < matrixR.Count; dataType++)
+                    for (int batchIndex = 0; batchIndex < matrixR[0].Count; batchIndex++)
+                        metaDataSheet.Cells[row + dataType + 2, col + batchIndex + 1] = $"{matrixR[dataType][batchIndex]}";
+
+                // Обводим границы
+                r = metaDataSheet.Range[metaDataSheet.Cells[row, col], metaDataSheet.Cells[row + this.config.dataTypesCount + 1, col + matrixR[0].Count]];
+                r.Borders.LineStyle = XlLineStyle.xlContinuous;
+                r.Borders.Weight = XlBorderWeight.xlThin;
+
+                nextRow = Math.Max(nextRow, row + matrixR.Count + 1);
+
+                // Устанавливаем следующий стобец
+                row += matrixR.Count + 2;
+            }
+            
+            // Отображаем матрицу T^0l
+            {
+
+                // Получаем матрицу T^0l
+                Dictionary<int, List<List<int>>> startProcessing = schedule.GetStartProcessing();
+
+                // Отображаем таблицу
+                for (int device = 0; device < this.config.deviceCount; device++)
+                {
+
+                    // Объединяем несколько ячеек для заголовка
+                    r = metaDataSheet.Range[metaDataSheet.Cells[row, col], metaDataSheet.Cells[row, col + maxJobCount]];
+                    r.Merge(true);
+
+                    // Устанавливаем автовыравнивание
+                    r.Columns.AutoFit();
+
+                    // Заголовок
+                    metaDataSheet.Cells[row, col] = $"Матрица T^0{device + 1}";
+                    metaDataSheet.Cells[row, col].Font.Bold = true;
+                    metaDataSheet.Cells[row, col].HorizontalAlignment = XlHAlign.xlHAlignCenter;
+                    for (int batchIndex = 0; batchIndex < startProcessing[device].Count(); batchIndex++)
+                        metaDataSheet.Cells[row + batchIndex + 2, col] = $"ПЗ {batchIndex + 1}";
+                    metaDataSheet.Cells[row + 1, col] = "Задание:";
+                    for (int job = 0; job < maxJobCount; job++)
+                        metaDataSheet.Cells[row + 1, col + job + 1] = job + 1;
+                    for (int batchIndex = 0; batchIndex < startProcessing[device].Count(); batchIndex++)
+                        for (int job = 0; job < startProcessing[device][batchIndex].Count; job++)
+                            metaDataSheet.Cells[row + batchIndex + 2, col + job + 1] = startProcessing[device][batchIndex][job];
+
+                    // Обводим границы
+                    r = metaDataSheet.Range[metaDataSheet.Cells[row, col], metaDataSheet.Cells[row + startProcessing[device].Count() + 1, col + maxJobCount]];
+                    r.Borders.LineStyle = XlLineStyle.xlContinuous;
+                    r.Borders.Weight = XlBorderWeight.xlThin;
+
+                    row += startProcessing[device].Count() + 2;
+                }
+
+                nextRow = Math.Max(nextRow, row + 1);
+
+                // Если установлен флаг отрисовки диагрммы Ганта
+                if (Form1.gantaOn)
+                {
+
+                    row = startRow;
+                    col = col + maxJobCount + 2;
+
+                    // Для каждого прибора
+                    for (int device = 0; device < this.config.deviceCount; device++)
+
+                        // Отображаем прибора
+                        metaDataSheet.Cells[row + device + 1, col] = $"Прибор {device + 1}";
+
+                    // Для каждого момента времени
+                    for (int time = 0; time <= schedule.GetMakespan(); time++)
+                    {
+
+                        // Отображаем время
+                        metaDataSheet.Cells[row, col + time + 1] = time;
+                        metaDataSheet.Cells[row, col + time + 1].Columns.AutoFit();
+                    }
+
+                    // Для каждого прибора
+                    for (int device = 0; device < this.config.deviceCount; device++)
+                    {
+
+                        // Для каджого типа данных
+                        for (int batchIndex = 0; batchIndex < startProcessing[device].Count; batchIndex++)
+                        {
+
+                            // Для каждого момента времени
+                            for (int job = 0; job < startProcessing[device][batchIndex].Count; job++)
+                            {
+
+                                // Выводим информацию
+                                metaDataSheet.Cells[row + device + 1, col + startProcessing[device][batchIndex][job] + 1] = $"Тип {schedule.GetDataTypeByBatchIndex(batchIndex) + 1}";
+
+                                // Получаем диапазон задания
+                                r = metaDataSheet.Range[metaDataSheet.Cells[row + device + 1, col + startProcessing[device][batchIndex][job] + 1], metaDataSheet.Cells[row + device + 1, col + startProcessing[device][batchIndex][job] + this.config.proccessingTime[device][schedule.GetDataTypeByBatchIndex(batchIndex)]]];
+                                r.Merge(true);
+                                r.Borders.LineStyle = XlLineStyle.xlContinuous;
+                                r.Borders.Weight = XlBorderWeight.xlThin;
+                                r.Interior.Color = System.Drawing.ColorTranslator.ToOle(System.Drawing.Color.Lime);
+                            }
+
+                        }
+                    }
+
+                    // Устанавливаем границы
+                    r = metaDataSheet.Range[metaDataSheet.Cells[row, col], metaDataSheet.Cells[row + this.config.deviceCount, col + schedule.GetMakespan() + 1]];
+                    r.Borders.LineStyle = XlLineStyle.xlContinuous;
+                    r.Borders.Weight = XlBorderWeight.xlThin;
+                }
+            }
+
+            // Устанавливаем номер состава ПЗ
+            metaDataSheet.Cells[startRow, 1] = compositionNumber;
+
+            // Получаем диапазон данных высотой в количество занимаемых строк
+            r = metaDataSheet.Range[
+                metaDataSheet.Cells[startRow, 1],
+                metaDataSheet.Cells[nextRow, 1]
+            ];
+
+            // Объединяем ячейки
+            r.Merge(Type.Missing);
+
+            // Растягиваем ширину диапазона
+            r.Columns.AutoFit();
+
+            // Выравниваем текст по центру
+            r.HorizontalAlignment = XlHAlign.xlHAlignCenter;
+            r.VerticalAlignment = XlVAlign.xlVAlignCenter;
+
+            // Устанавливаем границы
+            r.Borders.LineStyle = XlLineStyle.xlContinuous;
+            r.Borders.Weight = XlBorderWeight.xlThin;
+
+            // Устанавливаем следующую строку
+            row = nextRow + 2;
+        }
+
 
         /// <summary>
         /// Алгоритм формирования решения по составам паритй всех типов данных

@@ -743,6 +743,16 @@ namespace magisterDiplom.Fabric
             }
         }
 
+        /// <summary>
+        /// Вернёт тип данных по переданному индексу ПЗ
+        /// </summary>
+        /// <param name="batchIndex">Индекс ПЗ</param>
+        /// <returns>Тип данных</returns>
+        public int GetDataTypeByBatchIndex(int batchIndex)
+        {
+            return this.schedule[batchIndex].Type;
+        }
+
         public override int GetMakespan()
         {
             return this.startProcessing[this.config.deviceCount - 1].Last().Last() + this.config.proccessingTime.Last()[this.schedule.Last().Type];
@@ -792,6 +802,7 @@ namespace magisterDiplom.Fabric
 
         public override Dictionary<int, List<List<int>>> GetStartProcessing()
         {
+            CalcStartProcessing();
             return startProcessing;
         }
     }
