@@ -214,32 +214,538 @@ namespace magisterDiplom.Fabric
 
         private void CalcStartProcessing()
         {
-            
+
             // Отчищаяем данные
             this.startProcessing?.Clear();
 
             // Инициализируем новые данные матрицы
-            for (int device = 0; device < this.config.deviceCount; device++){
+            for (int device = 0; device < this.config.deviceCount; device++)
+            {
                 this.startProcessing.Add(device, new List<List<int>>(this.schedule.Count()));
                 for (int batchIndex = 0; batchIndex < this.schedule.Count(); batchIndex++)
                     this.startProcessing[device].Add(ListUtils.InitVectorInt(this.schedule[batchIndex].Size));
             }
 
-            // Выполняем построение матрицы времён начала заданий
-            CalculationService.CalculateTnMatrix(
-                this.GetMatrixR(),
-                this.GetMatrixP(),
-                this.config.proccessingTime,
-                this.config.changeoverTime,
-                this.config.buffer,
-                this.config.deviceCount,
-                ref this.startProcessing
-            );
+            // Количество пакетов для всех типов данных, так же известное как n_p
+            int maxBatchesPositions = schedule.Count();
+
+            // Предыдущий тип
+            int previousDataType = 0;
+            int previousJobCount = 0;
+
+            // Для всех пакетов выполняем обработку. batchIndex так же известен, как h
+            for (int batchIndex = 0; batchIndex < maxBatchesPositions; batchIndex++)
+            {
+                
+                int currentJobCount = schedule[batchIndex].Size;
+                int currentDataType = schedule[batchIndex].Type;
+
+                // Для всех заданий выполняем обработку. job так же известен, как q
+                for (int job = 0; job < currentJobCount; job++)
+                {
+
+                    // Для всех приборов выполняем обработку
+                    for (int device = 0; device < config.deviceCount; device++)
+                    {
+
+                        // Для первого прибора выполняем обработку
+                        if (device == 0)
+                        {
+
+                            // Для первого пакета в последовательности выполняем обработку
+                            // 4.1 (4)
+                            if (batchIndex == 0)
+                            {
+
+                                // Если данное задание является первым в пакете, добавляем его в матрицу
+                                if (job == 0)
+
+                                    // TODO: Релазиовать наладку приборов
+                                    startProcessing[device][batchIndex][job] = 0;
+
+                                // Если данное задание не первое и не превышает размер буфера, выполняем обработку
+                                if (job > 0 && job <= config.buffer)
+                                {
+
+                                    // Высчитываем время начала и выполнения задания
+                                    int startTime = startProcessing[device][batchIndex][job - 1];
+                                    int procTime = config.proccessingTime[device][schedule[batchIndex].Type];
+
+                                    // Высчитываем время конца выполнения задания
+                                    int stopTime = startTime + procTime;
+
+                                    // Добавляем время конца выполнения задания матрицу
+                                    startProcessing[device][batchIndex][job] = stopTime;
+
+                                    // Продолжаем вычисления для следующего прибора
+                                    continue;
+                                }
+
+                                // Если данное задание превышает размер буфера, выполняем обработку
+                                // 45
+                                if (job > config.buffer && job <= currentJobCount - 1)
+                                {
+
+                                    // Высчитываем время начала и выполнения задания
+                                    // int startTime = tnMatrix[device + 1, batchIndex + 1, job + 1 - 1];
+                                    int startTime = startProcessing[device][batchIndex][job - 1];
+                                    int procTime = config.proccessingTime[device][schedule[batchIndex].Type];
+
+                                    // Высчитываем время конца выполнения задания
+                                    int stopTime = startTime + procTime;
+
+                                    // Время начала задания на следующем приборе 
+                                    // int startBufferTime = tnMatrix[device + 1 + 1, batchIndex + 1, job + 1 - bufferSize];
+                                    int startBufferTime = startProcessing[device + 1][batchIndex][job - config.buffer];
+
+                                    // Выбираем между время между концом выполнения текущего задания и началом выполнения задания в буфере на следующем приборе
+                                    int resultTime = Math.Max(stopTime, startBufferTime);
+
+                                    // Добавляем результат в матрицу
+                                    startProcessing[device][batchIndex][job] = resultTime;
+                                }
+
+                                // Продолжаем вычисления для следующего прибора
+                                continue;
+                            }
+
+                            // Для любого не первого пакета в последовательности выполняем обработку
+                            if (batchIndex >= 1 && batchIndex <= maxBatchesPositions - 1)
+                            {
+
+                                // Для первого задания в пакете выполняем обработку
+                                if (job == 0)
+                                {
+
+                                    // Высчитываем время начала и выполнения задания
+                                    int startTime = startProcessing[device][batchIndex - 1].Last();
+                                    int procTime = config.proccessingTime[device][schedule[batchIndex - 1].Type];
+
+                                    // Высчитываем время переналадки с предыдущего типа на текущий
+                                    // int changeTime = timeChangeover[device + 1, previousType, currentDataType];
+                                    int changeTime = config.changeoverTime[device][previousDataType][currentDataType];
+
+                                    // Высчитываем время конца выполнения задания
+                                    int stopTime = changeTime + startTime + procTime;
+
+                                    // Время начала задания на следующем приборе предыдущего пакета предыдущего задания
+                                    int startBufferTime = 0;
+                                    if (previousJobCount - config.buffer >= 0 && previousJobCount - config.buffer < startProcessing[device + 1][batchIndex - 1].Count())
+                                        startBufferTime = startProcessing[device + 1][batchIndex - 1][previousJobCount - config.buffer];
+
+                                    // Выбираем между время между концом выполнения текущего задания и началом выполнения задания в буфере на следующем приборе
+                                    int result = Math.Max(stopTime, startBufferTime);
+
+                                    // Добавляем результат в матрицу
+                                    startProcessing[device][batchIndex][job] = result;
+
+                                    // Продолжаем вычисления для следующего прибора
+                                    continue;
+                                }
+
+                                // Если данное задание не первое и не превышает размер буфера, выполняем обработку
+                                if (job > 0 && job <= config.buffer - 1)
+                                {
+
+                                    // Высчитываем время начала и выполнения задания
+                                    int startTime = startProcessing[device][batchIndex][job - 1];
+                                    int procTime = config.proccessingTime[device][schedule[batchIndex].Type];
+
+                                    // Высчитываем время конца выполнения задания
+                                    int stopTime = startTime + procTime;
+
+                                    // Время начала задания на следующем приборе предыдущего пакета предыдущего задания
+                                    int startBufferTime = 0;
+                                    if (previousJobCount - config.buffer + job >= 0 && previousJobCount - config.buffer + job < startProcessing[device + 1][batchIndex - 1].Count())
+                                        startBufferTime = startProcessing[device + 1][batchIndex - 1][previousJobCount - config.buffer + job];
+
+                                    // Выбираем между время между концом выполнения текущего задания и началом выполнения задания в буфере на следующем приборе
+                                    stopTime = Math.Max(stopTime, startBufferTime);
+
+                                    // Добавляем результат в матрицу
+                                    startProcessing[device][batchIndex][job] = stopTime;
+
+                                    // Продолжаем вычисления для следующего прибора
+                                    continue;
+                                }
+
+                                // Если данное задание превышает размер буфера, выполняем обработку
+                                // 45
+                                if (job >= config.buffer && job <= currentJobCount - 1)
+                                {
+
+                                    // Высчитываем время начала и выполнения задания
+                                    int startTime = startProcessing[device][batchIndex][job - 1];
+                                    int procTime = config.proccessingTime[device][schedule[batchIndex].Type];
+
+                                    // Высчитываем время конца выполнения задания
+                                    int stopTime = startTime + procTime;
+
+                                    // Время начала задания на следующем приборе предыдущего пакета предыдущего задания
+                                    int startBufferTime = startProcessing[device + 1][batchIndex][job - config.buffer];
+
+                                    // Выбираем между концом выполнения текущего задания и началом выполнения задания в буфере на следующем приборе
+                                    int result = Math.Max(stopTime, startBufferTime);
+
+                                    // Добавляем результат в матрицу
+                                    startProcessing[device][batchIndex][job] = result;
+                                }
+
+                                // Продолжаем вычисления для следующего прибора
+                                continue;
+                            }
+                        }
+
+                        // Для любого не первого и не последнего прибора выполняем обработку
+                        //4.3 (6)
+                        if (device >= 1 && device <= config.deviceCount - 2)
+                        {
+
+                            // Для первого пакета в последовательности выполняем обработку
+                            if (batchIndex == 0)
+                            {
+
+                                // Для первого задания в пакете выполняем обработку
+                                // 49
+                                if (job == 0)
+                                {
+
+                                    // Высчитываем время начала и выполнения задания
+                                    int startTime = startProcessing[device - 1][0][0];
+                                    int procTime = config.proccessingTime[device - 1][schedule[0].Type];
+
+                                    // Высчитываем время конца выполнения задания
+                                    int stopTime = startTime + procTime;
+
+                                    // Добавляем результат в матрицу
+                                    startProcessing[device][0][0] = stopTime;
+
+                                    // Продолжаем вычисления для следующего прибора
+                                    continue;
+                                }
+
+                                // Если данное задание не первое и не превышает размер буфера, выполняем обработку
+                                //50
+                                if (job > 0 && job <= config.buffer)
+                                {
+
+                                    // Высчитываем время начала и выполнения задания
+                                    int startTime = startProcessing[device - 1][0][job];
+                                    int procTime = config.proccessingTime[device - 1][schedule[0].Type];
+
+                                    // Высчитываем время конца выполнения задания
+                                    int stopTimeCurrentJob = startTime + procTime;
+
+                                    // Высчитываем время начала и выполнения предыдущего задания
+                                    startTime = startProcessing[device][0][job - 1];
+                                    procTime = config.proccessingTime[device][schedule[0].Type];
+
+                                    // Высчитываем время конца выполнения предыдущего задания
+                                    int stopTimePreviousJob = startTime + procTime;
+
+                                    // Выбираем между концом выполнения текущего задания и концом выполнения предыдущего задания
+                                    int result = Math.Max(stopTimeCurrentJob, stopTimePreviousJob);
+
+                                    // Добавляем результат в матрицу
+                                    startProcessing[device][0][job] = result;
+
+                                    // Продолжаем вычисления для следующего прибора
+                                    continue;
+                                }
+
+                                // Если данное задание превышает размер буфера, выполняем обработку
+                                // 45
+                                if (job > config.buffer && job <= currentJobCount - 1)
+                                {
+
+                                    // Высчитываем время начала и выполнения задания
+                                    int startTime = startProcessing[device - 1][0][job];
+                                    int procTime = config.proccessingTime[device - 1][schedule[0].Type];
+
+                                    // Высчитываем время конца выполнения задания
+                                    int stopTimeCurrentJob = startTime + procTime;
+
+                                    // Высчитываем время начала и выполнения предыдущего задания
+                                    startTime = startProcessing[device][0][job];
+                                    procTime = config.proccessingTime[device][schedule[0].Type];
+
+                                    // Высчитываем время конца выполнения предыдущего задания
+                                    int stopTimePreviousJob = startTime + procTime;
+
+                                    // Выбираем между концом выполнения текущего задания и концом выполнения предыдущего задания
+                                    int stopTime = Math.Max(stopTimeCurrentJob, stopTimePreviousJob);
+
+                                    // Время начала задания на следующем приборе предыдущего задания через буфер
+                                    int startBufferTime = startProcessing[device + 1][0][job - config.buffer];
+
+                                    // Выбираем между концом выполнения задания и концом выполнения задания через буфер
+                                    int result = Math.Max(stopTime, startBufferTime);
+
+                                    // Добавляем результат в матрицу
+                                    startProcessing[device][0][job] = result;
+                                }
+
+                                // Продолжаем вычисления для следующего прибора
+                                continue;
+                            }
+
+                            // Для любого не первого пакета в последовательности выполняем обработку
+                            //4.4 (7)
+                            if (batchIndex >= 1 && batchIndex <= maxBatchesPositions - 1)
+                            {
+
+                                // Для первого задания в пакете выполняем обработку
+                                if (job == 0)
+                                {
+
+                                    // Высчитываем время начала и выполнения задания
+                                    int startTime = startProcessing[device - 1][batchIndex][0];
+                                    int procTime = config.proccessingTime[device - 1][schedule[batchIndex].Type];
+
+                                    // Высчитываем время конца выполнения задания
+                                    int stopTimeCurrentJob = startTime + procTime;
+
+                                    // Высчитываем время начала и выполнения предыдущего задания
+                                    startTime = startProcessing[device][batchIndex - 1].Last();
+                                    procTime = config.proccessingTime[device][schedule[batchIndex - 1].Type];
+
+                                    // Время переналадки прибора с предыдущего типа на текущий
+                                    // int changeTime = timeChangeover[device + 1, previousType, currentDataType];
+                                    int changeTime = config.changeoverTime[device][previousDataType][currentDataType];
+
+                                    // Высчитываем время конца выполнения предыдущего задания
+                                    int stopTimePreviousJob = startTime + procTime + changeTime;
+
+                                    // Выбираем между концом выполнения текущего задания и концом выполнения предыдущего задания
+                                    int stopTime = Math.Max(stopTimeCurrentJob, stopTimePreviousJob);
+
+                                    // Время начала задания на следующем приборе предыдущего задания через буфер
+
+                                    // Время начала задания на следующем приборе предыдущего пакета предыдущего задания
+                                    int startBufferTime = 0;
+                                    if (previousJobCount - config.buffer >= 0 && previousJobCount - config.buffer < startProcessing[device + 1][batchIndex - 1].Count())
+                                        startBufferTime = startProcessing[device + 1][batchIndex - 1][previousJobCount - config.buffer];
+
+                                    // Выбираем между концом выполнения задания и концом выполнения задания через буфер
+                                    int result = Math.Max(stopTime, startBufferTime);
+
+                                    // Добавляем результат в матрицу
+                                    startProcessing[device][batchIndex][0] = result;
+
+                                    // Продолжаем вычисления для следующего прибора
+                                    continue;
+                                }
+
+                                // Если данное задание не первое и не превышает размер буфера, выполняем обработку
+                                //53
+                                if (job > 0 && job <= config.buffer - 1)
+                                {
+
+                                    // Высчитываем время начала и выполнения задания
+                                    int startTime = startProcessing[device - 1][batchIndex][job];
+                                    int procTime = config.proccessingTime[device - 1][schedule[batchIndex].Type];
+
+                                    // Высчитываем время конца выполнения задания
+                                    int stopTimeCurrentJob = startTime + procTime;
+
+                                    // Высчитываем время начала и выполнения предыдущего задания
+                                    startTime = startProcessing[device][batchIndex][job - 1];
+                                    procTime = config.proccessingTime[device][schedule[batchIndex].Type];
+
+                                    // Высчитываем время конца выполнения предыдущего задания
+                                    int stopTimePreviousJob = startTime + procTime;
+
+                                    // Выбираем между концом выполнения текущего задания и концом выполнения предыдущего задания
+                                    int stopTime = Math.Max(stopTimeCurrentJob, stopTimePreviousJob);
+
+                                    // Время начала задания на следующем приборе предыдущего задания через буфер
+                                    int startBufferTime = 0;
+                                    if (previousJobCount - config.buffer + job >= 0 && previousJobCount - config.buffer + job < startProcessing[device + 1][batchIndex - 1].Count())
+                                        startBufferTime = startProcessing[device + 1][batchIndex - 1][previousJobCount - config.buffer + job];
+
+                                    // Выбираем между концом выполнения задания и концом выполнения задания через буфер
+                                    int result = Math.Max(stopTime, startBufferTime);
+
+                                    // Добавляем результат в матрицу
+                                    startProcessing[device][batchIndex][job] = result;
+
+                                    // Продолжаем вычисления для следующего прибора
+                                    continue;
+                                }
+
+                                // Если данное задание превышает размер буфера, выполняем обработку
+                                // 54
+                                if (job >= config.buffer && job <= currentJobCount - 1)
+                                {
+
+                                    // Высчитываем время начала и выполнения задания
+                                    int startTime = startProcessing[device - 1][batchIndex][job];
+                                    int procTime = config.proccessingTime[device - 1][schedule[batchIndex].Type];
+
+                                    // Высчитываем время конца выполнения задания
+                                    int stopTimeCurrentJob = startTime + procTime;
+
+                                    // Высчитываем время начала и выполнения предыдущего задания
+                                    startTime = startProcessing[device][batchIndex][job - 1];
+                                    procTime = config.proccessingTime[device][schedule[batchIndex].Type];
+
+                                    // Высчитываем время конца выполнения предыдущего задания
+                                    int stopTimePreviousJob = startTime + procTime;
+
+                                    // Выбираем между концом выполнения текущего задания и концом выполнения предыдущего задания
+                                    int stopTime = Math.Max(stopTimeCurrentJob, stopTimePreviousJob);
+
+                                    // Время начала задания на следующем приборе задания через буфер
+                                    int startBufferTime = startProcessing[device + 1][batchIndex][job - config.buffer];
+
+                                    // Выбираем между концом выполнения задания и концом выполнения задания через буфер
+                                    int result = Math.Max(stopTime, startBufferTime);
+
+                                    // Добавляем результат в матрицу
+                                    startProcessing[device][batchIndex][job] = result;
+                                }
+
+                                // Продолжаем вычисления для следующего прибора
+                                continue;
+                            }
+                        }
+
+                        // Для последнего прибора выполняем обработку
+                        if (device == config.deviceCount - 1)
+                        {
+
+                            // Для первого пакета в последовательности выполняем обработку
+                            if (batchIndex == 0)
+                            {
+
+                                // Для первого задания в пакете выполняем обработку
+                                if (job == 0)
+                                {
+
+                                    // Подсчитываем время выполнения для всех пакетов для предыдущих приборов
+                                    int result = 0;
+                                    for (int li = 0; li <= config.deviceCount - 2; li++)
+                                        result += config.proccessingTime[li][schedule[0].Type];
+
+                                    // Добавляем результат в матрицу
+                                    startProcessing[config.deviceCount - 1][0][0] = result;
+
+                                    // Продолжаем вычисления для следующего прибора
+                                    continue;
+                                }
+
+                                // Если данное задание превышает размер буфера, выполняем обработку
+                                // 45
+                                // TODO: нет необходимости обрабатывать случай (job + 1 <= currentJobCount), если значение job + 1 не имзеняется динамично, так как условие прописано в 
+                                if (job > 0 && job <= currentJobCount - 1)
+                                {
+
+                                    // Высчитываем время начала и выполнения задания
+                                    int startTime = startProcessing[device - 1][batchIndex][job];
+                                    int procTime = config.proccessingTime[device - 1][schedule[batchIndex].Type];
+
+                                    // Высчитываем время конца выполнения задания
+                                    int stopTimeCurrentJob = startTime + procTime;
+
+                                    // Высчитываем время начала и выполнения предыдущего задания
+                                    startTime = startProcessing[device][batchIndex][job - 1];
+                                    procTime = config.proccessingTime[config.deviceCount - 1][schedule[batchIndex].Type];
+
+                                    // Высчитываем время конца выполнения предыдущего задания
+                                    int stopTimePreviousJob = startTime + procTime;
+
+                                    // Выбираем между концом выполнения текущего и предыдущего задания
+                                    int result = Math.Max(stopTimeCurrentJob, stopTimePreviousJob);
+
+                                    // Добавляем результат в матрицу
+                                    startProcessing[config.deviceCount - 1][batchIndex][job] = result;
+                                }
+
+                                // Продолжаем вычисления для следующего прибора
+                                continue;
+                            }
+
+                            // Дл
+                            // 4.5 (9)
+                            if (batchIndex >= 1 && batchIndex <= maxBatchesPositions - 1)
+                            {
+
+                                // Для первого задания в пакете выполняем 
+                                if (job == 0)
+                                {
+
+                                    // Высчитываем время начала и выполнения задания
+                                    int startTime = startProcessing[device - 1][batchIndex][job];
+                                    int procTime = config.proccessingTime[config.deviceCount - 2][schedule[batchIndex].Type];
+
+                                    // Высчитываем время конца выполнения задания
+                                    int stopTimeCurrentJob = startTime + procTime;
+
+                                    // Высчитываем время начала и выполнения предыдущего задания
+                                    startTime = startProcessing[config.deviceCount - 1][batchIndex - 1].Last();
+                                    procTime = config.proccessingTime[config.deviceCount - 1][schedule[batchIndex - 1].Type];
+
+                                    // Время переналадки с предыдущего типа на текущей
+                                    // int changeTime = timeChangeover[config.deviceCount, previousType, currentDataType];
+                                    int changeTime = config.changeoverTime[config.deviceCount - 1][previousDataType][currentDataType];
+
+                                    // Высчитываем время конца выполнения предыдущего задания
+                                    int stopTimePreviousJob = changeTime + startTime + procTime;
+
+                                    // Выбираем между концом выполнения текущего и предыдущего задания
+                                    int result = Math.Max(stopTimeCurrentJob, stopTimePreviousJob);
+
+                                    // Добавляем результат в матрицу
+                                    startProcessing[config.deviceCount - 1][batchIndex][job] = result;
+
+                                    // Продолжаем вычисления для следующего прибора
+                                    continue;
+                                }
+
+
+                                // Если данное задание превышает размер буфера, выполняем обработку
+                                // 48
+                                // TODO: нет необходимости обрабатывать случай (job + 1 <= currentJobCount), если значение job + 1 не имзеняется динамично, так как условие прописано в 
+                                if (job > 0 && job <= currentJobCount - 1)
+                                {
+
+                                    // Высчитываем время начала и выполнения задания
+                                    int startTime = startProcessing[config.deviceCount - 2][batchIndex][job];
+                                    int procTime = config.proccessingTime[config.deviceCount - 2][schedule[batchIndex].Type];
+
+                                    // Высчитываем время конца выполнения задания
+                                    int stopTimeCurrentJob = startTime + procTime;
+
+                                    // Высчитываем время начала и выполнения предыдущего задания
+                                    startTime = startProcessing[config.deviceCount - 1][batchIndex][job - 1];
+                                    procTime = config.proccessingTime[config.deviceCount - 1][schedule[batchIndex].Type];
+
+                                    // Высчитываем время конца выполнения предыдущего задания
+                                    int stopTimePreviousJob = startTime + procTime;
+
+                                    // Выбираем между концом выполнения текущего и предыдущего задания
+                                    int result = Math.Max(stopTimeCurrentJob, stopTimePreviousJob);
+
+                                    // Добавляем результат в матрицу
+                                    startProcessing[config.deviceCount - 1][batchIndex][job] = result;
+
+                                    // Продолжаем вычисления для следующего прибора
+                                    continue;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // Переопределяем предыдущий тип и задание
+                previousDataType = currentDataType;
+                previousJobCount = currentJobCount;
+            }
         }
 
         public override int GetMakespan()
         {
-            return this.startProcessing[this.config.deviceCount - 1].Last().Last();
+            return this.startProcessing[this.config.deviceCount - 1].Last().Last() + this.config.proccessingTime.Last()[this.schedule.Last().Type];
         }
 
         public override List<List<int>> GetMatrixP()
