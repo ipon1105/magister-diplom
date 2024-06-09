@@ -319,15 +319,26 @@ namespace newAlgorithm
                 }
             }
 
-            // Инициализируем матрицу переналадки приборов
-            TreeDimMatrix timeChangeover = new TreeDimMatrix(changeoverTime);
+            Dictionary<int, List<List<int>>> GetTrueDictionaryTime(){
+                Dictionary<int, List<List<int>>> trueChangeoverTime = new Dictionary<int, List<List<int>>>(deviceCount);
+                for (int device = 0; device < deviceCount; device++) {
+                    trueChangeoverTime.Add(device, new List<List<int>>());
+                    for (int fromDataType = 0; fromDataType < dataTypesCount; fromDataType++){
+                        trueChangeoverTime[device].Add(new List<int>());
+                        for (int toDataType = 0; toDataType < dataTypesCount; toDataType++) {
+                            trueChangeoverTime[device][fromDataType].Add(changeoverTime[device][fromDataType][toDataType]);
+                        }
+                    }
+                }
+                return trueChangeoverTime;
+            }
 
             // Выполняем построение матрицы времён начала заданий
             TreeDimMatrix tnMatrix = CalculationService.CalculateTnMatrix(
                 newMatrixR,
                 newMatrixP,
                 proccessingTime,
-                timeChangeover,
+                GetTrueDictionaryTime(),
                 bufferSize
             );
 

@@ -61,18 +61,18 @@ namespace newAlgorithm.Service
             List<List<int>> rMatrix,
             List<List<int>> pMatrix,
             List<List<int>> timeProcessing,
-            TreeDimMatrix timeChangeover,
+            Dictionary<int, List<List<int>>> timeChangeover,
             int bufferSize
             )
         {
+            // Количество приборов в конвейерной системе
+            int deviceCount = timeProcessing.Count;
 
-            TreeDimMatrix tnMatrix = new TreeDimMatrix(timeChangeover.deviceCount);
+            TreeDimMatrix tnMatrix = new TreeDimMatrix(deviceCount);
 
             // Количество пакетов для всех типов данных, так же известное как n_p
             int maxBatchesPositions = pMatrix[0].Count;
 
-            // Количество приборов в конвейерной системе
-            int deviceCount = timeChangeover.deviceCount;
 
             // Предыдущий тип
             int previousType = 0;
@@ -203,7 +203,8 @@ namespace newAlgorithm.Service
                                     int procTime = getProccessingTimeOnDeviceInBatch(device + 1 - 1, batchIndex + 1 - 1 - 1);
 
                                     // Высчитываем время переналадки с предыдущего типа на текущий
-                                    int changeTime = timeChangeover[device + 1, previousType, currentDataType];
+                                    // int changeTime = timeChangeover[device + 1, previousType, currentDataType];
+                                    int changeTime = timeChangeover[device][previousType - 1][currentDataType - 1];
 
                                     // Высчитываем время конца выполнения задания
                                     int stopTime = changeTime + startTime + procTime;
@@ -389,7 +390,8 @@ namespace newAlgorithm.Service
                                     procTime = getProccessingTimeOnDeviceInBatch(device + 1 - 1, batchIndex + 1 - 1 - 1);
 
                                     // Время переналадки прибора с предыдущего типа на текущий
-                                    int changeTime = timeChangeover[device + 1, previousType, currentDataType];
+                                    // int changeTime = timeChangeover[device + 1, previousType, currentDataType];
+                                    int changeTime = timeChangeover[device][previousType - 1][currentDataType - 1];
 
                                     // Высчитываем время конца выполнения предыдущего задания
                                     int stopTimePreviousJob = startTime + procTime + changeTime;
@@ -560,7 +562,8 @@ namespace newAlgorithm.Service
                                     procTime = getProccessingTimeOnDeviceInBatch(deviceCount - 1, batchIndex + 1 - 1 - 1);
 
                                     // Время переналадки с предыдущего типа на текущей
-                                    int changeTime = timeChangeover[deviceCount, previousType, currentDataType];
+                                    // int changeTime = timeChangeover[deviceCount, previousType, currentDataType];
+                                    int changeTime = timeChangeover[deviceCount - 1][previousType - 1][currentDataType - 1];
 
                                     // Высчитываем время конца выполнения предыдущего задания
                                     int stopTimePreviousJob = changeTime + startTime + procTime;
