@@ -336,7 +336,8 @@ namespace newAlgorithm
             TreeDimMatrix timeChangeover = new TreeDimMatrix(changeoverTime);
 
             // Выполняем построение матрицы времён начала заданий
-            TreeDimMatrix tnMatrix = CalculationService.CalculateTnMatrix(rMatrix, pMatrix, proccessingTimeMatrix, timeChangeover, bufferSize);
+            Dictionary<int, List<List<int>>> d = new Dictionary<int, List<List<int>>>();
+            TreeDimMatrix tnMatrix = null;
 
             // Если визуализация включена отображаем Excel
             if (Form1.vizualizationOn)

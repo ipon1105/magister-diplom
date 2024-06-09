@@ -14,11 +14,6 @@
         public int dataType { get; }
 
         /// <summary>
-        /// Данная переменная представляет из себя позицию в матрице данного узла
-        /// </summary>
-        public int position { get; }
-
-        /// <summary>
         ///  Данная переменная содержит в себе количество пакетов в текущей позиции текущего типа данного узла
         /// </summary>
         public int batchCount { get; private set; }
@@ -29,10 +24,9 @@
         /// <param name="dataType">Определяет тип задания, данного узла</param>
         /// <param name="position">Определяет позицию задания, данного узла</param>
         /// <param name="batchCount">Определяет количество данных в данном узле</param>
-        public RMatrixNode(int dataType, int position, int batchCount)
+        public RMatrixNode(int dataType, int batchCount)
         {
             this.dataType = dataType;
-            this.position = position;
             this.batchCount = batchCount;
         }
 

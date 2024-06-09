@@ -21,11 +21,6 @@ namespace newAlgorithm.Model
         public List<int> typePriority;
 
         /// <summary>
-        /// Данная переменная содержит индекс последнего элемента
-        /// </summary>
-        public int lastPosition;
-
-        /// <summary>
         /// Данная пермення содержит количество типов данных
         /// </summary>
         public int dataTypesCount;
@@ -40,7 +35,6 @@ namespace newAlgorithm.Model
         {
             rMatrix = new List<RMatrixNode>();
             typePriority = new List<int>();
-            lastPosition = 0;
             this.dataTypesCount = dataTypesCount;
         }
 
@@ -51,7 +45,7 @@ namespace newAlgorithm.Model
         /// <param name="count">Количество данных в новом элементе</param>
         public void AddNode(int dataType, int count)
         {
-            RMatrixNode newNode = new RMatrixNode(dataType, ++lastPosition, count);
+            RMatrixNode newNode = new RMatrixNode(dataType, count);
             rMatrix.Add(newNode);
         }
 
@@ -62,57 +56,12 @@ namespace newAlgorithm.Model
         /// <returns>Целочисленное значение по позиции position</returns>
         public RMatrixNode this[int position]
         {
-
             // Переопределяем возвращение данных из матрицы R
             get
             {
-
-                // Выполяем поиск узла по позиции
-                foreach (RMatrixNode rMatrixNode in rMatrix)
-                    if (rMatrixNode.position == position)
-                        return rMatrixNode;
-
                 // Вовзращаем null в случае отсутствия узла в списке
-                return null;
+                return rMatrix[position];
             }
         }
-
-        #region Неиспользуемые функции
-
-        /// <summary>
-        /// Данная функция выполняет глубокое копирование данного класса
-        /// </summary>
-        /// <returns>Склонированный экземпляр класса RMatrix</returns>
-        public RMatrix Clone()
-        {
-            // Определяем новую матрицу R
-            RMatrix newRMatrix = new RMatrix(dataTypesCount);
-
-            // Определяем новый список узлов
-            List<RMatrixNode> newNodeList = new List<RMatrixNode>();
-
-            // Выполяем глубокое копирования каждого элемента матрица
-            foreach (RMatrixNode rMatrixNode in rMatrix)
-                newNodeList.Add(new RMatrixNode(rMatrixNode.dataType, rMatrixNode.position, rMatrixNode.batchCount));
-
-            // Выполняем необходимое переопределение данных для нового класса
-            newRMatrix.rMatrix = newNodeList;
-            newRMatrix.typePriority = new List<int>(typePriority);
-            newRMatrix.lastPosition = lastPosition;
-
-            // Возвращаем новый экземпляр класса
-            return newRMatrix;
-        }
-
-        /// <summary>
-        /// Данная функция возвращает последнюю позицию в матрице R
-        /// </summary>
-        /// <returns>Индкс последней позиции в матрице R</returns>
-        public int GetLastPosition()
-        {
-            return lastPosition;
-        }
-
-        #endregion
     }
 }

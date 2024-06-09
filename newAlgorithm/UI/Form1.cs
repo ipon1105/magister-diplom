@@ -137,20 +137,16 @@ namespace newAlgorithm
         /// <param name="e"></param>
         private void Button1_Click(object sender, EventArgs e)
         {
-
-            // Выполняем перестроение матриц
-            TablesRebuild();
-
-            // Инициализируем вектор длиной dataTypesCount, каждый элемент которого будет равен batchCount
-            List<int> batchCountList = CreateBatchCountList();
-
-            // Создаём экземпляр конфигурационной структуры
+            // Получаем экземпляр конфигурационной структуры для ПТО
             Config config = GetConfig();
 
             // Инициализируем расписание
             Shedule.deviceCount = config.deviceCount;
             Shedule.proccessingTime = config.proccessingTime;
             Shedule.changeoverTime = GetChangeoverTimeList();
+
+            // Инициализируем вектор длиной dataTypesCount, каждый элемент которого будет равен batchCount
+            List<int> batchCountList = CreateBatchCountList();
 
             // Формируем первый уровень
             var firstLevel = new FirstLevel(config, batchCountList);

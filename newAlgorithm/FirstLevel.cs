@@ -328,7 +328,7 @@ namespace newAlgorithm
         /// <param name="file"></param>
         /// <param name="tempA"></param>
         /// <param name="type"></param>
-        public void CombinationType(StreamWriter file, List<List<List<int>>> tempMatrix, int type, List<List<int>> tempM, ref bool solutionFlag )
+        public void CombinationType(StreamWriter file, List<List<List<int>>> tempMatrix, int type, List<List<int>> tempM, ref Schedule schedule, ref bool solutionFlag )
         {
             if (type < config.dataTypesCount)
             {
@@ -337,14 +337,11 @@ namespace newAlgorithm
                     List<List<int>> tempB = (tempM != null) ? ListUtils.MatrixIntDeepCopy(tempM) : new List<List<int>>();
 
                     tempB.Add(tempMatrix[type][variantOfSplitIndex]);
-                    CombinationType(file, tempMatrix, type + 1, tempB, ref solutionFlag);
+                    CombinationType(file, tempMatrix, type + 1, tempB, ref schedule, ref solutionFlag);
                 }
-            } else
-            {
-                var shedule = new Shedule(tempM);
-                //shedule.ConstructShedule();
-                shedule.ConstructSheduleWithBuffer(config.buffer, config.dataTypesCount);
-                var fBuf = shedule.GetTime();
+            } else {
+                schedule.Build(tempM);
+                var fBuf = schedule.GetMakespan();
                 string s = ListUtils.MatrixIntToString(tempM, ", ", "", ";");
                 file.Write(s + " " + fBuf);
                 MessageBox.Show(s + " Время обработки " + fBuf);
@@ -445,10 +442,10 @@ namespace newAlgorithm
             using (var file = new StreamWriter(fileName))
             {
                 GenerateFixedBatchesSolution();
-                var shedule = new Shedule(PrimeMatrixA);
+                Schedule schedule = new BufferSchedule(config);
                 //shedule.ConstructShedule();
-                shedule.ConstructSheduleWithBuffer(config.buffer, config.dataTypesCount);
-                f1Current = shedule.GetTime();
+                schedule.Build(PrimeMatrixA);
+                f1Current = schedule.GetMakespan();
 
                 MessageBox.Show(ListUtils.MatrixIntToString(PrimeMatrixA, ", ", "", ";") + "Время обработки " + f1Current);
                 f1Optimal = f1Current;
@@ -459,10 +456,8 @@ namespace newAlgorithm
                 // Генерируем начальное решение
                 GenerateStartSolution();
 
-                shedule = new Shedule(PrimeMatrixA);
-                //shedule.ConstructShedule();
-                shedule.ConstructSheduleWithBuffer(config.buffer, config.dataTypesCount);
-                f1Current = shedule.GetTime();
+                schedule.Build(PrimeMatrixA);
+                f1Current = schedule.GetMakespan();
                 MessageBox.Show(ListUtils.MatrixIntToString(PrimeMatrixA, ", ", "", ";") + " Время обработки " + f1Current);
                 if (f1Current < f1Optimal)
                 {
@@ -524,10 +519,8 @@ namespace newAlgorithm
                             for (var batchIndex = 0; batchIndex < _a2[dataType].Count; batchIndex++)
                             {
                                 tempA = SetTempAFromA2(dataType, batchIndex);
-                                shedule = new Shedule(tempA);
-                                //shedule.ConstructShedule();
-                                shedule.ConstructSheduleWithBuffer(config.buffer, config.dataTypesCount);
-                                var fBuf = shedule.GetTime();
+                                schedule.Build(tempA);
+                                var fBuf = schedule.GetMakespan();
                                 s = ListUtils.MatrixIntToString(tempA, ", ", "", ";");
                                 file.Write(s + " " + fBuf);
                                 MessageBox.Show(s + " Время обработки " + fBuf);                                    
@@ -544,7 +537,7 @@ namespace newAlgorithm
                         if (!isBestSolution)
                         {
                             file.WriteLine("комбинации типов");
-                            CombinationType(file, _a2, 0, null, ref isBestSolution);
+                            CombinationType(file, _a2, 0, null, ref schedule, ref isBestSolution);
                         }
 
                         if (isBestSolution)

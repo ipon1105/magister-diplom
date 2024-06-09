@@ -83,6 +83,7 @@
   <ItemGroup>
     <Compile Include="BatchTypeClaims.cs" />
     <Compile Include="CalculationService.cs" />
+    <Compile Include="Fabric\BufferSchedule.cs" />
     <Compile Include="Fabric\Builders\SimplePreMScheduleBuilder.cs" />
     <Compile Include="Fabric\PreMSchedule.cs" />
     <Compile Include="Fabric\SimplePreMSchedule.cs" />
