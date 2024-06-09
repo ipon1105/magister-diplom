@@ -73,17 +73,16 @@ namespace newAlgorithm.Service
             // Количество пакетов для всех типов данных, так же известное как n_p
             int maxBatchesPositions = pMatrix[0].Count;
 
-
             // Предыдущий тип
-            int previousType = 0;
-            int previousJob = 0;
+            int previousDataType = 0;
+            int previousJobCount = 0;
 
             // Для всех пакетов выполняем обработку. batchIndex так же известен, как h
             for (int batchIndex = 0; batchIndex < maxBatchesPositions; batchIndex++)
             {
 
                 // Получаем узел матрицы R в позиции batchIndex
-                int currentJobCount = 0;
+                int currentJobCount = 0; // Переменная учитыается только в условиях
                 int currentDataType = 0;
 
                 // Из узла матрицы R вытаскиваем тип данных и количество заданий данного типа
@@ -92,7 +91,7 @@ namespace newAlgorithm.Service
                     // Если для текущей позиции найден ПЗ
                     if (rMatrix[dataType][batchIndex] != 0) { 
                         currentJobCount = rMatrix[dataType][batchIndex];
-                        currentDataType = dataType + 1;
+                        currentDataType = dataType;
                         break;
                     }
                 
@@ -199,18 +198,18 @@ namespace newAlgorithm.Service
                                 {
 
                                     // Высчитываем время начала и выполнения задания
-                                    int startTime = tnMatrix[device + 1, batchIndex + 1 - 1, previousJob];
+                                    int startTime = tnMatrix[device + 1, batchIndex + 1 - 1, previousJobCount];
                                     int procTime = getProccessingTimeOnDeviceInBatch(device + 1 - 1, batchIndex + 1 - 1 - 1);
 
                                     // Высчитываем время переналадки с предыдущего типа на текущий
                                     // int changeTime = timeChangeover[device + 1, previousType, currentDataType];
-                                    int changeTime = timeChangeover[device][previousType - 1][currentDataType - 1];
+                                    int changeTime = timeChangeover[device][previousDataType][currentDataType];
 
                                     // Высчитываем время конца выполнения задания
                                     int stopTime = changeTime + startTime + procTime;
 
                                     // Время начала задания на следующем приборе предыдущего пакета предыдущего задания
-                                    int startBufferTime = tnMatrix[device + 1 + 1, batchIndex + 1 - 1, previousJob - bufferSize + 1];
+                                    int startBufferTime = tnMatrix[device + 1 + 1, batchIndex + 1 - 1, previousJobCount - bufferSize + 1];
 
                                     // Выбираем между время между концом выполнения текущего задания и началом выполнения задания в буфере на следующем приборе
                                     int result = Math.Max(stopTime, startBufferTime);
@@ -234,7 +233,7 @@ namespace newAlgorithm.Service
                                     int stopTime = startTime + procTime;
 
                                     // Время начала задания на следующем приборе предыдущего пакета предыдущего задания
-                                    int startBufferTime = tnMatrix[device + 1 + 1, batchIndex + 1 - 1, previousJob - bufferSize + job + 1];
+                                    int startBufferTime = tnMatrix[device + 1 + 1, batchIndex + 1 - 1, previousJobCount - bufferSize + job + 1];
 
                                     // Выбираем между время между концом выполнения текущего задания и началом выполнения задания в буфере на следующем приборе
                                     stopTime = Math.Max(stopTime, startBufferTime);
@@ -386,12 +385,12 @@ namespace newAlgorithm.Service
                                     int stopTimeCurrentJob = startTime + procTime;
 
                                     // Высчитываем время начала и выполнения предыдущего задания
-                                    startTime = tnMatrix[device + 1, batchIndex + 1 - 1, previousJob];
+                                    startTime = tnMatrix[device + 1, batchIndex + 1 - 1, previousJobCount];
                                     procTime = getProccessingTimeOnDeviceInBatch(device + 1 - 1, batchIndex + 1 - 1 - 1);
 
                                     // Время переналадки прибора с предыдущего типа на текущий
                                     // int changeTime = timeChangeover[device + 1, previousType, currentDataType];
-                                    int changeTime = timeChangeover[device][previousType - 1][currentDataType - 1];
+                                    int changeTime = timeChangeover[device][previousDataType][currentDataType];
 
                                     // Высчитываем время конца выполнения предыдущего задания
                                     int stopTimePreviousJob = startTime + procTime + changeTime;
@@ -400,7 +399,7 @@ namespace newAlgorithm.Service
                                     int stopTime = Math.Max(stopTimeCurrentJob, stopTimePreviousJob);
 
                                     // Время начала задания на следующем приборе предыдущего задания через буфер
-                                    int startBufferTime = tnMatrix[device + 1 + 1, batchIndex + 1 - 1, previousJob - bufferSize + 1];
+                                    int startBufferTime = tnMatrix[device + 1 + 1, batchIndex + 1 - 1, previousJobCount - bufferSize + 1];
 
                                     // Выбираем между концом выполнения задания и концом выполнения задания через буфер
                                     int result = Math.Max(stopTime, startBufferTime);
@@ -435,7 +434,7 @@ namespace newAlgorithm.Service
                                     int stopTime = Math.Max(stopTimeCurrentJob, stopTimePreviousJob);
 
                                     // Время начала задания на следующем приборе предыдущего задания через буфер
-                                    int startBufferTime = tnMatrix[device + 1 + 1, batchIndex + 1 - 1, previousJob - bufferSize + job + 1];
+                                    int startBufferTime = tnMatrix[device + 1 + 1, batchIndex + 1 - 1, previousJobCount - bufferSize + job + 1];
 
                                     // Выбираем между концом выполнения задания и концом выполнения задания через буфер
                                     int result = Math.Max(stopTime, startBufferTime);
@@ -558,12 +557,12 @@ namespace newAlgorithm.Service
                                     int stopTimeCurrentJob = startTime + procTime;
 
                                     // Высчитываем время начала и выполнения предыдущего задания
-                                    startTime = tnMatrix[deviceCount, batchIndex + 1 - 1, previousJob];
+                                    startTime = tnMatrix[deviceCount, batchIndex + 1 - 1, previousJobCount];
                                     procTime = getProccessingTimeOnDeviceInBatch(deviceCount - 1, batchIndex + 1 - 1 - 1);
 
                                     // Время переналадки с предыдущего типа на текущей
                                     // int changeTime = timeChangeover[deviceCount, previousType, currentDataType];
-                                    int changeTime = timeChangeover[deviceCount - 1][previousType - 1][currentDataType - 1];
+                                    int changeTime = timeChangeover[deviceCount - 1][previousDataType][currentDataType];
 
                                     // Высчитываем время конца выполнения предыдущего задания
                                     int stopTimePreviousJob = changeTime + startTime + procTime;
@@ -615,8 +614,8 @@ namespace newAlgorithm.Service
                 }
 
                 // Переопределяем предыдущий тип и задание
-                previousType = currentDataType;
-                previousJob = currentJobCount;
+                previousDataType = currentDataType;
+                previousJobCount = currentJobCount;
             }
 
             return tnMatrix;
