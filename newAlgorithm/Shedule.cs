@@ -319,9 +319,6 @@ namespace newAlgorithm
                 }
             }
 
-            // Инициализируем матрицу времени выполнения заданий
-            Model.Matrix proccessingTimeMatrix = new Model.Matrix(proccessingTime);
-
             // Инициализируем матрицу переналадки приборов
             TreeDimMatrix timeChangeover = new TreeDimMatrix(changeoverTime);
 
@@ -329,7 +326,7 @@ namespace newAlgorithm
             TreeDimMatrix tnMatrix = CalculationService.CalculateTnMatrix(
                 newMatrixR,
                 newMatrixP,
-                proccessingTimeMatrix,
+                proccessingTime,
                 timeChangeover,
                 bufferSize
             );
@@ -365,7 +362,7 @@ namespace newAlgorithm
             }
 
             // Определяем время обработки последнего задания в системе
-            int procTime = proccessingTimeMatrix[lastNode.device-1, GetTypeByBatchIndex(lastNode.fromDataType - 1)];
+            int procTime = proccessingTime[lastNode.device - 1][GetTypeByBatchIndex(lastNode.fromDataType - 1)];
 
             // Определяем новое время выполнения последнего задания в расписании
             timeOfLastScheduleExecution = startTime + procTime;

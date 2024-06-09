@@ -60,7 +60,7 @@ namespace newAlgorithm.Service
         public static TreeDimMatrix CalculateTnMatrix(
             List<List<int>> rMatrix,
             List<List<int>> pMatrix,
-            Matrix timeProcessing,
+            List<List<int>> timeProcessing,
             TreeDimMatrix timeChangeover,
             int bufferSize
             )
@@ -116,7 +116,7 @@ namespace newAlgorithm.Service
                             int _position = pMatrix[_dataType][_batchIndex];
                             
                             // Получаем время выполнения типа _dataType на приборе _device
-                            int _proccessingTime = timeProcessing[_device, _dataType++];
+                            int _proccessingTime = timeProcessing[_device][_dataType++];
 
                             // Выполяем подсчёт времени выполнения на позицию
                             _procTime = _proccessingTime * _position;
