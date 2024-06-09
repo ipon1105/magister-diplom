@@ -308,6 +308,23 @@ namespace newAlgorithm
             List<List<int>> newMatrixR = new List<List<int>>();
             List<List<int>> newMatrixP = new List<List<int>>();
 
+            // Функия вернёт для переданного индекса ПЗ его тип
+            int GetTypeByBatchIndex(int batchIndex)
+            {
+
+                // Из узла матрицы R вытаскиваем тип данных и количество заданий данного типа
+                for (int dataType = 0; dataType < newMatrixR.Count; dataType++)
+
+                    // Если для текущей позиции найден ПЗ
+                    if (newMatrixR[dataType][batchIndex] != 0)
+
+                        // Возвращяем тип
+                        return dataType;
+
+                // Ошибка
+                return -1;
+            }
+
             for (int dataType = 0; dataType < this.matrixR[0].Count(); dataType++)
             {
                 newMatrixR.Add(new List<int>());
@@ -333,13 +350,28 @@ namespace newAlgorithm
                 return trueChangeoverTime;
             }
 
+            Dictionary<int, List<List<int>>> tnMatrix = new Dictionary<int, List<List<int>>>(deviceCount);
+            for (int device = 0; device < deviceCount; device++)
+            {
+                tnMatrix.Add(device, new List<List<int>>());
+                for (int batchIndex = 0; batchIndex < newMatrixR[0].Count; batchIndex++)
+                {
+                    tnMatrix[device].Add(new List<int>());
+                    for (int job = 0; job < newMatrixR[GetTypeByBatchIndex(batchIndex)][batchIndex]; job++)
+                    {
+                        tnMatrix[device][batchIndex].Add(0);
+                    }
+                }
+            }
+
             // Выполняем построение матрицы времён начала заданий
-            TreeDimMatrix tnMatrix = CalculationService.CalculateTnMatrix(
+            CalculationService.CalculateTnMatrix(
                 newMatrixR,
                 newMatrixP,
                 proccessingTime,
                 GetTrueDictionaryTime(),
-                bufferSize
+                bufferSize,
+                ref tnMatrix
             );
 
             // Если визуализация включена отображаем Excel
@@ -349,31 +381,11 @@ namespace newAlgorithm
                 // viz.Visualize(tnMatrix, proccessingTimeMatrix, rMatrix);
             }
 
-            // Достаём последний элемент из матрицы времён начала заданий
-            TreeDimMatrixNode lastNode = tnMatrix.treeDimMatrix.Last();
-
             // Из последнего элемента матрицы достаём время начала обработки последнего задания
-            int startTime = lastNode.time;
-
-            // Функия вернёт для переданного индекса ПЗ его тип
-            int GetTypeByBatchIndex(int batchIndex)
-            {
-
-                // Из узла матрицы R вытаскиваем тип данных и количество заданий данного типа
-                for (int dataType = 0; dataType < newMatrixR.Count; dataType++)
-
-                    // Если для текущей позиции найден ПЗ
-                    if (newMatrixR[dataType][batchIndex] != 0)
-
-                        // Возвращяем тип
-                        return dataType;
-
-                // Ошибка
-                return -1;
-            }
+            int startTime = tnMatrix[deviceCount - 1].Last().Last();
 
             // Определяем время обработки последнего задания в системе
-            int procTime = proccessingTime[lastNode.device - 1][GetTypeByBatchIndex(lastNode.fromDataType - 1)];
+            int procTime = proccessingTime[deviceCount - 1][GetTypeByBatchIndex(newMatrixR[0].Count - 1)];
 
             // Определяем новое время выполнения последнего задания в расписании
             timeOfLastScheduleExecution = startTime + procTime;

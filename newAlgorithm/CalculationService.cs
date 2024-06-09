@@ -2,6 +2,8 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.Eventing.Reader;
+using System.Linq;
+using System.Runtime.Remoting.Metadata.W3cXsd2001;
 
 namespace newAlgorithm.Service
 {
@@ -57,18 +59,19 @@ namespace newAlgorithm.Service
         /// <param name="timeChangeover">Трёхмерная матрица времени переналадки</param>
         /// <param name="bufferSize">Целочисленный размер буфера</param>
         /// <returns></returns>
-        public static TreeDimMatrix CalculateTnMatrix(
+        public static void CalculateTnMatrix(
             List<List<int>> rMatrix,
             List<List<int>> pMatrix,
             List<List<int>> timeProcessing,
             Dictionary<int, List<List<int>>> timeChangeover,
-            int bufferSize
+            int bufferSize,
+            ref Dictionary<int, List<List<int>>> tnMatrix
             )
         {
             // Количество приборов в конвейерной системе
             int deviceCount = timeProcessing.Count;
 
-            TreeDimMatrix tnMatrix = new TreeDimMatrix(deviceCount);
+            // TreeDimMatrix tnMatrix = new TreeDimMatrix(deviceCount);
 
             // Количество пакетов для всех типов данных, так же известное как n_p
             int maxBatchesPositions = pMatrix[0].Count;
@@ -141,21 +144,21 @@ namespace newAlgorithm.Service
                                 if (job == 0)
 
                                     // TODO: Релазиовать наладку приборов
-                                    tnMatrix.AddNode(device + 1, batchIndex + 1, job + 1, 0);
+                                    tnMatrix[device][batchIndex][job] = 0;
 
                                 // Если данное задание не первое и не превышает размер буфера, выполняем обработку
                                 if (job > 0 && job <= bufferSize)
                                 {
 
                                     // Высчитываем время начала и выполнения задания
-                                    int startTime = tnMatrix[device + 1, batchIndex + 1, job + 1 - 1];
-                                    int procTime = getProccessingTimeOnDeviceInBatch(device + 1 - 1, batchIndex + 1 - 1);
+                                    int startTime = tnMatrix[device][batchIndex][job - 1];
+                                    int procTime = getProccessingTimeOnDeviceInBatch(device, batchIndex);
 
                                     // Высчитываем время конца выполнения задания
                                     int stopTime = startTime + procTime;
 
                                     // Добавляем время конца выполнения задания матрицу
-                                    tnMatrix.AddNode(device + 1, batchIndex + 1, job + 1, stopTime);
+                                    tnMatrix[device][batchIndex][job] = stopTime;
 
                                     // Продолжаем вычисления для следующего прибора
                                     continue;
@@ -167,20 +170,22 @@ namespace newAlgorithm.Service
                                 {
 
                                     // Высчитываем время начала и выполнения задания
-                                    int startTime = tnMatrix[device + 1, batchIndex + 1, job + 1 - 1];
-                                    int procTime = getProccessingTimeOnDeviceInBatch(device + 1 - 1, batchIndex + 1 - 1);
+                                    // int startTime = tnMatrix[device + 1, batchIndex + 1, job + 1 - 1];
+                                    int startTime = tnMatrix[device][batchIndex][job - 1];
+                                    int procTime = getProccessingTimeOnDeviceInBatch(device, batchIndex);
 
                                     // Высчитываем время конца выполнения задания
                                     int stopTime = startTime + procTime;
 
                                     // Время начала задания на следующем приборе 
-                                    int startBufferTime = tnMatrix[device + 1 + 1, batchIndex + 1, job + 1 - bufferSize];
+                                    // int startBufferTime = tnMatrix[device + 1 + 1, batchIndex + 1, job + 1 - bufferSize];
+                                    int startBufferTime = tnMatrix[device + 1][batchIndex][job - bufferSize];
 
                                     // Выбираем между время между концом выполнения текущего задания и началом выполнения задания в буфере на следующем приборе
                                     int resultTime = Math.Max(stopTime, startBufferTime);
 
                                     // Добавляем результат в матрицу
-                                    tnMatrix.AddNode(device + 1, batchIndex + 1, job + 1, resultTime);
+                                    tnMatrix[device][batchIndex][job] = resultTime;
                                 }
 
                                 // Продолжаем вычисления для следующего прибора
@@ -196,8 +201,8 @@ namespace newAlgorithm.Service
                                 {
 
                                     // Высчитываем время начала и выполнения задания
-                                    int startTime = tnMatrix[device + 1, batchIndex + 1 - 1, previousJobCount];
-                                    int procTime = getProccessingTimeOnDeviceInBatch(device + 1 - 1, batchIndex + 1 - 1 - 1);
+                                    int startTime = tnMatrix[device][batchIndex - 1].Last();
+                                    int procTime = getProccessingTimeOnDeviceInBatch(device, batchIndex - 1);
 
                                     // Высчитываем время переналадки с предыдущего типа на текущий
                                     // int changeTime = timeChangeover[device + 1, previousType, currentDataType];
@@ -207,13 +212,15 @@ namespace newAlgorithm.Service
                                     int stopTime = changeTime + startTime + procTime;
 
                                     // Время начала задания на следующем приборе предыдущего пакета предыдущего задания
-                                    int startBufferTime = tnMatrix[device + 1 + 1, batchIndex + 1 - 1, previousJobCount - bufferSize + 1];
+                                    int startBufferTime = 0;
+                                    if (previousJobCount - bufferSize >= 0 && previousJobCount - bufferSize < tnMatrix[device + 1][batchIndex - 1].Count())
+                                        startBufferTime = tnMatrix[device + 1][batchIndex - 1][previousJobCount - bufferSize];
 
                                     // Выбираем между время между концом выполнения текущего задания и началом выполнения задания в буфере на следующем приборе
                                     int result = Math.Max(stopTime, startBufferTime);
 
                                     // Добавляем результат в матрицу
-                                    tnMatrix.AddNode(device + 1, batchIndex + 1, job + 1, result);
+                                    tnMatrix[device][batchIndex][job] = result;
 
                                     // Продолжаем вычисления для следующего прибора
                                     continue;
@@ -224,20 +231,22 @@ namespace newAlgorithm.Service
                                 {
 
                                     // Высчитываем время начала и выполнения задания
-                                    int startTime = tnMatrix[device + 1, batchIndex + 1, job + 1 - 1];
-                                    int procTime = getProccessingTimeOnDeviceInBatch(device + 1 - 1, batchIndex + 1 - 1);
+                                    int startTime = tnMatrix[device][batchIndex][job - 1];
+                                    int procTime = getProccessingTimeOnDeviceInBatch(device, batchIndex);
 
                                     // Высчитываем время конца выполнения задания
                                     int stopTime = startTime + procTime;
 
                                     // Время начала задания на следующем приборе предыдущего пакета предыдущего задания
-                                    int startBufferTime = tnMatrix[device + 1 + 1, batchIndex + 1 - 1, previousJobCount - bufferSize + job + 1];
+                                    int startBufferTime = 0;
+                                    if (previousJobCount - bufferSize + job >= 0 &&  previousJobCount - bufferSize + job < tnMatrix[device + 1][batchIndex - 1].Count())
+                                        startBufferTime = tnMatrix[device + 1][batchIndex - 1][previousJobCount - bufferSize + job];
 
                                     // Выбираем между время между концом выполнения текущего задания и началом выполнения задания в буфере на следующем приборе
                                     stopTime = Math.Max(stopTime, startBufferTime);
 
                                     // Добавляем результат в матрицу
-                                    tnMatrix.AddNode(device + 1, batchIndex + 1, job + 1, stopTime);
+                                    tnMatrix[device][batchIndex][job] = stopTime;
 
                                     // Продолжаем вычисления для следующего прибора
                                     continue;
@@ -249,20 +258,20 @@ namespace newAlgorithm.Service
                                 {
 
                                     // Высчитываем время начала и выполнения задания
-                                    int startTime = tnMatrix[device + 1, batchIndex + 1, job + 1 - 1];
-                                    int procTime = getProccessingTimeOnDeviceInBatch(device + 1 - 1, batchIndex + 1 - 1);
+                                    int startTime = tnMatrix[device][batchIndex][job - 1];
+                                    int procTime = getProccessingTimeOnDeviceInBatch(device, batchIndex);
 
                                     // Высчитываем время конца выполнения задания
                                     int stopTime = startTime + procTime;
 
                                     // Время начала задания на следующем приборе предыдущего пакета предыдущего задания
-                                    int startBufferTime = tnMatrix[device + 1 + 1, batchIndex + 1, job + 1 - bufferSize];
+                                    int startBufferTime = tnMatrix[device + 1][batchIndex][job - bufferSize];
 
                                     // Выбираем между концом выполнения текущего задания и началом выполнения задания в буфере на следующем приборе
                                     int result = Math.Max(stopTime, startBufferTime);
 
                                     // Добавляем результат в матрицу
-                                    tnMatrix.AddNode(device + 1, batchIndex + 1, job + 1, result);
+                                    tnMatrix[device][batchIndex][job] = result;
                                 }
 
                                 // Продолжаем вычисления для следующего прибора
@@ -285,14 +294,14 @@ namespace newAlgorithm.Service
                                 {
 
                                     // Высчитываем время начала и выполнения задания
-                                    int startTime = tnMatrix[device + 1 - 1, batchIndex + 1, batchIndex + 1];
-                                    int procTime = getProccessingTimeOnDeviceInBatch(device + 1 - 1 - 1, batchIndex + 1 - 1);
+                                    int startTime = tnMatrix[device - 1][0][0];
+                                    int procTime = getProccessingTimeOnDeviceInBatch(device - 1, 0);
 
                                     // Высчитываем время конца выполнения задания
                                     int stopTime = startTime + procTime;
 
                                     // Добавляем результат в матрицу
-                                    tnMatrix.AddNode(device + 1, batchIndex + 1, job + 1, stopTime);
+                                    tnMatrix[device][0][0] = stopTime;
 
                                     // Продолжаем вычисления для следующего прибора
                                     continue;
@@ -304,15 +313,15 @@ namespace newAlgorithm.Service
                                 {
 
                                     // Высчитываем время начала и выполнения задания
-                                    int startTime = tnMatrix[device + 1 - 1, batchIndex + 1, job + 1];
-                                    int procTime = getProccessingTimeOnDeviceInBatch(device + 1 - 1 - 1, 1 - 1);
+                                    int startTime = tnMatrix[device - 1][0][job];
+                                    int procTime = getProccessingTimeOnDeviceInBatch(device - 1, 0);
 
                                     // Высчитываем время конца выполнения задания
                                     int stopTimeCurrentJob = startTime + procTime;
 
                                     // Высчитываем время начала и выполнения предыдущего задания
-                                    startTime = tnMatrix[device + 1, batchIndex + 1, job + 1 - 1];
-                                    procTime = getProccessingTimeOnDeviceInBatch(device + 1 - 1, batchIndex + 1 - 1);
+                                    startTime = tnMatrix[device][0][job - 1];
+                                    procTime = getProccessingTimeOnDeviceInBatch(device, 0);
 
                                     // Высчитываем время конца выполнения предыдущего задания
                                     int stopTimePreviousJob = startTime + procTime;
@@ -321,7 +330,7 @@ namespace newAlgorithm.Service
                                     int result = Math.Max(stopTimeCurrentJob, stopTimePreviousJob);
 
                                     // Добавляем результат в матрицу
-                                    tnMatrix.AddNode(device + 1, batchIndex + 1, job + 1, result);
+                                    tnMatrix[device][0][job] = result;
 
                                     // Продолжаем вычисления для следующего прибора
                                     continue;
@@ -333,15 +342,15 @@ namespace newAlgorithm.Service
                                 {
 
                                     // Высчитываем время начала и выполнения задания
-                                    int startTime = tnMatrix[device + 1 - 1, batchIndex + 1, job + 1];
-                                    int procTime = getProccessingTimeOnDeviceInBatch(device + 1 - 1 - 1, 1 - 1);
+                                    int startTime = tnMatrix[device - 1][0][job];
+                                    int procTime = getProccessingTimeOnDeviceInBatch(device - 1, 0);
 
                                     // Высчитываем время конца выполнения задания
                                     int stopTimeCurrentJob = startTime + procTime;
 
                                     // Высчитываем время начала и выполнения предыдущего задания
-                                    startTime = tnMatrix[device + 1, batchIndex + 1, job + 1 - 1];
-                                    procTime = getProccessingTimeOnDeviceInBatch(device + 1 - 1, batchIndex + 1 - 1);
+                                    startTime = tnMatrix[device][0][job];
+                                    procTime = getProccessingTimeOnDeviceInBatch(device, 0);
 
                                     // Высчитываем время конца выполнения предыдущего задания
                                     int stopTimePreviousJob = startTime + procTime;
@@ -350,13 +359,13 @@ namespace newAlgorithm.Service
                                     int stopTime = Math.Max(stopTimeCurrentJob, stopTimePreviousJob);
 
                                     // Время начала задания на следующем приборе предыдущего задания через буфер
-                                    int startBufferTime = tnMatrix[device + 1 + 1, batchIndex + 1, job + 1 - bufferSize];
+                                    int startBufferTime = tnMatrix[device + 1][0][job - bufferSize];
 
                                     // Выбираем между концом выполнения задания и концом выполнения задания через буфер
                                     int result = Math.Max(stopTime, startBufferTime);
 
                                     // Добавляем результат в матрицу
-                                    tnMatrix.AddNode(device + 1, batchIndex + 1, job + 1, result);
+                                    tnMatrix[device][0][job] = result;
                                 }
 
                                 // Продолжаем вычисления для следующего прибора
@@ -373,15 +382,15 @@ namespace newAlgorithm.Service
                                 {
 
                                     // Высчитываем время начала и выполнения задания
-                                    int startTime = tnMatrix[device + 1 - 1, batchIndex + 1, 1];
-                                    int procTime = getProccessingTimeOnDeviceInBatch(device + 1 - 1 - 1, batchIndex + 1 - 1);
+                                    int startTime = tnMatrix[device - 1][batchIndex][0];
+                                    int procTime = getProccessingTimeOnDeviceInBatch(device - 1, batchIndex);
 
                                     // Высчитываем время конца выполнения задания
                                     int stopTimeCurrentJob = startTime + procTime;
 
                                     // Высчитываем время начала и выполнения предыдущего задания
-                                    startTime = tnMatrix[device + 1, batchIndex + 1 - 1, previousJobCount];
-                                    procTime = getProccessingTimeOnDeviceInBatch(device + 1 - 1, batchIndex + 1 - 1 - 1);
+                                    startTime = tnMatrix[device][batchIndex - 1].Last();
+                                    procTime = getProccessingTimeOnDeviceInBatch(device, batchIndex - 1);
 
                                     // Время переналадки прибора с предыдущего типа на текущий
                                     // int changeTime = timeChangeover[device + 1, previousType, currentDataType];
@@ -394,13 +403,17 @@ namespace newAlgorithm.Service
                                     int stopTime = Math.Max(stopTimeCurrentJob, stopTimePreviousJob);
 
                                     // Время начала задания на следующем приборе предыдущего задания через буфер
-                                    int startBufferTime = tnMatrix[device + 1 + 1, batchIndex + 1 - 1, previousJobCount - bufferSize + 1];
+
+                                    // Время начала задания на следующем приборе предыдущего пакета предыдущего задания
+                                    int startBufferTime = 0;
+                                    if (previousJobCount - bufferSize >= 0 && previousJobCount - bufferSize < tnMatrix[device + 1][batchIndex - 1].Count())
+                                        startBufferTime = tnMatrix[device + 1][batchIndex - 1][previousJobCount - bufferSize];
 
                                     // Выбираем между концом выполнения задания и концом выполнения задания через буфер
                                     int result = Math.Max(stopTime, startBufferTime);
 
                                     // Добавляем результат в матрицу
-                                    tnMatrix.AddNode(device + 1, batchIndex + 1, job + 1, result);
+                                    tnMatrix[device][batchIndex][0] = result;
 
                                     // Продолжаем вычисления для следующего прибора
                                     continue;
@@ -412,15 +425,15 @@ namespace newAlgorithm.Service
                                 {
 
                                     // Высчитываем время начала и выполнения задания
-                                    int startTime = tnMatrix[device + 1 - 1, batchIndex + 1, job + 1];
-                                    int procTime = getProccessingTimeOnDeviceInBatch(device + 1 - 1 - 1, batchIndex + 1 - 1);
+                                    int startTime = tnMatrix[device - 1][batchIndex][job];
+                                    int procTime = getProccessingTimeOnDeviceInBatch(device - 1, batchIndex);
 
                                     // Высчитываем время конца выполнения задания
                                     int stopTimeCurrentJob = startTime + procTime;
 
                                     // Высчитываем время начала и выполнения предыдущего задания
-                                    startTime = tnMatrix[device + 1, batchIndex + 1, job + 1 - 1];
-                                    procTime = getProccessingTimeOnDeviceInBatch(device + 1 - 1, batchIndex + 1 - 1);
+                                    startTime = tnMatrix[device][batchIndex][job - 1];
+                                    procTime = getProccessingTimeOnDeviceInBatch(device, batchIndex);
 
                                     // Высчитываем время конца выполнения предыдущего задания
                                     int stopTimePreviousJob = startTime + procTime;
@@ -429,13 +442,15 @@ namespace newAlgorithm.Service
                                     int stopTime = Math.Max(stopTimeCurrentJob, stopTimePreviousJob);
 
                                     // Время начала задания на следующем приборе предыдущего задания через буфер
-                                    int startBufferTime = tnMatrix[device + 1 + 1, batchIndex + 1 - 1, previousJobCount - bufferSize + job + 1];
+                                    int startBufferTime = 0;
+                                    if (previousJobCount - bufferSize + job >= 0 && previousJobCount - bufferSize + job < tnMatrix[device + 1][batchIndex - 1].Count())
+                                        startBufferTime = tnMatrix[device + 1][batchIndex - 1][previousJobCount - bufferSize + job];
 
                                     // Выбираем между концом выполнения задания и концом выполнения задания через буфер
                                     int result = Math.Max(stopTime, startBufferTime);
 
                                     // Добавляем результат в матрицу
-                                    tnMatrix.AddNode(device + 1, batchIndex + 1, job + 1, result);
+                                    tnMatrix[device][batchIndex][job] = result;
 
                                     // Продолжаем вычисления для следующего прибора
                                     continue;
@@ -447,15 +462,15 @@ namespace newAlgorithm.Service
                                 {
 
                                     // Высчитываем время начала и выполнения задания
-                                    int startTime = tnMatrix[device + 1 - 1, batchIndex + 1, job + 1];
-                                    int procTime = getProccessingTimeOnDeviceInBatch(device + 1 - 1 - 1, batchIndex + 1 - 1);
+                                    int startTime = tnMatrix[device - 1][batchIndex][job];
+                                    int procTime = getProccessingTimeOnDeviceInBatch(device - 1, batchIndex);
 
                                     // Высчитываем время конца выполнения задания
                                     int stopTimeCurrentJob = startTime + procTime;
 
                                     // Высчитываем время начала и выполнения предыдущего задания
-                                    startTime = tnMatrix[device + 1, batchIndex + 1, job + 1 - 1];
-                                    procTime = getProccessingTimeOnDeviceInBatch(device + 1 - 1, batchIndex + 1 - 1);
+                                    startTime = tnMatrix[device][batchIndex][job - 1];
+                                    procTime = getProccessingTimeOnDeviceInBatch(device, batchIndex);
 
                                     // Высчитываем время конца выполнения предыдущего задания
                                     int stopTimePreviousJob = startTime + procTime;
@@ -464,13 +479,13 @@ namespace newAlgorithm.Service
                                     int stopTime = Math.Max(stopTimeCurrentJob, stopTimePreviousJob);
 
                                     // Время начала задания на следующем приборе задания через буфер
-                                    int startBufferTime = tnMatrix[device + 1 + 1, batchIndex + 1, job + 1 - bufferSize];
+                                    int startBufferTime = tnMatrix[device + 1][batchIndex][job - bufferSize];
 
                                     // Выбираем между концом выполнения задания и концом выполнения задания через буфер
                                     int result = Math.Max(stopTime, startBufferTime);
 
                                     // Добавляем результат в матрицу
-                                    tnMatrix.AddNode(device + 1, batchIndex + 1, job + 1, result);
+                                    tnMatrix[device][batchIndex][job] = result;
                                 }
 
                                 // Продолжаем вычисления для следующего прибора
@@ -490,13 +505,13 @@ namespace newAlgorithm.Service
                                 if (job == 0)
                                 {
 
-                                    // Подсчитываем время выполнения для всех пакетов
+                                    // Подсчитываем время выполнения для всех пакетов для предыдущих приборов
                                     int result = 0;
-                                    for (int li = 1; li <= deviceCount - 1; li++)
-                                        result += getProccessingTimeOnDeviceInBatch(li - 1, 0);
+                                    for (int li = 0; li <= deviceCount - 2; li++)
+                                        result += getProccessingTimeOnDeviceInBatch(li, 0);
 
                                     // Добавляем результат в матрицу
-                                    tnMatrix.AddNode(deviceCount, 0 + 1, 0 + 1, result);
+                                    tnMatrix[deviceCount - 1][0][0] = result;
 
                                     // Продолжаем вычисления для следующего прибора
                                     continue;
@@ -509,15 +524,15 @@ namespace newAlgorithm.Service
                                 {
 
                                     // Высчитываем время начала и выполнения задания
-                                    int startTime = tnMatrix[device + 1 - 1, batchIndex + 1, job + 1];
-                                    int procTime = getProccessingTimeOnDeviceInBatch(device + 1 - 1 - 1, batchIndex + 1 - 1);
+                                    int startTime = tnMatrix[device - 1][batchIndex][job];
+                                    int procTime = getProccessingTimeOnDeviceInBatch(device - 1, batchIndex);
 
                                     // Высчитываем время конца выполнения задания
                                     int stopTimeCurrentJob = startTime + procTime;
 
                                     // Высчитываем время начала и выполнения предыдущего задания
-                                    startTime = tnMatrix[device + 1, batchIndex + 1, job + 1 - 1];
-                                    procTime = getProccessingTimeOnDeviceInBatch(deviceCount - 1, batchIndex + 1 - 1);
+                                    startTime = tnMatrix[device][batchIndex][job - 1];
+                                    procTime = getProccessingTimeOnDeviceInBatch(deviceCount - 1, batchIndex);
 
                                     // Высчитываем время конца выполнения предыдущего задания
                                     int stopTimePreviousJob = startTime + procTime;
@@ -526,7 +541,7 @@ namespace newAlgorithm.Service
                                     int result = Math.Max(stopTimeCurrentJob, stopTimePreviousJob);
 
                                     // Добавляем результат в матрицу
-                                    tnMatrix.AddNode(deviceCount, batchIndex + 1, job + 1, result);
+                                    tnMatrix[deviceCount - 1][batchIndex][job] = result;
                                 }
 
                                 // Продолжаем вычисления для следующего прибора
@@ -543,15 +558,15 @@ namespace newAlgorithm.Service
                                 {
 
                                     // Высчитываем время начала и выполнения задания
-                                    int startTime = tnMatrix[device + 1 - 1, batchIndex + 1, job + 1];
-                                    int procTime = getProccessingTimeOnDeviceInBatch(deviceCount - 1 - 1, batchIndex + 1 - 1);
+                                    int startTime = tnMatrix[device - 1][batchIndex][job];
+                                    int procTime = getProccessingTimeOnDeviceInBatch(deviceCount - 2, batchIndex);
 
                                     // Высчитываем время конца выполнения задания
                                     int stopTimeCurrentJob = startTime + procTime;
 
                                     // Высчитываем время начала и выполнения предыдущего задания
-                                    startTime = tnMatrix[deviceCount, batchIndex + 1 - 1, previousJobCount];
-                                    procTime = getProccessingTimeOnDeviceInBatch(deviceCount - 1, batchIndex + 1 - 1 - 1);
+                                    startTime = tnMatrix[deviceCount - 1][batchIndex - 1].Last();
+                                    procTime = getProccessingTimeOnDeviceInBatch(deviceCount - 1, batchIndex - 1);
 
                                     // Время переналадки с предыдущего типа на текущей
                                     // int changeTime = timeChangeover[deviceCount, previousType, currentDataType];
@@ -564,7 +579,7 @@ namespace newAlgorithm.Service
                                     int result = Math.Max(stopTimeCurrentJob, stopTimePreviousJob);
 
                                     // Добавляем результат в матрицу
-                                    tnMatrix.AddNode(deviceCount, batchIndex + 1, job + 1, result);
+                                    tnMatrix[deviceCount - 1][batchIndex][job] = result;
 
                                     // Продолжаем вычисления для следующего прибора
                                     continue;
@@ -578,15 +593,15 @@ namespace newAlgorithm.Service
                                 {
 
                                     // Высчитываем время начала и выполнения задания
-                                    int startTime = tnMatrix[deviceCount - 1, batchIndex + 1, job + 1];
-                                    int procTime = getProccessingTimeOnDeviceInBatch(deviceCount - 1 - 1, batchIndex + 1 - 1);
+                                    int startTime = tnMatrix[deviceCount - 2][batchIndex][job];
+                                    int procTime = getProccessingTimeOnDeviceInBatch(deviceCount - 2, batchIndex);
 
                                     // Высчитываем время конца выполнения задания
                                     int stopTimeCurrentJob = startTime + procTime;
 
                                     // Высчитываем время начала и выполнения предыдущего задания
-                                    startTime = tnMatrix[deviceCount, batchIndex + 1, job + 1 - 1];
-                                    procTime = getProccessingTimeOnDeviceInBatch(deviceCount - 1, batchIndex + 1 - 1);
+                                    startTime = tnMatrix[deviceCount - 1][batchIndex][job- 1];
+                                    procTime = getProccessingTimeOnDeviceInBatch(deviceCount - 1, batchIndex);
 
                                     // Высчитываем время конца выполнения предыдущего задания
                                     int stopTimePreviousJob = startTime + procTime;
@@ -595,7 +610,7 @@ namespace newAlgorithm.Service
                                     int result = Math.Max(stopTimeCurrentJob, stopTimePreviousJob);
 
                                     // Добавляем результат в матрицу
-                                    tnMatrix.AddNode(deviceCount, batchIndex + 1, job + 1, result);
+                                    tnMatrix[deviceCount - 1][batchIndex][job] = result;
 
                                     // Продолжаем вычисления для следующего прибора
                                     continue;
@@ -610,8 +625,6 @@ namespace newAlgorithm.Service
                 previousDataType = currentDataType;
                 previousJobCount = currentJobCount;
             }
-
-            return tnMatrix;
         }
     }
 }
