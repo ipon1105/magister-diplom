@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Data.Common;
 using System.Diagnostics.PerformanceData;
+using System.Drawing.Drawing2D;
 using System.Linq;
 
 namespace newAlgorithm
@@ -303,18 +304,16 @@ namespace newAlgorithm
         private void CalculateSheduleWithBufer(int bufferSize, int dataTypesCount)
         {
 
-            // Инициализируем матрицу времени выполнения заданий
-            Matrix proccessingTimeMatrix = new Matrix(proccessingTime);
-
-            // Инициализируем матрицу R - количества данных i-ых типов в партиях занимающих в последовательноси pi_l j-е позиции
-            RMatrix rMatrix = new RMatrix(dataTypesCount);
-
-            // Для каждого позиции в последовательности выполняем перебор
-            for (int batchIndex = 0; batchIndex < matrixR.Count; batchIndex++)
+            
+            List<List<int>> newMatrixR = new List<List<int>>();
+            for (int dataType = 0; dataType < this.matrixR[0].Count(); dataType++)
             {
-                int _dataType = ReturnRDataType(batchIndex);
-                rMatrix.AddNode(_dataType + 1, matrixR[batchIndex][_dataType]);
+                newMatrixR.Add(new List<int>());
+                for (int batchIndex = 0; batchIndex < this.matrixR.Count(); batchIndex++)
+                    newMatrixR[dataType].Add(this.matrixR[batchIndex][dataType]);
             }
+            // Инициализируем матрицу времени выполнения заданий
+            Model.Matrix proccessingTimeMatrix = new Model.Matrix(proccessingTime);
 
             // Выполяем инициализацию матрицы P
             List<List<int>> pMatr = ListUtils.InitMatrixInt(matrixR[0].Count, matrixR.Count, 0);
@@ -330,19 +329,25 @@ namespace newAlgorithm
                         pMatr[_dataType][batchIndex] = 1;
 
             // Инициализируем матрицу P
-            Matrix pMatrix = new Matrix(pMatr);
+            Model.Matrix pMatrix = new Model.Matrix(pMatr);
 
             // Инициализируем матрицу переналадки приборов
             TreeDimMatrix timeChangeover = new TreeDimMatrix(changeoverTime);
 
             // Выполняем построение матрицы времён начала заданий
-            TreeDimMatrix tnMatrix = CalculationService.CalculateTnMatrix(rMatrix, pMatrix, proccessingTimeMatrix, timeChangeover, bufferSize);
+            TreeDimMatrix tnMatrix = CalculationService.CalculateTnMatrix(
+                newMatrixR,
+                pMatrix,
+                proccessingTimeMatrix,
+                timeChangeover,
+                bufferSize
+            );
 
             // Если визуализация включена отображаем Excel
             if (Form1.vizualizationOn)
             {
                 viz.CreateExcelAppList(deviceCount, dataTypesCount);
-                viz.Visualize(tnMatrix, proccessingTimeMatrix, rMatrix);
+                // viz.Visualize(tnMatrix, proccessingTimeMatrix, rMatrix);
             }
 
             // Достаём последний элемент из матрицы времён начала заданий
@@ -351,11 +356,25 @@ namespace newAlgorithm
             // Из последнего элемента матрицы достаём время начала обработки последнего задания
             int startTime = lastNode.time;
 
-            // Определяем тип последнего задания
-            int dataType = rMatrix[lastNode.fromDataType].dataType;
+            // Функия вернёт для переданного индекса ПЗ его тип
+            int GetTypeByBatchIndex(int batchIndex)
+            {
+
+                // Из узла матрицы R вытаскиваем тип данных и количество заданий данного типа
+                for (int dataType = 0; dataType < newMatrixR.Count; dataType++)
+
+                    // Если для текущей позиции найден ПЗ
+                    if (newMatrixR[dataType][batchIndex] != 0)
+
+                        // Возвращяем тип
+                        return dataType;
+
+                // Ошибка
+                return -1;
+            }
 
             // Определяем время обработки последнего задания в системе
-            int procTime = proccessingTimeMatrix[lastNode.device-1, dataType-1];
+            int procTime = proccessingTimeMatrix[lastNode.device-1, GetTypeByBatchIndex(lastNode.fromDataType - 1)];
 
             // Определяем новое время выполнения последнего задания в расписании
             timeOfLastScheduleExecution = startTime + procTime;

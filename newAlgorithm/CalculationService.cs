@@ -1,6 +1,7 @@
 ﻿using newAlgorithm.Model;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.Eventing.Reader;
 
 namespace newAlgorithm.Service
 {
@@ -57,7 +58,7 @@ namespace newAlgorithm.Service
         /// <param name="bufferSize">Целочисленный размер буфера</param>
         /// <returns></returns>
         public static TreeDimMatrix CalculateTnMatrix(
-            RMatrix rMatrix,
+            List<List<int>> rMatrix,
             Matrix pMatrix,
             Matrix timeProcessing,
             TreeDimMatrix timeChangeover,
@@ -82,11 +83,19 @@ namespace newAlgorithm.Service
             {
 
                 // Получаем узел матрицы R в позиции batchIndex
-                RMatrixNode currentNode = rMatrix[batchIndex + 1];
+                int currentJobCount = 0;
+                int currentDataType = 0;
 
                 // Из узла матрицы R вытаскиваем тип данных и количество заданий данного типа
-                int currentJobCount = currentNode.batchCount;
-                int currentDataType = currentNode.dataType;
+                for (int dataType = 0; dataType < rMatrix.Count; dataType++)
+                    
+                    // Если для текущей позиции найден ПЗ
+                    if (rMatrix[dataType][batchIndex] != 0) { 
+                        currentJobCount = rMatrix[dataType][batchIndex];
+                        currentDataType = dataType + 1;
+                        break;
+                    }
+                
 
                 // Для всех заданий выполняем обработку. job так же известен, как q
                 for (int job = 0; job < currentJobCount; job++)
@@ -603,7 +612,7 @@ namespace newAlgorithm.Service
                 }
 
                 // Переопределяем предыдущий тип и задание
-                previousType = currentNode.dataType;
+                previousType = currentDataType;
                 previousJob = currentJobCount;
             }
 
