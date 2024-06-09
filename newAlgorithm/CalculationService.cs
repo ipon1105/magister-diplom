@@ -59,7 +59,7 @@ namespace newAlgorithm.Service
         /// <returns></returns>
         public static TreeDimMatrix CalculateTnMatrix(
             List<List<int>> rMatrix,
-            Matrix pMatrix,
+            List<List<int>> pMatrix,
             Matrix timeProcessing,
             TreeDimMatrix timeChangeover,
             int bufferSize
@@ -69,7 +69,7 @@ namespace newAlgorithm.Service
             TreeDimMatrix tnMatrix = new TreeDimMatrix(timeChangeover.deviceCount);
 
             // Количество пакетов для всех типов данных, так же известное как n_p
-            int maxBatchesPositions = pMatrix.columnCount;
+            int maxBatchesPositions = pMatrix[0].Count;
 
             // Количество приборов в конвейерной системе
             int deviceCount = timeChangeover.deviceCount;
@@ -113,7 +113,7 @@ namespace newAlgorithm.Service
                         while (_procTime == 0)
                         {
                             // Подсчёт времени выполнения типа данных dataType на устройстве _device
-                            int _position = pMatrix[_dataType, _batchIndex];
+                            int _position = pMatrix[_dataType][_batchIndex];
                             
                             // Получаем время выполнения типа _dataType на приборе _device
                             int _proccessingTime = timeProcessing[_device, _dataType++];

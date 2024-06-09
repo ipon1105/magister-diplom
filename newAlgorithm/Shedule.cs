@@ -304,32 +304,23 @@ namespace newAlgorithm
         private void CalculateSheduleWithBufer(int bufferSize, int dataTypesCount)
         {
 
-            
+
             List<List<int>> newMatrixR = new List<List<int>>();
+            List<List<int>> newMatrixP = new List<List<int>>();
+
             for (int dataType = 0; dataType < this.matrixR[0].Count(); dataType++)
             {
                 newMatrixR.Add(new List<int>());
+                newMatrixP.Add(new List<int>());
                 for (int batchIndex = 0; batchIndex < this.matrixR.Count(); batchIndex++)
+                {
                     newMatrixR[dataType].Add(this.matrixR[batchIndex][dataType]);
+                    newMatrixP[dataType].Add((this.matrixR[batchIndex][dataType] != 0) ? 1 : 0);
+                }
             }
+
             // Инициализируем матрицу времени выполнения заданий
             Model.Matrix proccessingTimeMatrix = new Model.Matrix(proccessingTime);
-
-            // Выполяем инициализацию матрицы P
-            List<List<int>> pMatr = ListUtils.InitMatrixInt(matrixR[0].Count, matrixR.Count, 0);
-
-            // Для каждой позиции в последовательности выполняем перебор
-            for (int batchIndex = 0; batchIndex < matrixR.Count; batchIndex++)
-            
-                // Для каждого типа данных выполняем перебор
-                for (int _dataType = 0; _dataType < matrixR[batchIndex].Count; _dataType++)
-                
-                    // Если значение в позиции и типа не равно 0, инвертируем его в новой матрице pMatr
-                    if (matrixR[batchIndex][_dataType] != 0)
-                        pMatr[_dataType][batchIndex] = 1;
-
-            // Инициализируем матрицу P
-            Model.Matrix pMatrix = new Model.Matrix(pMatr);
 
             // Инициализируем матрицу переналадки приборов
             TreeDimMatrix timeChangeover = new TreeDimMatrix(changeoverTime);
@@ -337,7 +328,7 @@ namespace newAlgorithm
             // Выполняем построение матрицы времён начала заданий
             TreeDimMatrix tnMatrix = CalculationService.CalculateTnMatrix(
                 newMatrixR,
-                pMatrix,
+                newMatrixP,
                 proccessingTimeMatrix,
                 timeChangeover,
                 bufferSize
