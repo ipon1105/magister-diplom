@@ -890,10 +890,10 @@ namespace newAlgorithm
                 preMaintenanceTimes.Add((device % 2 == 0) ? randomValue : _randomValue);
 
                 // Рандомим значение интенсивности восстановления
-                restoringDevice.Add(random.NextDouble() % 0.01);
+                failureRates.Add(random.NextDouble() % 0.01);
 
                 // Рандомим значение интенсивности отказов
-                failureRates.Add(random.NextDouble());
+                restoringDevice.Add(random.NextDouble());
             }
 
             // Устанавливаем значение таблицы длительностей ПТО
