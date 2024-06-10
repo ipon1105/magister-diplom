@@ -107,9 +107,6 @@ namespace newAlgorithm
         private void Button3_Click(object sender, EventArgs e)
         {
 
-            // Выполняем перестроение матриц
-            TablesRebuild();
-
             // TODO: Перед вызовом данной функции необходимо выполнить присваивание для Form1.compositionSets и Form1.timeSets
 
             // Инициализируем вектор длиной dataTypesCount, каждый элемент которого будет равен batchCount
@@ -137,9 +134,6 @@ namespace newAlgorithm
         /// <param name="e"></param>
         private void Button1_Click(object sender, EventArgs e)
         {
-
-            // Выполняем перестроение матриц
-            TablesRebuild();
 
             // Инициализируем вектор длиной dataTypesCount, каждый элемент которого будет равен batchCount
             List<int> batchCountList = CreateBatchCountList();
@@ -172,9 +166,6 @@ namespace newAlgorithm
 
             // Объявляем и инициализируем количество приборов
             int Device = Convert.ToInt32(numeric_device_count.Value);
-
-            // Выполняем перестроение матриц
-            TablesRebuild();
 
             // Формируем вектор из значений { 2, 4, 8, 16, 32 }, для генерации матриц выполнения и переналадки
             int[] array = { 2, 4, 8, 16, 32 };
@@ -250,9 +241,6 @@ namespace newAlgorithm
             // Объявляем и инициализируем количество приборов
             int Device = Convert.ToInt32(numeric_device_count.Value);
 
-            // Выполняем перестроение матриц
-            TablesRebuild();
-
             // Формируем вектор из значений { 2, 4, 8, 16, 32 }, для генерации матриц выполнения и переналадки
             var array = new[] { 2, 4, 8, 16, 32 };
 
@@ -315,9 +303,6 @@ namespace newAlgorithm
         /// <param name="e"></param>
         private void Button4_Click(object sender, EventArgs e)
         {
-
-            // Выполняем перестроение матриц
-            TablesRebuild();
 
             Form1.direct = checkBox_deadline_on.Checked;
             int[] N_komplect_sostav = { 2, 4 };
@@ -464,10 +449,6 @@ namespace newAlgorithm
         private void Button5Click(object sender, EventArgs e)
         {
 
-
-            // Выполняем перестроение матриц
-            TablesRebuild();
-
             // Инициализируем выходной файл на добавление
             StreamWriter file_output_method_GAA = new StreamWriter("outputGAASimpleResult.txt", true);
 
@@ -577,9 +558,6 @@ namespace newAlgorithm
         /// <param name="e"></param>
         private void Button2_Click(object sender, EventArgs e)
         {
-
-            // Выполняем перестроение матриц
-            TablesRebuild();
 
             // Создаём экземпляр класса Random для генерации рандомных данных
             var rand = new Random(0);
@@ -695,8 +673,6 @@ namespace newAlgorithm
         private void SetsBtn_Click(object sender, EventArgs e)
         {
 
-            // Выполняем перестроение матриц
-            TablesRebuild();
         }
 
         #endregion
