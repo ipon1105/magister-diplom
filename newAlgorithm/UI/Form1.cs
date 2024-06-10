@@ -1011,7 +1011,6 @@ namespace newAlgorithm
         {
             buffer = Convert.ToInt32(numeric_buffer.Value);
             Form1.buff = buffer;
-            TablesRebuild();
         }
 
         /// <summary>
