@@ -10,6 +10,7 @@ using System.Text;
 using System.Windows.Forms;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System.Diagnostics.Eventing.Reader;
 
 namespace newAlgorithm
 {
@@ -18,6 +19,26 @@ namespace newAlgorithm
     {
 
         #region Поля данных
+
+        /// <summary>
+        /// Минимальное значение для матриц changeoverTime processingTime и preMaintenance
+        /// </summary>
+        private const int minTimesValue = 0;
+
+        /// <summary>
+        /// Максимальное значение для матриц changeoverTime processingTime и preMaintenance
+        /// </summary>
+        private const int maxTimesValue = 100000;
+
+        /// <summary>
+        /// Минимальное значение для beta и матриц restoringDevice, failureRates
+        /// </summary>
+        private const double minProbValue = 0;
+
+        /// <summary>
+        /// Максимальное значение для beta и матриц restoringDevice, failureRates
+        /// </summary>
+        private const double maxProbValue = 1;
 
         /// <summary>
         /// Данная переменная отвечает за выбор способа обработки данных и определено перечислением SelectionType
@@ -865,9 +886,6 @@ namespace newAlgorithm
             // Объявляем и инициализируем количество приборов
             int Device = Convert.ToInt32(numeric_device_count.Value);
 
-            // Объявляем и инициализируем количество приборов
-            int DataType = Convert.ToInt32(numeric_data_types_count.Value);
-
             // Объявляем и инициализируем вектор длительностей ПТО
             List<int> preMaintenanceTimes = new List<int>(Device);
 
@@ -1323,6 +1341,8 @@ namespace newAlgorithm
         /// Функция вернёт матрицу времени выполнения
         /// </summary>
         /// <returns>Матрица времени выполнения</returns>
+        /// <exception cref="ArgumentException">Данные в таблице вышли за пределы</exception>
+        /// <exception cref="IndexOutOfRangeException">Количество строк или столбцов некорректны</exception>
         private List<List<int>> GetProcessingTime()
         {
 
@@ -1332,9 +1352,20 @@ namespace newAlgorithm
             // Объявляем и инициализируем количество типов данных
             int DataType = Convert.ToInt32(numeric_data_types_count.Value);
 
+            // Проверяем количество строк
+            if (dataGridView_processing_time.RowCount != Device)
+                throw new IndexOutOfRangeException($"Count of row in DataGridView processingTime must be {Device}");
+
+            // Проверяем количество столбцов
+            if (dataGridView_processing_time.ColumnCount != DataType)
+                throw new IndexOutOfRangeException($"Count of column in DataGridView processingTime must be {DataType}");
+
             // Объявляем матрицу время выполнения
             List<List<int>> processingTime = new List<List<int>>(Device);
 
+            // Объявляем значение ячейки
+            int value;
+            
             // Для каждого прибора
             for (int device = 0; device < Device; device++) {
 
@@ -1343,9 +1374,19 @@ namespace newAlgorithm
 
                 // Для каждого типа данных
                 for (int dataType = 0; dataType < DataType; dataType++)
+                {
 
-                    // Добавляем элемент в строку
-                    processingTime[device].Add(Convert.ToInt32(this.dataGridView_processing_time.Rows[device].Cells[dataType].Value)); 
+                    // Получаем значение ячейки
+                    value = Convert.ToInt32(this.dataGridView_processing_time.Rows[device].Cells[dataType].Value);
+
+                    // Проверяем диапазон данных
+                    if (value < minTimesValue || value > maxTimesValue)
+                        throw new ArgumentException($"The value in DataGridView processingTime by row {device + 1} and column {dataType + 1} must be between [{minTimesValue}, {maxTimesValue}]");
+
+                    // Добавляем элемент в матрицу
+                    processingTime[device].Add(value); 
+                }
+
             }
 
             // Возвращяем матрицу
@@ -1447,7 +1488,9 @@ namespace newAlgorithm
         /// <summary>
         /// Функция вернёт матриц времени переналадки
         /// </summary>
-        /// <returns></returns>
+        /// <returns>Матрица переналадки</returns>
+        /// <exception cref="ArgumentException">Данные в таблице вышли за пределы</exception>
+        /// <exception cref="IndexOutOfRangeException">Количество строк или столбцов некорректны</exception>
         private List<List<List<int>>> GetChangeoverTimeList()
         {
 
@@ -1457,8 +1500,19 @@ namespace newAlgorithm
             // Объявляем и инициализируем количество типов данных
             int DataType = Convert.ToInt32(numeric_data_types_count.Value);
 
+            // Проверяем количество строк
+            if (dataGridView_changeover_time.RowCount != Device * DataType)
+                throw new IndexOutOfRangeException($"Count of row in DataGridView changeoverTime must be {Device * DataType}");
+
+            // Проверяем количество столбцов
+            if (dataGridView_changeover_time.ColumnCount != DataType)
+                throw new IndexOutOfRangeException($"Count of column in DataGridView changeoverTime must be {DataType}");
+
             // Объявляем матрицу времени переналадки
             List<List<List<int>>> changeoverTime = new List<List<List<int>>>(Device);
+
+            // Объявляем значение ячейки
+            int value;
 
             // Для каждого прибора
             for (var device = 0; device < Device; device++)
@@ -1476,20 +1530,31 @@ namespace newAlgorithm
 
                     // Для каждого типа данных
                     for (var toDataType = 0; toDataType < DataType; toDataType++)
+                    {
 
+                        // Получаем значение ячейки
+                        value = Convert.ToInt32(dataGridView_changeover_time.Rows[device * DataType + fromDataType].Cells[toDataType].Value);
+                        
+                        // Проверяем диапазон данных
+                        if (value < minTimesValue || value > maxTimesValue)
+                            throw new ArgumentException($"The value in DataGridView changeoverTime by row {(device * DataType + fromDataType) + 1} and column {toDataType + 1} must be between [{minTimesValue}, {maxTimesValue}]");
+                        
                         // Добавляем значения в матрицу
-                        changeoverTime[device][fromDataType].Add(Convert.ToInt32(dataGridView_changeover_time.Rows[device * DataType + fromDataType].Cells[toDataType].Value));
+                        changeoverTime[device][fromDataType].Add(value);
+                    }
                 }
             }
 
-            // Вернём матрицу
+            // Возвращяем матрицу
             return changeoverTime;
         }
 
         /// <summary>
         /// Функция вернёт матриц времени переналадки
         /// </summary>
-        /// <returns>Матрица переналадки</returns>
+        /// <returns>Словарь матриц переналадки</returns>
+        /// <exception cref="ArgumentException">Данные в таблице вышли за пределы</exception>
+        /// <exception cref="IndexOutOfRangeException">Количество строк или столбцов некорректны</exception>
         private Dictionary<int, List<List<int>>> GetChangeoverTimeDict()
         {
 
@@ -1499,8 +1564,19 @@ namespace newAlgorithm
             // Объявляем и инициализируем количество типов данных
             int DataType = Convert.ToInt32(numeric_data_types_count.Value);
 
-            // Объявляем матрицу времени переналадки
+            // Проверяем количество строк
+            if (dataGridView_changeover_time.RowCount != Device * DataType)
+                throw new IndexOutOfRangeException($"Count of row in DataGridView changeoverTime must be {Device * DataType}");
+
+            // Проверяем количество столбцов
+            if (dataGridView_changeover_time.ColumnCount != DataType)
+                throw new IndexOutOfRangeException($"Count of column in DataGridView changeoverTime must be {DataType}");
+
+            // Объявляем словарь матриц времени переналадки
             Dictionary<int, List<List<int>>> changeoverTime = new Dictionary<int, List<List<int>>>(Device);
+
+            // Объявляем значение ячейки
+            int value;
 
             // Для каждого прибора
             for (var device = 0; device < Device; device++)
@@ -1518,13 +1594,21 @@ namespace newAlgorithm
 
                     // Для каждого типа данных
                     for (var toDataType = 0; toDataType < DataType; toDataType++)
+                    {
+                        // Получаем значение ячейки
+                        value = Convert.ToInt32(dataGridView_changeover_time.Rows[device * DataType + fromDataType].Cells[toDataType].Value);
 
-                        // Добавляем значения в матрицу
-                        changeoverTime[device][fromDataType].Add(Convert.ToInt32(dataGridView_changeover_time.Rows[device * DataType + fromDataType].Cells[toDataType].Value));
+                        // Проверяем диапазон данных
+                        if (value < minTimesValue || value > maxTimesValue)
+                            throw new ArgumentException($"The value in DataGridView changeoverTime by row {(device * DataType + fromDataType) + 1} and column {toDataType + 1} must be between [{minTimesValue}, {maxTimesValue}]");
+
+                        // Добавляем значения в матриц из словаря
+                        changeoverTime[device][fromDataType].Add(value);
+                    }
                 }
             }
 
-            // Вернём матрицу
+            // Возвращяем словарь матриц переналадки
             return changeoverTime;
         }
 
@@ -1561,17 +1645,41 @@ namespace newAlgorithm
         /// Функция вернёт длительности ПТО
         /// </summary>
         /// <returns>Вектори длительностей ПТО</returns>
+        /// <exception cref="ArgumentException">Данные в таблице вышли за пределы</exception>
+        /// <exception cref="IndexOutOfRangeException">Количество строк или столбцов некорректны</exception>
         private List<int> GetPreMaintenanceTimes()
         {
 
+            // Объявляем и инициализируем количество приборов
+            int Device = Convert.ToInt32(numeric_device_count.Value);
+
+            // Проверяем количество строк
+            if (dataGridView_pre_maintenance.RowCount != Device)
+                throw new IndexOutOfRangeException($"Count of row in DataGridView PreMaintenanceTimes must be {Device}");
+
+            // Проверяем количество столбцов
+            if (dataGridView_pre_maintenance.ColumnCount != 1)
+                throw new IndexOutOfRangeException($"Count of column in DataGridView PreMaintenanceTimes must be {1}");
+
             // Объявляем вектор длительностей ПТО
-            List<int> preMaintenanceTimes = new List<int>(dataGridView_pre_maintenance.RowCount);
+            List<int> preMaintenanceTimes = new List<int>(Device);
+
+            // Объявляем значение ячейки
+            int value;
 
             // Для каждого прибора
-            for (int device = 0; device < dataGridView_pre_maintenance.RowCount; device++)
+            for (int device = 0; device < Device; device++)
+            {
+                // Получаем значение ячейки
+                value = Convert.ToInt32(dataGridView_pre_maintenance.Rows[device].Cells[0].Value);
 
-                // Считываем матрицу длительностей ПТО
-                preMaintenanceTimes.Add(Convert.ToInt32(dataGridView_pre_maintenance.Rows[device].Cells[0].Value));
+                // Проверяем диапазон данных
+                if (value <= minTimesValue || value > maxTimesValue)
+                    throw new ArgumentException($"The value in DataGridView PreMaintenanceTimes by row {(device) + 1} and column {1} must be between ({minTimesValue}, {maxTimesValue}]");
+
+                // Устанавливаем значение вектора длительностей ПТО
+                preMaintenanceTimes.Add(value);
+            }
 
             // Вовзращяем вектор длительностей ПТО
             return preMaintenanceTimes; 
@@ -1607,17 +1715,42 @@ namespace newAlgorithm
         /// Функция вернёт вектор интенсивности восстановления
         /// </summary>
         /// <returns>Вектор интенсивности восстановления</returns>
+        /// <exception cref="ArgumentException">Данные в таблице вышли за пределы</exception>
+        /// <exception cref="IndexOutOfRangeException">Количество строк или столбцов некорректны</exception>
         private List<double> GetRestoringDevice()
         {
 
+            // Объявляем и инициализируем количество приборов
+            int Device = Convert.ToInt32(numeric_device_count.Value);
+
+            // Проверяем количество строк
+            if (dataGridView_preM_restoringDevice.RowCount != Device)
+                throw new IndexOutOfRangeException($"Count of row in DataGridView restoringDevice must be {Device}");
+
+            // Проверяем количество столбцов
+            if (dataGridView_preM_restoringDevice.ColumnCount != 1)
+                throw new IndexOutOfRangeException($"Count of column in DataGridView restoringDevice must be {1}");
+
             // Объявляем вектор интенсивности восстановления
-            List<double> restoringDevice = new List<double>(Convert.ToInt32(dataGridView_preM_restoringDevice.RowCount));
+            List<double> restoringDevice = new List<double>(Device);
+
+            // Объявляем значение ячейки
+            double value;
 
             // Для каждого прибора
-            for (int device = 0; device < dataGridView_preM_restoringDevice.RowCount; device++)
+            for (int device = 0; device < Device; device++)
+            {
 
-                // Считываем вектор интенсивности восстановления
-                restoringDevice.Add(Convert.ToDouble(dataGridView_preM_restoringDevice.Rows[device].Cells[0].Value));
+                // Получаем значение в ячейке
+                value = Convert.ToDouble(dataGridView_preM_restoringDevice.Rows[device].Cells[0].Value);
+
+                // Проверяем диапазон данных
+                if (value < minProbValue || value > maxProbValue)
+                    throw new ArgumentException($"The value in DataGridView restoringDevice by row {(device) + 1} and column {1} must be between [{minProbValue}, {maxProbValue}]");
+
+                // Устанавливаем значение в вектор интенсивности восстановления
+                restoringDevice.Add(value);
+            }
 
             // Вовзращяем вектор интенсивности восстановления
             return restoringDevice;
@@ -1653,17 +1786,41 @@ namespace newAlgorithm
         /// Функция вернёт вектор интенсивности отказов
         /// </summary>
         /// <returns>Вектор интенсивности отказов</returns>
+        /// <exception cref="ArgumentException">Данные в таблице вышли за пределы</exception>
+        /// <exception cref="IndexOutOfRangeException">Количество строк или столбцов некорректны</exception>
         private List<double> GetFailureRates()
         {
 
+            // Объявляем и инициализируем количество приборов
+            int Device = Convert.ToInt32(numeric_device_count.Value);
+
+            // Проверяем количество строк
+            if (dataGridView_preM_failureRates.RowCount != Device)
+                throw new IndexOutOfRangeException($"Count of row in DataGridView failureRates must be {Device}");
+
+            // Проверяем количество столбцов
+            if (dataGridView_preM_failureRates.ColumnCount != 1)
+                throw new IndexOutOfRangeException($"Count of column in DataGridView failureRates must be {1}");
+
             // Объявляем вектор интенсивности отказов
-            List<double> failureRates= new List<double>(Convert.ToInt32(dataGridView_preM_failureRates.RowCount));
+            List<double> failureRates = new List<double>(Device);
+
+            // Объявляем значение ячейки
+            double value;
 
             // Для каждого прибора
-            for (int device = 0; device < dataGridView_preM_failureRates.RowCount; device++)
+            for (int device = 0; device < Device; device++) {
 
-                // Считываем вектор интенсивности отказов
-                failureRates.Add(Convert.ToDouble(dataGridView_preM_failureRates.Rows[device].Cells[0].Value));
+                // Получаем значение в ячейке
+                value = Convert.ToDouble(dataGridView_preM_failureRates.Rows[device].Cells[0].Value);
+
+                // Проверяем диапазон данных
+                if (value < minProbValue || value > maxProbValue)
+                    throw new ArgumentException($"The value in DataGridView failureRates by row {device + 1} and column {1} must be between [{minProbValue}, {maxProbValue}]");
+
+                // Устанавливаем значение в вектор интенсивности отказов
+                failureRates.Add(value);
+            }
 
             // Вовзращяем вектор интенсивности отказов
             return failureRates;
