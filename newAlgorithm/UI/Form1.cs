@@ -159,8 +159,23 @@ namespace newAlgorithm
             // Инициализируем вектор длиной dataTypesCount, каждый элемент которого будет равен batchCount
             List<int> batchCountList = CreateBatchCountList();
 
-            // Создаём экземпляр конфигурационной структуры
-            Config config = GetConfig();
+            // Объявляем конфигурационную структуру
+            Config config;
+
+            try {
+
+                // Получаем экземпляр конфигурационной структуры
+                config = GetConfig();
+
+            }
+            catch (Exception ex) {
+
+                // Отображаем сообщение об ошибке
+                MessageBox.Show(ex.Message, "Ошибка");
+
+                // Прекращяем обработку
+                return;
+            }
 
             // Инициализируем расписание
             Shedule.deviceCount = config.deviceCount;
@@ -1277,8 +1292,22 @@ namespace newAlgorithm
         private void GetPreMSolution_Click(object sender, EventArgs e)
         {
 
-            // Получаем экземпляр конфигурационной структуры для ПТО
-            PreMConfig preMConfig = GetPreMConfig();
+            // Объявляем конфигурационную структуру с ПТО
+            PreMConfig preMConfig;
+
+            try {
+
+                // Получаем экземпляр конфигурационной структуры для ПТО
+                preMConfig = GetPreMConfig();
+
+            } catch(Exception ex) {
+
+                // Отображаем сообщение об ошибке
+                MessageBox.Show(ex.Message, "Ошибка");
+
+                // Прекращяем обработку
+                return;
+            }
 
             // Инициализируем расписание
             Shedule.deviceCount = preMConfig.config.deviceCount;
