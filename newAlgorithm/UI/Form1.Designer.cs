@@ -38,12 +38,13 @@
             this.button2 = new System.Windows.Forms.Button();
             this.tabControl = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
-            this.button_import = new System.Windows.Forms.Button();
             this.GetPreMSolution = new System.Windows.Forms.Button();
             this.groupBox_system_setup = new System.Windows.Forms.GroupBox();
+            this.button_export = new System.Windows.Forms.Button();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.checkBox_ganta = new System.Windows.Forms.CheckBox();
             this.checkBox_visualization = new System.Windows.Forms.CheckBox();
+            this.button_import = new System.Windows.Forms.Button();
             this.checkBox_logging = new System.Windows.Forms.CheckBox();
             this.textBox2 = new System.Windows.Forms.TextBox();
             this.numeric_generation_count = new System.Windows.Forms.NumericUpDown();
@@ -91,7 +92,6 @@
             this.label6 = new System.Windows.Forms.Label();
             this.betaValue = new System.Windows.Forms.TextBox();
             this.label15 = new System.Windows.Forms.Label();
-            this.button_export = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.numeric_data_types_count)).BeginInit();
             this.tabControl.SuspendLayout();
             this.tabPage1.SuspendLayout();
@@ -118,11 +118,6 @@
             // numeric_data_types_count
             // 
             this.numeric_data_types_count.Location = new System.Drawing.Point(197, 57);
-            this.numeric_data_types_count.Maximum = new decimal(new int[] {
-            15,
-            0,
-            0,
-            0});
             this.numeric_data_types_count.Minimum = new decimal(new int[] {
             1,
             0,
@@ -231,16 +226,6 @@
             this.tabPage1.Text = "Установка параметров";
             this.tabPage1.UseVisualStyleBackColor = true;
             // 
-            // button_import
-            // 
-            this.button_import.Location = new System.Drawing.Point(267, 29);
-            this.button_import.Name = "button_import";
-            this.button_import.Size = new System.Drawing.Size(75, 23);
-            this.button_import.TabIndex = 43;
-            this.button_import.Text = "Импорт";
-            this.button_import.UseVisualStyleBackColor = true;
-            this.button_import.Click += new System.EventHandler(this.button_import_Click);
-            // 
             // GetPreMSolution
             // 
             this.GetPreMSolution.Location = new System.Drawing.Point(542, 395);
@@ -290,6 +275,16 @@
             this.groupBox_system_setup.TabStop = false;
             this.groupBox_system_setup.Text = "Настройки системы";
             // 
+            // button_export
+            // 
+            this.button_export.Location = new System.Drawing.Point(267, 58);
+            this.button_export.Name = "button_export";
+            this.button_export.Size = new System.Drawing.Size(75, 23);
+            this.button_export.TabIndex = 44;
+            this.button_export.Text = "Экспорт";
+            this.button_export.UseVisualStyleBackColor = true;
+            this.button_export.Click += new System.EventHandler(this.button_export_Click);
+            // 
             // groupBox1
             // 
             this.groupBox1.Controls.Add(this.checkBox_ganta);
@@ -323,6 +318,16 @@
             this.checkBox_visualization.Text = "Отображение в EXCEL";
             this.checkBox_visualization.UseVisualStyleBackColor = true;
             this.checkBox_visualization.CheckedChanged += new System.EventHandler(this.CheckBox_visualization_CheckedChanged);
+            // 
+            // button_import
+            // 
+            this.button_import.Location = new System.Drawing.Point(267, 29);
+            this.button_import.Name = "button_import";
+            this.button_import.Size = new System.Drawing.Size(75, 23);
+            this.button_import.TabIndex = 43;
+            this.button_import.Text = "Импорт";
+            this.button_import.UseVisualStyleBackColor = true;
+            this.button_import.Click += new System.EventHandler(this.button_import_Click);
             // 
             // checkBox_logging
             // 
@@ -435,11 +440,6 @@
             // numeric_device_count
             // 
             this.numeric_device_count.Location = new System.Drawing.Point(197, 160);
-            this.numeric_device_count.Maximum = new decimal(new int[] {
-            15,
-            0,
-            0,
-            0});
             this.numeric_device_count.Minimum = new decimal(new int[] {
             1,
             0,
@@ -477,6 +477,11 @@
             // numeric_max_proccessing_time
             // 
             this.numeric_max_proccessing_time.Location = new System.Drawing.Point(197, 108);
+            this.numeric_max_proccessing_time.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
             this.numeric_max_proccessing_time.Name = "numeric_max_proccessing_time";
             this.numeric_max_proccessing_time.Size = new System.Drawing.Size(45, 20);
             this.numeric_max_proccessing_time.TabIndex = 39;
@@ -502,6 +507,11 @@
             // numeric_batch_count
             // 
             this.numeric_batch_count.Location = new System.Drawing.Point(197, 32);
+            this.numeric_batch_count.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
             this.numeric_batch_count.Name = "numeric_batch_count";
             this.numeric_batch_count.Size = new System.Drawing.Size(45, 20);
             this.numeric_batch_count.TabIndex = 37;
@@ -537,6 +547,11 @@
             // numeric_max_changeover_time
             // 
             this.numeric_max_changeover_time.Location = new System.Drawing.Point(197, 83);
+            this.numeric_max_changeover_time.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
             this.numeric_max_changeover_time.Name = "numeric_max_changeover_time";
             this.numeric_max_changeover_time.Size = new System.Drawing.Size(45, 20);
             this.numeric_max_changeover_time.TabIndex = 38;
@@ -592,11 +607,6 @@
             // numeric_buffer
             // 
             this.numeric_buffer.Location = new System.Drawing.Point(197, 134);
-            this.numeric_buffer.Maximum = new decimal(new int[] {
-            15,
-            0,
-            0,
-            0});
             this.numeric_buffer.Minimum = new decimal(new int[] {
             1,
             0,
@@ -708,7 +718,7 @@
             this.tableLayoutPanel.Size = new System.Drawing.Size(1410, 829);
             this.tableLayoutPanel.TabIndex = 23;
             // 
-            // dataGridView_proccessing_time
+            // dataGridView_processing_time
             // 
             this.dataGridView_processing_time.AllowUserToAddRows = false;
             this.dataGridView_processing_time.AllowUserToDeleteRows = false;
@@ -717,7 +727,7 @@
             this.tableLayoutPanel.SetColumnSpan(this.dataGridView_processing_time, 2);
             this.dataGridView_processing_time.Dock = System.Windows.Forms.DockStyle.Fill;
             this.dataGridView_processing_time.Location = new System.Drawing.Point(3, 85);
-            this.dataGridView_processing_time.Name = "dataGridView_proccessing_time";
+            this.dataGridView_processing_time.Name = "dataGridView_processing_time";
             this.dataGridView_processing_time.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.AutoSizeToAllHeaders;
             this.tableLayoutPanel.SetRowSpan(this.dataGridView_processing_time, 2);
             this.dataGridView_processing_time.Size = new System.Drawing.Size(464, 573);
@@ -934,16 +944,6 @@
             this.label15.Size = new System.Drawing.Size(31, 82);
             this.label15.TabIndex = 32;
             this.label15.Text = "beta:";
-            // 
-            // button_export
-            // 
-            this.button_export.Location = new System.Drawing.Point(267, 58);
-            this.button_export.Name = "button_export";
-            this.button_export.Size = new System.Drawing.Size(75, 23);
-            this.button_export.TabIndex = 44;
-            this.button_export.Text = "Экспорт";
-            this.button_export.UseVisualStyleBackColor = true;
-            this.button_export.Click += new System.EventHandler(this.button_export_Click);
             // 
             // Form1
             // 
