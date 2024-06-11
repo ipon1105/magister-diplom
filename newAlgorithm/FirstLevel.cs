@@ -382,7 +382,7 @@ namespace newAlgorithm
                 if (Form1.loggingOn)
 
                     // Задаём новое имя файла для записи
-                    schedule.SetLogFile($"{logFileNamePrefix}_{compositionNumber}.log");
+                    schedule.SetLogFile($"{logFileNamePrefix}_{compositionNumber}.log.json");
 
                 // Если построение расписание прошло успешно
                 if (schedule.Build(tempM))
@@ -1352,7 +1352,6 @@ namespace newAlgorithm
 
                 // Получаем вкладки и переключаемся на неё
                 excelSheet = (Excel.Worksheet)excelApplication.Worksheets.get_Item(2);
-                excelSheet.Activate();
 
                 // Устанавливаем имя вкладки
                 excelSheet.Name = "Результаты";
@@ -1366,6 +1365,7 @@ namespace newAlgorithm
 
                 // Получаем вкладку с параметрами
                 metaDataSheet = (Excel.Worksheet)excelApplication.Worksheets.get_Item(3);
+                metaDataSheet.Activate();
 
                 // Устанавливаем имя вкладки
                 metaDataSheet.Name = "Промежуточные данные";
@@ -1389,7 +1389,7 @@ namespace newAlgorithm
                     if (Form1.loggingOn)
 
                         // Задаём новое имя файла для записи
-                        schedule.SetLogFile($"{logFileNamePrefix}_{compositionNumber}.log");
+                        schedule.SetLogFile($"{logFileNamePrefix}_{compositionNumber}.log.json");
 
                     // Если построение расписание выполнено удачно
                     if (schedule.Build(PrimeMatrixA))
@@ -1437,7 +1437,7 @@ namespace newAlgorithm
                 if (Form1.loggingOn)
 
                     // Задаём новое имя файла для записи
-                    schedule.SetLogFile($"{logFileNamePrefix}_{compositionNumber}.log");
+                    schedule.SetLogFile($"{logFileNamePrefix}_{compositionNumber}.log.json");
 
                 // Вызываем расчёты
                 if (schedule.Build(PrimeMatrixA)) {
@@ -1573,7 +1573,7 @@ namespace newAlgorithm
                                 if (Form1.loggingOn)
 
                                     // Задаём новое имя файла для записи
-                                    schedule.SetLogFile($"{logFileNamePrefix}_{compositionNumber}.log");
+                                    schedule.SetLogFile($"{logFileNamePrefix}_{compositionNumber}.log.json");
 
                                 // Если расписание построилось не успешно
                                 if (!schedule.Build(tempA))
@@ -1673,6 +1673,34 @@ namespace newAlgorithm
                 // Проверяем успешность работы программы
                 if (f1Optimal == int.MaxValue)
                 {
+                    // Если визуализация включена
+                    if (Form1.vizualizationOn)
+                    {
+                        try
+                        {
+                            ((Excel.Worksheet)excelApplication.Worksheets.get_Item(1)).SaveAs($"{logFileNamePrefix}_worksheet_1");
+                        }
+                        catch (Exception e)
+                        {
+                            MessageBox.Show($"Не удалось сохранить файл \"{logFileNamePrefix}_worksheet_1\"");
+                        }
+                        try
+                        {
+                            ((Excel.Worksheet)excelApplication.Worksheets.get_Item(2)).SaveAs($"{logFileNamePrefix}_worksheet_2");
+                        }
+                        catch (Exception e)
+                        {
+                            MessageBox.Show($"Не удалось сохранить файл \"{logFileNamePrefix}_worksheet_2\"");
+                        }
+                        try
+                        {
+                            ((Excel.Worksheet)excelApplication.Worksheets.get_Item(3)).SaveAs($"{logFileNamePrefix}_worksheet_3");
+                        }
+                        catch (Exception e)
+                        {
+                            MessageBox.Show($"Не удалось сохранить файл \"{logFileNamePrefix}_worksheet_3\"");
+                        }
+                    }
                     MessageBox.Show("Решения не было найдено");
                     return;
                 }
@@ -1690,6 +1718,34 @@ namespace newAlgorithm
                     Chart chart = (Chart)charts.Chart;
                     chart.SetSourceData(r);
                     chart.ChartType = XlChartType.xlLine;
+
+                    if (Form1.vizualizationOn)
+                    {
+                        try
+                        {
+                            ((Excel.Worksheet)excelApplication.Worksheets.get_Item(1)).SaveAs($"{logFileNamePrefix}_worksheet_1");
+                        }
+                        catch (Exception e)
+                        {
+                            MessageBox.Show($"Не удалось сохранить файл \"{logFileNamePrefix}_worksheet_1\"");
+                        }
+                        try
+                        {
+                            ((Excel.Worksheet)excelApplication.Worksheets.get_Item(2)).SaveAs($"{logFileNamePrefix}_worksheet_2");
+                        }
+                        catch (Exception e)
+                        {
+                            MessageBox.Show($"Не удалось сохранить файл \"{logFileNamePrefix}_worksheet_2\"");
+                        }
+                        try
+                        {
+                            ((Excel.Worksheet)excelApplication.Worksheets.get_Item(3)).SaveAs($"{logFileNamePrefix}_worksheet_3");
+                        }
+                        catch (Exception e)
+                        {
+                            MessageBox.Show($"Не удалось сохранить файл \"{logFileNamePrefix}_worksheet_3\"");
+                        }
+                    }
                 }
 
                 // Логируем лучший критерий f1
