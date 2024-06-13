@@ -59,6 +59,70 @@ namespace magisterDiplom.Fabric
             fstream = null;
         }
 
+        public string GetMatrixByString(List<List<int>> matrix, string prefix = "")
+        {
+            // Объявляем и вычисляем количество символов для отрисовки значения матрицы
+            int charLen = (int)(Math.Log10(matrix.Max(row => row.Max()))) + 1;
+
+            // Cоздаём экземпляр класса для работы со строками
+            StringBuilder stringBuilder = new StringBuilder(
+
+                // Вычисляем количество символов необходимое для отрисовки значений матрицы
+                matrix.Select(row => row.Count).Sum() * charLen +
+
+                // Количество разделителей между элементами матрицы в строке
+                matrix.Select(row => (row.Count + 1)).Sum() +
+
+                // Количество разделительных символов между строками данных
+                matrix.Select(row => (row.Count * charLen) + row.Count + 1).Sum() +
+
+                // Разделитель в конце
+                matrix.Last().Count * charLen + matrix.Last().Count + 1 +
+
+                // Количество символов для префикса
+                (matrix.Count + 1) * prefix.Length +
+
+                // Количество символов перевода строки
+                (matrix.Count * 2 + 1) * (Environment.NewLine).Length
+            );
+
+            // Для каждой строки
+            for (int i = 0; i < matrix.Count; i++)
+            {
+
+                // Добавляем в строку префикс
+                stringBuilder.Append(prefix);
+
+                // Добавляем межстрочный разделитель
+                for (int j = 0; j < matrix[i].Count; j++)
+                    stringBuilder.Append("+".PadRight(charLen + 1, '-'));
+                stringBuilder.AppendLine("+");
+
+                // Добавляем в строку префикс
+                stringBuilder.Append(prefix);
+
+                // Для каждого столбца
+                for (int j = 0; j < matrix[i].Count; j++)
+
+                    // Добавляем в строку данные
+                    stringBuilder.Append(string.Format("|{0}", $"{matrix[i][j]}".PadRight(charLen)));
+
+                // Добавляем в текст перевод строки
+                stringBuilder.AppendLine("|");
+            }
+
+            // Добавляем в строку префикс
+            stringBuilder.Append(prefix);
+
+            // Добавляем межстрочный разделитель
+            for (int j = 0; j < matrix.Last().Count; j++)
+                stringBuilder.Append("+".PadRight(charLen + 1, '-'));
+            stringBuilder.AppendLine("+");
+
+            // Возвращяем строку
+            return stringBuilder.ToString(); 
+        }
+
         /// <summary>
         /// Выполнит запись матрицы в файл
         /// </summary>

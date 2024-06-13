@@ -1312,11 +1312,18 @@ namespace newAlgorithm
         public void GenetateSolutionWithPremaintenance(string fileName, PreMConfig preMConfig)
         {
 
+            // Путь до текущей директории
+            string path = Environment.CurrentDirectory;
+            
             // Устанавливам номер строки
             int helpRowNumber = 1;
 
             // Формируем имя файла
             logFileNamePrefix = $"{DateTime.Now.Day}_{DateTime.Now.Month}_{DateTime.Now.Year}_{DateTime.Now.Hour}_{DateTime.Now.Minute}";
+            
+            DirectoryInfo dirInfo = new DirectoryInfo(path);
+            dirInfo.CreateSubdirectory($@"{logFileNamePrefix}");
+            logFileNamePrefix += "/" + logFileNamePrefix;
 
             // Инициализируем значения
             compositionNumber = 1;
@@ -1375,7 +1382,7 @@ namespace newAlgorithm
             f1Optimal = int.MaxValue;
             f1Current = int.MaxValue;
 
-            using (var file = new StreamWriter(fileName))
+            using (var file = new StreamWriter($"{logFileNamePrefix}_{fileName}.log"))
             {
 
                 // Создаём экземпляр класса для работы с нижним уровнем
@@ -1750,6 +1757,7 @@ namespace newAlgorithm
 
                 // Логируем лучший критерий f1
                 file.WriteLine(f1Optimal);
+                file.WriteLine(schedule.GetMatrixByString(schedule.GetMatrixY()));
                 file.Close();
                 MessageBox.Show("Решения найдены");
 
