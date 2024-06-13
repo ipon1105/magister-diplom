@@ -708,8 +708,63 @@ namespace newAlgorithm
         /// <param name="e"></param>
         private void SetsBtn_Click(object sender, EventArgs e)
         {
+            List<int> dataTypesCount_list = new List<int>{ 4, 6 };
+            List<List<int>> preMaintenanceTimes_list = new List<List<int>> {
+                new List<int>{ 4, 4, 2, 1, 1 },
+                new List<int>{ 2, 2, 1, 1, 2 },
+                new List<int>{ 8, 4, 4, 1, 2 }
+            };
+            List<List<double>> failureRates_list = new List<List<double>> {
+                new List<double>{ 0.009, 0.008, 0.007, 0.006, 0.005 },
+                new List<double>{ 0.005, 0.006, 0.007, 0.008, 0.009 },
+                new List<double>{ 0.007, 0.007, 0.007, 0.007, 0.007 },
+            };
+            List<List<double>> restoringDevice_list = new List<List<double>> {
+                new List<double>{ 0.80, 0.78, 0.76, 0.74, 0.72 },
+                new List<double>{ 0.72, 0.74, 0.76, 0.78, 0.80 },
+                new List<double>{ 0.76, 0.76, 0.76, 0.76, 0.76 },
+            };
+            List<double> beta_list = new List<double> { 0.9, 0.95, 0.965, 0.98 };
 
-        }
+            int deviceCount = 5;
+            int buffer = 100;
+
+            foreach (int dataTypesCount in dataTypesCount_list)
+            foreach (List<int> preMaintenanceTimes in preMaintenanceTimes_list)
+            foreach (List<double> failureRates in failureRates_list)
+            foreach (List<double> restoringDevice in restoringDevice_list)
+            foreach (double beta in beta_list)
+            {
+
+                Config config = new Config(
+                    dataTypesCount,
+                    deviceCount,
+                    buffer,
+                    OldProccessingTimeGenerator(10, deviceCount, dataTypesCount),
+                    Config.ChangeoverTimeConverter(OldChangeoverTimeGenerator(10, deviceCount, dataTypesCount)),
+                    true,
+                    12
+                );
+
+                // Объявляем конфигурационную структуру с ПТО
+                PreMConfig preMConfig = new PreMConfig(
+                    config,
+                    preMaintenanceTimes,
+                    failureRates,
+                    restoringDevice,
+                    beta
+                );
+
+                // Инициализируем вектор длиной dataTypesCount, каждый элемент которого будет равен batchCount
+                List<int> batchCountList = CreateBatchCountList(12, dataTypesCount);
+
+                // Формируем первый уровень
+                var firstLevel = new FirstLevel(preMConfig.config, batchCountList);
+
+                // Выполняем генерацию данных для всех типов вторым алгоритмом
+                firstLevel.GenetateSolutionWithPremaintenance("PreMaintenance", preMConfig);
+            }
+        }   
 
         #endregion
 
@@ -1158,7 +1213,7 @@ namespace newAlgorithm
         private List<List<int>> OldProccessingTimeGenerator(int _maxChangeoverTime, int _deviceCount, int _dataTypesCount)
         {
             // Объявляем переменную для хранения матрицы времени выполнения заданий
-            List<List<int>> _proccessingTime = new List<List<int>>();
+            List<List<int>> _proccessingTime = new List<List<int>>(_deviceCount);
 
             // Инициализируем переменную для генерации данных
             int count = 0;
@@ -1168,11 +1223,11 @@ namespace newAlgorithm
             {
 
                 // Выполняем инициализацию матрицы
-                _proccessingTime.Add(new List<int>());
+                _proccessingTime.Add(new List<int>(_dataTypesCount));
 
                 // Для каждого типа данных выполняем генерацию
                 for (var dataType = 0; dataType < _dataTypesCount; dataType++)
-                    _proccessingTime[device].Add((count++ % 2 == 0) ? 2 : _maxChangeoverTime);
+                    _proccessingTime[device].Add((count++ % 2 == 0) ? (_maxChangeoverTime / 2) : _maxChangeoverTime);
             }
 
             // Возвращаем матрицу времён выполнения
@@ -1209,10 +1264,11 @@ namespace newAlgorithm
 
                     // Для каждого типа данных выполняем генерацию
                     for (var col_dataType = 0; col_dataType < _dataTypesCount; col_dataType++)
-                        _changeoverTime[device][row_dataType].Add((count % 2 == 0) ? 2 : _maxChangeoverTime);
+                        if (row_dataType == col_dataType)
+                            _changeoverTime[device][row_dataType].Add(0);
+                        else
+                            _changeoverTime[device][row_dataType].Add((count++ % 2 == 0) ? (_maxChangeoverTime / 2) : _maxChangeoverTime);
 
-                    // Увеличиваем счётчик
-                    count++;
                 }
             }
 

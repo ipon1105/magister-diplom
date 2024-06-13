@@ -1320,10 +1320,11 @@ namespace newAlgorithm
 
             // Формируем имя файла
             logFileNamePrefix = $"{DateTime.Now.Day}_{DateTime.Now.Month}_{DateTime.Now.Year}_{DateTime.Now.Hour}_{DateTime.Now.Minute}";
-            
-            DirectoryInfo dirInfo = new DirectoryInfo(path);
-            dirInfo.CreateSubdirectory($@"{logFileNamePrefix}");
-            logFileNamePrefix += "/" + logFileNamePrefix;
+
+            int crutch = 0;
+            while (Directory.Exists($"{logFileNamePrefix}_{crutch}")) crutch++;
+            (new DirectoryInfo(path)).CreateSubdirectory($@"{logFileNamePrefix}_{crutch}");
+            logFileNamePrefix += $"_{crutch}/" + logFileNamePrefix;
 
             // Инициализируем значения
             compositionNumber = 1;
@@ -1332,7 +1333,7 @@ namespace newAlgorithm
 
             // Инициализируем объект для работы с Excel
             excelApplication = null;
-
+            
             // Инициализируем владки для работы с Excel
             excelSheet = null; metaDataSheet = null;
 
@@ -1384,6 +1385,9 @@ namespace newAlgorithm
 
             using (var file = new StreamWriter($"{logFileNamePrefix}_{fileName}.log"))
             {
+
+                // Выводим параметры системы
+                file.WriteLine(preMConfig.ToString());
 
                 // Создаём экземпляр класса для работы с нижним уровнем
                 SimplePreMSchedule schedule = new SimplePreMSchedule(config, preMConfig);
@@ -1708,7 +1712,9 @@ namespace newAlgorithm
                             MessageBox.Show($"Не удалось сохранить файл \"{logFileNamePrefix}_worksheet_3\"");
                         }
                     }
-                    MessageBox.Show("Решения не было найдено");
+                    file.WriteLine("Решения нет");
+
+                    // MessageBox.Show("Решения не было найдено");
                     return;
                 }
 
@@ -1759,7 +1765,7 @@ namespace newAlgorithm
                 file.WriteLine(f1Optimal);
                 file.WriteLine(schedule.GetMatrixByString(schedule.GetMatrixY()));
                 file.Close();
-                MessageBox.Show("Решения найдены");
+                // MessageBox.Show("Решения найдены");
 
             }
         }
